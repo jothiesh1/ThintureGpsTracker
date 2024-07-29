@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thinture Fleet Dashboard</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+       body {
+    font-family: Arial, sans-serif;
+    background-color:white;
+    margin: 0;
+    padding: 0;
+}
+.container{
+
+
+font-size: 10px;
+
+
+
+
+}
+.navbar {
+    background-color: lightgray;
+    color: white;
+    padding: 10px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px; /* Adjust as needed */
+    margin: 0 auto;
+    height: 45px;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-brand img {
+    height: 30px;
+    margin-right: 10px;
+}
+
+.navbar-menu, .navbar-end {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-menu a, .navbar-end a {
+    color: white;
+    text-decoration: none;
+    margin-left: 15px;
+}
+
+.navbar-menu a:hover, .navbar-end a:hover {
+    text-decoration: underline;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.container {
+    padding: 20px;
+}
+
+.verification {
+    background-color: #f1f1f1;
+    padding: 10px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.verify-btn {
+    background-color: #3f51b5;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.dashboard {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    flex: 1;
+    min-width: 200px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.card h2 {
+    margin: 0;
+    font-size: 3em;
+    color: #3f51b5;
+}
+
+.card p {
+    margin: 5px 0;
+}
+
+.stat {
+    color: green;
+}.cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.card {
+    background-color: #047A0B;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    color: white;
+    width: calc(33% - 20px); /* Adjust width for 3 cards per row */
+    min-width: 200px; /* Minimum width for responsiveness */
+}
+
+.card:hover {
+    background-color: #036A09;
+}
+
+.card h3 {
+    margin: 0 0 10px;
+    font-size: 1.2em;
+}
+
+.card p {
+    margin: 5px 0;
+}
+
+
+        .cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.card {
+    background-color: #047A0B;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    color: white;
+    width: calc(33% - 20px); /* Adjust width for 3 cards per row */
+    min-width: 200px; /* Minimum width for responsiveness */
+}
+
+.card:hover {
+    background-color: #036A09;
+}
+
+.card h3 {
+    margin: 0 0 10px;
+    font-size: 1.2em;
+}
+
+.card p {
+    margin: 5px 0;
+}
+
+        #map {
+            width: 100%;
+            height: 400px;
+            margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .new-section {
+            background-color: #0c4a1c;
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+        .tabs {
+            display: flex;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .tabs div {
+            padding: 10px 20px;
+            background-color: #4B9CD3;
+            color: white;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        .tabs div.active {
+            background-color: white;
+            color: #4B9CD3;
+            border-bottom: 2px solid white;
+        }
+        .tab-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 0 5px 5px 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .card-user
+        {
+             width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 5px;
+        }
+        .navbar-logo{
+            width:160px;
+            height: 60px;
+        }
+          .form-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            flex: 1;
+            margin-right: 10px;
+            text-align: right;
+        }
+        .form-group input {
+            flex: 2;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .tab-content {
+            padding: 20px;
+        }
+        .tab-content h3 {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="THINTURE_IMAGE/logo2.jpg" alt="THINTURE Logo" class="navbar-logo">
+    </div>
+     <div class="navbar">
+        <a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="#"><i class="fas fa-map"></i> Map</a>
+        <div class="dropdown">
+            <a href="#"><i class="fas fa-th-large"></i> View</a>
+            <div class="dropdown-content">
+                <a href="total-users.html">Users</a>
+                <a href="#">Vehicle</a>
+                <a href="#">Calendar</a>
+            </div>
+        </div>
+         <div class="dropdown">
+        <a href="#"><i class="fas fa-th-large"></i> Utility</a>
+        <div class="dropdown-content">
+                <a href="#">Support & Feedback</a>
+                <a href="#">Announcement</a>
+                <a href="#">Send Notification</a>
+            </div>
+        </div>
+          <div class="dropdown">
+        <a href="#"><i class="fas fa-th-large"></i> Accounts</a>
+        <div class="dropdown-content">
+                <a href="#">Renewal</a>
+                
+               
+            </div>
+        </div>
+        <a href="#"><i class="fas fa-th-large"></i>Profile</a>
+    </div>
+        
+    </div>
+   <div class="container">
+    <div class="dashboard-header">
+        <p> Users</p>
+    </div>
+    <div class="cards">
+        <a href="total-vehicles.html" class="card">
+            <h3>Total Vehicles</h3>
+            <p>11</p>
+            <p>2 New This Month</p>
+        </a>
+        <a href="total-users.html" class="card">
+            <h3>All Users</h3>
+            <p>1</p>
+            <p>0 New This Month</p>
+        </a>
+        <a href="total-expire.html" class="card">
+            <h3>Vehicle Expiring</h3>
+            <p>0</p>
+            <p>0 in next 30 days</p>
+        </a>
+        <a href="javascript:void(0);" class="card" onclick="openAddPage('addAdmin')">
+            <h3>Add Admin</h3>
+        </a>
+        <a href="javascript:void(0);" class="card" onclick="openAddPage('addDealer')">
+            <h3>Add Dealer</h3>
+        </a>
+        <a href="javascript:void(0);" class="card" onclick="openAddPage('addUser')">
+            <h3>Add User</h3>
+        </a>
+    </div>
+        <div id="add-section" style="display:none;">
+            <div class="tabs">
+              
+                <button class="close-btn" onclick="closeAddSection()">Close</button>
+            </div>
+            <div id="addAdmin" class="tab-content card-user">
+                <h3>Add Admin</h3>
+                <form>
+                     <div class="form-group">
+                    <label for="newUserName">Name</label>
+                    <input type="text" class="form-control" id="newUserName" required><br><br>
+                </div>
+                 <div class="form-group">
+                    <label for="newUserEmail">Email</label>
+                    <input type="email" class="form-control" id="newUserEmail" required><br><br>
+                </div>
+                 <div class="form-group">
+                    <label for="Address">Address</label>
+                    <input type="text" class="form-control" id="Address" required><br><br>
+                </div>
+                 <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="text" class="form-control" id="phone" required><br><br>
+                </div>
+                 <div class="form-group">
+                    <label for="Country">Country</label>
+                    <input type="text" class="form-control" id="Country" required><br><br>
+                </div>
+                 <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" required><br><br>
+                </div>
+                 <div class="form-group">
+                    <label for="confirm">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirm" required><br><br>
+                </div>
+                    <button type="submit">Add Admin</button>
+                </form>
+            </div>
+            <div id="addDealer" class="tab-content card-user" style="display:none;">
+                <h3>Add Dealer</h3>
+                <form>
+                     <div class="form-group">
+                    <label for="newUserName">Name</label>
+                    <input type="text" class="form-control" id="newUserName" required><br><br>
+                </div>
+                 <div class="form-group">
+                    <label for="newUserEmail">Email</label>
+                    <input type="email" class="form-control" id="newUserEmail" required><br><br>
+                  </div>
+                   <div class="form-group">
+                    <label for="Address">Address</label>
+                    <input type="text" class="form-control" id="Address" required><br><br>
+                </div>
+                 <div class="form-group">
+
+                    <label for="phone">Phone</label>
+                    <input type="text" class="form-control" id="phone" required><br><br>
+                </div>
+                 <div class="form-group">
+
+                    <label for="Country">Country</label>
+                    <input type="text" class="form-control" id="Country" required><br><br>
+                </div>
+                 <div class="form-group">
+
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" required><br><br>
+                </div>
+                 <div class="form-group">
+
+                    <label for="confirm">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirm" required><br><br>
+                </div>
+
+
+                    <button type="submit">Add Dealer</button>
+                </form>
+            </div>
+            <div id="addUser" class="tab-content card-user" style="display:none;">
+                <h3>Add Users</h3>
+                <form>
+                     <div class="form-group">
+                    <label for="newUserName">Name</label>
+                    <input type="text" class="form-control" id="newUserName" required><br><br>
+                </div>
+                     <div class="form-group">
+                    <label for="newUserEmail">Email</label>
+                    <input type="email" class="form-control" id="newUserEmail" required><br><br>
+                </div>
+                 <div class="form-group">
+                    <label for="Address">Address</label>
+                    <input type="text" class="form-control" id="Address" required><br><br>
+                </div>
+                 <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="text" class="form-control" id="phone" required><br><br>
+                </div>
+                 <div class="form-group">
+                    <label for="Country">Country</label>
+                    <input type="text" class="form-control" id="Country" required><br><br>
+                </div>
+                 <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" required><br><br>
+                </div>
+                 <div class="form-group">
+                    <label for="confirm">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirm" required><br><br>
+                </div>
+                    <button type="submit">Add User</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        function openAddPage(section) {
+            document.getElementById('add-section').style.display = 'block';
+            openTab(event, section);
+        }
+
+        function closeAddSection() {
+            document.getElementById('add-section').style.display = 'none';
+        }
+
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tab");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+    </script>
+    <footer>
+        <ul>
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="terms.html">Terms of Service</a></li>
+            <li><a href="newsletter.html">Newsletter Signup</a></li>
+        </ul>
+        <p>&copy; 2024 GPS Tracking Company. All rights reserved.</p>
+    </footer>
+</body>
+</html>
