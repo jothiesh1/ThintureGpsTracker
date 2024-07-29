@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fleet Thinture</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <style>
+        /* CSS styles */
+        body {
+            background-color: #047A0B;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+        .left-section, .right-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            margin: 10px;
+        }
+        .left-section {
+            flex: 2;
+        }
+        .header img {
+            height: 60px;
+            width: 190px;
+        }
+        .header p {
+            color: #047A0B;
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+        .content {
+            margin-top: 20px;
+        }
+        .main-image {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        .content p.title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .content p.description {
+            font-size: 1.1em;
+            color: #555;
+        }
+        .login-container {
+            text-align: center;
+        }
+        .login-container h2 {
+            color: #047A0B;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+        .login-container p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        .login-container label {
+            display: block;
+            text-align: left;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .login-container input,
+        .login-container select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        .login-container button {
+            width: 100%;
+            padding: 15px;
+            background-color: #047A0B;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .login-container button:hover {
+            background-color: #036A09;
+        }
+        .forgot-password {
+            display: block;
+            text-align: right;
+            margin-top: 10px;
+            color: #047A0B;
+            text-decoration: none;
+        }
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .left-section, .right-section {
+                width: 100%;
+                margin: 10px 0;
+            }
+        }
+        .input {
+            width: 210px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-section">
+            <div class="header">
+                <img src="THINTURE_IMAGE/logot.jpg" alt="THINTURE Logo" class="navbar-logo">
+                <p>Stop Searching for Self-Hosted GPS Software</p>
+            </div>
+            <div class="content">
+                <img src="THINTURE_IMAGE/first.jpg" alt="Car" class="main-image"/>
+                <p class="title">Logistics</p>
+                <p class="description">Automate your business through cutting-edge IoT automation tools</p>
+            </div>
+        </div>
+        <br><br>
+        <div class="right-section">
+            <div class="login-container">
+                <h2>Welcome to Thinture Technologies Pvt. Ltd!</h2>
+                <p>Login</p>
+                <form th:action="@{/login}" method="post">
+                    <div class="input">
+                        <label for="usertype">User Type</label>
+                        <select id="usertype" name="usertype" required>
+                            <option value="SuperAdmin">SuperAdmin</option>
+                            <option value="Admin">Admin</option>
+                            <option value="dealer">Dealer</option>
+                            <option value="user">User</option>
+                        </select>
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required>
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required>
+                        <button type="submit">Log In</button>
+                        <a href="#" class="forgot-password">Forgot Password?</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

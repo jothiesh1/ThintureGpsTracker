@@ -31,35 +31,6 @@
             align-items: center;
             gap: 10px;
         }
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #047A0B;
-            padding: 10px 20px;
-            color: white;
-        }
-        .navbar .menu {
-            display: flex;
-            gap: 20px;
-        }
-        .navbar .menu a {
-            color: white;
-            text-decoration: none;
-        }
-        .navbar .menu a:hover {
-            text-decoration: underline;
-        }
-        .navbar .user {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .navbar .user img {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-        }
         .content {
             padding: 0;
         }
@@ -72,25 +43,12 @@
     </style>
 </head>
 <body>
+    <div th:replace="fragments/navigation :: *"></div>
     <div class="header">
         <h1> Thinture Technology </h1>
-        
         <div class="right">
             <span>Revitstone Private Limited</span>
             <img src="user_icon.png" alt="User">
-        </div>
-    </div>
-    <div class="navbar">
-        <div class="menu">
-            <a href="/dashboard">Dashboard</a>
-            <a href="/map">Map</a>
-            <a href="#">Utility</a>
-            <a href="#">Accounts</a>
-            <a href="#">Settings</a>
-        </div>
-        <div class="user">
-            <img src="flag.png" alt="Flag" style="width:20px;">
-            <img src="bell.png" alt="Notifications" style="width:20px;">
         </div>
     </div>
     <div class="content">

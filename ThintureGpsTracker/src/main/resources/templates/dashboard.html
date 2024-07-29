@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thinture Fleet Dashboard</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            font-size: 14px;
+        }
+        .container {
+            padding: 20px;
+            font-size: 14px;
+        }
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+        }
+        .card {
+            background-color: #0056b3;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            color: white;
+            text-align: center;
+            height: auto;
+            max-width: 150px;
+            box-sizing: border-box;
+            display: inline-block;
+            text-decoration: none;
+        }
+        .card:hover {
+            background-color: darkblue;
+            color: ghostwhite;
+        }
+        .card h3 {
+            margin: 0;
+        }
+        .tabs {
+            display: flex;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .tabs div {
+            padding: 10px 20px;
+            background-color: darkblue;
+            color: white;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+            flex: 1;
+            text-align: center;
+            border: none;
+            outline: none;
+        }
+        .tabs div.active {
+            background-color: white;
+            color: #4b9cd3;
+            border-bottom: 2px solid white;
+        }
+        .tab-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 0 0 5px 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        .card-user {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .form-column {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .form-group input {
+            padding: 1px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 60%;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+            color: #f1f1f1;
+        }
+        .tab-content button {
+            border: 2px solid gray;
+            background-color: darkblue;
+            padding: 10px 20px;
+            margin-top: 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .tab-content button:hover {
+            background-color: orange;
+        }
+        .footer {
+            background-color: darkblue;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        .footer ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .footer ul li {
+            display: inline;
+            margin: 0 10px;
+        }
+        .footer ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        .footer ul li a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 768px) {
+            .card {
+                width: calc(100% - 20px);
+                max-width: none;
+            }
+        }
+        .close-btn {
+            background-color: darkblue;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .close-btn:hover {
+            background-color: rgb(0, 0, 64);
+        }
+        .container-header {
+            padding: 20px;
+            background-color: gray;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+        .navbar {
+            background-color: lightgray;
+            color: white;
+            padding: 10px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 120%;
+            max-width: 900px;
+            margin: 0 auto;
+            height: 55px;
+            margin-top: -30px;
+            margin-left: 210px;
+        }
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+        }
+        .navbar-brand img {
+            height: 30px;
+            margin-right: 20px;
+        }
+        .navbar-menu, .navbar-end {
+            display: flex;
+            align-items: center;
+        }
+        .navbar-menu a, .navbar-end a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+        .navbar-menu a:hover, .navbar-end a:hover {
+            text-decoration: underline;
+        }
+        h3 {
+            text-align: center;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+        .dropdown-content a {
+            color: black;
+            padding: 12px 12px;
+            text-decoration: none;
+            display: block;
+            width: 200px;
+        }
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .navbar-logo {
+            width: 160px;
+            height: 60px;
+        }
+        button {
+            background-color: rgb(0, 0, 64);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-header">
+        <div class="header">
+            <img src="THINTURE_IMAGE/logo2.jpg" alt="THINTURE Logo" class="navbar-logo">
+        </div>
+    </div>
+    <div class="navbar">
+        <a href="dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="#"><i class="fas fa-map"></i> Map</a>
+        <div class="dropdown">
+            <a href="#"><i class="fas fa-th-large"></i> View</a>
+            <div class="dropdown-content">
+                <a href="total-users.html">Users</a>
+                <a href="total-vehicles.html">Vehicle</a>
+                <a href="tracking_details.html">Tracking Details</a>
+                <a href="#">Calendar</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#"><i class="fas fa-th-large"></i> Utility</a>
+            <div class="dropdown-content">
+                <a href="#">Support & Feedback</a>
+                <a href="#">Announcement</a>
+                <a href="#">Send Notification</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#"><i class="fas fa-th-large"></i> Accounts</a>
+            <div class="dropdown-content">
+                <a href="#">Renewal</a>
+            </div>
+        </div>
+        <a href="#"><i class="fas fa-th-large"></i> Profile</a>
+    </div>
+    <br><br><br>
+    <div class="container">
+        <div class="dashboard">
+            <div class="card-container">
+                <a href="javascript:void(0);" class="card" onclick="openAddPage('addAdmin')">
+                    <h3>Add Admin</h3>
+                </a>
+                <a href="javascript:void(0);" class="card" onclick="openAddPage('addDealer')">
+                    <h3>Add Dealer</h3>
+                </a>
+                <a href="javascript:void(0);" class="card" onclick="openAddPage('addUser')">
+                    <h3>Add User</h3>
+                </a>
+            </div>
+        </div>
+        <div id="add-section" style="display:none;">
+            <div id="addAdmin" class="tab-content card-user">
+                <h3>ADMIN</h3>
+                <form>
+                    <button class="close-btn" type="button" onclick="closeAddSection()">Close</button>
+                    <div class="form-row">
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="adminName">Name</label>
+                                <input type="text" id="adminName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="adminEmail">Email</label>
+                                <input type="email" id="adminEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="adminAddress">Address</label>
+                                <input type="text" id="adminAddress" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="adminPhone">Phone</label>
+                                <input type="text" id="adminPhone" required>
+                            </div>
+                        </div>
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="adminCountry">Country</label>
+                                <input type="text" id="adminCountry" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="adminPassword">Password</label>
+                                <input type="password" id="adminPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="adminConfirmPassword">Confirm Password</label>
+                                <input type="password" id="adminConfirmPassword" required>
+                                <div class="button-container">
+                                    <button type="submit" style="color:white ;">ADD</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div id="addDealer" class="tab-content card-user" style="display:none;">
+                <h3>DEALER</h3>
+                <form>
+                    <button class="close-btn" type="button" onclick="closeAddSection()">Close</button>
+                    <div class="form-row">
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="dealerName">Name</label>
+                                <input type="text" id="dealerName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="dealerEmail">Email</label>
+                                <input type="email" id="dealerEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="dealerAddress">Address</label>
+                                <input type="text" id="dealerAddress" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="dealerPhone">Phone</label>
+                                <input type="text" id="dealerPhone" required>
+                            </div>
+                        </div>
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="dealerCountry">Country</label>
+                                <input type="text" id="dealerCountry" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="dealerPassword">Password</label>
+                                <input type="password" id="dealerPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="dealerConfirmPassword">Confirm Password</label>
+                                <input type="password" id="dealerConfirmPassword" required>
+                                <div class="button-container">
+                                    <button type="submit" style="color:white ;">ADD</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div id="addUser" class="tab-content card-user" style="display:none;">
+                <h3>USER</h3>
+                <form>
+                    <button class="close-btn" type="button" onclick="closeAddSection()">Close</button>
+                    <div class="form-row">
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="userName">Name</label>
+                                <input type="text" id="userName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="userEmail">Email</label>
+                                <input type="email" id="userEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="userAddress">Address</label>
+                                <input type="text" id="userAddress" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="userPhone">Phone</label>
+                                <input type="text" id="userPhone" required>
+                            </div>
+                        </div>
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="userCountry">Country</label>
+                                <input type="text" id="userCountry" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="userPassword">Password</label>
+                                <input type="password" id="userPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="userConfirmPassword">Confirm Password</label>
+                                <input type="password" id="userConfirmPassword" required>
+                                <div class="button-container">
+                                    <button type="submit" style="color:white ;">ADD</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+        <ul>
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="terms.html">Terms of Service</a></li>
+            <li><a href="newsletter.html">Newsletter Signup</a></li>
+        </ul>
+        <p>&copy; 2024 GPS Tracking Company. All rights reserved.</p>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.tabs div').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    openTab(this.dataset.tab);
+                });
+            });
+        });
+
+        function openAddPage(section) {
+            document.getElementById('add-section').style.display = 'block';
+            openTab(section);
+        }
+
+        function closeAddSection() {
+            document.getElementById('add-section').style.display = 'none';
+        }
+
+        function openTab(tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.querySelectorAll('.tabs div');
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            var activeTab = document.getElementById(tabName);
+            if (activeTab) {
+                activeTab.style.display = "block";
+                var tabElement = Array.from(tablinks).find(link => link.dataset.tab === tabName);
+                if (tabElement) {
+                    tabElement.classList.add("active");
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</body>
+</html>

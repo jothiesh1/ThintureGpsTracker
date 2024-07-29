@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Navigation</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container-header">
+        <br>
+        <div class="header">
+            <img th:src="@{/images/logo.jpg}" alt="THINTURE Logo" class="navbar-logo">
+        </div>
+    </div>
+    <div class="navbar">
+        <a href="details.html" class="active"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="#"><i class="fas fa-map"></i> Map</a>
+        <div class="dropdown">
+            <a href="#"><i class="fas fa-th-large"></i> View</a>
+            <div class="dropdown-content">
+                <a href="total-users.html">Users</a>
+                <a href="total-vehicles.html">Vehicle</a>
+                <a href="tracking_details.html">Tracking Details</a>
+                <a href="#">Calendar</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#"><i class="fas fa-th-large"></i> Utility</a>
+            <div class="dropdown-content">
+                <a href="#">Support & Feedback</a>
+                <a href="#">Announcement</a>
+                <a href="#">Send Notification</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#"><i class="fas fa-th-large"></i> Accounts</a>
+            <div class="dropdown-content">
+                <a href="#">Renewal</a>
+            </div>
+        </div>
+        <a href="#"><i class="fas fa-th-large"></i> Profile</a>
+    </div>
+</body>
+</html>
