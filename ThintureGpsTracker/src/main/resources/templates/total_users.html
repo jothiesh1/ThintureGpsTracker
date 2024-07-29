@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thinture Fleet Dashboard</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+	 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	  <style>
+
+        body {
+			font-family: Arial, sans-serif;
+			          margin: 0;
+			          padding: 0;
+					font-size: 14px;
+        }
+		.container {
+		            padding: 20px;
+		        }
+		.container-header{
+
+		 padding: 20px;
+		font-size: 10px;
+		background-color: gray;
+		margin-left: 10px;
+
+
+		}
+		.navbar {
+					    background-color: lightgray;
+					    color: white;
+					    padding: 10px 10px;
+					    display: flex;
+					    justify-content: space-between;
+					    align-items: center;
+					    width: 120%;
+					    max-width: 900px; /* Adjust as needed */
+					    margin: 0 auto;
+					    height: 55px;
+					    margin-top: -30px;
+						margin-left: 210px;
+					}
+
+					.navbar-brand {
+					    display: flex;
+					    align-items: center;
+					}
+
+					.navbar-brand img {
+					    height: 30px;
+					    margin-right: 20px;
+					}
+
+					.navbar-menu, .navbar-end {
+					    display: flex;
+					    align-items: center;
+					}
+
+					.navbar-menu a, .navbar-end a {
+					    color: white;
+					    text-decoration: none;
+					    margin-left: 15px;
+					}
+
+					.navbar-menu a:hover, .navbar-end a:hover {
+					    text-decoration: underline;
+					}
+
+					.dropdown {
+					    position: relative;
+					    display: inline-block;
+
+					}
+
+					.dropdown-content {
+					    display: none;
+					    position: absolute;
+					    background-color: white;
+					    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+					    z-index: 1;
+					}
+
+					.dropdown-content a {
+					    color: black;
+					    padding: 12px 16px;
+					    text-decoration: none;
+					    display: block;
+					    width: 200px;
+					}
+
+					.dropdown-content a:hover {
+					    background-color: #f1f1f1;
+					}
+
+					.dropdown:hover .dropdown-content {
+					    display: block;
+					}
+					.navbar-logo{
+					            width:160px;
+					            height: 60px;
+					        }
+
+				       
+        
+        .content {
+            padding: 20px;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .dashboard-header h2 {
+            margin: 0;
+        }
+        .dashboard-header .actions {
+            display: flex;
+            gap: 10px;
+        }
+        .dashboard-header .actions button {
+            padding: 5px 10px;
+            border: none;
+            background-color: #4B9CD3;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .dashboard-header .actions button:hover {
+            background-color: #357ABD;
+			text-align: center;
+        }
+        .table-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #4B9CD3;
+            color: white;
+        }
+           .modal-content {
+            padding: 20px;
+        }
+		h3{
+			text-align: center;
+		}
+		
+    </style>
+    <script>
+        function loadNav() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'navigation.html', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    document.getElementById('nav-placeholder').innerHTML = xhr.responseText;
+                }
+            };
+            xhr.send();
+        }
+    </script>
+	<script>
+	    function refreshPage() {
+	        // Reload the entire page
+	        window.location.reload();
+	    }
+
+	    function exportToExcel() {
+	        var table = document.querySelector('table');
+	        var ws = XLSX.utils.table_to_sheet(table);
+	        var wb = XLSX.utils.book_new();
+	        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+	        XLSX.writeFile(wb, 'table-data.xlsx');
+	    }
+	</script>
+
+</head>
+<body>
+	<div class="container-header">
+				    <br>
+				  <div class="header">
+				        <img src="THINTURE_IMAGE/logo2.jpg" alt="THINTURE Logo" class="navbar-logo">
+				    </div>
+				    </div>
+				     <div class="navbar">
+				        <a href="dashborad.html" class="active"><i class="fas fa-home"></i> Dashboard</a>
+				        <a href="#"><i class="fas fa-map"></i> Map</a>
+				        <div class="dropdown">
+				            <a href="#"><i class="fas fa-th-large"></i> View</a>
+				            <div class="dropdown-content">
+				                <a href="total-users.html">Users</a>
+				                <a href="total-vehicles.html">Vehicle</a>
+				                 <a href="tracking_details.html">Tracking Details</a>
+				                <a href="#">Calendar</a>
+				            </div>
+				        </div>
+				         <div class="dropdown">
+				        <a href="#"><i class="fas fa-th-large"></i> Utility</a>
+				        <div class="dropdown-content">
+				                <a href="#">Support & Feedback</a>
+				                <a href="#">Announcement</a>
+				                <a href="#">Send Notification</a>
+				            </div>
+				        </div>
+						<div class="dropdown">
+								        <a href="#"><i class="fas fa-th-large"></i> Report</a>
+								        <div class="dropdown-content">
+								                <a href="#">Admin</a>
+								                <a href="#">Dealer</a>
+								                <a href="#">Users</a>
+								            </div>
+								        </div>
+				          <div class="dropdown">
+				        <a href="#"><i class="fas fa-th-large"></i> Accounts</a>
+				        <div class="dropdown-content">
+				                <a href="#">Renewal</a>
+				                
+				               
+				            </div>
+				        </div>
+				        <a href="#"><i class="fas fa-th-large"></i>Profile</a>
+				    </div>
+   <body onload="loadNav()">
+    <div id="nav-placeholder"></div>
+	<br>
+	<br>
+	<div class="dashboard-header">
+	     <h3>Users Details</h3>
+	     <div class="actions">
+	         <button onclick="exportToExcel()">Download Excel</button>
+			 <button onclick="refreshPage()">Refresh</button>
+	     </div>
+	 </div>
+        <div class="table-container">
+              <div class="modal-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>NAME</th>
+                        <th>LOGIN</th>
+                        <th>VEHICLES</th>
+                        <th>COMPANY</th>
+                        <th>MOBILE</th>
+                        <th>EMAIL</th>
+                        <th>STATUS</th>
+                       
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>12345</td>
+                        <td>ABC123</td>
+                        <td>ftgf12345</td>
+                        <td>gff12345</td>
+                        <td>12345</td>
+                        <td>ABC123</td>
+                        <td>ftgf12345</td>
+                        <td>gff12345</td>
+                       
+                    </tr>
+                    <!-- Add more rows as needed -->
+                </tbody>
+            </table>
+        </div>
+        </div>
+    </div>
+</body>
+</html>

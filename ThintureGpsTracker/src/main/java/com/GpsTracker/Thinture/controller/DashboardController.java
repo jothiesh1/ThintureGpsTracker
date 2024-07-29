@@ -10,4 +10,14 @@ public class DashboardController {
     public String getDashboard() {
         return "dashboard";  // Ensure this matches the path in the templates directory
     }
+    @GetMapping("/total_users")
+    public String getTotalUsers() {
+        return "total_users";  // Ensure this matches the path in the templates directory
+    }
+    
+    @GetMapping("/details_user")
+    public String getDetailsUser() {
+        return "details_user";  // Ensure this matches the path in the templates directory
+    }
+    
 }
