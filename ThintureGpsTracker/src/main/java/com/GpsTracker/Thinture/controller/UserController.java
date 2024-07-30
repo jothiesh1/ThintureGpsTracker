@@ -2,6 +2,8 @@ package com.GpsTracker.Thinture.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.GpsTracker.Thinture.model.User;
@@ -10,16 +12,18 @@ import com.GpsTracker.Thinture.service.UserService;
 import java.util.List;
 import java.util.Optional;
 
-@RestController
-@RequestMapping("/api/users")
+@Controller
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public String getAllUsers(Model model) {
+        List<User> users = userService.getAllUsers();
+        model.addAttribute("users", users);
+        return "total_users"; // Ensure this matches the template name
     }
 
     @GetMapping("/{id}")
@@ -30,8 +34,9 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
+    public String createUser(User user) {
+        userService.createUser(user);
+        return "redirect:/users";
     }
 
     @PutMapping("/{id}")

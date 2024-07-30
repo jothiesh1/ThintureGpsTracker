@@ -1,5 +1,4 @@
 package com.GpsTracker.Thinture.service;
-//package com.GpsTracker.Thinture.service;
 
 import com.GpsTracker.Thinture.model.User;
 import com.GpsTracker.Thinture.repository.UserRepository;
@@ -31,6 +30,11 @@ public class UserService {
         return userRepository.findById(id).map(user -> {
             user.setUsername(userDetails.getUsername());
             user.setPassword(userDetails.getPassword());
+            user.setEmail(userDetails.getEmail());
+            user.setUserType(userDetails.getUserType());
+            user.setAddress(userDetails.getAddress());
+            user.setPhone(userDetails.getPhone());
+            user.setCountry(userDetails.getCountry());
             return userRepository.save(user);
         });
     }
@@ -39,3 +43,4 @@ public class UserService {
         userRepository.deleteById(id);
     }
 }
+

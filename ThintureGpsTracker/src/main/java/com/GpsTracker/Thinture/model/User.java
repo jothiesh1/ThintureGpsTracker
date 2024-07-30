@@ -5,9 +5,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
 @Entity
-@Table(name = "user")
+@Table(name = "users") // Ensure the table name is plural to follow convention
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,10 +16,29 @@ public class User {
     private String password;
     private String email;
     private String userType;
-
+    private String address;
+    private String phone;
+    private String country;
     // Getters and Setters
 
-    public Long getId() {
+    public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	
+	public Long getId() {
         return id;
     }
 
@@ -59,4 +77,13 @@ public class User {
     public void setUserType(String userType) {
         this.userType = userType;
     }
+
+public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+	
 }
