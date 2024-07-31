@@ -1,37 +1,70 @@
 package com.GpsTracker.Thinture.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+
 
 @Entity
+@Table(name = "vehicle")
 public class vehicle {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "deviceID")
     private String deviceID;
-    
+
+    @Column(name = "timestamp")
     private String timestamp;
+
+    @Column(name = "dataValidity")
     private String dataValidity;
+
+    @Column(name = "status")
     private String status;
+
+    @Column(name = "latitude")
     private String latitude;
+
+    @Column(name = "longitude")
     private String longitude;
+
+    @Column(name = "speed")
     private String speed;
+
+    @Column(name = "course")
     private String course;
+
+    @Column(name = "additionalData")
     private String additionalData;
-    public String getVehicletype() {
-		return vehicletype;
+
+    @Column(name = "vehicle_type")
+    private String vehicleType;
+
+    // Getters and Setters
+
+
+
+
+
+
+	public String getVehicleType() {
+		return vehicleType;
 	}
-	public void setVehicletype(String vehicletype) {
-		this.vehicletype = vehicletype;
+	public void setVehicleType(String vehicleType) {
+		this.vehicleType = vehicleType;
 	}
 	private String sequenceNumber;
  
     
     // tempory code 
-    private String vehicletype;
+  
   
     
     // Getters and setters

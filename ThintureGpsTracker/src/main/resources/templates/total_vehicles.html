@@ -297,19 +297,20 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Example rows (replace with dynamic PHP/JS generation) -->
-				<tr th:each="vehicle : ${vehicle}">
-				        <td th:text="${user.deviceId}"></td>
-				        <td th:text="${user.timestamp}"></td>
-				        <td th:text="${user.dataValidity}"></td>
-				        <td th:text="${user.status}"></td>
-				        <td th:text="${user.latitude}"></td>
-				        <td th:text="${user.longitude}"></td>
-				        <td th:text="${user.speed}"></td>
-				        <td th:text="${user.course}"></td>
-				        <td th:text="${user.additionalData}"></td>
-				        <td th:text="${user.sequenceNumber}"></td>
-				    </tr>
+                <!-- -->
+				<tr th:each="vehicle : ${total_vehicles}">
+				               <td th:text="${vehicle.deviceID}"></td>
+				               <td th:text="${vehicle.timestamp}"></td>
+				               <td th:text="${vehicle.dataValidity}"></td>
+				               <td th:text="${vehicle.status}"></td>
+				               <td th:text="${vehicle.latitude}"></td>
+				               <td th:text="${vehicle.longitude}"></td>
+				               <td th:text="${vehicle.speed}"></td>
+				               <td th:text="${vehicle.course}"></td>
+				               <td th:text="${vehicle.additionalData}"></td>
+				               <td th:text="${vehicle.sequenceNumber}"></td>
+				               <td th:text="${vehicle.vehicleType}"></td>
+				           </tr>
                 <!-- Add more rows as needed -->
             </tbody>
         </table>
@@ -329,7 +330,7 @@
 	            <div class="modal-body">
 	                <label for="primaryUser">Primary User</label>
 	                <div class="d-flex align-items-center mb-3">
-	                    <select class="form-control mr-2" id="primaryUser" required>
+	                    <select class="form-control mr-2" id="primary_user" name="primary_user" required>
 	                        <option value="">Select a user</option>
 	                        <!-- Example options, replace with dynamic user data -->
 	                        <option value="user1">User 1</option>
