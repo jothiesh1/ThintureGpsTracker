@@ -19,5 +19,11 @@ public class DashboardController {
     public String getDetailsUser() {
         return "details_user";  // Ensure this matches the path in the templates directory
     }
-    
 }
+/*
+ * @GetMapping("/total_vehicles") public String getTotalVehicles () { return
+ * "total_vehicles"; // Ensure this matches the path in the templates directory
+ * }
+ * 
+ * }
+ */

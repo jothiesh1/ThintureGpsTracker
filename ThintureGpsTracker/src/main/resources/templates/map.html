@@ -8,7 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.0/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+	<style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -120,6 +121,9 @@
 			button{
 				background-color: rgb(0, 0, 64);
 			}
+			.content{
+				height: 500px;
+			}
     </style>
 </head>
 <body>
@@ -134,9 +138,9 @@
         <div class="dropdown">
             <a href="#"><i class="fas fa-th-large"></i> View</a>
             <div class="dropdown-content">
-                <a href="total-users.html">Users</a>
-                <a href="total-vehicles.html">Vehicle</a>
-                <a href="tracking_details.html">Tracking Details</a>
+				<a href="/total_users">Users</a>
+				                <a href="/total_vehicles">Vehicle</a>
+				                <a href="/tracking_details">Tracking Details</a>
                 <a href="#">Calendar</a>
             </div>
         </div>
@@ -156,6 +160,15 @@
         </div>
         <a href="#"><i class="fas fa-th-large"></i> Profile</a>
     </div>
+	<br>
+	<br>
+	<br>
+	<br>
+		<br>
+		<br>
+		<br>
+			<br>
+			<br>
     <div class="content">
         <div id="map"></div>
     </div>
