@@ -2,12 +2,10 @@ package com.GpsTracker.Thinture.service;
 
 import com.GpsTracker.Thinture.dto.LocationUpdate;
 import com.GpsTracker.Thinture.model.GpsData;
+import com.GpsTracker.Thinture.model.Vehicle;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import jakarta.annotation.PostConstruct;
-
 import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.slf4j.Logger;
@@ -18,9 +16,21 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+/*
+**********************************Developer Jothiesh **********************
+*                                                                         /
+*                                 ********************                                                                  /
+***************************************************************************
+*                                                                         /
+*
+*                                                                         /
+*
+***************************************************************************
+*
+*/
 @Service
 public class MqttService {
 
@@ -38,7 +48,10 @@ public class MqttService {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-    private final List<String> receivedData = new ArrayList<>();
+    @Autowired
+    private VehicleService vehicleService;
+
+    private final List<String> receivedData = new CopyOnWriteArrayList<>();
 
     public void publish(String message) {
         try {
@@ -77,16 +90,24 @@ public class MqttService {
         try {
             GpsData gpsData = objectMapper.readValue(payload, GpsData.class);
 
-            double latitude = parseCoordinate(gpsData.getLatitude());
-            double longitude = parseCoordinate(gpsData.getLongitude());
+            // Check if the device is registered
+            boolean isRegistered = vehicleService.getAllVehicles().stream()
+                    .anyMatch(vehicle -> vehicle.getDeviceID().equals(gpsData.getDeviceID()));
 
-            gpsData.setLatitude(String.valueOf(latitude));
-            gpsData.setLongitude(String.valueOf(longitude));
+            if (isRegistered) {
+                double latitude = parseCoordinate(gpsData.getLatitude());
+                double longitude = parseCoordinate(gpsData.getLongitude());
 
-            logger.info("Processed GPS Data: {}", gpsData);
+                gpsData.setLatitude(String.valueOf(latitude));
+                gpsData.setLongitude(String.valueOf(longitude));
 
-            messagingTemplate.convertAndSend("/topic/location-updates", new LocationUpdate(latitude, longitude, gpsData.getDeviceID(), gpsData.getTimestamp()));
+                logger.info("Processed GPS Data: {}", gpsData);
 
+                messagingTemplate.convertAndSend("/topic/location-updates",
+                        new LocationUpdate(latitude, longitude, gpsData.getDeviceID(), gpsData.getTimestamp()));
+            } else {
+                logger.warn("Received data for unregistered device ID: {}", gpsData.getDeviceID());
+            }
         } catch (Exception e) {
             logger.error("Failed to parse payload: {}", payload, e);
         }
@@ -117,6 +138,6 @@ public class MqttService {
     }
 
     public List<String> getReceivedData() {
-        return new ArrayList<>(receivedData);
+        return new CopyOnWriteArrayList<>(receivedData);
     }
 }

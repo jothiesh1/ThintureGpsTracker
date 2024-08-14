@@ -1,5 +1,4 @@
 package com.GpsTracker.Thinture.service;
-
 import com.GpsTracker.Thinture.model.User;
 import com.GpsTracker.Thinture.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,4 +42,3 @@ public class UserService {
         userRepository.deleteById(id);
     }
 }
-

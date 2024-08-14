@@ -1,5 +1,7 @@
 package com.GpsTracker.Thinture.model;
 
+import org.hibernate.annotations.processing.Pattern;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,6 +15,9 @@ public class Vehicle {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    //
+    //@NotEmpty(message = "Device ID cannot be empty")
+  //  @Pattern(regexp = "^[A-Za-z0-9]+$", message = "Device ID must be alphanumeric")
     private String deviceID;
     
     private String timestamp;
@@ -49,9 +54,13 @@ public class Vehicle {
 	public String getDeviceID() {
 		return deviceID;
 	}
-	public void setDeviceID(String deviceID) {
-		this.deviceID = deviceID;
-	}
+	  public void setDeviceID(String deviceID) {
+	        if (deviceID != null && deviceID.matches("\\d{10}")) {
+	            this.deviceID = deviceID;
+	        } else {
+	            throw new IllegalArgumentException("deviceID must be exactly 10 digits long");
+	        } 
+	  }
 	public String getTimestamp() {
 		return timestamp;
 	}
@@ -106,5 +115,22 @@ public class Vehicle {
 	public void setSequenceNumber(String sequenceNumber) {
 		this.sequenceNumber = sequenceNumber;
 	}
-	
+	@Override
+    public String toString() {
+        return "Vehicle{" +
+                "id=" + id +
+                ", deviceID='" + deviceID + '\'' +
+                ", timestamp='" + timestamp + '\'' +
+                ", dataValidity='" + dataValidity + '\'' +
+                ", status='" + status + '\'' +
+                ", latitude='" + latitude + '\'' +
+                ", longitude='" + longitude + '\'' +
+                ", speed='" + speed + '\'' +
+                ", course='" + course + '\'' +
+                ", additionalData='" + additionalData + '\'' +
+                ", sequenceNumber='" + sequenceNumber + '\'' +
+                ", vehicletype='" + vehicletype + '\'' +
+                '}';
+    }
+
 }

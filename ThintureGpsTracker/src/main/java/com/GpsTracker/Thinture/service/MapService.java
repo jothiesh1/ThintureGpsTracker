@@ -1,6 +1,19 @@
 package com.GpsTracker.Thinture.service;
 import org.springframework.stereotype.Service;
 
+import java.util.*;
+/*
+**********************************Developer Jothiesh **********************
+*                                                                         /
+*                                                                         /
+***************************************************************************
+*
+*
+*                                                                         /
+*
+***************************************************************************
+*
+*/
 @Service
 public class MapService {
 
@@ -12,5 +25,7 @@ public class MapService {
                "L.marker([51.5, -0.09]).addTo(map)\n" +
                "    .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')\n" +
                "    .openPopup();";
+              //  " <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors' \n "
     }
+    
 }

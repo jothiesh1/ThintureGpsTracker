@@ -2,7 +2,20 @@ package com.GpsTracker.Thinture.model;
 
 import java.io.Serializable;
 
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+
+@Entity
+@Table(name = "gps_data")
 public class GpsData implements Serializable {
+	 @Id
+	    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	    private Long id; // This field serves as the primary key
     private String deviceID;
     private String timestamp;
     private String dataValidity;

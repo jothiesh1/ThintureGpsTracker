@@ -9,10 +9,17 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            font-size: 14px;
+			
+			    font-family: Arial, sans-serif;
+			    margin: 0;
+			    padding: 0;
+			    font-size: 14px;
+			    background-image: url('THINTURE_IMAGE/locate2.jpg');
+			    background-size: cover; /* Ensures the image covers the entire background */
+			    background-position: center; /* Centers the background image */
+			    background-repeat: no-repeat; /* Prevents repeating the image */
+			
+
         }
         .container {
             padding: 20px;
@@ -22,6 +29,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 25px;
+			
         }
         .card {
             background-color: #0056b3;
@@ -30,19 +38,22 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             color: white;
             text-align: center;
-            height: auto;
-            max-width: 150px;
+		
+      width: 350px;
             box-sizing: border-box;
             display: inline-block;
             text-decoration: none;
         }
         .card:hover {
             background-color: darkblue;
-            color: ghostwhite;
+            color: white;
         }
         .card h3 {
             margin: 0;
         }
+		h1{
+			font-size: 10px;
+		}
         .tabs {
             display: flex;
             cursor: pointer;
@@ -105,6 +116,7 @@
             text-align: center;
             margin-top: 20px;
             color: #f1f1f1;
+			
         }
         .tab-content button {
             border: 2px solid gray;
@@ -118,7 +130,7 @@
             background-color: orange;
         }
         .footer {
-            background-color: darkblue;
+            background-color:transparent;
             color: white;
             text-align: center;
             padding: 10px;
@@ -159,12 +171,13 @@
         .close-btn:hover {
             background-color: rgb(0, 0, 64);
         }
-        .container-header {
-            padding: 20px;
-            background-color: gray;
-            margin-left: 10px;
-            margin-right: 10px;
-        }
+		.container-header {
+		          padding: 20px;
+		          font-size: 20px;
+		          background-color:transparent;
+		          margin-left: 2px;
+				  margin-top: -10px;
+		      }
         .navbar {
             background-color: lightgray;
             color: white;
@@ -213,12 +226,14 @@
             box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
             z-index: 1;
         }
+		
         .dropdown-content a {
             color: black;
             padding: 12px 12px;
             text-decoration: none;
             display: block;
             width: 200px;
+			font-size: 10px;
         }
         .dropdown-content a:hover {
             background-color: #f1f1f1;
@@ -242,16 +257,33 @@
         </div>
     </div>
     <div class="navbar">
-        <a href="dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a>
-        <a href="/map"><i class="fas fa-map"></i> Map</a>
+        <a href="/dashboard" class="active"><i class="fas fa-home"></i> Dashboard</a>
+		<div class="dropdown">
+		            <a href="#"><i class="fas fa-th-large"></i> Superadmin</a>
+		            <div class="dropdown-content">
+		                <a href="javascript:void(0);" onclick="openAddPage('addAdmin')">
+		                    <h1>Add Admin</h1>
+		                </a>
+		                <a href="javascript:void(0);" onclick="openAddPage('addDealer')">
+		                    <h1>Add Dealer</h3>
+		                </a>
+						<a href="javascript:void(0);" onclick="openAddPage('addAdmin')">
+								                    <h1>Add Client</h1>
+								                </a>
+		                <a href="javascript:void(0);" onclick="openAddPage('addUser')">
+		                    <h1>Add User</h1>
+		                </a>
+		            </div>
+		        </div>
+		 <a href="/map"><i class="fas fa-map"></i> Map</a>
         <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i> View</a>
+            <a href="#"><i class="fas fa-th-large"></i> Reports</a>
             <div class="dropdown-content">
-				<
+				
                 <a href="/total_users">Users</a>
 				<a href="/total_vehicles">Vehicle</a>
-                <a href="tracking_details.html">Tracking Details</a>
-                <a href="#">Calendar</a>
+                <a href="/tracking_details">Tracking Details</a>
+                <a href="/calender">Calendar</a>
             </div>
         </div>
         <div class="dropdown">
@@ -274,17 +306,32 @@
     <div class="container">
         <div class="dashboard">
             <div class="card-container">
-                <a href="javascript:void(0);" class="card" onclick="openAddPage('addAdmin')">
-                    <h3>Add Admin</h3>
-                </a>
-                <a href="javascript:void(0);" class="card" onclick="openAddPage('addDealer')">
-                    <h3>Add Dealer</h3>
-                </a>
-                <a href="javascript:void(0);" class="card" onclick="openAddPage('addUser')">
-                    <h3>Add User</h3>
-                </a>
+				<a href="/total_vehicles" class="card">
+						                <h3>Total Vehicles</h3>
+										<p><i class="fas fa-car"></i></p>
+						                <p>11</p>
+						                <p>2 New This Month</p>
+						            </a>
+						            <a href="/total_users" class="card">
+						                <h3>All Users</h3>
+										<i class="fas fa-users"></i>
+						                <p>1</p>
+						                <p>0 New This Month</p>
+						            </a>
+						            <a href="/total_expire" class="card">
+						                <h3>Vehicle Expiring</h3>
+						                <p>0</p>
+						                <p>0 in next 30 days</p>
+						            </a>
+		
+             
+				
             </div>
         </div>
+		<div class="cards">
+		            
+		        </div>
+		    </div>
         <div id="add-section" style="display:none;">
             <div id="addAdmin" class="tab-content card-user">
                 <h3>ADMIN</h3>
@@ -417,13 +464,16 @@
             </div>
         </div>
     </div>
+	<br>
+	<br>
+	<br>
     <footer class="footer">
         <ul>
             <li><a href="privacy.html">Privacy Policy</a></li>
             <li><a href="terms.html">Terms of Service</a></li>
             <li><a href="newsletter.html">Newsletter Signup</a></li>
         </ul>
-        <p>&copy; 2024 GPS Tracking Company. All rights reserved.</p>
+        <p>&copy; 2024 <strong>Thinture Technologies Pvt. Ltd!</strong>. All rights reserved.</p>
     </footer>
     <script>
         document.addEventListener('DOMContentLoaded', function() {

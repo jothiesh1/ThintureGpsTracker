@@ -14,7 +14,23 @@ public class LocationUpdate {
       this.timestamp = timestamp;
   }
 
-  public double getLatitude() {
+  public void setLatitude(double latitude) {
+	this.latitude = latitude;
+}
+
+public void setLongitude(double longitude) {
+	this.longitude = longitude;
+}
+
+public void setDeviceID(String deviceID) {
+	this.deviceID = deviceID;
+}
+
+public void setTimestamp(String timestamp) {
+	this.timestamp = timestamp;
+}
+
+public double getLatitude() {
       return latitude;
   }
 

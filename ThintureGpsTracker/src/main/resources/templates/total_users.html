@@ -253,210 +253,200 @@
 				    color: #4B9CD3; /* Adjust color as needed */
 				}
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script>
-        
+	 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+	    <script>
+	        function refreshPage() {
+	            window.location.reload();
+	        }
 
-        function refreshPage() {
-            window.location.reload();
-        }
+	        function exportToExcel() {
+	            var table = document.querySelector('table');
+	            var ws = XLSX.utils.table_to_sheet(table);
+	            var wb = XLSX.utils.book_new();
+	            XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+	            XLSX.writeFile(wb, 'table-data.xlsx');
+	        }
 
-        function exportToExcel() {
-            var table = document.querySelector('table');
-            var ws = XLSX.utils.table_to_sheet(table);
-            var wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-            XLSX.writeFile(wb, 'table-data.xlsx');
-        }
+	        function openAddPage(section) {
+	            document.getElementById(section).style.display = 'block';
+	            openTab(section);
+	        }
 
-        function openAddPage(section) {
-            document.getElementById(section).style.display = 'block';
-            openTab(section);
-        }
+	        function closeAddSection() {
+	            document.getElementById('addUser').style.display = 'none';
+	        }
 
-        function closeAddSection() {
-            document.getElementById('addUser').style.display = 'none';
-        }
+	        function openTab(tabName) {
+	            var i, tabcontent, tablinks;
+	            tabcontent = document.getElementsByClassName("tab-content");
+	            for (i = 0; i < tabcontent.length; i++) {
+	                tabcontent[i].style.display = "none";
+	            }
+	            tablinks = document.querySelectorAll('.tabs div');
+	            for (i = 0; i < tablinks.length; i++) {
+	                tablinks[i].classList.remove("active");
+	            }
+	            var activeTab = document.getElementById(tabName);
+	            if (activeTab) {
+	                activeTab.style.display = "block";
+	                var tabElement = Array.from(tablinks).find(link => link.dataset.tab === tabName);
+	                if (tabElement) {
+	                    tabElement.classList.add("active");
+	                }
+	            }
+	        }
 
-        function openTab(tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-            }
-            tablinks = document.querySelectorAll('.tabs div');
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].classList.remove("active");
-            }
-            var activeTab = document.getElementById(tabName);
-            if (activeTab) {
-                activeTab.style.display = "block";
-                var tabElement = Array.from(tablinks).find(link => link.dataset.tab === tabName);
-                if (tabElement) {
-                    tabElement.classList.add("active");
-                }
-            }
-        }
-    </script>
-	<script>
-	      document.addEventListener('DOMContentLoaded', function() {
-	          loadNav();
-
-	          document.querySelectorAll('.tabs div').forEach(tab => {
-	              tab.addEventListener('click', function() {
-	                  openTab(this.dataset.tab);
-	              });
-	          });
-	      });
-
-		
-				
-	  </script>
-</head>
-<body>
-    <div class="container-header">
-        <br>
-        <div class="header">
-            <img src="THINTURE_IMAGE/logo2.jpg" alt="THINTURE Logo" class="navbar-logo">
-        </div>
-    </div>
-    <div class="navbar">
-        <a href="/dashboard" class="active"><i class="fas fa-home"></i> Dashboard</a>
-        <a href="/map"><i class="fas fa-map"></i> Map</a>
-        <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i> View</a>
-            <div class="dropdown-content">
-                <a href="/total_users">Users</a>
-                <a href="/total_vehicles">Vehicle</a>
-                <a href="/tracking_details">Tracking Details</a>
-                <a href="#">Calendar</a>
-            </div>
-        </div>
-        <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i> Utility</a>
-            <div class="dropdown-content">
-                <a href="#">Support & Feedback</a>
-                <a href="#">Announcement</a>
-                <a href="#">Send Notification</a>
-            </div>
-        </div>
-        <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i> Report</a>
-            <div class="dropdown-content">
-                <a href="#">Admin</a>
-                <a href="#">Dealer</a>
-                <a href="#">Users</a>
-            </div>
-        </div>
-        <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i> Accounts</a>
-            <div class="dropdown-content">
-                <a href="#">Renewal</a>
-            </div>
-        </div>
-		<div class="dropdown">
-		        <a href="#"><i class="fas fa-th-large"></i> Profile</a>
-				<div class="dropdown-content">
-					<a href="/profile">Profile</a>
-					<a href="/login">Logout</a>
-				</div>
-				
-		    </div>
-    </div>
-    <div id="nav-placeholder"></div>
-    <br>
-    <br>
-    <div class="dashboard-header">
-        <h3>Users Details</h3>
-        <div class="actions">
-            <button onclick="openAddPage('addUser')">Add User</button>
-            <button onclick="exportToExcel()">Download Excel</button>
-            <button onclick="refreshPage()">Refresh</button>
-        </div>
-    </div>
-	<div class="search-container">
-								        <input type="text" id="search" name="search" placeholder="Search">
-								        <i class="fas fa-search search-icon"></i>
-								    </div>
-									<br>
-									<br>
-    <div id="addUser" class="tab-content card-user" style="display:none;">
-        <h3>USER</h3>
-        <form th:action="@{/users}" method="post">
-            <button class="close-btn" type="button" onclick="closeAddSection()">Close</button>
-            <div class="form-row">
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="username">Name</label>
-                        <input type="text" id="username" name="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="address">Address</label>
-                        <input type="text" id="address" name="address" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">Phone</label>
-                        <input type="text" id="phone" name="phone" required>
-                    </div>
-                </div>
-                <div class="form-column">
-                    <div class="form-group">
-                        <label for="country">Country</label>
-                        <input type="text" id="country" name="country" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="confirmPassword">Confirm Password</label>
-                        <input type="password" id="confirmPassword" name="confirmPassword" required>
-                        <br><br>
-                        <div class="button-container">
-                            <button type="submit" style="color:white;">ADD</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-    <div class="table-container">
-        <div class="modal-content">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>NAME</th>
-                        <th>LOGIN</th>
-                        <th>VEHICLES</th>
-                        <th>COMPANY</th>
-                        <th>MOBILE</th>
-                        <th>EMAIL</th>
-						<th>COUNTRY</th>
-                        <th>STATUS</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="user : ${users}">
-                        <td th:text="${user.id}"></td>
-                        <td th:text="${user.username}"></td>
-                        <td th:text="${user.username}"></td>
-                        <td th:text="'gff12345'"></td>
-                        <td th:text="'12345'"></td>
-                        <td th:text="${user.phone}"></td>
-						<td th:text="${user.country}"></td>
-                        <td th:text="${user.email}"></td>
-                        <td th:text="'Active'"></td>
-                    </tr>
-                    <!-- Add more rows as needed -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-  
-</body>
-</html>
+	        document.addEventListener('DOMContentLoaded', function() {
+	            document.querySelectorAll('.tabs div').forEach(tab => {
+	                tab.addEventListener('click', function() {
+	                    openTab(this.dataset.tab);
+	                });
+	            });
+	        });
+	    </script>
+	</head>
+	<body>
+	    <div class="container-header">
+	        <br>
+	        <div class="header">
+	            <img src="THINTURE_IMAGE/logo2.jpg" alt="THINTURE Logo" class="navbar-logo">
+	        </div>
+	    </div>
+	    <div class="navbar">
+	        <a href="/dashboard" class="active"><i class="fas fa-home"></i> Dashboard</a>
+	        <a href="/map"><i class="fas fa-map"></i> Map</a>
+	        <div class="dropdown">
+	            <a href="#"><i class="fas fa-th-large"></i> View</a>
+	            <div class="dropdown-content">
+	                <a href="/total_users">Users</a>
+	                <a href="/total_vehicles">Vehicle</a>
+	                <a href="/tracking_details">Tracking Details</a>
+	                <a href="#">Calendar</a>
+	            </div>
+	        </div>
+	        <div class="dropdown">
+	            <a href="#"><i class="fas fa-th-large"></i> Utility</a>
+	            <div class="dropdown-content">
+	                <a href="#">Support & Feedback</a>
+	                <a href="#">Announcement</a>
+	                <a href="#">Send Notification</a>
+	            </div>
+	        </div>
+	        <div class="dropdown">
+	            <a href="#"><i class="fas fa-th-large"></i> Report</a>
+	            <div class="dropdown-content">
+	                <a href="#">Admin</a>
+	                <a href="#">Dealer</a>
+	                <a href="#">Users</a>
+	            </div>
+	        </div>
+	        <div class="dropdown">
+	            <a href="#"><i class="fas fa-th-large"></i> Accounts</a>
+	            <div class="dropdown-content">
+	                <a href="#">Renewal</a>
+	            </div>
+	        </div>
+	        <div class="dropdown">
+	            <a href="#"><i class="fas fa-th-large"></i> Profile</a>
+	            <div class="dropdown-content">
+	                <a href="/profile">Profile</a>
+	                <a href="/login">Logout</a>
+	            </div>
+	        </div>
+	    </div>
+	    <div id="nav-placeholder"></div>
+	    <br>
+	    <br>
+	    <div class="dashboard-header">
+	        <h3>Users Details</h3>
+	        <div class="actions">
+	            <button onclick="openAddPage('addUser')">Add User</button>
+	            <button onclick="exportToExcel()">Download Excel</button>
+	            <button onclick="refreshPage()">Refresh</button>
+	        </div>
+	    </div>
+	    <div class="search-container">
+	        <input type="text" id="search" name="search" placeholder="Search">
+	        <i class="fas fa-search search-icon"></i>
+	    </div>
+	    <br>
+	    <br>
+	    <div id="addUser" class="tab-content card-user" style="display:none;">
+	        <h3>USER</h3>
+	        <form th:action="@{/users}" method="post">
+	            <button class="close-btn" type="button" onclick="closeAddSection()">Close</button>
+	            <div class="form-row">
+	                <div class="form-column">
+	                    <div class="form-group">
+	                        <label for="username">Name</label>
+	                        <input type="text" id="username" name="username" required>
+	                    </div>
+	                    <div class="form-group">
+	                        <label for="email">Email</label>
+	                        <input type="email" id="email" name="email" required>
+	                    </div>
+	                    <div class="form-group">
+	                        <label for="address">Address</label>
+	                        <input type="text" id="address" name="address" required>
+	                    </div>
+	                    <div class="form-group">
+	                        <label for="phone">Phone</label>
+	                        <input type="text" id="phone" name="phone" required>
+	                    </div>
+	                </div>
+	                <div class="form-column">
+	                    <div class="form-group">
+	                        <label for="country">Country</label>
+	                        <input type="text" id="country" name="country" required>
+	                    </div>
+	                    <div class="form-group">
+	                        <label for="password">Password</label>
+	                        <input type="password" id="password" name="password" required>
+	                    </div>
+	                    <div class="form-group">
+	                        <label for="confirmPassword">Confirm Password</label>
+	                        <input type="password" id="confirmPassword" name="confirmPassword" required>
+	                        <br><br>
+	                        <div class="button-container">
+	                            <button type="submit" style="color:white;">ADD</button>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+	        </form>
+	    </div>
+	    <div class="table-container">
+	        <div class="modal-content">
+	            <table>
+	                <thead>
+	                    <tr>
+	                        <th>ID</th>
+	                        <th>NAME</th>
+	                        <th>LOGIN</th>
+	                        <th>VEHICLES</th>
+	                        <th>COMPANY</th>
+	                        <th>MOBILE</th>
+	                        <th>EMAIL</th>
+	                        <th>COUNTRY</th>
+	                        <th>STATUS</th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                    <tr th:each="user : ${users}">
+	                        <td th:text="${user.id}"></td>
+	                        <td th:text="${user.username}"></td>
+	                        <td th:text="${user.username}"></td>
+	                        <td th:text="'gff12345'"></td>
+	                        <td th:text="'12345'"></td>
+	                        <td th:text="${user.phone}"></td>
+	                        <td th:text="${user.country}"></td>
+	                        <td th:text="${user.email}"></td>
+	                        <td th:text="'Active'"></td>
+	                    </tr>
+	                    <!-- Add more rows as needed -->
+	                </tbody>
+	            </table>
+	        </div>
+	    </div>
+	</body>
+	</html>

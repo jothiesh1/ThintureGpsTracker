@@ -2,196 +2,864 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Fleet Thinture Map</title>
+    <title>Fleet Tracker Map</title>
+    <!-- Link to necessary styles and scripts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.0/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-	<style>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
         }
-        .header {
-            background-color: gray;
+        #map {
+            width: 100%;
+            height: 120vh;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .custom-icon {
+            font-size: 32px;
+			
+        }
+        .ring-blink {
+            position: relative;
+			animation: blink 1s infinite;
+			border-color: red;
+        }
+		
+        .ring-blink::before, .ring-blink::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: ringBlink 1.5s infinite;
+            background-color: transparent;
+            border: 5px solid;
+        }
+        .ring-blink::before {
+            top: -10px;
+            left: -10px;
+            width: 60px;
+            height: 60px;
+            animation-delay: 0s;
+        }
+        .ring-blink::after {
+            top: -20px;
+            left: -20px;
+            width: 80px;
+            height: 80px;
+            animation-delay: 0.3s;
+        }
+        @keyframes ringBlink {
+            0% { transform: scale(0.3); opacity: 0.3; }
+            50% { transform: scale(0.5); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+        .ring-blink-red {
+            color: red;
+            border-color: red;
+        }
+        .ring-blink-green {
+            color: green;
+            border-color: green;
+        }
+		.vehicle-details {
+		    margin-top: 20px;
+		    padding: 10px;
+		    border: 1px solid #ddd;
+		    background-color: #f9f9f9;
+			
+		}
+
+        .navbar {
+            background-color: lightgray;
             color: white;
-            padding: 10px;
-            text-align: center;
+            padding: 10px 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            width: 120%;
+            max-width: 900px;
+            margin: 0 auto;
+            height: 55px;
+            margin-top: -2px;
+            margin-left: 210px;
         }
-        .header h1 {
-            margin: 0;
+        .refresh-button {
+            position: relative;
+            display: inline-block;
         }
-        .header .right {
+
+        .refresh-button i {
+            transition: transform 0.3s ease;
+        }
+
+        .refresh-button.animate i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .navbar-brand img {
+            height: 30px;
+            margin-right: 20px;
+        }
+        .navbar-menu, .navbar-end {
             display: flex;
             align-items: center;
-            gap: 10px;
         }
-        .content {
-            padding: 0;
+        .navbar-menu a, .navbar-end a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
         }
-        #map {
-            width: 100%;
-            height: calc(100vh - 120px); /* Adjust height to fit screen */
+        .navbar-menu a:hover, .navbar-end a:hover {
+            text-decoration: underline;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+        .dropdown-content a {
+            color: black;
+            padding: 12px 12px;
+            text-decoration: none;
+            display: block;
+            width: 200px;
+        }
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .navbar-logo {
+            width: 160px;
+            height: 60px;
+        }
+        .hover-info {
+            position: absolute;
+            background: #fff;
+            padding: 5px;
+            border: 1px solid #ddd;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            pointer-events: none;
+           
         }
-		.container-header {
-		            padding: 20px;
-		            background-color: gray;
-		            margin-left: 10px;
-		            margin-right: 10px;
-		        }
-		.navbar {
-							    background-color: lightgray;
-							    color: white;
-							    padding: 10px 10px;
-							    display: flex;
-							    justify-content: space-between;
-							    align-items: center;
-							    width: 120%;
-							    max-width: 900px; /* Adjust as needed */
-							    margin: 0 auto;
-							    height: 55px;
-							    margin-top: -30px;
-								margin-left: 210px;
-							}
-
-							.navbar-brand {
-							    display: flex;
-							    align-items: center;
-							}
-
-							.navbar-brand img {
-							    height: 30px;
-							    margin-right: 20px;
-							}
-
-							.navbar-menu, .navbar-end {
-							    display: flex;
-							    align-items: center;
-							}
-
-							.navbar-menu a, .navbar-end a {
-							    color: white;
-							    text-decoration: none;
-							    margin-left: 15px;
-							}
-
-							.navbar-menu a:hover, .navbar-end a:hover {
-							    text-decoration: underline;
-							}
-		h3{
-			text-align: center;
-		}
-		        .dropdown {
-		            position: relative;
-		            display: inline-block;
-		        }
-		        .dropdown-content {
-		            display: none;
-		            position: absolute;
-		            background-color: white;
-		            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-		            z-index: 1;
-		        }
-		        .dropdown-content a {
-		            color: black;
-		            padding: 12px 12px;
-		            text-decoration: none;
-		            display: block;
-		            width: 200px;
-		        }
-		        .dropdown-content a:hover {
-		            background-color: #f1f1f1;
-		        }
-		        .dropdown:hover .dropdown-content {
-		            display: block;
-		        }
-		        .navbar-logo {
-		            width: 160px;
-		            height: 60px;
-		        }
-			button{
-				background-color: rgb(0, 0, 64);
-			}
-			.content{
-				height: 500px;
-			}
+        #sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: lightgrey;
+            color: black;
+            transition: 0.3s;
+            overflow-x: hidden;
+            padding-top: 80px;
+            z-index: 1000;
+        }
+        #sidebar a {
+            padding: 10px 15px;
+            text-decoration: none;
+            color: white;
+            display: block;
+            font-size: 7px;
+        }
+        #sidebar a:hover {
+            background-color: white;
+            color: black;
+        }
+        #sidebar .closebtn {
+            position: absolute;
+            top: 5px;
+            right: 25px;
+            font-size: 26px;
+            margin-left: 50px;
+            background-color: white;
+            color: red;
+        }
+        #menu-toggle {
+            position: absolute;
+            top: 100px;
+            left: 50px;
+            font-size: 24px;
+            color: #333;
+            cursor: pointer;
+            z-index: 1001;
+            background-color: white;
+            color: black;
+            width: 40px;
+            text-align: center;
+        }
+        .controls {
+            position: absolute;
+            top: 250px;
+            right: 10px;
+            z-index: 1000;
+        }
+        .controls button {
+            display: block;
+            margin: 5px 0;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .controls button:hover {
+            background-color: #0056b3;
+        }
+        .tabs {
+            display: flex;
+            background-color: #444;
+            padding: 8px;
+            font-size: 8px;
+			top:100px;
+        }
+        .tabs a {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            color: white;
+            text-decoration: none;
+            background-color: #555;
+            border-radius: 5px;
+            margin: 0 5px;
+            cursor: pointer;
+            width: 220px;
+			font-size: 8px;
+        }
+        .tabs a.active {
+            background-color: #007bff;
+        }
+        .tab-content {
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+			font-size: 12px;
+        }
+        .history-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .history-list li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .history-list li:hover {
+            background-color: #f1f1f1;
+        }
+		.status-buttons {
+		           display: fixed;
+		           gap: 10px;
+				   
+		       }
+		       .status-button {
+		           width: 50px;
+		           height: 50px;
+		           border-radius: 50%;
+		           border: none;
+		           color: white;
+		           font-size: 8px;
+		           font-weight: bold;
+		          
+		           flex-direction: column;
+		           justify-content: center;
+		           align-items: center;
+		           cursor: pointer;
+				   top:50px;
+				  
+		       }
+		       .all {
+		           background-color: #555; /* Gray */
+		       }
+		       .running {
+		           background-color: #4CAF50; /* Green */
+		       }
+		       .stop {
+		           background-color: #FF0000; /* Red */
+		       }
+		       .idle {
+		           background-color: #FFEB3B; /* Yellow */
+		           color: #000; /* Black text */
+		       }
+		       .inactive {
+		           background-color: #3F51B5; /* Blue */
+		       }
+			   .back {
+			       background-color: #3F51B5;
+			       color: white; /* Optional: changes the text color to white for better contrast */
+			       border: none; /* Optional: removes the border if you want a cleaner look */
+			       padding: 10px 20px; /* Optional: adds some padding inside the button */
+			       margin: 10px; /* Optional: adds margin around the button */
+			       position: absolute; /* Position the button absolutely within its container */
+			       right: 0; /* Align the button to the right */
+			       top: 2px; /* Optional: align the button to the top */
+			   }
+			 
+			  .custom-popup:hover{
+			       width: 200px; /* Set the width */
+			       height: 120px; /* Set the height */
+			      
+			       padding: 10px; /* Add padding */
+			       background-color: #fff; /* Set background color */
+			       border: 1px solid #ccc; /* Add border */
+			   }
+			          
+			        
     </style>
 </head>
-<body>
-	<div class="container-header">
-	        <div class="header">
-	            <img src="THINTURE_IMAGE/logo2.jpg" alt="THINTURE Logo" class="navbar-logo">
+<br>
+
+	<div id="menu-toggle" onclick="openNav()">
+		      <i class="fas fa-bars"></i>
+		  </div>
+		  <button id="back-button" class="back" onclick="history.back()">
+		      <i class="fas fa-arrow-left"></i>Back
+		  </button>
+		  <div class="tooltip">Vehicle Data Here</div>
+	    <div id="sidebar" class="tabopen">
+	        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+	        <div class="tabs">
+	         <!--     <a href="javascript:void(0)" onclick="showTab('search')">Search</a> -->	
+	            <a href="javascript:void(0)" onclick="showTab('vehicles')">Vehicle</a>
+	            <a href="javascript:void(0)" onclick="showTab('history')">History</a>
+				<a href="javascript:void(0)" onclick="showTab('events')">Events</a>
+		
+				       <a href="javascript:void(0)" onclick="logout()">Logout</a>
+							
+				
+	        </div>
+			
+	      <div class="tab-content">
+	        <!--     <div id="search" class="tab-pane">
+	                <h2>Search</h2>
+	                <div id="search-container">
+	                    <input type="text" id="deviceIDSearch" list="searchHistory" placeholder="Search by Device ID" />
+	                    <button onclick="searchDevice()">Search</button>
+	                    <button onclick="clearSearchHistory()">Clear History</button>
+	                </div>
+	                <datalist id="searchHistory"></datalist>
+					
+	                <div id="report"></div> <!-- Section for displaying vehicle report -->	
+
+
+				<div id="vehicles" class="tab-pane">
+				    <div class="tab-header">
+				        <input type="text" id="vehicleSearch" placeholder="Search" oninput="filterVehicles()" />
+						<button class="refresh-button" onclick="refreshVehicleList()">
+						       <i class="fa fa-sync"></i> <!-- Try using 'fa-sync' or 'fa-refresh' -->
+						   </button>
+				    </div>
+
+				    <div class="vehicle-list">
+				        <table id="vehicleTable">
+							
+							    <thead>
+							        <tr>
+										<th></th>
+							            <th>Device</th>
+							            <th><i class="material-icons">speed</i></th>
+							            <th><i class="material-icons">map</i></th>
+							        </tr>
+							    </thead>
+							    <tbody>
+							        <tr>
+							            <td class="status"><span class="dot blue"></span></td>
+							            <td class="details">
+							                <strong>25435 -jestin-Toyota 2020</strong><br>
+							                30-Jul-2024 12:05:36 PM
+							            </td>
+							            <td class="speed">0<br>KM/hr</td>
+							            <td class="distance">0<br>KM</td>
+							        </tr>
+							        <tr>
+							            <td class="status"><span class="dot blue"></span></td>
+							            <td class="details">
+							                <strong>6107-jestin-0911618682-Toyota 2020</strong><br>
+							                29-Jul-2024 06:02:50 PM
+							            </td>
+							            <td class="speed">0<br>KM/hr</td>
+							            <td class="distance">0<br>KM</td>
+							        </tr>
+							        <tr>
+							            <td class="status"><span class="dot red"></span></td>
+							            <td class="details">
+							                <strong>6085-jestin-0911617090-Toyota 2020</strong><br>
+							                06-Aug-2024 11:57:41 AM
+							            </td>
+							            <td class="speed">0<br>KM/hr</td>
+							            <td class="distance">8.47<br>KM</td>
+							        </tr>
+							        <tr>
+							            <td class="status"><span class="dot red"></span></td>
+							            <td class="details">
+							                <strong>6480-jestin -091157617568--Toyota 2023</strong><br>
+							                06-Aug-2024 12:00:59 PM
+							            </td>
+							            <td class="speed">0<br>KM/hr</td>
+							            <td class="distance">11.33<br>KM</td>
+							        </tr>
+							        <tr>
+							            <td class="status"><span class="dot red"></span></td>
+							            <td class="details">
+							                <strong>5861-jestin-0911617345-Toyota 2013</strong><br>
+							                06-Aug-2024 11:38:19 AM
+							            </td>
+							            <td class="speed">0<br>KM/hr</td>
+							            <td class="distance">18.97<br>KM</td>
+							        </tr>
+							    </tbody>
+							</table>
+				    </div>
+					<div id="vehicleDetails" class="vehicle-details" style="display: none;">
+					    <h2>Vehicle Details</h2>
+					    <div id="detailsContent"></div>
+					</div>
+				</div>
+				<div id="history" class="tab-pane">
+				        <div class="history-section">
+				            <!-- History Search Content -->
+							<div class="card">
+							       <h3>History Search</h3>
+							       <div id="searchForm">
+							           <div class="form-group">
+							               <label for="vehicleInput">Vehicle:</label>
+							               <select id="vehicleInput" placeholder="Select Vehicle ID">
+							                   <option value="">Select Vehicle ID</option>
+							                   <!-- Options will be added dynamically or statically -->
+							                   <option value="1">Vehicle 1</option>
+							                   <option value="2">Vehicle 2</option>
+							                   <option value="3">Vehicle 3</option>
+							                   <!-- Add more options as needed -->
+							               </select>
+							           </div>
+							           <div class="form-group">
+							               <label for="timeFromInput">Time From:</label>
+							               <input type="datetime-local" id="timeFromInput" />
+							           </div>
+							           <div class="form-group">
+							               <label for="timeToInput">Time To:</label>
+							               <input type="datetime-local" id="timeToInput" />
+							           </div>
+							           <div class="form-group">
+							               <label for="stopsInput">Stops:</label>
+							               <input type="text" id="stopsInput" placeholder="Enter Stops" />
+							           </div>
+							           <button onclick="searchHistory()">Show</button>
+							       </div>
+							       <!-- <button onclick="toggleForm()">Hide</button>-->
+							   </div>
+				    </div>
+	</div>
+				    <div id="events" class="tab-pane">
+				        <!-- Events Content -->
+				    </div>
+				</div>
+			
+
+	           
 	        </div>
 	    </div>
-    <div class="navbar">
-        <a href="/dashboard" class="active"><i class="fas fa-home"></i> Dashboard</a>
-        <a href="/map"><i class="fas fa-map"></i> Map</a>
-        <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i> View</a>
-            <div class="dropdown-content">
-				<a href="/total_users">Users</a>
-				                <a href="/total_vehicles">Vehicle</a>
-				                <a href="/tracking_details">Tracking Details</a>
-                <a href="#">Calendar</a>
-            </div>
-        </div>
-        <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i> Utility</a>
-            <div class="dropdown-content">
-                <a href="#">Support & Feedback</a>
-                <a href="#">Announcement</a>
-                <a href="#">Send Notification</a>
-            </div>
-        </div>
-        <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i> Accounts</a>
-            <div class="dropdown-content">
-                <a href="#">Renewal</a>
-            </div>
-        </div>
-        <a href="#"><i class="fas fa-th-large"></i> Profile</a>
-    </div>
+		<div class="status-buttons">
+		    <button class="status-button all">
+		        5<br>All
+		    </button>
+		    <button class="status-button running">
+		        0<br>Running
+		    </button>
+		    <button class="status-button stop">
+		        2<br>Stop
+		    </button>
+		    <button class="status-button idle">
+		        0<br>Idle
+		    </button>
+		    <button class="status-button inactive">
+		        3<br>Inactive
+		    </button>
+		</div>
+		
+
+	    <div id="map"></div>
+
 	
-    <div class="content">
-        <div id="map"></div>
-    </div>
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        var map = L.map('map').setView([12.225284, 79.074699], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+	    <div id="hover-info" class="hover-info"></div>
+		
 
-        var marker = L.marker([12.225284, 79.074699]).addTo(map)
-            .bindPopup('Location: Tiruvannamalai<br> Latitude: 12.225284<br> Longitude: 79.074699')
-            .openPopup();
+	
 
-        var socket = new SockJS('/gs-guide-websocket');
-        var stompClient = Stomp.over(socket);
+		<script>
+		document.addEventListener('DOMContentLoaded', () => {
+		    const table = document.getElementById('vehicleTable');
+		    const rows = table.getElementsByTagName('tr');
+		    const detailsSection = document.getElementById('vehicleDetails');
+		    const detailsContent = document.getElementById('detailsContent');
 
-        stompClient.connect({}, function (frame) {
-            stompClient.subscribe('/topic/location-updates', function (locationUpdate) {
-                var data = JSON.parse(locationUpdate.body);
-                var lat = parseFloat(data.latitude);
-                var lon = parseFloat(data.longitude);
+		    for (let i = 1; i < rows.length; i++) { // Skip header row
+		        rows[i].addEventListener('mouseover', function () {
+		            const details = this.getElementsByClassName('details')[0].innerHTML;
+		            detailsContent.innerHTML = details; // Set the details content
+		            detailsSection.style.display = 'block'; // Show the details section
+		        });
 
-                marker.setLatLng([lat, lon])
-                    .bindPopup('Device ID: ' + data.deviceID + '<br>Timestamp: ' + data.timestamp)
-                    .openPopup();
+		        rows[i].addEventListener('mouseout', function () {
+		            detailsSection.style.display = 'none'; // Hide the details section when not hovering
+		        });
 
-                map.setView([lat, lon], 13);
-            });
-        });
-        /*]]>*/
-    </script>
-</body>
-</html>
+		        // Add event listener to open details in a new tab
+		        rows[i].addEventListener('mouseover', function () {
+		            const vehicleDetails = this.getElementsByClassName('details')[0].innerHTML;
+		            const newTab = window.open('', '_blank'); // Open new tab
+
+		            newTab.document.write(`
+		                <html>
+		                    <head>
+		                        <title>Vehicle Details</title>
+		                        <style>
+		                            body { font-family: Arial, sans-serif; margin: 20px; }
+		                            .details { font-size: 18px; }
+		                            .status { font-size: 24px; }
+		                        </style>
+		                    </head>
+		                    <body>
+		                        <h1>Vehicle Details</h1>
+		                        <div class="details">${vehicleDetails}</div>
+		                    </body>
+		                </html>
+		            `);
+		            newTab.document.close(); // Close the document to finish loading
+		        });
+		    }
+		});
+
+		function filterVehicles() {
+		    const searchValue = document.getElementById('vehicleSearch').value.toLowerCase();
+		    const table = document.getElementById('vehicleTable');
+		    const rows = table.getElementsByTagName('tr');
+		    let found = false;
+
+		    // Remove any previous "no match" row
+		    const previousNoMatch = document.getElementById('noMatchRow');
+		    if (previousNoMatch) {
+		        previousNoMatch.remove();
+		    }
+
+		    // Loop through table rows, and hide those that don't match the search query
+		    for (let i = 1; i < rows.length; i++) { // Skip header row
+		        const details = rows[i].getElementsByClassName('details')[0];
+		        const deviceIdText = details ? details.textContent.toLowerCase() : '';
+
+		        if (deviceIdText.includes(searchValue)) {
+		            rows[i].style.display = ''; // Show the row if matched
+		            found = true;
+		        } else {
+		            rows[i].style.display = 'none'; // Hide the row if not matched
+		        }
+		    }
+
+		    if (!found) {
+		        const noMatchRow = document.createElement('tr');
+		        noMatchRow.id = 'noMatchRow'; // Assign an ID to easily find and remove this row later
+		        const noMatchCell = document.createElement('td');
+		        noMatchCell.colSpan = 3;
+		        noMatchCell.style.textAlign = 'center';
+		        noMatchCell.textContent = 'No matching vehicle found';
+		        noMatchRow.appendChild(noMatchCell);
+		        table.getElementsByTagName('tbody')[0].appendChild(noMatchRow);
+		    }
+		}
+
+		// Clear the "no match" row if the search is cleared
+		function clearNoMatchRow() {
+		    const table = document.getElementById('vehicleTable');
+		    const noMatchRows = Array.from(table.getElementsByTagName('tr')).filter(row => {
+		        return row.textContent.includes('No matching vehicle found');
+		    });
+
+		    noMatchRows.forEach(row => row.parentNode.removeChild(row));
+		}
+
+		// Refresh button function to reset the vehicle list
+		function refreshVehicleList() {
+		    document.getElementById('vehicleSearch').value = ''; // Clear the search box
+		    clearNoMatchRow(); // Clear the "no match" row if present
+
+		    const table = document.getElementById('vehicleTable');
+		    const rows = table.getElementsByTagName('tr');
+
+		    // Show all rows except the header
+		    for (let i = 1; i < rows.length; i++) {
+		        rows[i].style.display = '';
+		    }
+		}
+
+		document.getElementById('detailsTab').addEventListener('click', function () {
+		    // Switch to the Details tab
+		    document.querySelector('.tab-pane.active').classList.remove('active');
+		    document.getElementById('details').classList.add('active');
+
+		    // Highlight the Details tab
+		    document.querySelector('.tabs div.active').classList.remove('active');
+		    this.classList.add('active');
+		});
+		</script>
+
+		   <script>
+			var map = L.map('map').setView([13.0827, 77.5776], 13);
+
+			L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+			}).addTo(map);
+
+			// Object to hold markers by deviceID
+			var markers = {};
+			var currentDeviceID = null; // Variable to store the current search device ID
+
+			// Define sample data for three different car locations and statuses
+			var initialCarData = [
+			    { deviceID: 'car1', latitude: 13.0811, longitude: 77.5562, status: 'N1', timestamp: new Date().toISOString(), vehicleData: 'Car 1' },
+			    { deviceID: 'car2', latitude: 13.0820, longitude: 77.5570, status: 'N2', timestamp: new Date().toISOString(), vehicleData: 'Car 2' },
+			    { deviceID: 'car3', latitude: 13.0830, longitude: 77.5580, status: 'N1', timestamp: new Date().toISOString(), vehicleData: 'Car 3' }
+			];
+
+			// Add markers to the map
+			initialCarData.forEach(data => addOrUpdateMarker(data));
+
+			// Function definitions
+			function addOrUpdateMarker(data) {
+			    var lat = parseFloat(data.latitude);
+			    var lon = parseFloat(data.longitude);
+			    var icon = getCarIcon(data.status, data.vehicleData);
+
+			    if (markers[data.deviceID]) {
+			        markers[data.deviceID].setLatLng([lat, lon])
+			            .setIcon(icon)
+			            .bindPopup(`
+			                <b>Device ID:</b> ${data.deviceID}<br>
+			                <b>Status:</b> ${data.status === 'N1' ? 'Stopped' : 'Running'}<br>
+			                <b>Timestamp:</b> ${data.timestamp}
+			            `)
+			            .openPopup();
+			    } else {
+			        markers[data.deviceID] = L.marker([lat, lon], {icon: icon})
+			            .bindPopup(`
+			                <b>Device ID:</b> ${data.deviceID}<br>
+			                <b>Status:</b> ${data.status === 'N1' ? 'Stopped' : 'Running'}<br>
+			                <b>Timestamp:</b> ${data.timestamp}
+			            `);
+
+			        if (data.deviceID === currentDeviceID) {
+			            markers[data.deviceID].addTo(map); // Show marker if it matches the current search
+			        }
+			    }
+
+			    map.setView([lat, lon], 13); // Optionally, adjust zoom level
+			}
+
+			function getCarIcon(status, vehicleData) {
+			    var ringClass = status === 'N1' ? 'ring-blink-red' : 'ring-blink-green';
+
+			    return L.divIcon({
+			        className: 'custom-icon ring-blink ' + ringClass,
+			        html: `
+			            <div class="ring-blink">
+			                <img src="${status === 'N1' ? 'THINTURE_IMAGE/red2.png' : 'THINTURE_IMAGE/greencar2.png'}" alt="car-icon" style="width: 38px; height: 38px;">
+			                <div class="tooltip">${vehicleData}</div>
+			            </div>
+			        `,
+			        iconSize: [38, 38],
+			        iconAnchor: [19, 19],
+			        popupAnchor: [0, -19]
+			    });
+			}
+
+			// Fetch initial data and set up WebSocket as needed
+			// (Include your fetch and WebSocket setup code here)
+
+
+			var markers = {};
+
+			function addOrUpdateMarker(data) {
+			    var lat = parseFloat(data.latitude);
+			    var lon = parseFloat(data.longitude);
+			    var icon = getCarIcon(data.status);
+
+			    // Properly format the HTML content with correct string concatenation
+			    var popupContent = '<b>Device ID:</b> ' + data.deviceID + '<br>' +
+			                       '<b>Status:</b> ' + (data.status === 'N1' ? 'Stop' : 'Running') + '<br>' +
+			                       '<b>Timestamp:</b> ' + data.timestamp;
+
+			    if (markers[data.deviceID]) {
+			        // Update existing marker
+			        markers[data.deviceID].setLatLng([lat, lon])
+			            .setIcon(icon)
+			            .bindPopup(popupContent)
+			            .openPopup();
+			    } else {
+			        // Create new marker
+			        markers[data.deviceID] = L.marker([lat, lon], { icon: icon }).addTo(map)
+			            .bindPopup(popupContent)
+			            .openPopup();
+			    }
+
+			    // Set the map view to the new location
+			    map.setView([lat, lon], 13);
+			}
+
+
+			   var defaultMarker = L.marker([13.0811, 77.5562], { icon: getCarIcon('N1') }).addTo(map)
+			       .bindPopup('<div class="custom-popup">' +
+			                  '<strong>Vehicle Details</strong>' +
+			                  '<div class="card">Name: Jestin George <br>Vehicle No: kL:78 A 9345<br>Country:INDIA<br>Location:Thinture<br>Time&Date:12:57pm/13-08-2024</div>' +
+			                  '</div>')
+			       .openPopup();
+
+
+		       fetch('/gps/locations')
+		           .then(response => response.json())
+		           .then(data => {
+		               data.forEach(location => addOrUpdateMarker(location));
+		           })
+		           .catch(error => console.error('Error fetching initial locations:', error));
+
+		       var socket = new SockJS('/gs-guide-websocket');
+		       var stompClient = Stomp.over(socket);
+
+		       stompClient.connect({}, function (frame) {
+		           stompClient.subscribe('/topic/location-updates', function (locationUpdate) {
+		               var data = JSON.parse(locationUpdate.body);
+		               addOrUpdateMarker(data);
+		           });
+		       }, function (error) {
+		           console.error('Error connecting to WebSocket:', error);
+		       });
+
+		       function showTab(tabId) {
+		           document.querySelectorAll('.tab-pane').forEach(pane => {
+		               pane.classList.remove('active');
+		           });
+		           document.getElementById(tabId).classList.add('active');
+		       }
+
+		       document.addEventListener('DOMContentLoaded', function() {
+		           let history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+		           let datalist = document.getElementById('searchHistory');
+		           history.forEach(id => {
+		               let option = document.createElement('option');
+		               option.value = id;
+		               datalist.appendChild(option);
+		           });
+		       });
+
+		       function updateSearchHistory(deviceID) {
+		           let history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+		           if (!history.includes(deviceID)) {
+		               history.push(deviceID);
+		               localStorage.setItem('searchHistory', JSON.stringify(history));
+		           }
+		           let datalist = document.getElementById('searchHistory');
+		           datalist.innerHTML = "";
+		           history.forEach(id => {
+		               let option = document.createElement('option');
+		               option.value = id;
+		               datalist.appendChild(option);
+		           });
+		       }
+
+		       function showHistoryForDevice(deviceID) {
+		           document.querySelectorAll('.tab-pane').forEach(pane => {
+		               pane.style.display = 'none';
+		           });
+
+		           var historyTab = document.getElementById('history');
+		           if (historyTab) {
+		               historyTab.style.display = 'block';
+		               var historyContent = getHistoryForDevice(deviceID);
+		               historyTab.innerHTML = `
+		                   <h2>History for Device ID: ${deviceID}</h2>
+		                   <div class="history-content">${historyContent}</div>
+		               `;
+		           }
+		       }
+
+		       function getHistoryForDevice(deviceID) {
+		           var historyData = {
+		               'device1': 'Device 1 History Data',
+		               'device2': 'Device 2 History Data',
+		               'device3': 'Device 3 History Data',
+		               'device4': 'Device 4 History Data'
+		           };
+		           return historyData[deviceID] || 'No history data available for this device.';
+		       }
+
+		       function clearSearchHistory() {
+		           localStorage.removeItem('searchHistory');
+		           document.getElementById('searchHistory').innerHTML = "";
+		       }
+
+		       function openNav() {
+		           document.getElementById("sidebar").style.width = "350px";
+		           showTab('search');
+		       }
+
+		       function closeNav() {
+		           document.getElementById("sidebar").style.width = "0";
+		       }
+
+		       function resetSidebar() {
+		           document.getElementById("sidebar").style.width = "-250px";
+		       }
+
+		       function openTab(evt, tabName) {
+		           const tabcontent = document.querySelectorAll(".tab-content");
+		           tabcontent.forEach(content => content.style.display = "none");
+
+		           const tablinks = document.querySelectorAll(".tabs a");
+		           tablinks.forEach(link => link.classList.remove("active"));
+
+		           document.getElementById(tabName).style.display = "block";
+		           evt.currentTarget.classList.add("active");
+		       }
+			   document.addEventListener('DOMContentLoaded', function() {
+			       // Assuming you get the user type from some source
+			       // For example, from a global variable, API call, or session
+			       var userType = 'dealer'; // Replace with actual user type retrieval logic
+
+			       // List of allowed user types
+			       var allowedUserTypes = ['dealer', 'admin', 'superadmin'];
+
+			       // Show the button if the user type is in the allowed list
+			       if (allowedUserTypes.includes(userType)) {
+			           document.getElementById('back-button').style.display = 'block';
+			       }
+			   });
+
+		   		   </script>
+		   </body>
+		   </html>   
