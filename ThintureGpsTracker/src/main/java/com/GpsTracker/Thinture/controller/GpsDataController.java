@@ -47,5 +47,5 @@ public class GpsDataController {
         GpsData savedData = gpsDataService.saveOrUpdateGpsData(gpsData);
         return ResponseEntity.ok(savedData);
     }
-
+//
 }

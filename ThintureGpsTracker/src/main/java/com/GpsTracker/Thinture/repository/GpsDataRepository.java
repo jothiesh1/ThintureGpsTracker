@@ -20,3 +20,4 @@ public interface GpsDataRepository extends JpaRepository<GpsData, Long> {
     @Query("SELECT g FROM GpsData g WHERE g.id IN (SELECT MAX(id) FROM GpsData GROUP BY deviceID)")
     List<GpsData> findAllLatestGpsData();
 }
+//

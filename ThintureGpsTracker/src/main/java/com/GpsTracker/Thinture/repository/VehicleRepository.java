@@ -13,3 +13,4 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 	
     // You can add custom query methods if needed
 }
+//

@@ -112,7 +112,7 @@ public class MqttService {
             logger.error("Failed to parse payload: {}", payload, e);
         }
     }
-
+//
     private double parseCoordinate(String coordinate) {
         char direction = coordinate.charAt(coordinate.length() - 1);
         double value = Double.parseDouble(coordinate.substring(0, coordinate.length() - 1));

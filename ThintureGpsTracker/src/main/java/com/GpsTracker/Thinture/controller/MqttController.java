@@ -1,5 +1,5 @@
 package com.GpsTracker.Thinture.controller;
-
+///
 import com.GpsTracker.Thinture.model.GpsData;
 import com.GpsTracker.Thinture.service.MqttService;
 import com.fasterxml.jackson.databind.ObjectMapper;

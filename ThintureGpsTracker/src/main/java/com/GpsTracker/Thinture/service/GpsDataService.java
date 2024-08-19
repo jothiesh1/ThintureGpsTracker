@@ -13,7 +13,7 @@ import com.GpsTracker.Thinture.repository.GpsDataRepository;
 public class GpsDataService {
     @Autowired
     private GpsDataRepository gpsDataRepository;
-
+//
     public GpsData saveOrUpdateGpsData(GpsData gpsData) {
         Optional<GpsData> existingGpsData = gpsDataRepository.findByDeviceID(gpsData.getDeviceID());
         if (existingGpsData.isPresent()) {

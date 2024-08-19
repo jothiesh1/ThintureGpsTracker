@@ -22,7 +22,7 @@ public class VehicleController {
 
     @Autowired
     private VehicleService vehicleService;
-
+//
     @GetMapping
     public String getAllVehicles(Model model) {
         model.addAttribute("vehicles", vehicleService.getAllVehicles());

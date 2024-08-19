@@ -13,3 +13,4 @@ public class MapController {
       return "map";  // The name of your Thymeleaf template (without the .html extension)
   }
 }
+//

@@ -1,6 +1,6 @@
 package com.GpsTracker.Thinture.dto;
 
-
+//
 public class LocationUpdate {
   private double latitude;
   private double longitude;
