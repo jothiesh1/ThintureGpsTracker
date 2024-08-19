@@ -21,10 +21,21 @@ public class GpsDataService {
             existingData.setTimestamp(gpsData.getTimestamp());
             existingData.setLatitude(gpsData.getLatitude());
             existingData.setLongitude(gpsData.getLongitude());
+            existingData.setDataValidity(gpsData.getDataValidity());
+            existingData.setStatus(gpsData.getStatus());
+            existingData.setSpeed(gpsData.getSpeed());
+            existingData.setCourse(gpsData.getCourse());
+            existingData.setAdditionalData(gpsData.getAdditionalData());
+            existingData.setSequenceNumber(gpsData.getSequenceNumber());
             return gpsDataRepository.save(existingData);
         } else {
             return gpsDataRepository.save(gpsData);
         }
+    }
+    
+    public List<GpsData> findAllLatestDeviceLocations() {
+        // Assuming you have a method in your repository to get the latest record for each device
+        return gpsDataRepository.findAllLatestGpsData();
     }
     // Method to save GPS data
     

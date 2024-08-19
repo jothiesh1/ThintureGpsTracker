@@ -332,7 +332,101 @@
 			       border: 1px solid #ccc; /* Add border */
 			   }
 			          
-			        
+
+			   #live-video {
+			       display: none; /* Initially hidden */
+			       position: relative;
+			       width: 100%;
+			       height: 350px; /* Adjust height as needed */
+			       margin-top: 20px;
+			   }
+
+			   #live-video.active {
+			       display: block; /* Display the video when active */
+			   }
+
+			   #video-stream {
+			       width: 100%;
+			       height: 100%;
+			   }
+
+			   #close-icon {
+			       position: absolute;
+			       top: 5px;
+			       right: 10px;
+			       cursor: pointer;
+			       font-size: 24px;
+			       color: #fff;
+			   }
+
+
+			   #close-icon {
+			       position: absolute;
+			       top: 5px;
+			       right: 5px;
+			       width: 20px;
+			       height: 20px;
+			       background-color: #fff;
+			       color: #000;
+			       text-align: center;
+			       line-height: 20px;
+			       border-radius: 50%;
+			       cursor: pointer;
+			       font-weight: bold;
+			   }
+
+			   #close-icon:hover {
+			       background-color: #ccc;
+			   }
+			   #sideTab {
+			       height: 100%;
+			       width: 0;
+			       position: fixed;
+			       top: 0;
+			       right: 0;
+			       background-color: lightsteelblue;
+			       overflow-x: hidden;
+			       transition: width 0.5s ease;
+			       padding-top: 60px;
+			       box-shadow: -5px 0px 15px rgba(0,0,0,0.5);
+			       z-index: 9999;
+			   }
+
+			   #sideTab.open {
+			       width: 300px; /* Adjust the width as needed */
+			   }
+
+			   .tab-content {
+			       display: block; /* Ensure tab content is visible */
+			       padding: 15px; /* Add padding for better layout */
+				   font-size: 12px;
+			   }
+
+			 
+			   .closebtn {
+			       font-size: 36px;
+			       cursor: pointer;
+			       position: absolute;
+			       top: 0;
+			       right: 15px;
+				   color: #FF0000;
+			   }
+			   .card{
+				background-color:lightsteelblue ;
+	
+			   }
+.live-button{
+	
+	background-color: #3F51B5;
+			       color: white; /* Optional: changes the text color to white for better contrast */
+			       border: none; /* Optional: removes the border if you want a cleaner look */
+			       padding: 10px 20px; /* Optional: adds some padding inside the button */
+			       margin: 10px; /* Optional: adds margin around the button */
+			       position: absolute; /* Position the button absolutely within its container */
+			       right: 100px; /* Align the button to the right */
+			       top: 2px; /* Optional: align the button to the top */
+			   
+}
     </style>
 </head>
 <br>
@@ -343,6 +437,10 @@
 		  <button id="back-button" class="back" onclick="history.back()">
 		      <i class="fas fa-arrow-left"></i>Back
 		  </button>
+		  <button type="menu" class="live-button" id="open">
+		      <i class="fas fa-video"></i> Live Streaming
+		  </button>
+
 		  <div class="tooltip">Vehicle Data Here</div>
 	    <div id="sidebar" class="tabopen">
 	        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
@@ -351,7 +449,7 @@
 	            <a href="javascript:void(0)" onclick="showTab('vehicles')">Vehicle</a>
 	            <a href="javascript:void(0)" onclick="showTab('history')">History</a>
 				<a href="javascript:void(0)" onclick="showTab('events')">Events</a>
-		
+				<a href="javascript:void(0)" onclick="showTab('live')">Video</a>
 				       <a href="javascript:void(0)" onclick="logout()">Logout</a>
 							
 				
@@ -481,12 +579,50 @@
 				    <div id="events" class="tab-pane">
 				        <!-- Events Content -->
 				    </div>
+					   <div id="live" class="tab-pane active"> <!-- Set this as active -->
+					            <div class="live-video">
+									<div class="card">
+									<button type="menu" id="open">Live Streaming</button>
+									<button type="menu">Events</button>
+									
+					            </div>
+					        </div>
+					    </div>
+					</div>
 				</div>
-			
+				
 
 	           
-	        </div>
+	        
 	    </div>
+		
+		<div id="sideTab">
+		       <a href="javascript:void(0)" class="closebtn" id="closeSideTab">&times;</a>
+		       <div class="tab-content" id="tabContent">
+		           <div class="card">
+		               <label for="vehicle-search">Search Vehicle:</label>
+		               <input type="text" id="vehicle-search" placeholder="Enter vehicle name or ID">
+		               <br><br>
+		               <label for="camera-select">Select Camera:</label>
+		               <select id="camera-select">
+		                   <option value="front">Front</option>
+		                   <option value="rear">Rear</option>
+		               </select>
+					   <br>
+					   <br>
+		               <button class="button" id="btnLiveStream">
+		                   <i class="fas fa-video"></i> Open Live
+		               </button>
+					   <span id="error-message" style="color: red; display: none; margin-top: 10px;"></span>
+		           </div>
+		       </div>
+		       <div id="live-video">
+		           <span id="close-icon" class="closebtn">&times;</span>
+		           <iframe id="video-stream" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+		       </div>
+		   </div>
+
+		   
 		<div class="status-buttons">
 		    <button class="status-button all">
 		        5<br>All
@@ -504,11 +640,14 @@
 		        3<br>Inactive
 		    </button>
 		</div>
+
+		<!-- Form for selecting camera, vehicle ID, and date range -->
 		
 
 	    <div id="map"></div>
+		
 
-	
+		           
 	    <div id="hover-info" class="hover-info"></div>
 		
 
@@ -630,7 +769,7 @@
 		});
 		</script>
 
-		   <script>
+		   <!--<script>
 			var map = L.map('map').setView([13.0827, 77.5776], 13);
 
 			L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -680,8 +819,202 @@
 			    }
 
 			    map.setView([lat, lon], 13); // Optionally, adjust zoom level
-			}
+			}-->
+			<script>
+			    // Initialize the map and set the initial view
+			    var map = L.map('map').setView([13.0827, 77.5776], 13);
 
+			    // Add OpenStreetMap tile layer
+			    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+			    }).addTo(map);
+
+			    // Function to create a car icon with different styles based on status
+			    function getCarIcon(status) {
+			        return L.divIcon({
+			            className: 'custom-icon ring-blink ' + (status === 'N1' ? 'ring-blink-red' : 'ring-blink-green'),
+			            html: '<i class="fas fa-car"></i>',
+			            iconSize: [32, 32],
+			            iconAnchor: [16, 32],
+			            popupAnchor: [0, -32]
+			        });
+			    }
+
+			    // Object to store markers by device ID
+			    var markers = {};
+
+			    // Function to add or update a marker on the map
+			    function addOrUpdateMarker(data) {
+			        var lat = parseFloat(data.latitude);
+			        var lon = parseFloat(data.longitude);
+			        var icon = getCarIcon(data.status);
+
+			        var popupContent = `<b>Device ID:</b> ${data.deviceID}<br>
+			                            <b>Timestamp:</b> ${data.timestamp}<br>
+			                            <b>Data Validity:</b> ${data.dataValidity}<br>
+			                            <b>Status:</b> ${data.status === 'N1' ? 'Stopped' : 'Running'}<br>
+			                            <b>Speed:</b> ${data.speed} km/h`;
+
+			        if (markers[data.deviceID]) {
+			            // Update the existing marker's position, icon, and popup content
+			            markers[data.deviceID].setLatLng([lat, lon])
+			                .setIcon(icon)
+			                .bindPopup(popupContent);
+			        } else {
+			            // Create a new marker if it doesn't exist
+			            markers[data.deviceID] = L.marker([lat, lon], { icon: icon }).addTo(map)
+			                .bindPopup(popupContent);
+			        }
+
+			        // Optionally, center the map on the updated marker
+			        map.setView([lat, lon], 13);
+			    }
+
+			    // Default marker for initial load
+			    var defaultMarker = L.marker([13.0811, 77.5562], { icon: getCarIcon('N1') }).addTo(map)
+			        .bindPopup('Default Location')
+			        .openPopup();
+
+			    // Fetch all locations from the server on initial load
+			    fetch('/gps/locations')
+			        .then(response => response.json())
+			        .then(data => {
+			            data.forEach(location => addOrUpdateMarker(location));
+			        })
+			        .catch(error => console.error('Error fetching initial locations:', error));
+
+			    // WebSocket to listen for real-time updates
+			    var socket = new SockJS('/gs-guide-websocket');
+			    var stompClient = Stomp.over(socket);
+
+			    stompClient.connect({}, function (frame) {
+			        stompClient.subscribe('/topic/location-updates', function (locationUpdate) {
+			            var data = JSON.parse(locationUpdate.body);
+			            addOrUpdateMarker(data);
+			        });
+			    }, function (error) {
+			        console.error('Error connecting to WebSocket:', error);
+			    });
+			
+
+			    // WebSocket to listen for real-time updates
+			    var socket = new SockJS('/gs-guide-websocket');
+			    var stompClient = Stomp.over(socket);
+
+			    stompClient.connect({}, function (frame) {
+			        stompClient.subscribe('/topic/location-updates', function (locationUpdate) {
+			            var data = JSON.parse(locationUpdate.body);
+			            addOrUpdateMarker(data);
+			        });
+			    }, function (error) {
+			        console.error('Error connecting to WebSocket:', error);
+			    });
+			
+    
+				
+				//tab button
+
+				       function showTab(tabId) {
+				           document.querySelectorAll('.tab-pane').forEach(pane => {
+				               pane.classList.remove('active');
+				           });
+				           document.getElementById(tabId).classList.add('active');
+				       }
+
+				       document.addEventListener('DOMContentLoaded', function() {
+				           let history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+				           let datalist = document.getElementById('searchHistory');
+				           history.forEach(id => {
+				               let option = document.createElement('option');
+				               option.value = id;
+				               datalist.appendChild(option);
+				           });
+				       });
+
+				       function updateSearchHistory(deviceID) {
+				           let history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+				           if (!history.includes(deviceID)) {
+				               history.push(deviceID);
+				               localStorage.setItem('searchHistory', JSON.stringify(history));
+				           }
+				           let datalist = document.getElementById('searchHistory');
+				           datalist.innerHTML = "";
+				           history.forEach(id => {
+				               let option = document.createElement('option');
+				               option.value = id;
+				               datalist.appendChild(option);
+				           });
+				       }
+
+				       function showHistoryForDevice(deviceID) {
+				           document.querySelectorAll('.tab-pane').forEach(pane => {
+				               pane.style.display = 'none';
+				           });
+
+				           var historyTab = document.getElementById('history');
+				           if (historyTab) {
+				               historyTab.style.display = 'block';
+				               var historyContent = getHistoryForDevice(deviceID);
+				               historyTab.innerHTML = `
+				                   <h2>History for Device ID: ${deviceID}</h2>
+				                   <div class="history-content">${historyContent}</div>
+				               `;
+				           }
+				       }
+
+				       function getHistoryForDevice(deviceID) {
+				           var historyData = {
+				               'device1': 'Device 1 History Data',
+				               'device2': 'Device 2 History Data',
+				               'device3': 'Device 3 History Data',
+				               'device4': 'Device 4 History Data'
+				           };
+				           return historyData[deviceID] || 'No history data available for this device.';
+				       }
+
+				       function clearSearchHistory() {
+				           localStorage.removeItem('searchHistory');
+				           document.getElementById('searchHistory').innerHTML = "";
+				       }
+
+				       function openNav() {
+				           document.getElementById("sidebar").style.width = "350px";
+				           showTab('search');
+				       }
+
+				       function closeNav() {
+				           document.getElementById("sidebar").style.width = "0";
+				       }
+
+				       function resetSidebar() {
+				           document.getElementById("sidebar").style.width = "-250px";
+				       }
+
+				       function openTab(evt, tabName) {
+				           const tabcontent = document.querySelectorAll(".tab-content");
+				           tabcontent.forEach(content => content.style.display = "none");
+
+				           const tablinks = document.querySelectorAll(".tabs a");
+				           tablinks.forEach(link => link.classList.remove("active"));
+
+				           document.getElementById(tabName).style.display = "block";
+				           evt.currentTarget.classList.add("active");
+				       }
+					   document.addEventListener('DOMContentLoaded', function() {
+					       // Assuming you get the user type from some source
+					       // For example, from a global variable, API call, or session
+					       var userType = 'dealer'; // Replace with actual user type retrieval logic
+
+					       // List of allowed user types
+					       var allowedUserTypes = ['dealer', 'admin', 'superadmin'];
+
+					       // Show the button if the user type is in the allowed list
+					       if (allowedUserTypes.includes(userType)) {
+					           document.getElementById('back-button').style.display = 'block';
+					       }
+					   });
+
+				   
 			function getCarIcon(status, vehicleData) {
 			    var ringClass = status === 'N1' ? 'ring-blink-red' : 'ring-blink-green';
 
@@ -732,14 +1065,22 @@
 			    map.setView([lat, lon], 13);
 			}
 
+//  code for getting data backend
+function createPopupContent(vehicle) {
+    return '<div class="custom-popup">' +
+           '<strong>Vehicle Details</strong>' +
+           '<div class="card">' +
+           'Device ID: ' + vehicle.deviceID + '<br>' +
+           'Timestamp: ' + vehicle.timestamp + '<br>' +
+           'Data Validity: ' + vehicle.dataValidity + '<br>' +
+           'Status: ' + vehicle.status + '<br>' +
+           'Speed: ' + vehicle.speed + ' km/h<br>' +
+           '</div>' +
+           '</div>'
+}
 
-			   var defaultMarker = L.marker([13.0811, 77.5562], { icon: getCarIcon('N1') }).addTo(map)
-			       .bindPopup('<div class="custom-popup">' +
-			                  '<strong>Vehicle Details</strong>' +
-			                  '<div class="card">Name: Jestin George <br>Vehicle No: kL:78 A 9345<br>Country:INDIA<br>Location:Thinture<br>Time&Date:12:57pm/13-08-2024</div>' +
-			                  '</div>')
-			       .openPopup();
-
+//			       .openPopup() ;
+//
 
 		       fetch('/gps/locations')
 		           .then(response => response.json())
@@ -861,5 +1202,58 @@
 			   });
 
 		   		   </script>
+				   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+				   <scriptsrc="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script><script>
+				       $(document).ready(function() {
+				           const deviceStreams = {
+				               'vehicle1-front': 'https://www.youtube.com/embed/MpoSEvSqRqg',
+				               'vehicle1-rear': 'https://www.youtube.com/embed/Xo8jdYu1B4c',
+				               'vehicle2-front': 'https://www.youtube.com/embed/rJxSlIXUGy4',
+				               'vehicle2-rear': 'https://www.youtube.com/embed/3JZ_D3ELwOQ'
+				               // Add more mappings as needed
+				           };
+
+				           $('#btnLiveStream').click(function() {
+				               $('#sideTab').addClass('open'); // Open the side tab
+
+				               const vehicleId = $('#vehicle-search').val().toLowerCase();
+				               const camera = $('#camera-select').val();
+				               const key = `${vehicleId}-${camera}`; // Corrected template literal usage
+				               const videoUrl = deviceStreams[key];
+
+				               if (videoUrl) {
+				                   $('#video-stream').attr('src', videoUrl);
+				                   $('#live-video').show().addClass('active');
+				                   $('#tabContent').show();
+				                   $('#error-message').hide(); // Hide any previous error message
+				               } else {
+				                   $('#live-video').hide().removeClass('active');
+				                   $('#tabContent').show();
+				                   $('#error-message').text('No live stream available for this vehicle and camera.').show();
+				               }
+				           });
+
+				           // Close the side tab
+				           $('#closeSideTab').click(function() {
+				               $('#sideTab').removeClass('open');
+				               $('#live-video').hide().removeClass('active');
+				               $('#tabContent').show();
+				               $('#video-stream').attr('src', ''); // Stop the video stream
+				               $('#error-message').hide(); // Hide error message
+				           });
+
+				           // Close the live video and show tab content
+				           $('#close-icon').click(function() {
+				               $('#live-video').hide().removeClass('active');
+				               $('#tabContent').show();
+				               $('#video-stream').attr('src', ''); // Stop the video stream
+				               $('#error-message').hide(); // Hide error message
+				           });
+
+				           $('#open').click(function() {
+				               $('#sideTab').addClass('open');
+				           });
+				       });
+				   </script>
 		   </body>
-		   </html>   
+		   </html>

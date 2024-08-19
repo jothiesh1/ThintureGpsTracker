@@ -136,6 +136,9 @@ public class GpsData implements Serializable {
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", speed='" + speed + '\'' +
+                ", course='" + course + '\'' +
+                ", speed='" + speed + '\'' +
+               ", additionalData='" + additionalData +'\''+
                 '}';
     }
 }

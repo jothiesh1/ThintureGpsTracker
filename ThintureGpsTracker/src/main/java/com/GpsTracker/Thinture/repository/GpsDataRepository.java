@@ -1,5 +1,6 @@
 package com.GpsTracker.Thinture.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,4 +17,6 @@ public interface GpsDataRepository extends JpaRepository<GpsData, Long> {
     // Find the latest GPS data by deviceID
     @Query("SELECT g FROM GpsData g WHERE g.deviceID = :deviceID ORDER BY g.timestamp DESC")
     GpsData findLatestByDeviceID(@Param("deviceID") String deviceID);
+    @Query("SELECT g FROM GpsData g WHERE g.id IN (SELECT MAX(id) FROM GpsData GROUP BY deviceID)")
+    List<GpsData> findAllLatestGpsData();
 }

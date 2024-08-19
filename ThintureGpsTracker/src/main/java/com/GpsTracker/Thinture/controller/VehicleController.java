@@ -1,5 +1,7 @@
 package com.GpsTracker.Thinture.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,4 +38,11 @@ public class VehicleController {
         vehicleService.save(vehicle);
         return "redirect:/total_vehicles";  // Redirect to avoid duplicate submissions
     }
+    
+    // code for the visible map in the javascript page
+    @GetMapping("/locations")
+    public List<Vehicle> getGpsLocations() {
+        return vehicleService.getAllVehicles(); // Fetches all vehicles from the database
+    }
+    
 }
