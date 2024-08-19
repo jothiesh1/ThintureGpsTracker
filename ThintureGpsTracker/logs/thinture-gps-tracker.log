@@ -166,3 +166,13 @@ java.lang.IllegalArgumentException: Invalid character found in the request targe
 2024-08-19 14:20:10 [http-nio-8181-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
 2024-08-19 14:20:10 [http-nio-8181-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 3 ms
 2024-08-19 14:20:52 [MessageBroker-4] INFO  o.s.w.s.c.WebSocketMessageBrokerStats - WebSocketSession[3 current WS(3)-HttpStream(0)-HttpPoll(0), 6 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(6)-CONNECTED(6)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[unknown], outboundChannel[unknown], sockJsScheduler[pool size = 4, active threads = 1, queued tasks = 4, completed tasks = 12]
+2024-08-19 14:49:02 [RMI TCP Connection(39)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2024-08-19 14:49:02 [RMI TCP Connection(39)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
+2024-08-19 14:49:02 [RMI TCP Connection(39)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@56972302]]
+2024-08-19 14:49:02 [RMI TCP Connection(39)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
+2024-08-19 14:49:02 [RMI TCP Connection(39)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-19 14:49:02 [RMI TCP Connection(39)-127.0.0.1] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 0 subscriber(s).
+2024-08-19 14:49:02 [RMI TCP Connection(39)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2024-08-19 14:49:02 [RMI TCP Connection(39)-127.0.0.1] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-08-19 14:49:02 [RMI TCP Connection(39)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-08-19 14:49:02 [RMI TCP Connection(39)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
