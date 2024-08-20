@@ -768,338 +768,114 @@
 		    this.classList.add('active');
 		});
 		</script>
+     <!--  
+		
+		map code below all
+		
+		
+		
+		
+	 -->
 
-		   <!--<script>
-			var map = L.map('map').setView([13.0827, 77.5776], 13);
+		<div id="map"></div>
+		<script>
+		    var map = L.map('map').setView([13.0827, 77.5776], 13);
 
-			L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-			    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-			}).addTo(map);
+		    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+		    }).addTo(map);
 
-			// Object to hold markers by deviceID
-			var markers = {};
-			var currentDeviceID = null; // Variable to store the current search device ID
+		    // Function to create a car icon based on status
+		    function getCarIcon(status, vehicleData) {
+		        var ringClass = status === 'N1' ? 'ring-blink-red' : 'ring-blink-green';
+		        var imageSrc = status === 'N1' ? 'THINTURE_IMAGE/red2.png' : 'THINTURE_IMAGE/greencar2.png';
 
-			// Define sample data for three different car locations and statuses
-			var initialCarData = [
-			    { deviceID: 'car1', latitude: 13.0811, longitude: 77.5562, status: 'N1', timestamp: new Date().toISOString(), vehicleData: 'Car 1' },
-			    { deviceID: 'car2', latitude: 13.0820, longitude: 77.5570, status: 'N2', timestamp: new Date().toISOString(), vehicleData: 'Car 2' },
-			    { deviceID: 'car3', latitude: 13.0830, longitude: 77.5580, status: 'N1', timestamp: new Date().toISOString(), vehicleData: 'Car 3' }
-			];
+		        return L.divIcon({
+		            className: 'custom-icon ring-blink ' + ringClass,
+		            html: `
+		                <div class="ring-blink">
+		                    <img src="${imageSrc}" alt="car-icon" style="width: 38px; height: 38px;">
+		                    <div class="tooltip">${vehicleData}</div>
+		                </div>
+		            `,
+		            iconSize: [38, 38],
+		            iconAnchor: [19, 19],
+		            popupAnchor: [0, -19]
+		        });
+		    }
 
-			// Add markers to the map
-			initialCarData.forEach(data => addOrUpdateMarker(data));
+		    var markers = {};
 
-			// Function definitions
-			function addOrUpdateMarker(data) {
-			    var lat = parseFloat(data.latitude);
-			    var lon = parseFloat(data.longitude);
-			    var icon = getCarIcon(data.status, data.vehicleData);
+		    // Function to add or update a marker on the map
+		    function addOrUpdateMarker(data) {
+		        var lat = parseFloat(data.latitude);
+		        var lon = parseFloat(data.longitude);
+		        var icon = getCarIcon(data.status, `Device ID: ${data.deviceID}`);
 
-			    if (markers[data.deviceID]) {
-			        markers[data.deviceID].setLatLng([lat, lon])
-			            .setIcon(icon)
-			            .bindPopup(`
-			                <b>Device ID:</b> ${data.deviceID}<br>
-			                <b>Status:</b> ${data.status === 'N1' ? 'Stopped' : 'Running'}<br>
-			                <b>Timestamp:</b> ${data.timestamp}
-			            `)
-			            .openPopup();
-			    } else {
-			        markers[data.deviceID] = L.marker([lat, lon], {icon: icon})
-			            .bindPopup(`
-			                <b>Device ID:</b> ${data.deviceID}<br>
-			                <b>Status:</b> ${data.status === 'N1' ? 'Stopped' : 'Running'}<br>
-			                <b>Timestamp:</b> ${data.timestamp}
-			            `);
+		        var popupContent = `
+		            <b>Device ID:</b> ${data.deviceID}<br>
+		            <b>Status:</b> ${data.status === 'N1' ? 'Stopped' : 'Running'}<br>
+		            <b>Timestamp:</b> ${data.timestamp}<br>
+		            <b>Data Validity:</b> ${data.dataValidity}<br>
+		            <b>Speed:</b> ${data.speed} km/h
+		        `;
 
-			        if (data.deviceID === currentDeviceID) {
-			            markers[data.deviceID].addTo(map); // Show marker if it matches the current search
-			        }
-			    }
+		        if (markers[data.deviceID]) {
+		            markers[data.deviceID]
+		                .setLatLng([lat, lon])
+		                .setIcon(icon)
+		                .bindPopup(popupContent);
+		        } else {
+		            markers[data.deviceID] = L.marker([lat, lon], { icon: icon })
+		                .addTo(map)
+		                .bindPopup(popupContent);
+		        }
 
-			    map.setView([lat, lon], 13); // Optionally, adjust zoom level
-			}-->
-			<script>
-			    // Initialize the map and set the initial view
-			    var map = L.map('map').setView([13.0827, 77.5776], 13);
+		        markers[data.deviceID].openPopup();
+		        map.setView([lat, lon], 13);
+		    }
 
-			    // Add OpenStreetMap tile layer
-			    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-			        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-			    }).addTo(map);
+		    // Fetch all locations from the server
+		    fetch('/gps/locations')
+		        .then(response => response.json())
+		        .then(data => {
+		            data.forEach(location => addOrUpdateMarker(location));
+		        })
+		        .catch(error => console.error('Error fetching initial locations:', error));
 
-			    // Function to create a car icon with different styles based on status
-			    function getCarIcon(status) {
-			        return L.divIcon({
-			            className: 'custom-icon ring-blink ' + (status === 'N1' ? 'ring-blink-red' : 'ring-blink-green'),
-			            html: '<i class="fas fa-car"></i>',
-			            iconSize: [32, 32],
-			            iconAnchor: [16, 32],
-			            popupAnchor: [0, -32]
-			        });
-			    }
+		    // WebSocket to listen for real-time updates
+		    var socket = new SockJS('/gs-guide-websocket');
+		    var stompClient = Stomp.over(socket);
 
-			    // Object to store markers by device ID
-			    var markers = {};
-
-			    // Function to add or update a marker on the map
-			    function addOrUpdateMarker(data) {
-			        var lat = parseFloat(data.latitude);
-			        var lon = parseFloat(data.longitude);
-			        var icon = getCarIcon(data.status);
-
-			        var popupContent = `<b>Device ID:</b> ${data.deviceID}<br>
-			                            <b>Timestamp:</b> ${data.timestamp}<br>
-			                            <b>Data Validity:</b> ${data.dataValidity}<br>
-			                            <b>Status:</b> ${data.status === 'N1' ? 'Stopped' : 'Running'}<br>
-			                            <b>Speed:</b> ${data.speed} km/h`;
-
-			        if (markers[data.deviceID]) {
-			            // Update the existing marker's position, icon, and popup content
-			            markers[data.deviceID].setLatLng([lat, lon])
-			                .setIcon(icon)
-			                .bindPopup(popupContent);
-			        } else {
-			            // Create a new marker if it doesn't exist
-			            markers[data.deviceID] = L.marker([lat, lon], { icon: icon }).addTo(map)
-			                .bindPopup(popupContent);
-			        }
-
-			        // Optionally, center the map on the updated marker
-			        map.setView([lat, lon], 13);
-			    }
-
-			    // Default marker for initial load
-			    var defaultMarker = L.marker([13.0811, 77.5562], { icon: getCarIcon('N1') }).addTo(map)
-			        .bindPopup('Default Location')
-			        .openPopup();
-
-			    // Fetch all locations from the server on initial load
-			    fetch('/gps/locations')
-			        .then(response => response.json())
-			        .then(data => {
-			            data.forEach(location => addOrUpdateMarker(location));
-			        })
-			        .catch(error => console.error('Error fetching initial locations:', error));
-
-			    // WebSocket to listen for real-time updates
-			    var socket = new SockJS('/gs-guide-websocket');
-			    var stompClient = Stomp.over(socket);
-
-			    stompClient.connect({}, function (frame) {
-			        stompClient.subscribe('/topic/location-updates', function (locationUpdate) {
-			            var data = JSON.parse(locationUpdate.body);
-			            addOrUpdateMarker(data);
-			        });
-			    }, function (error) {
-			        console.error('Error connecting to WebSocket:', error);
-			    });
+		    stompClient.connect({}, function (frame) {
+		        stompClient.subscribe('/topic/location-updates', function (locationUpdate) {
+		            var data = JSON.parse(locationUpdate.body);
+		            addOrUpdateMarker(data);
+		        });
+		    }, function (error) {
+		        console.error('Error connecting to WebSocket:', error);
+		    });
+		
+			
+			
+			
 			
 
-			    // WebSocket to listen for real-time updates
-			    var socket = new SockJS('/gs-guide-websocket');
-			    var stompClient = Stomp.over(socket);
+				// WebSocket to listen for real-time updates
+				var socket = new SockJS('/gs-guide-websocket');
+				var stompClient = Stomp.over(socket);
 
-			    stompClient.connect({}, function (frame) {
-			        stompClient.subscribe('/topic/location-updates', function (locationUpdate) {
-			            var data = JSON.parse(locationUpdate.body);
-			            addOrUpdateMarker(data);
-			        });
-			    }, function (error) {
-			        console.error('Error connecting to WebSocket:', error);
-			    });
-			
-    
+				stompClient.connect({}, function (frame) {
+				    stompClient.subscribe('/topic/location-updates', function (locationUpdate) {
+				        var data = JSON.parse(locationUpdate.body);
+				        addOrUpdateMarker(data);
+				    });
+				}, function (error) {
+				    console.error('Error connecting to WebSocket:', error);
+				});
 				
-				//tab button
-
-				       function showTab(tabId) {
-				           document.querySelectorAll('.tab-pane').forEach(pane => {
-				               pane.classList.remove('active');
-				           });
-				           document.getElementById(tabId).classList.add('active');
-				       }
-
-				       document.addEventListener('DOMContentLoaded', function() {
-				           let history = JSON.parse(localStorage.getItem('searchHistory')) || [];
-				           let datalist = document.getElementById('searchHistory');
-				           history.forEach(id => {
-				               let option = document.createElement('option');
-				               option.value = id;
-				               datalist.appendChild(option);
-				           });
-				       });
-
-				       function updateSearchHistory(deviceID) {
-				           let history = JSON.parse(localStorage.getItem('searchHistory')) || [];
-				           if (!history.includes(deviceID)) {
-				               history.push(deviceID);
-				               localStorage.setItem('searchHistory', JSON.stringify(history));
-				           }
-				           let datalist = document.getElementById('searchHistory');
-				           datalist.innerHTML = "";
-				           history.forEach(id => {
-				               let option = document.createElement('option');
-				               option.value = id;
-				               datalist.appendChild(option);
-				           });
-				       }
-
-				       function showHistoryForDevice(deviceID) {
-				           document.querySelectorAll('.tab-pane').forEach(pane => {
-				               pane.style.display = 'none';
-				           });
-
-				           var historyTab = document.getElementById('history');
-				           if (historyTab) {
-				               historyTab.style.display = 'block';
-				               var historyContent = getHistoryForDevice(deviceID);
-				               historyTab.innerHTML = `
-				                   <h2>History for Device ID: ${deviceID}</h2>
-				                   <div class="history-content">${historyContent}</div>
-				               `;
-				           }
-				       }
-
-				       function getHistoryForDevice(deviceID) {
-				           var historyData = {
-				               'device1': 'Device 1 History Data',
-				               'device2': 'Device 2 History Data',
-				               'device3': 'Device 3 History Data',
-				               'device4': 'Device 4 History Data'
-				           };
-				           return historyData[deviceID] || 'No history data available for this device.';
-				       }
-
-				       function clearSearchHistory() {
-				           localStorage.removeItem('searchHistory');
-				           document.getElementById('searchHistory').innerHTML = "";
-				       }
-
-				       function openNav() {
-				           document.getElementById("sidebar").style.width = "350px";
-				           showTab('search');
-				       }
-
-				       function closeNav() {
-				           document.getElementById("sidebar").style.width = "0";
-				       }
-
-				       function resetSidebar() {
-				           document.getElementById("sidebar").style.width = "-250px";
-				       }
-
-				       function openTab(evt, tabName) {
-				           const tabcontent = document.querySelectorAll(".tab-content");
-				           tabcontent.forEach(content => content.style.display = "none");
-
-				           const tablinks = document.querySelectorAll(".tabs a");
-				           tablinks.forEach(link => link.classList.remove("active"));
-
-				           document.getElementById(tabName).style.display = "block";
-				           evt.currentTarget.classList.add("active");
-				       }
-					   document.addEventListener('DOMContentLoaded', function() {
-					       // Assuming you get the user type from some source
-					       // For example, from a global variable, API call, or session
-					       var userType = 'dealer'; // Replace with actual user type retrieval logic
-
-					       // List of allowed user types
-					       var allowedUserTypes = ['dealer', 'admin', 'superadmin'];
-
-					       // Show the button if the user type is in the allowed list
-					       if (allowedUserTypes.includes(userType)) {
-					           document.getElementById('back-button').style.display = 'block';
-					       }
-					   });
-
-				   
-			function getCarIcon(status, vehicleData) {
-			    var ringClass = status === 'N1' ? 'ring-blink-red' : 'ring-blink-green';
-
-			    return L.divIcon({
-			        className: 'custom-icon ring-blink ' + ringClass,
-			        html: `
-			            <div class="ring-blink">
-			                <img src="${status === 'N1' ? 'THINTURE_IMAGE/red2.png' : 'THINTURE_IMAGE/greencar2.png'}" alt="car-icon" style="width: 38px; height: 38px;">
-			                <div class="tooltip">${vehicleData}</div>
-			            </div>
-			        `,
-			        iconSize: [38, 38],
-			        iconAnchor: [19, 19],
-			        popupAnchor: [0, -19]
-			    });
-			}
-
-			// Fetch initial data and set up WebSocket as needed
-			// (Include your fetch and WebSocket setup code here)
-
-
-			var markers = {};
-
-			function addOrUpdateMarker(data) {
-			    var lat = parseFloat(data.latitude);
-			    var lon = parseFloat(data.longitude);
-			    var icon = getCarIcon(data.status);
-
-			    // Properly format the HTML content with correct string concatenation
-			    var popupContent = '<b>Device ID:</b> ' + data.deviceID + '<br>' +
-			                       '<b>Status:</b> ' + (data.status === 'N1' ? 'Stop' : 'Running') + '<br>' +
-			                       '<b>Timestamp:</b> ' + data.timestamp;
-
-			    if (markers[data.deviceID]) {
-			        // Update existing marker
-			        markers[data.deviceID].setLatLng([lat, lon])
-			            .setIcon(icon)
-			            .bindPopup(popupContent)
-			            .openPopup();
-			    } else {
-			        // Create new marker
-			        markers[data.deviceID] = L.marker([lat, lon], { icon: icon }).addTo(map)
-			            .bindPopup(popupContent)
-			            .openPopup();
-			    }
-
-			    // Set the map view to the new location
-			    map.setView([lat, lon], 13);
-			}
-
-//  code for getting data backend
-function createPopupContent(vehicle) {
-    return '<div class="custom-popup">' +
-           '<strong>Vehicle Details</strong>' +
-           '<div class="card">' +
-           'Device ID: ' + vehicle.deviceID + '<br>' +
-           'Timestamp: ' + vehicle.timestamp + '<br>' +
-           'Data Validity: ' + vehicle.dataValidity + '<br>' +
-           'Status: ' + vehicle.status + '<br>' +
-           'Speed: ' + vehicle.speed + ' km/h<br>' +
-           '</div>' +
-           '</div>'
-}
-
-//			       .openPopup() ;
-//
-
-		       fetch('/gps/locations')
-		           .then(response => response.json())
-		           .then(data => {
-		               data.forEach(location => addOrUpdateMarker(location));
-		           })
-		           .catch(error => console.error('Error fetching initial locations:', error));
-
-		       var socket = new SockJS('/gs-guide-websocket');
-		       var stompClient = Stomp.over(socket);
-
-		       stompClient.connect({}, function (frame) {
-		           stompClient.subscribe('/topic/location-updates', function (locationUpdate) {
-		               var data = JSON.parse(locationUpdate.body);
-		               addOrUpdateMarker(data);
-		           });
-		       }, function (error) {
-		           console.error('Error connecting to WebSocket:', error);
-		       });
+				
+				///
 
 		       function showTab(tabId) {
 		           document.querySelectorAll('.tab-pane').forEach(pane => {

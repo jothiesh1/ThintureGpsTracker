@@ -181,6 +181,10 @@
         h3 {
             text-align: center;
         }
+		.delete-button{
+			background-color: darkblue;
+			color: white;
+		}
     </style>
     <script>
         function refreshPage() {
@@ -281,6 +285,7 @@
                     <th>Course</th>
                     <th>AdditionalData</th>
                     <th>SequenceNumber</th>
+					<th>Delete</th>
                 </tr>
             </thead>
             <tbody>
@@ -295,6 +300,10 @@
                     <td th:text="${vehicle.course}"></td>
                     <td th:text="${vehicle.additionalData}"></td>
                     <td th:text="${vehicle.sequenceNumber}"></td>
+										<td>
+					    <button type="button" class="btn btn-danger delete-button" data-device-id="${vehicle.deviceID}">Delete</button>
+					
+</td>
                 </tr>
             </tbody>
         </table>
@@ -395,6 +404,52 @@
             });
         });
     </script>
+	<script>
+	    // Function to handle delete button clicks
+	    function handleDeleteClick(event) {
+	        const button = event.target;
+	        const deviceID = button.getAttribute('data-device-id');
+	        const row = button.closest('tr');
+
+	        if (!confirm('Are you sure you want to delete this vehicle?')) {
+	            return;
+	        }
+
+	        fetch(`/gps/delete/${deviceID}`, {
+	            method: 'DELETE'
+	        })
+	        .then(response => {
+	            if (response.ok) {
+	                row.remove(); // Remove the row from the table
+	                alert('Vehicle deleted successfully.');
+	            } else {
+	                alert('Failed to delete the vehicle.');
+	            }
+	        })
+	        .catch(error => {
+	            console.error('Error deleting vehicle:', error);
+	            alert('Error deleting the vehicle.');
+	        });
+	    }
+
+	    // Add event listeners to all delete buttons
+	    document.addEventListener('DOMContentLoaded', () => {
+	        document.querySelectorAll('.delete-button').forEach(button => {
+	            button.addEventListener('click', handleDeleteClick);
+	        });
+	    });
+
+	    // Function to export table data to Excel (Example using SheetJS library)
+	    function exportToExcel() {
+	        const wb = XLSX.utils.table_to_book(document.getElementById('vehicleTable'), {sheet: "Sheet1"});
+	        XLSX.writeFile(wb, 'vehicles.xlsx');
+	    }
+
+	    // Function to refresh the page
+	    function refreshPage() {
+	        location.reload();
+	    }
+	</script>
+
 </body>
 </html>
-<!--->

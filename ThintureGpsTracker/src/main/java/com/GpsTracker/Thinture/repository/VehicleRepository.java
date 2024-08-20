@@ -10,6 +10,8 @@ import com.GpsTracker.Thinture.model.Vehicle;
 
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
+	void deleteByDeviceID(String deviceID);
+
 	
     // You can add custom query methods if needed
 }
