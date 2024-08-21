@@ -26,6 +26,7 @@ public class VehicleService {
         return vehicleRepository.save(vehicle);
     }
 
+    
     // Additional service methods if needed
     // ...
 }

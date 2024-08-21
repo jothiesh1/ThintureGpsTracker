@@ -8388,3 +8388,1060 @@ org.springframework.expression.spel.SpelEvaluationException: EL1008E: Property o
 2024-07-31 17:04:29 [http-nio-8181-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
 2024-07-31 17:04:29 [http-nio-8181-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
 2024-07-31 17:05:15 [MessageBroker-2] INFO  o.s.w.s.c.WebSocketMessageBrokerStats - WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 1 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(1)-CONNECTED(1)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[unknown], outboundChannel[unknown], sockJsScheduler[pool size = 12, active threads = 1, queued tasks = 1, completed tasks = 10]
+2024-08-21 12:12:43 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Starting ThintureGpsTrackerApplication using Java 17.0.12 with PID 15852 (C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker\target\classes started by jothi in C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker)
+2024-08-21 12:12:43 [main] INFO  c.G.T.ThintureGpsTrackerApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-21 12:12:44 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-08-21 12:12:44 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 119 ms. Found 2 JPA repository interfaces.
+2024-08-21 12:12:44 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2024-08-21 12:12:44 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2024-08-21 12:12:45 [main] WARN  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.ws.config.annotation.DelegatingWsConfiguration' of type [org.springframework.ws.config.annotation.DelegatingWsConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [annotationActionEndpointMapping] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2024-08-21 12:12:45 [main] INFO  o.s.w.s.a.s.AnnotationActionEndpointMapping - Supporting [WS-Addressing August 2004, WS-Addressing 1.0]
+2024-08-21 12:12:45 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8181 (http)
+2024-08-21 12:12:45 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-21 12:12:45 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.26]
+2024-08-21 12:12:45 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-21 12:12:45 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1427 ms
+2024-08-21 12:12:45 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-08-21 12:12:45 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.5.2.Final
+2024-08-21 12:12:45 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2024-08-21 12:12:45 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-08-21 12:12:45 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-08-21 12:12:46 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@41a8f0d8
+2024-08-21 12:12:46 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-08-21 12:12:46 [main] WARN  org.hibernate.dialect.Dialect - HHH000511: The 5.7.44 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2024-08-21 12:12:47 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-08-21 12:12:47 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 12:12:48 [main] INFO  c.G.Thinture.service.MqttService - Subscribed to topic: Test
+2024-08-21 12:12:48 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-08-21 12:12:48 [main] WARN  o.t.templatemode.TemplateMode - [THYMELEAF][main] Unknown Template Mode 'HTML5'. Must be one of: 'HTML', 'XML', 'TEXT', 'JAVASCRIPT', 'CSS', 'RAW'. Using default Template Mode 'HTML'.
+2024-08-21 12:12:48 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 12:12:48 [main] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 1 subscriber(s).
+2024-08-21 12:12:48 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2024-08-21 12:12:48 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8181 (http) with context path '/'
+2024-08-21 12:12:48 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
+2024-08-21 12:12:48 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@193f5509]]
+2024-08-21 12:12:48 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
+2024-08-21 12:12:48 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Started ThintureGpsTrackerApplication in 5.151 seconds (process running for 5.659)
+2024-08-21 12:12:59 [http-nio-8181-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-08-21 12:12:59 [http-nio-8181-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-08-21 12:12:59 [http-nio-8181-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2024-08-21 12:13:14 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Raw payload received: {
+  "deviceID": "1212121212",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 12:13:14 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed payload: {
+  "deviceID": "1212121212",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 12:13:14 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed GPS Data: GpsData{DeviceID='1212121212', timestamp='2024-07-31 10:00:00', DataValidity='Valid', status='Active', latitude=12.971, longitude=77.594, speed='60'}
+2024-08-21 12:13:48 [MessageBroker-9] INFO  o.s.w.s.c.WebSocketMessageBrokerStats - WebSocketSession[1 current WS(1)-HttpStream(0)-HttpPoll(0), 1 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(1)-CONNECTED(1)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[unknown], outboundChannel[unknown], sockJsScheduler[pool size = 12, active threads = 1, queued tasks = 2, completed tasks = 11]
+2024-08-21 12:15:33 [RMI TCP Connection(11)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2024-08-21 12:15:33 [RMI TCP Connection(11)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
+2024-08-21 12:15:33 [RMI TCP Connection(11)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@193f5509]]
+2024-08-21 12:15:33 [RMI TCP Connection(11)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
+2024-08-21 12:15:34 [RMI TCP Connection(12)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2024-08-21 12:15:34 [RMI TCP Connection(11)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 12:15:34 [RMI TCP Connection(11)-127.0.0.1] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 0 subscriber(s).
+2024-08-21 12:15:34 [RMI TCP Connection(11)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2024-08-21 12:15:34 [RMI TCP Connection(11)-127.0.0.1] WARN  o.s.b.f.s.DisposableBeanAdapter - Invocation of close method failed on bean with name 'mqttClient': Client is connected (32100)
+2024-08-21 12:15:34 [RMI TCP Connection(11)-127.0.0.1] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 12:15:34 [RMI TCP Connection(11)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-08-21 12:15:34 [RMI TCP Connection(11)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2024-08-21 12:18:29 [main] INFO  c.G.T.ThintureGpsTrackerApplicationTests - Starting ThintureGpsTrackerApplicationTests using Java 17.0.12 with PID 12292 (started by jothi in C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker)
+2024-08-21 12:18:29 [main] INFO  c.G.T.ThintureGpsTrackerApplicationTests - No active profile set, falling back to 1 default profile: "default"
+2024-08-21 12:18:30 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-08-21 12:18:30 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 183 ms. Found 2 JPA repository interfaces.
+2024-08-21 12:18:31 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2024-08-21 12:18:31 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2024-08-21 12:18:31 [main] WARN  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.ws.config.annotation.DelegatingWsConfiguration' of type [org.springframework.ws.config.annotation.DelegatingWsConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [annotationActionEndpointMapping] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2024-08-21 12:18:31 [main] INFO  o.s.w.s.a.s.AnnotationActionEndpointMapping - Supporting [WS-Addressing August 2004, WS-Addressing 1.0]
+2024-08-21 12:18:31 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-08-21 12:18:32 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.5.2.Final
+2024-08-21 12:18:32 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2024-08-21 12:18:33 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-08-21 12:18:33 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-08-21 12:18:33 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@55682482
+2024-08-21 12:18:33 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-08-21 12:18:33 [main] WARN  org.hibernate.dialect.Dialect - HHH000511: The 5.7.44 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2024-08-21 12:18:34 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-08-21 12:18:35 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 12:18:36 [main] INFO  c.G.Thinture.service.MqttService - Subscribed to topic: Test
+2024-08-21 12:18:36 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-08-21 12:18:37 [main] WARN  o.t.templatemode.TemplateMode - [THYMELEAF][main] Unknown Template Mode 'HTML5'. Must be one of: 'HTML', 'XML', 'TEXT', 'JAVASCRIPT', 'CSS', 'RAW'. Using default Template Mode 'HTML'.
+2024-08-21 12:18:38 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 12:18:38 [main] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 1 subscriber(s).
+2024-08-21 12:18:38 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2024-08-21 12:18:38 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
+2024-08-21 12:18:38 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@51aa8c0f]]
+2024-08-21 12:18:38 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
+2024-08-21 12:18:38 [main] INFO  c.G.T.ThintureGpsTrackerApplicationTests - Started ThintureGpsTrackerApplicationTests in 8.848 seconds (process running for 9.908)
+2024-08-21 12:18:38 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
+2024-08-21 12:18:38 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@51aa8c0f]]
+2024-08-21 12:18:38 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
+2024-08-21 12:18:38 [SpringApplicationShutdownHook] INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 12:18:38 [SpringApplicationShutdownHook] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 0 subscriber(s).
+2024-08-21 12:18:38 [SpringApplicationShutdownHook] INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2024-08-21 12:18:38 [SpringApplicationShutdownHook] WARN  o.s.b.f.s.DisposableBeanAdapter - Invocation of close method failed on bean with name 'mqttClient': Client is connected (32100)
+2024-08-21 12:18:38 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 12:18:38 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-08-21 12:18:38 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2024-08-21 14:42:41 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Starting ThintureGpsTrackerApplication using Java 17.0.12 with PID 20108 (C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker\target\classes started by jothi in C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker)
+2024-08-21 14:42:41 [main] INFO  c.G.T.ThintureGpsTrackerApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-21 14:42:42 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-08-21 14:42:42 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 144 ms. Found 2 JPA repository interfaces.
+2024-08-21 14:42:42 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2024-08-21 14:42:42 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2024-08-21 14:42:42 [main] WARN  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.ws.config.annotation.DelegatingWsConfiguration' of type [org.springframework.ws.config.annotation.DelegatingWsConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [annotationActionEndpointMapping] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2024-08-21 14:42:42 [main] INFO  o.s.w.s.a.s.AnnotationActionEndpointMapping - Supporting [WS-Addressing August 2004, WS-Addressing 1.0]
+2024-08-21 14:42:42 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8181 (http)
+2024-08-21 14:42:42 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-21 14:42:42 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.26]
+2024-08-21 14:42:42 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-21 14:42:42 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1372 ms
+2024-08-21 14:42:42 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-08-21 14:42:43 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.5.2.Final
+2024-08-21 14:42:43 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2024-08-21 14:42:43 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-08-21 14:42:43 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-08-21 14:42:43 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@41a8f0d8
+2024-08-21 14:42:43 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-08-21 14:42:44 [main] WARN  org.hibernate.dialect.Dialect - HHH000511: The 5.7.44 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2024-08-21 14:42:44 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-08-21 14:42:45 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 14:42:45 [main] INFO  c.G.Thinture.service.MqttService - Subscribed to topic: Test
+2024-08-21 14:42:46 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-08-21 14:42:46 [main] WARN  o.t.templatemode.TemplateMode - [THYMELEAF][main] Unknown Template Mode 'HTML5'. Must be one of: 'HTML', 'XML', 'TEXT', 'JAVASCRIPT', 'CSS', 'RAW'. Using default Template Mode 'HTML'.
+2024-08-21 14:42:46 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 14:42:46 [main] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 1 subscriber(s).
+2024-08-21 14:42:46 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2024-08-21 14:42:46 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8181 (http) with context path '/'
+2024-08-21 14:42:46 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
+2024-08-21 14:42:46 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@193f5509]]
+2024-08-21 14:42:46 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
+2024-08-21 14:42:46 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Started ThintureGpsTrackerApplication in 5.418 seconds (process running for 6.169)
+2024-08-21 14:42:48 [http-nio-8181-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-08-21 14:42:48 [http-nio-8181-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-08-21 14:42:48 [http-nio-8181-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2024-08-21 14:43:46 [MessageBroker-1] INFO  o.s.w.s.c.WebSocketMessageBrokerStats - WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[unknown], outboundChannel[unknown], sockJsScheduler[pool size = 1, active threads = 1, queued tasks = 0, completed tasks = 0]
+2024-08-21 14:52:56 [RMI TCP Connection(17)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2024-08-21 14:52:56 [RMI TCP Connection(17)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
+2024-08-21 14:52:56 [RMI TCP Connection(17)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@193f5509]]
+2024-08-21 14:52:56 [RMI TCP Connection(17)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
+2024-08-21 14:52:56 [RMI TCP Connection(17)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 14:52:56 [RMI TCP Connection(17)-127.0.0.1] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 0 subscriber(s).
+2024-08-21 14:52:56 [RMI TCP Connection(17)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2024-08-21 14:52:56 [RMI TCP Connection(17)-127.0.0.1] WARN  o.s.b.f.s.DisposableBeanAdapter - Invocation of close method failed on bean with name 'mqttClient': Client is connected (32100)
+2024-08-21 14:52:56 [RMI TCP Connection(17)-127.0.0.1] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 14:52:56 [RMI TCP Connection(17)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-08-21 14:52:56 [RMI TCP Connection(17)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2024-08-21 14:52:59 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Starting ThintureGpsTrackerApplication using Java 17.0.12 with PID 14048 (C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker\target\classes started by jothi in C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker)
+2024-08-21 14:52:59 [main] INFO  c.G.T.ThintureGpsTrackerApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-21 14:52:59 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-08-21 14:52:59 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 104 ms. Found 2 JPA repository interfaces.
+2024-08-21 14:52:59 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2024-08-21 14:52:59 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2024-08-21 14:53:00 [main] WARN  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.ws.config.annotation.DelegatingWsConfiguration' of type [org.springframework.ws.config.annotation.DelegatingWsConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [annotationActionEndpointMapping] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2024-08-21 14:53:00 [main] INFO  o.s.w.s.a.s.AnnotationActionEndpointMapping - Supporting [WS-Addressing August 2004, WS-Addressing 1.0]
+2024-08-21 14:53:00 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8181 (http)
+2024-08-21 14:53:00 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-21 14:53:00 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.26]
+2024-08-21 14:53:00 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-21 14:53:00 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1251 ms
+2024-08-21 14:53:00 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-08-21 14:53:00 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.5.2.Final
+2024-08-21 14:53:00 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2024-08-21 14:53:00 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-08-21 14:53:00 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-08-21 14:53:01 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@87220f1
+2024-08-21 14:53:01 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-08-21 14:53:01 [main] WARN  org.hibernate.dialect.Dialect - HHH000511: The 5.7.44 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2024-08-21 14:53:02 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-08-21 14:53:02 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 14:53:03 [main] INFO  c.G.Thinture.service.MqttService - Subscribed to topic: Test
+2024-08-21 14:53:03 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-08-21 14:53:03 [main] WARN  o.t.templatemode.TemplateMode - [THYMELEAF][main] Unknown Template Mode 'HTML5'. Must be one of: 'HTML', 'XML', 'TEXT', 'JAVASCRIPT', 'CSS', 'RAW'. Using default Template Mode 'HTML'.
+2024-08-21 14:53:03 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 14:53:03 [main] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 1 subscriber(s).
+2024-08-21 14:53:03 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2024-08-21 14:53:03 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8181 (http) with context path '/'
+2024-08-21 14:53:03 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
+2024-08-21 14:53:03 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@3c5d183]]
+2024-08-21 14:53:03 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
+2024-08-21 14:53:03 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Started ThintureGpsTrackerApplication in 4.835 seconds (process running for 5.345)
+2024-08-21 14:53:04 [http-nio-8181-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-08-21 14:53:04 [http-nio-8181-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-08-21 14:53:04 [http-nio-8181-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 3 ms
+2024-08-21 14:54:03 [MessageBroker-8] INFO  o.s.w.s.c.WebSocketMessageBrokerStats - WebSocketSession[1 current WS(1)-HttpStream(0)-HttpPoll(0), 3 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(3)-CONNECTED(3)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[unknown], outboundChannel[unknown], sockJsScheduler[pool size = 12, active threads = 1, queued tasks = 2, completed tasks = 14]
+2024-08-21 14:57:40 [RMI TCP Connection(14)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2024-08-21 14:57:40 [RMI TCP Connection(14)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
+2024-08-21 14:57:40 [RMI TCP Connection(14)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@3c5d183]]
+2024-08-21 14:57:40 [RMI TCP Connection(14)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
+2024-08-21 14:57:40 [RMI TCP Connection(15)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2024-08-21 14:57:40 [RMI TCP Connection(14)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 14:57:40 [RMI TCP Connection(14)-127.0.0.1] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 0 subscriber(s).
+2024-08-21 14:57:40 [RMI TCP Connection(14)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2024-08-21 14:57:40 [RMI TCP Connection(14)-127.0.0.1] WARN  o.s.b.f.s.DisposableBeanAdapter - Invocation of close method failed on bean with name 'mqttClient': Client is connected (32100)
+2024-08-21 14:57:40 [RMI TCP Connection(14)-127.0.0.1] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 14:57:40 [RMI TCP Connection(14)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-08-21 14:57:40 [RMI TCP Connection(14)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2024-08-21 14:57:43 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Starting ThintureGpsTrackerApplication using Java 17.0.12 with PID 20912 (C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker\target\classes started by jothi in C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker)
+2024-08-21 14:57:43 [main] INFO  c.G.T.ThintureGpsTrackerApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-21 14:57:43 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Starting ThintureGpsTrackerApplication using Java 17.0.12 with PID 9080 (C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker\target\classes started by jothi in C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker)
+2024-08-21 14:57:43 [main] INFO  c.G.T.ThintureGpsTrackerApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-21 14:57:44 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-08-21 14:57:44 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-08-21 14:57:44 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 171 ms. Found 2 JPA repository interfaces.
+2024-08-21 14:57:44 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 154 ms. Found 2 JPA repository interfaces.
+2024-08-21 14:57:44 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2024-08-21 14:57:44 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2024-08-21 14:57:44 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2024-08-21 14:57:44 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2024-08-21 14:57:44 [main] WARN  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.ws.config.annotation.DelegatingWsConfiguration' of type [org.springframework.ws.config.annotation.DelegatingWsConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [annotationActionEndpointMapping] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2024-08-21 14:57:44 [main] WARN  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.ws.config.annotation.DelegatingWsConfiguration' of type [org.springframework.ws.config.annotation.DelegatingWsConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [annotationActionEndpointMapping] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2024-08-21 14:57:44 [main] INFO  o.s.w.s.a.s.AnnotationActionEndpointMapping - Supporting [WS-Addressing August 2004, WS-Addressing 1.0]
+2024-08-21 14:57:44 [main] INFO  o.s.w.s.a.s.AnnotationActionEndpointMapping - Supporting [WS-Addressing August 2004, WS-Addressing 1.0]
+2024-08-21 14:57:45 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8181 (http)
+2024-08-21 14:57:45 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-21 14:57:45 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.26]
+2024-08-21 14:57:45 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8181 (http)
+2024-08-21 14:57:45 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-21 14:57:45 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.26]
+2024-08-21 14:57:45 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-21 14:57:45 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1838 ms
+2024-08-21 14:57:45 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-21 14:57:45 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1837 ms
+2024-08-21 14:57:45 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-08-21 14:57:45 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-08-21 14:57:45 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.5.2.Final
+2024-08-21 14:57:45 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.5.2.Final
+2024-08-21 14:57:45 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2024-08-21 14:57:45 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2024-08-21 14:57:45 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-08-21 14:57:45 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-08-21 14:57:45 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-08-21 14:57:45 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-08-21 14:57:46 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@56b751b1
+2024-08-21 14:57:46 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-08-21 14:57:46 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@69e36fe3
+2024-08-21 14:57:46 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-08-21 14:57:46 [main] WARN  org.hibernate.dialect.Dialect - HHH000511: The 5.7.44 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2024-08-21 14:57:46 [main] WARN  org.hibernate.dialect.Dialect - HHH000511: The 5.7.44 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2024-08-21 14:57:47 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-08-21 14:57:47 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-08-21 14:57:47 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 14:57:47 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 14:57:48 [main] ERROR c.G.Thinture.service.MqttService - Error while subscribing to topic: Client is not connected
+org.eclipse.paho.client.mqttv3.MqttException: Client is not connected
+	at org.eclipse.paho.client.mqttv3.internal.ExceptionHelper.createMqttException(ExceptionHelper.java:31)
+	at org.eclipse.paho.client.mqttv3.internal.ClientComms.sendNoWait(ClientComms.java:205)
+	at org.eclipse.paho.client.mqttv3.MqttAsyncClient.subscribeBase(MqttAsyncClient.java:1088)
+	at org.eclipse.paho.client.mqttv3.MqttAsyncClient.subscribe(MqttAsyncClient.java:1152)
+	at org.eclipse.paho.client.mqttv3.MqttClient.subscribe(MqttClient.java:459)
+	at org.eclipse.paho.client.mqttv3.MqttClient.subscribe(MqttClient.java:436)
+	at com.GpsTracker.Thinture.service.MqttService.subscribe(MqttService.java:57)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.beans.factory.annotation.InitDestroyAnnotationBeanPostProcessor$LifecycleMethod.invoke(InitDestroyAnnotationBeanPostProcessor.java:457)
+	at org.springframework.beans.factory.annotation.InitDestroyAnnotationBeanPostProcessor$LifecycleMetadata.invokeInitMethods(InitDestroyAnnotationBeanPostProcessor.java:401)
+	at org.springframework.beans.factory.annotation.InitDestroyAnnotationBeanPostProcessor.postProcessBeforeInitialization(InitDestroyAnnotationBeanPostProcessor.java:219)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.applyBeanPostProcessorsBeforeInitialization(AbstractAutowireCapableBeanFactory.java:422)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1798)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200)
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1443)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1353)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:784)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:767)
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:145)
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:508)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1439)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:599)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:975)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:971)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:625)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.GpsTracker.Thinture.ThintureGpsTrackerApplication.main(ThintureGpsTrackerApplication.java:12)
+2024-08-21 14:57:48 [main] INFO  c.G.Thinture.service.MqttService - Subscribed to topic: Test
+2024-08-21 14:57:48 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-08-21 14:57:48 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-08-21 14:57:48 [main] WARN  o.t.templatemode.TemplateMode - [THYMELEAF][main] Unknown Template Mode 'HTML5'. Must be one of: 'HTML', 'XML', 'TEXT', 'JAVASCRIPT', 'CSS', 'RAW'. Using default Template Mode 'HTML'.
+2024-08-21 14:57:48 [main] WARN  o.t.templatemode.TemplateMode - [THYMELEAF][main] Unknown Template Mode 'HTML5'. Must be one of: 'HTML', 'XML', 'TEXT', 'JAVASCRIPT', 'CSS', 'RAW'. Using default Template Mode 'HTML'.
+2024-08-21 14:57:48 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 14:57:48 [main] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 1 subscriber(s).
+2024-08-21 14:57:48 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2024-08-21 14:57:48 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8181 (http) with context path '/'
+2024-08-21 14:57:48 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
+2024-08-21 14:57:48 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@66f88fd3]]
+2024-08-21 14:57:48 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
+2024-08-21 14:57:48 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Started ThintureGpsTrackerApplication in 6.048 seconds (process running for 6.708)
+2024-08-21 14:57:49 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 14:57:49 [main] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 1 subscriber(s).
+2024-08-21 14:57:49 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2024-08-21 14:57:49 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 14:57:49 [main] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 0 subscriber(s).
+2024-08-21 14:57:49 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2024-08-21 14:57:49 [main] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2024-08-21 14:57:49 [main] WARN  o.s.b.f.s.DisposableBeanAdapter - Invocation of close method failed on bean with name 'mqttClient': Client is connected (32100)
+2024-08-21 14:57:49 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 14:57:49 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-08-21 14:57:49 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2024-08-21 14:57:49 [main] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2024-08-21 14:57:49 [main] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8181 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8181 or configure this application to listen on another port.
+
+2024-08-21 14:57:53 [RMI TCP Connection(6)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2024-08-21 14:57:53 [RMI TCP Connection(6)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
+2024-08-21 14:57:53 [RMI TCP Connection(6)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@66f88fd3]]
+2024-08-21 14:57:53 [RMI TCP Connection(6)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
+2024-08-21 14:57:53 [RMI TCP Connection(6)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 14:57:53 [RMI TCP Connection(6)-127.0.0.1] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 0 subscriber(s).
+2024-08-21 14:57:53 [RMI TCP Connection(6)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2024-08-21 14:57:53 [RMI TCP Connection(6)-127.0.0.1] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 14:57:53 [RMI TCP Connection(6)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-08-21 14:57:53 [RMI TCP Connection(6)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2024-08-21 14:57:56 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Starting ThintureGpsTrackerApplication using Java 17.0.12 with PID 4676 (C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker\target\classes started by jothi in C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker)
+2024-08-21 14:57:56 [main] INFO  c.G.T.ThintureGpsTrackerApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-21 14:57:57 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-08-21 14:57:57 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 92 ms. Found 2 JPA repository interfaces.
+2024-08-21 14:57:57 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2024-08-21 14:57:57 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2024-08-21 14:57:57 [main] WARN  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.ws.config.annotation.DelegatingWsConfiguration' of type [org.springframework.ws.config.annotation.DelegatingWsConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [annotationActionEndpointMapping] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2024-08-21 14:57:57 [main] INFO  o.s.w.s.a.s.AnnotationActionEndpointMapping - Supporting [WS-Addressing August 2004, WS-Addressing 1.0]
+2024-08-21 14:57:58 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8181 (http)
+2024-08-21 14:57:58 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-21 14:57:58 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.26]
+2024-08-21 14:57:58 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-21 14:57:58 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1155 ms
+2024-08-21 14:57:58 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-08-21 14:57:58 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.5.2.Final
+2024-08-21 14:57:58 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2024-08-21 14:57:58 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-08-21 14:57:58 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-08-21 14:57:59 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@405603b6
+2024-08-21 14:57:59 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-08-21 14:57:59 [main] WARN  org.hibernate.dialect.Dialect - HHH000511: The 5.7.44 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2024-08-21 14:58:00 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-08-21 14:58:00 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 14:58:01 [main] INFO  c.G.Thinture.service.MqttService - Subscribed to topic: Test
+2024-08-21 14:58:01 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-08-21 14:58:01 [main] WARN  o.t.templatemode.TemplateMode - [THYMELEAF][main] Unknown Template Mode 'HTML5'. Must be one of: 'HTML', 'XML', 'TEXT', 'JAVASCRIPT', 'CSS', 'RAW'. Using default Template Mode 'HTML'.
+2024-08-21 14:58:01 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 14:58:01 [main] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 1 subscriber(s).
+2024-08-21 14:58:01 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2024-08-21 14:58:01 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8181 (http) with context path '/'
+2024-08-21 14:58:01 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
+2024-08-21 14:58:01 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@6592a73b]]
+2024-08-21 14:58:01 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
+2024-08-21 14:58:01 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Started ThintureGpsTrackerApplication in 5.345 seconds (process running for 6.397)
+2024-08-21 14:58:01 [http-nio-8181-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-08-21 14:58:01 [http-nio-8181-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-08-21 14:58:01 [http-nio-8181-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2024-08-21 14:59:01 [MessageBroker-2] INFO  o.s.w.s.c.WebSocketMessageBrokerStats - WebSocketSession[1 current WS(1)-HttpStream(0)-HttpPoll(0), 1 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(1)-CONNECTED(1)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[unknown], outboundChannel[unknown], sockJsScheduler[pool size = 12, active threads = 1, queued tasks = 2, completed tasks = 14]
+2024-08-21 15:03:00 [RMI TCP Connection(10)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2024-08-21 15:03:00 [RMI TCP Connection(10)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
+2024-08-21 15:03:00 [RMI TCP Connection(10)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@6592a73b]]
+2024-08-21 15:03:00 [RMI TCP Connection(10)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
+2024-08-21 15:03:00 [RMI TCP Connection(10)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 15:03:00 [RMI TCP Connection(10)-127.0.0.1] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 0 subscriber(s).
+2024-08-21 15:03:00 [RMI TCP Connection(10)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2024-08-21 15:03:00 [RMI TCP Connection(10)-127.0.0.1] WARN  o.s.b.f.s.DisposableBeanAdapter - Invocation of close method failed on bean with name 'mqttClient': Client is connected (32100)
+2024-08-21 15:03:00 [RMI TCP Connection(10)-127.0.0.1] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 15:03:00 [RMI TCP Connection(10)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-08-21 15:03:00 [RMI TCP Connection(10)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2024-08-21 15:03:03 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Starting ThintureGpsTrackerApplication using Java 17.0.12 with PID 4276 (C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker\target\classes started by jothi in C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker)
+2024-08-21 15:03:03 [main] INFO  c.G.T.ThintureGpsTrackerApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-21 15:03:04 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-08-21 15:03:04 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 95 ms. Found 2 JPA repository interfaces.
+2024-08-21 15:03:04 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2024-08-21 15:03:04 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2024-08-21 15:03:04 [main] WARN  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.ws.config.annotation.DelegatingWsConfiguration' of type [org.springframework.ws.config.annotation.DelegatingWsConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [annotationActionEndpointMapping] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2024-08-21 15:03:04 [main] INFO  o.s.w.s.a.s.AnnotationActionEndpointMapping - Supporting [WS-Addressing August 2004, WS-Addressing 1.0]
+2024-08-21 15:03:04 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8181 (http)
+2024-08-21 15:03:04 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-21 15:03:04 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.26]
+2024-08-21 15:03:04 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-21 15:03:04 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1195 ms
+2024-08-21 15:03:04 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-08-21 15:03:04 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.5.2.Final
+2024-08-21 15:03:04 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2024-08-21 15:03:05 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-08-21 15:03:05 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-08-21 15:03:05 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@3639b04
+2024-08-21 15:03:05 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-08-21 15:03:05 [main] WARN  org.hibernate.dialect.Dialect - HHH000511: The 5.7.44 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2024-08-21 15:03:06 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-08-21 15:03:06 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 15:03:07 [main] INFO  c.G.Thinture.service.MqttService - Subscribed to topic: Test
+2024-08-21 15:03:07 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-08-21 15:03:07 [main] WARN  o.t.templatemode.TemplateMode - [THYMELEAF][main] Unknown Template Mode 'HTML5'. Must be one of: 'HTML', 'XML', 'TEXT', 'JAVASCRIPT', 'CSS', 'RAW'. Using default Template Mode 'HTML'.
+2024-08-21 15:03:07 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 15:03:07 [main] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 1 subscriber(s).
+2024-08-21 15:03:07 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2024-08-21 15:03:07 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8181 (http) with context path '/'
+2024-08-21 15:03:07 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
+2024-08-21 15:03:07 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@74ea1cd0]]
+2024-08-21 15:03:07 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
+2024-08-21 15:03:07 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Started ThintureGpsTrackerApplication in 4.734 seconds (process running for 5.431)
+2024-08-21 15:03:52 [http-nio-8181-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-08-21 15:03:52 [http-nio-8181-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-08-21 15:03:52 [http-nio-8181-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 14 ms
+2024-08-21 15:04:07 [MessageBroker-2] INFO  o.s.w.s.c.WebSocketMessageBrokerStats - WebSocketSession[1 current WS(1)-HttpStream(0)-HttpPoll(0), 1 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(1)-CONNECTED(1)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[unknown], outboundChannel[unknown], sockJsScheduler[pool size = 7, active threads = 1, queued tasks = 2, completed tasks = 3]
+2024-08-21 15:18:37 [http-nio-8181-exec-9] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@3639b04 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2024-08-21 15:18:39 [http-nio-8181-exec-10] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@69b99ddd (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2024-08-21 15:18:42 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=2m36s419ms220µs200ns).
+2024-08-21 15:18:42 [http-nio-8181-exec-9] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@42d7b200 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2024-08-21 15:18:44 [http-nio-8181-exec-10] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@677e6e9a (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2024-08-21 15:18:47 [http-nio-8181-exec-9] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@41399423 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2024-08-21 15:18:49 [http-nio-8181-exec-10] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@6341f6ad (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2024-08-21 15:18:52 [http-nio-8181-exec-9] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@44381b58 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2024-08-21 15:18:54 [http-nio-8181-exec-10] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@264364a1 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2024-08-21 15:18:57 [http-nio-8181-exec-9] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@52ed89ea (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2024-08-21 15:18:59 [http-nio-8181-exec-10] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@3b152c1 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2024-08-21 15:26:36 [RMI TCP Connection(29)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2024-08-21 15:26:36 [RMI TCP Connection(29)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
+2024-08-21 15:26:36 [RMI TCP Connection(29)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@74ea1cd0]]
+2024-08-21 15:26:36 [RMI TCP Connection(29)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
+2024-08-21 15:26:36 [RMI TCP Connection(29)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 15:26:36 [RMI TCP Connection(29)-127.0.0.1] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 0 subscriber(s).
+2024-08-21 15:26:36 [RMI TCP Connection(29)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2024-08-21 15:26:36 [RMI TCP Connection(29)-127.0.0.1] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 15:26:36 [RMI TCP Connection(29)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-08-21 15:26:36 [RMI TCP Connection(29)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2024-08-21 15:26:39 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Starting ThintureGpsTrackerApplication using Java 17.0.12 with PID 6368 (C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker\target\classes started by jothi in C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker)
+2024-08-21 15:26:39 [main] INFO  c.G.T.ThintureGpsTrackerApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-21 15:26:40 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-08-21 15:26:40 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 100 ms. Found 2 JPA repository interfaces.
+2024-08-21 15:26:40 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2024-08-21 15:26:40 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2024-08-21 15:26:40 [main] WARN  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.ws.config.annotation.DelegatingWsConfiguration' of type [org.springframework.ws.config.annotation.DelegatingWsConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [annotationActionEndpointMapping] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2024-08-21 15:26:40 [main] INFO  o.s.w.s.a.s.AnnotationActionEndpointMapping - Supporting [WS-Addressing August 2004, WS-Addressing 1.0]
+2024-08-21 15:26:40 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8181 (http)
+2024-08-21 15:26:40 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-21 15:26:40 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.26]
+2024-08-21 15:26:41 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-21 15:26:41 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1222 ms
+2024-08-21 15:26:41 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-08-21 15:26:41 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.5.2.Final
+2024-08-21 15:26:41 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2024-08-21 15:26:41 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-08-21 15:26:41 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-08-21 15:26:41 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@37fca349
+2024-08-21 15:26:41 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-08-21 15:26:42 [main] WARN  org.hibernate.dialect.Dialect - HHH000511: The 5.7.44 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2024-08-21 15:26:42 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-08-21 15:26:42 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 15:26:43 [main] INFO  c.G.Thinture.service.MqttService - Subscribed to topic: Test
+2024-08-21 15:26:43 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-08-21 15:26:43 [main] WARN  o.t.templatemode.TemplateMode - [THYMELEAF][main] Unknown Template Mode 'HTML5'. Must be one of: 'HTML', 'XML', 'TEXT', 'JAVASCRIPT', 'CSS', 'RAW'. Using default Template Mode 'HTML'.
+2024-08-21 15:26:44 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 15:26:44 [main] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 1 subscriber(s).
+2024-08-21 15:26:44 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2024-08-21 15:26:44 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8181 (http) with context path '/'
+2024-08-21 15:26:44 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
+2024-08-21 15:26:44 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@77a13162]]
+2024-08-21 15:26:44 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
+2024-08-21 15:26:44 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Started ThintureGpsTrackerApplication in 4.635 seconds (process running for 5.392)
+2024-08-21 15:27:44 [MessageBroker-1] INFO  o.s.w.s.c.WebSocketMessageBrokerStats - WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[unknown], outboundChannel[unknown], sockJsScheduler[pool size = 1, active threads = 1, queued tasks = 0, completed tasks = 0]
+2024-08-21 15:29:06 [http-nio-8181-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-08-21 15:29:06 [http-nio-8181-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-08-21 15:29:06 [http-nio-8181-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 0 ms
+2024-08-21 15:35:54 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m42s15ms845µs500ns).
+2024-08-21 15:50:18 [RMI TCP Connection(30)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2024-08-21 15:50:18 [RMI TCP Connection(30)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
+2024-08-21 15:50:18 [RMI TCP Connection(30)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@77a13162]]
+2024-08-21 15:50:18 [RMI TCP Connection(30)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
+2024-08-21 15:50:18 [RMI TCP Connection(30)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 15:50:18 [RMI TCP Connection(30)-127.0.0.1] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 0 subscriber(s).
+2024-08-21 15:50:18 [RMI TCP Connection(30)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2024-08-21 15:50:18 [RMI TCP Connection(30)-127.0.0.1] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 15:50:18 [RMI TCP Connection(30)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-08-21 15:50:18 [RMI TCP Connection(30)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2024-08-21 15:50:33 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Starting ThintureGpsTrackerApplication using Java 17.0.12 with PID 12112 (C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker\target\classes started by jothi in C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker)
+2024-08-21 15:50:33 [main] INFO  c.G.T.ThintureGpsTrackerApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-21 15:50:34 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-08-21 15:50:34 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 166 ms. Found 2 JPA repository interfaces.
+2024-08-21 15:50:34 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2024-08-21 15:50:34 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2024-08-21 15:50:35 [main] WARN  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.ws.config.annotation.DelegatingWsConfiguration' of type [org.springframework.ws.config.annotation.DelegatingWsConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [annotationActionEndpointMapping] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2024-08-21 15:50:35 [main] INFO  o.s.w.s.a.s.AnnotationActionEndpointMapping - Supporting [WS-Addressing August 2004, WS-Addressing 1.0]
+2024-08-21 15:50:35 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8181 (http)
+2024-08-21 15:50:35 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-21 15:50:35 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.26]
+2024-08-21 15:50:35 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-21 15:50:35 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1423 ms
+2024-08-21 15:50:35 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-08-21 15:50:35 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.5.2.Final
+2024-08-21 15:50:35 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2024-08-21 15:50:36 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-08-21 15:50:36 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-08-21 15:50:36 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@30a62a5b
+2024-08-21 15:50:36 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-08-21 15:50:36 [main] WARN  org.hibernate.dialect.Dialect - HHH000511: The 5.7.44 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2024-08-21 15:50:37 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-08-21 15:50:37 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 15:50:38 [main] INFO  c.G.Thinture.service.MqttService - Subscribed to topic: Test
+2024-08-21 15:50:39 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-08-21 15:50:39 [main] WARN  o.t.templatemode.TemplateMode - [THYMELEAF][main] Unknown Template Mode 'HTML5'. Must be one of: 'HTML', 'XML', 'TEXT', 'JAVASCRIPT', 'CSS', 'RAW'. Using default Template Mode 'HTML'.
+2024-08-21 15:50:39 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 15:50:39 [main] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 1 subscriber(s).
+2024-08-21 15:50:39 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2024-08-21 15:50:39 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8181 (http) with context path '/'
+2024-08-21 15:50:39 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
+2024-08-21 15:50:39 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@6179af64]]
+2024-08-21 15:50:39 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
+2024-08-21 15:50:39 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Started ThintureGpsTrackerApplication in 6.179 seconds (process running for 7.949)
+2024-08-21 15:50:57 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Raw payload received: Hi
+2024-08-21 15:50:57 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed payload: Hi
+2024-08-21 15:50:57 [MQTT Call: spring-client] ERROR c.G.Thinture.service.MqttService - Failed to parse payload: Hi
+com.fasterxml.jackson.core.JsonParseException: Unrecognized token 'Hi': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')
+ at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 3]
+	at com.fasterxml.jackson.core.JsonParser._constructError(JsonParser.java:2572)
+	at com.fasterxml.jackson.core.JsonParser._constructReadException(JsonParser.java:2598)
+	at com.fasterxml.jackson.core.JsonParser._constructReadException(JsonParser.java:2606)
+	at com.fasterxml.jackson.core.base.ParserMinimalBase._reportError(ParserMinimalBase.java:765)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._reportInvalidToken(ReaderBasedJsonParser.java:3018)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser._handleOddValue(ReaderBasedJsonParser.java:2052)
+	at com.fasterxml.jackson.core.json.ReaderBasedJsonParser.nextToken(ReaderBasedJsonParser.java:780)
+	at com.fasterxml.jackson.databind.ObjectMapper._initForReading(ObjectMapper.java:4992)
+	at com.fasterxml.jackson.databind.ObjectMapper._readMapAndClose(ObjectMapper.java:4898)
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3848)
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3816)
+	at com.GpsTracker.Thinture.service.MqttService.processPayload(MqttService.java:78)
+	at com.GpsTracker.Thinture.service.MqttService.lambda$0(MqttService.java:65)
+	at org.eclipse.paho.client.mqttv3.internal.CommsCallback.deliverMessage(CommsCallback.java:511)
+	at org.eclipse.paho.client.mqttv3.internal.CommsCallback.handleMessage(CommsCallback.java:417)
+	at org.eclipse.paho.client.mqttv3.internal.CommsCallback.run(CommsCallback.java:214)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+2024-08-21 15:51:39 [MessageBroker-1] INFO  o.s.w.s.c.WebSocketMessageBrokerStats - WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[unknown], outboundChannel[unknown], sockJsScheduler[pool size = 1, active threads = 1, queued tasks = 0, completed tasks = 0]
+2024-08-21 15:52:22 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Raw payload received: {
+  "deviceID": "1212121212",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 15:52:22 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed payload: {
+  "deviceID": "1212121212",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 15:52:23 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed GPS Data: GpsData{DeviceID='1212121212', timestamp='2024-07-31 10:00:00', DataValidity='Valid', status='Active', latitude=12.971, longitude=77.594, speed='60'}
+2024-08-21 15:52:32 [http-nio-8181-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-08-21 15:52:32 [http-nio-8181-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-08-21 15:52:32 [http-nio-8181-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2024-08-21 15:52:38 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Raw payload received: {
+  "deviceID": "1212121212",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 15:52:38 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed payload: {
+  "deviceID": "1212121212",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 15:52:38 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed GPS Data: GpsData{DeviceID='1212121212', timestamp='2024-07-31 10:00:00', DataValidity='Valid', status='Active', latitude=12.971, longitude=77.594, speed='60'}
+2024-08-21 15:52:52 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Raw payload received: {
+  "deviceID": "1212121212",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 15:52:52 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed payload: {
+  "deviceID": "1212121212",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 15:52:52 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed GPS Data: GpsData{DeviceID='1212121212', timestamp='2024-07-31 10:00:00', DataValidity='Valid', status='Active', latitude=12.971, longitude=77.594, speed='60'}
+2024-08-21 15:53:11 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Raw payload received: {
+  "deviceID": "1212121212",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 15:53:11 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed payload: {
+  "deviceID": "1212121212",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 15:53:11 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed GPS Data: GpsData{DeviceID='1212121212', timestamp='2024-07-31 10:00:00', DataValidity='Valid', status='Active', latitude=12.971, longitude=77.594, speed='60'}
+2024-08-21 15:53:55 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Raw payload received: {
+  "deviceID": "1234567891",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 15:53:55 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed payload: {
+  "deviceID": "1234567891",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 15:53:55 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed GPS Data: GpsData{DeviceID='1234567891', timestamp='2024-07-31 10:00:00', DataValidity='Valid', status='Active', latitude=12.971, longitude=77.594, speed='60'}
+2024-08-21 15:54:06 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Raw payload received: {
+  "deviceID": "1234567891",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 15:54:06 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed payload: {
+  "deviceID": "1234567891",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 15:54:06 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed GPS Data: GpsData{DeviceID='1234567891', timestamp='2024-07-31 10:00:00', DataValidity='Valid', status='Active', latitude=12.971, longitude=77.594, speed='60'}
+2024-08-21 15:54:12 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Raw payload received: {
+  "deviceID": "1234567893",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 15:54:12 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed payload: {
+  "deviceID": "1234567893",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 15:54:12 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed GPS Data: GpsData{DeviceID='1234567893', timestamp='2024-07-31 10:00:00', DataValidity='Valid', status='Active', latitude=12.971, longitude=77.594, speed='60'}
+2024-08-21 15:54:26 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Raw payload received: {
+  "deviceID": "1234567893",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 15:54:26 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed payload: {
+  "deviceID": "1234567893",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 15:54:26 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed GPS Data: GpsData{DeviceID='1234567893', timestamp='2024-07-31 10:00:00', DataValidity='Valid', status='Active', latitude=12.971, longitude=77.594, speed='60'}
+2024-08-21 15:56:08 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Raw payload received: {
+  "deviceID": "1234567893",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 15:56:08 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed payload: {
+  "deviceID": "1234567893",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 15:56:08 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed GPS Data: GpsData{DeviceID='1234567893', timestamp='2024-07-31 10:00:00', DataValidity='Valid', status='Active', latitude=12.971, longitude=77.594, speed='60'}
+2024-08-21 16:05:54 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=6m18s85ms405µs900ns).
+2024-08-21 16:06:27 [MQTT Ping: spring-client] ERROR o.e.p.c.mqttv3.internal.ClientState - spring-client: Timed out as no write activity, keepAlive=60,000,000,000 lastOutboundActivity=22,160,079,854,700 lastInboundActivity=22,160,102,710,300 time=22,568,163,534,500 lastPing=22,160,079,863,300
+2024-08-21 16:10:27 [http-nio-8181-exec-9] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@30a62a5b (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2024-08-21 16:10:32 [http-nio-8181-exec-9] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@35711568 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2024-08-21 16:10:36 [RMI TCP Connection(24)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2024-08-21 16:10:36 [RMI TCP Connection(24)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
+2024-08-21 16:10:36 [RMI TCP Connection(24)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@6179af64]]
+2024-08-21 16:10:36 [RMI TCP Connection(24)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
+2024-08-21 16:10:37 [http-nio-8181-exec-9] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@48a03bf6 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2024-08-21 16:10:37 [RMI TCP Connection(26)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2024-08-21 16:10:40 [RMI TCP Connection(27)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2024-08-21 16:10:41 [RMI TCP Connection(28)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2024-08-21 16:10:41 [RMI TCP Connection(29)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2024-08-21 16:10:42 [RMI TCP Connection(24)-127.0.0.1] WARN  o.apache.tomcat.util.net.NioEndpoint - The executor associated with thread pool [http-nio-8181] has not fully shutdown. Some application threads may still be running.
+2024-08-21 16:10:42 [RMI TCP Connection(24)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 16:10:42 [RMI TCP Connection(24)-127.0.0.1] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 0 subscriber(s).
+2024-08-21 16:10:42 [RMI TCP Connection(30)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2024-08-21 16:10:42 [RMI TCP Connection(24)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2024-08-21 16:10:42 [RMI TCP Connection(24)-127.0.0.1] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 16:10:42 [RMI TCP Connection(24)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-08-21 16:10:42 [RMI TCP Connection(24)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2024-08-21 16:10:42 [http-nio-8181-exec-9] WARN  com.zaxxer.hikari.pool.PoolBase - HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@1d8f0bb0 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2024-08-21 16:10:42 [http-nio-8181-exec-9] WARN  o.h.e.jdbc.spi.SqlExceptionHelper - SQL Error: 0, SQLState: null
+2024-08-21 16:10:42 [http-nio-8181-exec-9] ERROR o.h.e.jdbc.spi.SqlExceptionHelper - HikariPool-1 - Interrupted during connection acquisition
+2024-08-21 16:11:00 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Starting ThintureGpsTrackerApplication using Java 17.0.12 with PID 17812 (C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker\target\classes started by jothi in C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker)
+2024-08-21 16:11:00 [main] INFO  c.G.T.ThintureGpsTrackerApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-21 16:11:01 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-08-21 16:11:01 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 94 ms. Found 2 JPA repository interfaces.
+2024-08-21 16:11:01 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2024-08-21 16:11:01 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2024-08-21 16:11:01 [main] WARN  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.ws.config.annotation.DelegatingWsConfiguration' of type [org.springframework.ws.config.annotation.DelegatingWsConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [annotationActionEndpointMapping] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2024-08-21 16:11:01 [main] INFO  o.s.w.s.a.s.AnnotationActionEndpointMapping - Supporting [WS-Addressing August 2004, WS-Addressing 1.0]
+2024-08-21 16:11:01 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8181 (http)
+2024-08-21 16:11:01 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-21 16:11:01 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.26]
+2024-08-21 16:11:01 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-21 16:11:01 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1151 ms
+2024-08-21 16:11:02 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-08-21 16:11:02 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.5.2.Final
+2024-08-21 16:11:02 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2024-08-21 16:11:02 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-08-21 16:11:02 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-08-21 16:11:02 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@3c3cd13a
+2024-08-21 16:11:02 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-08-21 16:11:02 [main] WARN  org.hibernate.dialect.Dialect - HHH000511: The 5.7.44 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2024-08-21 16:11:03 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-08-21 16:11:03 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 16:11:04 [main] INFO  c.G.Thinture.service.MqttService - Subscribed to topic: Test
+2024-08-21 16:11:04 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-08-21 16:11:04 [main] WARN  o.t.templatemode.TemplateMode - [THYMELEAF][main] Unknown Template Mode 'HTML5'. Must be one of: 'HTML', 'XML', 'TEXT', 'JAVASCRIPT', 'CSS', 'RAW'. Using default Template Mode 'HTML'.
+2024-08-21 16:11:04 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 16:11:04 [main] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 1 subscriber(s).
+2024-08-21 16:11:04 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2024-08-21 16:11:04 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8181 (http) with context path '/'
+2024-08-21 16:11:04 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
+2024-08-21 16:11:04 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@14f11a56]]
+2024-08-21 16:11:04 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
+2024-08-21 16:11:04 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Started ThintureGpsTrackerApplication in 4.445 seconds (process running for 5.249)
+2024-08-21 16:11:09 [http-nio-8181-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-08-21 16:11:09 [http-nio-8181-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-08-21 16:11:09 [http-nio-8181-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2024-08-21 16:12:04 [MessageBroker-4] INFO  o.s.w.s.c.WebSocketMessageBrokerStats - WebSocketSession[1 current WS(1)-HttpStream(0)-HttpPoll(0), 2 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(2)-CONNECTED(2)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[unknown], outboundChannel[unknown], sockJsScheduler[pool size = 12, active threads = 1, queued tasks = 2, completed tasks = 12]
+2024-08-21 16:12:09 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Raw payload received: {
+  "deviceID": "1234567893",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 16:12:09 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed payload: {
+  "deviceID": "1234567893",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "1"
+}
+2024-08-21 16:12:09 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed GPS Data: GpsData{DeviceID='1234567893', timestamp='2024-07-31 10:00:00', DataValidity='Valid', status='Active', latitude=12.971, longitude=77.594, speed='60'}
+2024-08-21 16:12:28 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Raw payload received: {
+  "deviceID": "1234567893",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "2"
+}
+2024-08-21 16:12:28 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed payload: {
+  "deviceID": "1234567893",
+  "timestamp": "2024-07-31 10:00:00",
+  "dataValidity": "Valid",
+  "status": "Active",
+  "latitude": "12.9716",
+  "longitude": "77.5946",
+  "speed": "60",
+  "course": "NW",
+  "additionalData": "None",
+  "sequenceNumber": "2"
+}
+2024-08-21 16:12:28 [MQTT Call: spring-client] INFO  c.G.Thinture.service.MqttService - Processed GPS Data: GpsData{DeviceID='1234567893', timestamp='2024-07-31 10:00:00', DataValidity='Valid', status='Active', latitude=12.971, longitude=77.594, speed='60'}
+2024-08-21 16:31:04 [RMI TCP Connection(27)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2024-08-21 16:31:04 [RMI TCP Connection(27)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
+2024-08-21 16:31:04 [RMI TCP Connection(27)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@14f11a56]]
+2024-08-21 16:31:04 [RMI TCP Connection(27)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
+2024-08-21 16:31:04 [RMI TCP Connection(27)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 16:31:04 [RMI TCP Connection(27)-127.0.0.1] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 0 subscriber(s).
+2024-08-21 16:31:04 [RMI TCP Connection(27)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2024-08-21 16:31:04 [RMI TCP Connection(27)-127.0.0.1] WARN  o.s.b.f.s.DisposableBeanAdapter - Invocation of close method failed on bean with name 'mqttClient': Client is connected (32100)
+2024-08-21 16:31:04 [RMI TCP Connection(27)-127.0.0.1] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 16:31:04 [RMI TCP Connection(27)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-08-21 16:31:04 [RMI TCP Connection(27)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2024-08-21 16:31:07 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Starting ThintureGpsTrackerApplication using Java 17.0.12 with PID 2560 (C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker\target\classes started by jothi in C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker)
+2024-08-21 16:31:07 [main] INFO  c.G.T.ThintureGpsTrackerApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-21 16:31:07 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-08-21 16:31:07 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 92 ms. Found 2 JPA repository interfaces.
+2024-08-21 16:31:07 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2024-08-21 16:31:07 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2024-08-21 16:31:08 [main] WARN  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.ws.config.annotation.DelegatingWsConfiguration' of type [org.springframework.ws.config.annotation.DelegatingWsConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [annotationActionEndpointMapping] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2024-08-21 16:31:08 [main] INFO  o.s.w.s.a.s.AnnotationActionEndpointMapping - Supporting [WS-Addressing August 2004, WS-Addressing 1.0]
+2024-08-21 16:31:08 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8181 (http)
+2024-08-21 16:31:08 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-21 16:31:08 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.26]
+2024-08-21 16:31:08 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-21 16:31:08 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1111 ms
+2024-08-21 16:31:08 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-08-21 16:31:08 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.5.2.Final
+2024-08-21 16:31:08 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2024-08-21 16:31:08 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-08-21 16:31:08 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-08-21 16:31:09 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@71ee2fff
+2024-08-21 16:31:09 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-08-21 16:31:09 [main] WARN  org.hibernate.dialect.Dialect - HHH000511: The 5.7.44 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2024-08-21 16:31:10 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-08-21 16:31:10 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 16:31:11 [main] INFO  c.G.Thinture.service.MqttService - Subscribed to topic: Test
+2024-08-21 16:31:11 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-08-21 16:31:11 [main] WARN  o.t.templatemode.TemplateMode - [THYMELEAF][main] Unknown Template Mode 'HTML5'. Must be one of: 'HTML', 'XML', 'TEXT', 'JAVASCRIPT', 'CSS', 'RAW'. Using default Template Mode 'HTML'.
+2024-08-21 16:31:11 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 16:31:11 [main] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 1 subscriber(s).
+2024-08-21 16:31:11 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2024-08-21 16:31:11 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8181 (http) with context path '/'
+2024-08-21 16:31:11 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
+2024-08-21 16:31:11 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@329b4b8b]]
+2024-08-21 16:31:11 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
+2024-08-21 16:31:11 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Started ThintureGpsTrackerApplication in 4.66 seconds (process running for 5.068)
+2024-08-21 16:31:20 [http-nio-8181-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-08-21 16:31:20 [http-nio-8181-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-08-21 16:31:20 [http-nio-8181-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 0 ms
+2024-08-21 16:32:11 [RMI TCP Connection(7)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2024-08-21 16:32:11 [RMI TCP Connection(7)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
+2024-08-21 16:32:11 [RMI TCP Connection(7)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@329b4b8b]]
+2024-08-21 16:32:11 [RMI TCP Connection(7)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
+2024-08-21 16:32:11 [RMI TCP Connection(7)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 16:32:11 [RMI TCP Connection(7)-127.0.0.1] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 0 subscriber(s).
+2024-08-21 16:32:11 [RMI TCP Connection(7)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2024-08-21 16:32:11 [RMI TCP Connection(7)-127.0.0.1] WARN  o.s.b.f.s.DisposableBeanAdapter - Invocation of close method failed on bean with name 'mqttClient': Client is connected (32100)
+2024-08-21 16:32:11 [RMI TCP Connection(7)-127.0.0.1] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 16:32:11 [RMI TCP Connection(7)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-08-21 16:32:11 [RMI TCP Connection(7)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2024-08-21 16:32:18 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Starting ThintureGpsTrackerApplication using Java 17.0.12 with PID 8856 (C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker\target\classes started by jothi in C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker)
+2024-08-21 16:32:18 [main] INFO  c.G.T.ThintureGpsTrackerApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-21 16:32:18 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-08-21 16:32:19 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 146 ms. Found 2 JPA repository interfaces.
+2024-08-21 16:32:19 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2024-08-21 16:32:19 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2024-08-21 16:32:19 [main] WARN  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.ws.config.annotation.DelegatingWsConfiguration' of type [org.springframework.ws.config.annotation.DelegatingWsConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [annotationActionEndpointMapping] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2024-08-21 16:32:19 [main] INFO  o.s.w.s.a.s.AnnotationActionEndpointMapping - Supporting [WS-Addressing August 2004, WS-Addressing 1.0]
+2024-08-21 16:32:19 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8181 (http)
+2024-08-21 16:32:19 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-21 16:32:19 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.26]
+2024-08-21 16:32:19 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-21 16:32:19 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1301 ms
+2024-08-21 16:32:19 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-08-21 16:32:19 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.5.2.Final
+2024-08-21 16:32:19 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2024-08-21 16:32:20 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-08-21 16:32:20 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-08-21 16:32:20 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@405603b6
+2024-08-21 16:32:20 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-08-21 16:32:20 [main] WARN  org.hibernate.dialect.Dialect - HHH000511: The 5.7.44 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2024-08-21 16:32:21 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-08-21 16:32:21 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 16:32:22 [main] INFO  c.G.Thinture.service.MqttService - Subscribed to topic: Test
+2024-08-21 16:32:22 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-08-21 16:32:22 [main] WARN  o.t.templatemode.TemplateMode - [THYMELEAF][main] Unknown Template Mode 'HTML5'. Must be one of: 'HTML', 'XML', 'TEXT', 'JAVASCRIPT', 'CSS', 'RAW'. Using default Template Mode 'HTML'.
+2024-08-21 16:32:23 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 16:32:23 [main] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 1 subscriber(s).
+2024-08-21 16:32:23 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2024-08-21 16:32:23 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8181 (http) with context path '/'
+2024-08-21 16:32:23 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
+2024-08-21 16:32:23 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@6592a73b]]
+2024-08-21 16:32:23 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
+2024-08-21 16:32:23 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Started ThintureGpsTrackerApplication in 5.094 seconds (process running for 5.561)
+2024-08-21 16:32:24 [http-nio-8181-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-08-21 16:32:24 [http-nio-8181-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-08-21 16:32:24 [http-nio-8181-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 3 ms
+2024-08-21 16:33:23 [MessageBroker-3] INFO  o.s.w.s.c.WebSocketMessageBrokerStats - WebSocketSession[1 current WS(1)-HttpStream(0)-HttpPoll(0), 1 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(1)-CONNECTED(1)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[unknown], outboundChannel[unknown], sockJsScheduler[pool size = 12, active threads = 1, queued tasks = 2, completed tasks = 13]
+2024-08-21 16:39:21 [RMI TCP Connection(14)-127.0.0.1] INFO  o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2024-08-21 16:39:21 [RMI TCP Connection(14)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
+2024-08-21 16:39:21 [RMI TCP Connection(14)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@6592a73b]]
+2024-08-21 16:39:21 [RMI TCP Connection(14)-127.0.0.1] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
+2024-08-21 16:39:21 [RMI TCP Connection(14)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 16:39:21 [RMI TCP Connection(14)-127.0.0.1] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 0 subscriber(s).
+2024-08-21 16:39:21 [RMI TCP Connection(14)-127.0.0.1] INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2024-08-21 16:39:21 [RMI TCP Connection(14)-127.0.0.1] WARN  o.s.b.f.s.DisposableBeanAdapter - Invocation of close method failed on bean with name 'mqttClient': Client is connected (32100)
+2024-08-21 16:39:21 [RMI TCP Connection(14)-127.0.0.1] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 16:39:21 [RMI TCP Connection(14)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-08-21 16:39:21 [RMI TCP Connection(14)-127.0.0.1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2024-08-21 16:39:24 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Starting ThintureGpsTrackerApplication using Java 17.0.12 with PID 13684 (C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker\target\classes started by jothi in C:\Users\jothi\OneDrive\Desktop\New folder (3)\ThintureGpsTracker\ThintureGpsTracker)
+2024-08-21 16:39:24 [main] INFO  c.G.T.ThintureGpsTrackerApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-21 16:39:25 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-08-21 16:39:25 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 122 ms. Found 2 JPA repository interfaces.
+2024-08-21 16:39:25 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2024-08-21 16:39:25 [main] INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2024-08-21 16:39:25 [main] WARN  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.ws.config.annotation.DelegatingWsConfiguration' of type [org.springframework.ws.config.annotation.DelegatingWsConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [annotationActionEndpointMapping] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2024-08-21 16:39:25 [main] INFO  o.s.w.s.a.s.AnnotationActionEndpointMapping - Supporting [WS-Addressing August 2004, WS-Addressing 1.0]
+2024-08-21 16:39:25 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8181 (http)
+2024-08-21 16:39:25 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-21 16:39:25 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.26]
+2024-08-21 16:39:25 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-21 16:39:25 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1301 ms
+2024-08-21 16:39:25 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-08-21 16:39:26 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.5.2.Final
+2024-08-21 16:39:26 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2024-08-21 16:39:26 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-08-21 16:39:26 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-08-21 16:39:26 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@30ef32eb
+2024-08-21 16:39:26 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-08-21 16:39:26 [main] WARN  org.hibernate.dialect.Dialect - HHH000511: The 5.7.44 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2024-08-21 16:39:27 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-08-21 16:39:27 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-08-21 16:39:28 [main] INFO  c.G.Thinture.service.MqttService - Subscribed to topic: Test
+2024-08-21 16:39:28 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-08-21 16:39:28 [main] WARN  o.t.templatemode.TemplateMode - [THYMELEAF][main] Unknown Template Mode 'HTML5'. Must be one of: 'HTML', 'XML', 'TEXT', 'JAVASCRIPT', 'CSS', 'RAW'. Using default Template Mode 'HTML'.
+2024-08-21 16:39:28 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2024-08-21 16:39:28 [main] INFO  o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 1 subscriber(s).
+2024-08-21 16:39:28 [main] INFO  o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2024-08-21 16:39:29 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8181 (http) with context path '/'
+2024-08-21 16:39:29 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
+2024-08-21 16:39:29 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@41acf2f1]]
+2024-08-21 16:39:29 [main] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
+2024-08-21 16:39:29 [main] INFO  c.G.T.ThintureGpsTrackerApplication - Started ThintureGpsTrackerApplication in 4.831 seconds (process running for 5.286)
+2024-08-21 16:39:32 [http-nio-8181-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-08-21 16:39:32 [http-nio-8181-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-08-21 16:39:32 [http-nio-8181-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2024-08-21 16:40:28 [MessageBroker-8] INFO  o.s.w.s.c.WebSocketMessageBrokerStats - WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 2 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(2)-CONNECTED(2)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[unknown], outboundChannel[unknown], sockJsScheduler[pool size = 12, active threads = 1, queued tasks = 1, completed tasks = 12]

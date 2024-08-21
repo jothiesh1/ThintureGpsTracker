@@ -124,82 +124,675 @@
 			.content{
 				height: 500px;
 			}
+			#sidebar {
+			            height: 100%;
+			            width: 0;
+			            position: fixed;
+			            top: 0;
+			            left: 0;
+			            background-color: lightgrey;
+			            color: black;
+			            transition: 0.3s;
+			            overflow-x: hidden;
+			            padding-top: 80px;
+			            z-index: 1000;
+			        }
+			        #sidebar a {
+			            padding: 10px 15px;
+			            text-decoration: none;
+			            color: white;
+			            display: block;
+			            font-size: 7px;
+			        }
+			        #sidebar a:hover {
+			            background-color: white;
+			            color: black;
+			        }
+			        #sidebar .closebtn {
+			            position: absolute;
+			            top: 5px;
+			            right: 25px;
+			            font-size: 26px;
+			            margin-left: 50px;
+			            background-color: white;
+			            color: red;
+			        }
+			        #menu-toggle {
+			            position: absolute;
+			            top: 100px;
+			            left: 50px;
+			            font-size: 24px;
+			            color: #333;
+			            cursor: pointer;
+			            z-index: 1001;
+			            background-color: white;
+			            color: black;
+			            width: 40px;
+			            text-align: center;
+			        }
+			        .controls {
+			            position: absolute;
+			            top: 250px;
+			            right: 10px;
+			            z-index: 1000;
+			        }
+			        .controls button {
+			            display: block;
+			            margin: 5px 0;
+			            padding: 10px;
+			            background-color: #007bff;
+			            color: white;
+			            border: none;
+			            border-radius: 5px;
+			            cursor: pointer;
+			        }
+			        .controls button:hover {
+			            background-color: #0056b3;
+			        }
+			        .tabs {
+			            display: flex;
+			            background-color: #444;
+			            padding: 8px;
+			            font-size: 8px;
+						top:100px;
+			        }
+			        .tabs a {
+			            flex: 1;
+			            text-align: center;
+			            padding: 10px;
+			            color: white;
+			            text-decoration: none;
+			            background-color: #555;
+			            border-radius: 5px;
+			            margin: 0 5px;
+			            cursor: pointer;
+			            width: 220px;
+						font-size: 8px;
+			        }
+			        .tabs a.active {
+			            background-color: #007bff;
+			        }
+			        .tab-content {
+			            padding: 10px;
+			            background-color: #fff;
+			            border: 1px solid #ddd;
+			            border-radius: 5px;
+						font-size: 12px;
+			        }
+			        .history-list {
+			            margin: 0;
+			            padding: 0;
+			            list-style: none;
+			        }
+			        .history-list li {
+			            padding: 10px;
+			            border-bottom: 1px solid #ddd;
+			        }
+			        .history-list li:hover {
+			            background-color: #f1f1f1;
+			        }
+					.status-buttons {
+					           display: fixed;
+					           gap: 10px;
+							   
+					       }
+					       .status-button {
+					           width: 50px;
+					           height: 50px;
+					           border-radius: 50%;
+					           border: none;
+					           color: white;
+					           font-size: 8px;
+					           font-weight: bold;
+					          
+					           flex-direction: column;
+					           justify-content: center;
+					           align-items: center;
+					           cursor: pointer;
+							   top:50px;
+							  
+					       }
+					       .all {
+					           background-color: #555; /* Gray */
+					       }
+					       .running {
+					           background-color: #4CAF50; /* Green */
+					       }
+					       .stop {
+					           background-color: #FF0000; /* Red */
+					       }
+					       .idle {
+					           background-color: #FFEB3B; /* Yellow */
+					           color: #000; /* Black text */
+					       }
+					       .inactive {
+					           background-color: #3F51B5; /* Blue */
+					       }
+						   .back {
+						       background-color: #3F51B5;
+						       color: white; /* Optional: changes the text color to white for better contrast */
+						       border: none; /* Optional: removes the border if you want a cleaner look */
+						       padding: 10px 20px; /* Optional: adds some padding inside the button */
+						       margin: 10px; /* Optional: adds margin around the button */
+						       position: absolute; /* Position the button absolutely within its container */
+						       right: 0; /* Align the button to the right */
+						       top: 2px; /* Optional: align the button to the top */
+						   }
+						 
+						  .custom-popup:hover{
+						       width: 200px; /* Set the width */
+						       height: 120px; /* Set the height */
+						      
+						       padding: 10px; /* Add padding */
+						       background-color: #fff; /* Set background color */
+						       border: 1px solid #ccc; /* Add border */
+						   }
+						          
+
+						   #live-video {
+						      
+						       position: absolute;
+						       width: 250px; /* Adjust this value as needed */
+						       height: 10px; /* Adjust this value as needed */
+						       right: 20px; /* Align the live video to the right (adjust as needed) */
+						       top: 20px; /* Position the video vertically */
+						       background-color: #ffffff; /* Optional: background color to make it stand out */
+						       box-shadow: -5px 0px 15px rgba(0,0,0,0.5); /* Optional: add shadow for a pop-out effect */
+						       z-index: 1000; /* Ensure it's above other content */
+						   }
+
+						   #live-video.active {
+						       display: block; /* Display the video when active */
+						   }
+
+						   #video-stream {
+						       width: 100%; /* Make sure the video occupies the full width of its container */
+						       height: 100%; /* Make sure the video occupies the full height of its container */
+						       border: none; /* Remove default iframe border */
+						       background-color: #000; /* Optional: background color of the iframe */
+						   }
+
+
+						   #close-icon {
+						       position: absolute;
+						       top: 5px;
+						       right: 10px;
+						       cursor: pointer;
+						       font-size: 24px;
+						       color: #fff;
+						   }
+
+
+						   #close-icon {
+						       position: absolute;
+						       top: 5px;
+						       right: 5px;
+						       width: 20px;
+						       height: 20px;
+						       background-color: #fff;
+						       color: #000;
+						       text-align: center;
+						       line-height: 20px;
+						       border-radius: 50%;
+						       cursor: pointer;
+						       font-weight: bold;
+						   }
+
+						   #close-icon:hover {
+						       background-color: red;
+						   }
+						   #sideTab {
+						       height: 100%; /* Start with height 0 */
+						       width: 0%; /* Full width of the screen */
+						       position: fixed;
+						       bottom: 100px; /* Position at the bottom */
+						       left: 0; /* Align to the left */
+						       background-color:lightgrey;
+						       overflow-y: hidden;
+						       transition: height 0.5s ease; /* Animate the height instead of width */
+						       padding-top: 20px; /* Adjust padding as needed */
+						       box-shadow: 0px -5px 15px rgba(0,0,0,0.5); /* Shadow on top */
+						       z-index: 9999;
+							   top:300px;
+						   }
+
+						   #sideTab.active {
+						       height: 500px; /* Adjust height when active */
+						   }
+
+
+						   #sideTab.open {
+						       width: 1270px; /* Adjust the width as needed */
+						   }
+
+						   .tab-content {
+						       display: block; /* Ensure tab content is visible */
+						       padding: 15px; /* Add padding for better layout */
+							   font-size: 12px;
+						   }
+
+						 
+						   .closebtn {
+						       font-size: 36px;
+						       cursor: pointer;
+						       position: absolute;
+						       top: 0;
+						       right: 15px;
+							   color: #FF0000;
+						   }
+						   
+			.live-button{
+				
+				background-color: #3F51B5;
+						       color: white; /* Optional: changes the text color to white for better contrast */
+						       border: none; /* Optional: removes the border if you want a cleaner look */
+						       padding: 2px 2px; /* Optional: adds some padding inside the button */
+						       margin: 10px; /* Optional: adds margin around the button */
+						       position: absolute; /* Position the button absolutely within its container */
+						       right: 5px; /* Align the button to the right */
+						     width: 95px;
+							 top:-10px;
+						   }
+						   
+						   /* General button styling */
+						   .history-button {
+						       background-color: #007bff; /* Blue background */
+						       color: white; /* White text */
+						       padding: 10px 20px; /* Padding around the button */
+						       border: none; /* No border */
+						       border-radius: 5px; /* Slightly rounded corners */
+						       cursor: pointer; /* Pointer cursor on hover */
+						       font-size: 16px; /* Font size */
+						       display: inline-flex; /* Align icon and text */
+						       align-items: center; /* Center icon and text vertically */
+						       transition: background-color 0.3s ease; /* Smooth background color transition */
+						   }
+
+						   /* Button hover effect */
+						   .history-button:hover {
+						       background-color: #0056b3; /* Darker blue on hover */
+						   }
+
+						   /* Icon within the button */
+						   .history-button i {
+						       margin-right: 8px; /* Space between icon and text */
+						   }
+
+						   /* General tab pane styling */
+						   .tab-pane {
+						       display: none; /* Hide all tabs by default */
+						       padding: 20px; /* Padding inside the tab content */
+						       border: 1px solid #ddd; /* Light border around the content */
+						       border-radius: 5px; /* Rounded corners */
+						       background-color: #f9f9f9; /* Light gray background */
+						       margin-top: 10px; /* Space above the tab content */
+						   }
+
+						   .custom-icon {
+						               font-size: 32px;
+						   			
+						           }
+						           .ring-blink {
+						               position: relative;
+						   			animation: blink 1s infinite;
+						   			border-color: red;
+						           }
+						   		
+						           .ring-blink::before, .ring-blink::after {
+						               content: '';
+						               position: absolute;
+						               border-radius: 50%;
+						               opacity: 0.5;
+						               animation: ringBlink 1.5s infinite;
+						               background-color: transparent;
+						               border: 5px solid;
+						           }
+						           .ring-blink::before {
+						               top: -10px;
+						               left: -10px;
+						               width: 60px;
+						               height: 60px;
+						               animation-delay: 0s;
+						           }
+						           .ring-blink::after {
+						               top: -20px;
+						               left: -20px;
+						               width: 80px;
+						               height: 80px;
+						               animation-delay: 0.3s;
+						           }
+						           @keyframes ringBlink {
+						               0% { transform: scale(0.3); opacity: 0.3; }
+						               50% { transform: scale(0.5); opacity: 0.5; }
+						               100% { transform: scale(1); opacity: 0; }
+						           }
+						           .ring-blink-red {
+						               color: red;
+						               border-color: red;
+						           }
+						           .ring-blink-green {
+						               color: green;
+						               border-color: green;
+						           }
+						   		.vehicle-details {
+						   		    margin-top: 20px;
+						   		    padding: 10px;
+						   		    border: 1px solid #ddd;
+						   		    background-color: #f9f9f9;
+						   			
+						   		}
+
+
+						
+
+						   /* Error message styling */
+						   #error-message {
+						       color: red; /* Red text color */
+						       margin-top: 10px; /* Space above the error message */
+						   }
+
+						   /* Video player styling */
+						   #cameraScreen video {
+						       border-radius: 10px; /* Rounded corners for the video player */
+						       border: 1px solid #ddd; /* Light border around the video player */
+						   }
+						   .tab-pane {
+						           display: none; /* Hide by default */
+						       }
+						       .tab-pane.active {
+						           display: block; /* Show when active */
+						       }
+						       .event-report table {
+						           width: 100%;
+						           border-collapse: collapse;
+						           margin-top: 20px;
+								   font-size: 8px;
+						       }
+						       .event-report th, .event-report td {
+						           border: 1px solid #ddd;
+						           padding: 8px;
+						           text-align: left;
+						       }
+						       .event-report th {
+						           background-color: #f2f2f2;
+						       }
+							   .search-container {
+							       position: absolute; /* Change to absolute to position relative to parent */
+							       top: 20px; /* Adjust the top position as needed */
+							       right: 290px; /* Adjust the right position as needed */
+							       width: auto; /* Set width based on content */
+							       display: flex;
+							       align-items: center; /* Vertically center the items */
+							   }			 
+							  
+
+							  
+
+							   .live-button {
+							       background-color: #f44336; /* Red color */
+							       color: white;
+							       border: none;
+							       padding: 10px 20px;
+							       font-size: 16px;
+							       cursor: pointer;
+							       border-radius: 0 5px 5px 0; /* Rounded corners on the right side */
+							       margin-left: -1px; /* To avoid the gap between input and button */
+							       display: flex;
+							       align-items: center;
+							       justify-content: center;
+							   }
+
+
+							   .search-container .search {
+							       padding-left: 30px;
+							       height: 35px;
+							       font-size: 16px;
+							       flex: 1;
+							       margin-right: 10px; /* Add space between input and button */
+								   width:400px;
+								   
+							   }
+
+							   .search-container .fa-search {
+							       position: absolute;
+							       top: 50%;
+							       left: 10px;
+							       transform: translateY(-50%);
+							       color: #999;
+							       pointer-events: none;
+							   }
+
+							   .search-container .live-button {
+							       height: 35px;
+							       padding: 0 15px;
+							       font-size: 14px;
+							       background-color: darkblue;
+							       color: white;
+							       border: none;
+							       cursor: pointer;
+							       display: flex;
+							       align-items: center;
+							       justify-content: center;
+							       white-space: nowrap; /* Ensure text stays on one line */
+							   }
+
+							   .search-container .live-button i {
+							       margin-right: 5px;
+							   }
+
+							   .search-container .live-button:hover {
+							       background-color: #0056b3;
+							   }
+
+									  .bottom-tab {
+									             position: fixed;
+									             bottom: 0;
+									             left: 0;
+									             width: 100%;
+									             background-color: #f1f1f1;
+									             border-top: 1px solid #ccc;
+									             padding: 15px;
+									             box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+									             display: none;
+									         }
+
+									         .bottom-tab.active {
+									             display: block;
+									         }
+
+									         .bottom-tab h3 {
+									             margin: 0;
+									         }
+											 .alert-button {
+												background-color: darkred;
+															       color: white; /* Optional: changes the text color to white for better contrast */
+															       border: none; /* Optional: removes the border if you want a cleaner look */
+															       padding: 10px 20px; /* Optional: adds some padding inside the button */
+															       margin: 10px; /* Optional: adds margin around the button */
+															       position: absolute; /* Position the button absolutely within its container */
+															       right: 110px; /* Align the button to the right */
+															       top: 2px;
+																   }
+
+											 .alert-button i {
+											     margin-right: 8px; /* Space between icon and text */
+											 }
+
+
+											 .alert-button:hover {
+											     background-color: #d32f2f; /* Darker red on hover */
+											 }
+
+											 .alert-button:active {
+											     background-color: #b71c1c; /* Even darker red when clicked */
+											 }
+											 .card-sideTab{
+												background-color: darkred;
+												color: white;
+												border: none; /* Optional: removes the border if you want a cleaner look */
+											    padding: 10px 20px; /* Optional: adds some padding inside the button */
+												margin: 10px; /* Optional: adds margin around the button */
+												position: absolute; /* Position the button absolutely within its container */
+											    right: 310px; /* Align the button to the right */
+												top: 2px;																												     							
+												}
+												.closebtn {
+													font-size: 30px; /* Adjust size as needed */
+													color:red; /* Adjust color as needed */
+													cursor: pointer;
+													position: absolute;
+													top: 8px; /* Adjust positioning as needed */
+													right: 200px; /* Adjust positioning as needed */
+													z-index: 1000; /* Ensure it's above other content */
+												}
+																																										    
+																																      
+																																	 
+												#historySection {
+												position: fixed;
+												top: 0;
+												right: 0;
+												width: 300px; /* Adjust width as needed */
+												height: 100%; /* Full height of the screen */
+												background-color: #f4f4f4; /* Background color */
+												padding: 20px;
+											    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2); /* Optional shadow for depth */
+												z-index: 1000; /* Ensure it's on top of other elements */
+												overflow-y: auto; /* Scroll if content exceeds screen height */
+												}
+
+												 #searchForm {
+												margin-top: 20px; /* Space between heading and form */
+												}												     
+
+																						
+
     </style>
 </head>
 <body>
-	<div class="container-header">
-	        <div class="header">
-	            <img src="THINTURE_IMAGE/logo2.jpg" alt="THINTURE Logo" class="navbar-logo">
-	        </div>
-	    </div>
-    <div class="navbar">
-        <a href="/dashboard" class="active"><i class="fas fa-home"></i> Dashboard</a>
-        <a href="/map"><i class="fas fa-map"></i> Map</a>
-        <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i> View</a>
-            <div class="dropdown-content">
-				<a href="/total_users">Users</a>
-				                <a href="/total_vehicles">Vehicle</a>
-				                <a href="/tracking_details">Tracking Details</a>
-                <a href="#">Calendar</a>
-            </div>
-        </div>
-        <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i> Utility</a>
-            <div class="dropdown-content">
-                <a href="#">Support & Feedback</a>
-                <a href="#">Announcement</a>
-                <a href="#">Send Notification</a>
-            </div>
-        </div>
-        <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i> Accounts</a>
-            <div class="dropdown-content">
-                <a href="#">Renewal</a>
-            </div>
-        </div>
-        <a href="#"><i class="fas fa-th-large"></i> Profile</a>
-    </div>
-	<br>
-	<br>
-	<br>
-	<br>
-		<br>
-		<br>
-		<br>
-			<br>
-			<br>
+	<div id="menu-toggle" onclick="openNav()">
+			      <i class="fas fa-bars"></i>
+			  </div>
+			  <button id="back-button" class="back" onclick="history.back()">
+			      <i class="fas fa-arrow-left"></i>Back
+			  </button>
+			  <button type="button" class="alert-button" id="alertButton">
+			      <i class="fas fa-exclamation-triangle"></i> Alert <span id="alertCount"><strong>[3]</strong></span>
+			  </button>
+
+
+			  </div>
+	<div class="status-buttons">
+			    <button class="status-button all">
+			        5<br>All
+			    </button>
+			    <button class="status-button running">
+			        0<br>Running
+			    </button>
+			    <button class="status-button stop">
+			        2<br>Stop
+			    </button>
+			    <button class="status-button idle">
+			        0<br>Idle
+			    </button>
+			    <button class="status-button inactive">
+			        3<br>Inactive
+			    </button>
+			</div>
     <div class="content">
         <div id="map"></div>
     </div>
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        var map = L.map('map').setView([12.225284, 79.074699], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+	
+	<!-- map code starts here below 
+	************************************
+	-->
+	<script th:inline="javascript">
+	    var map = L.map('map').setView([12.225284, 79.074699], 5); // Adjusted zoom level to show more of the map
+	    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+	    }).addTo(map);
 
-        var marker = L.marker([12.225284, 79.074699]).addTo(map)
-            .bindPopup('Location: Tiruvannamalai<br> Latitude: 12.225284<br> Longitude: 79.074699')
-            .openPopup();
+	    // Dictionary to hold markers by deviceID
+	    var markers = {};
 
-        var socket = new SockJS('/gs-guide-websocket');
-        var stompClient = Stomp.over(socket);
+	    // Function to get the car icon based on the status
+	    function getCarIcon(status) {
+	        var ringClass = status === 'N1' ? 'ring-blink-red' : 'ring-blink-green';
 
-        stompClient.connect({}, function (frame) {
-            stompClient.subscribe('/topic/location-updates', function (locationUpdate) {
-                var data = JSON.parse(locationUpdate.body);
-                var lat = parseFloat(data.latitude);
-                var lon = parseFloat(data.longitude);
+	        return L.divIcon({
+	            className: 'custom-icon ring-blink ' + ringClass,
+	            html: `
+	                <div class="ring-blink">
+	                    <img src="${status === 'N1' ? 'THINTURE_IMAGE/red2.png' : 'THINTURE_IMAGE/greencar2.png'}" alt="car-icon" style="width: 38px; height: 38px;">
+	                </div>
+	            `,
+	            iconSize: [38, 38],
+	            iconAnchor: [19, 19],
+	            popupAnchor: [0, -19]
+	        });
+	    }
 
-                marker.setLatLng([lat, lon])
-                    .bindPopup('Device ID: ' + data.deviceID + '<br>Timestamp: ' + data.timestamp)
-                    .openPopup();
+	    // Function to create or update a marker
+	    function createOrUpdateMarker(vehicle) {
+	        var icon = getCarIcon(vehicle.status);
 
-                map.setView([lat, lon], 13);
-            });
-        });
-        /*]]>*/
-    </script>
+	        var popupContent = `
+	            <strong>Device ID:</strong> ${vehicle.deviceID}<br>
+	            <strong>Timestamp:</strong> ${vehicle.timestamp}<br>
+	            <strong>Address:</strong> ${vehicle.address || 'Address not available'}<br>
+	            <strong>Latitude:</strong> ${vehicle.latitude}<br>
+	            <strong>Longitude:</strong> ${vehicle.longitude}
+	        `;
+
+	        if (markers[vehicle.deviceID]) {
+	            // Update existing marker
+	            markers[vehicle.deviceID].setLatLng([vehicle.latitude, vehicle.longitude])
+	                .setIcon(icon)
+	                .bindPopup(popupContent)
+	                .openPopup();
+	        } else {
+	            // Create new marker
+	            markers[vehicle.deviceID] = L.marker([vehicle.latitude, vehicle.longitude], { icon: icon })
+	                .addTo(map)
+	                .bindPopup(popupContent)
+	                .openPopup();
+	        }
+	    }
+
+	    // Fetch initial vehicle data from the Spring Boot application
+	    fetch('/api/vehicles')
+	        .then(response => response.json())
+	        .then(data => {
+	            if (data && data.length > 0) {
+	                data.forEach(vehicle => {
+	                    createOrUpdateMarker(vehicle);
+	                });
+	            } else {
+	                console.error('No vehicle data available');
+	            }
+	        })
+	        .catch(error => console.error('Error fetching vehicle data:', error));
+
+	    // WebSocket connection for real-time updates
+	    var socket = new SockJS('/gs-guide-websocket');
+	    var stompClient = Stomp.over(socket);
+
+	    stompClient.connect({}, function (frame) {
+	        stompClient.subscribe('/topic/location-updates', function (locationUpdate) {
+	            var data = JSON.parse(locationUpdate.body);
+
+	            // Update marker with the new data received via WebSocket
+	            createOrUpdateMarker(data);
+
+	            // Optionally center the map on the updated marker
+	            map.setView([parseFloat(data.latitude), parseFloat(data.longitude)], 13);
+	        });
+	    });
+	</script>
+
+		<!--
+			 map code ending here
+		 *************************-->
+
 </body>
 </html>
