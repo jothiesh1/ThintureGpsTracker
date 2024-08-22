@@ -680,28 +680,51 @@
 			      <i class="fas fa-exclamation-triangle"></i> Alert <span id="alertCount"><strong>[3]</strong></span>
 			  </button>
 
-
+			  <!-- Top all count vehicle butto code starts here below 
+			  	************************************
+			  	
+			  	***************
+			  	-->
 			  </div>
-	<div class="status-buttons">
-			    <button class="status-button all">
-			        5<br>All
-			    </button>
-			    <button class="status-button running">
-			        0<br>Running
-			    </button>
-			    <button class="status-button stop">
-			        2<br>Stop
-			    </button>
-			    <button class="status-button idle">
-			        0<br>Idle
-			    </button>
-			    <button class="status-button inactive">
-			        3<br>Inactive
-			    </button>
-			</div>
+			  <div class="status-buttons">
+			      <button class="status-button all">
+			          0<br>All
+			      </button>
+			      <!-- Other buttons... -->
+			  </div>
+
+			  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+			  <script >
+				function updateVehicleCount() {
+				    $.ajax({
+				        url: '/api/vehicles/countAll', // Ensure this URL is correct
+				        method: 'GET',
+				        success: function(count) {
+				            console.log("Fetched vehicle count:", count); // Add this line to log the count
+				            $('.status-button.all').html(count + "<br>All");
+				        },
+				        error: function(error) {
+				            console.log("Error fetching vehicle count:", error);
+				        }
+				    });
+				}
+
+				$(document).ready(function() {
+				    updateVehicleCount(); // Call the function when the page loads
+				});
+
+			  </script>
+
     <div class="content">
         <div id="map"></div>
     </div>
+	
+
+	<!-- Top all count vehicle butto code End here  
+		************************************
+		
+		***************
+		-->
 	
 	<!-- map code starts here below 
 	************************************
@@ -790,11 +813,9 @@
 	            map.setView([parseFloat(data.latitude), parseFloat(data.longitude)], 13);
 	        });
 	    });
-	</script>
-
-		<!--
-			 map code ending here
-		 *************************-->
+	
+<!-- map code end here -->
+</script>
 
 </body>
 </html>

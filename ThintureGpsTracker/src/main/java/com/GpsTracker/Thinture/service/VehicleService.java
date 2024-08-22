@@ -36,5 +36,12 @@ public class VehicleService {
 		 return vehicleRepository.save(vehicle);// TODO Auto-generated method stub
 		
 	}
+// code for count all vehcile map round first button 
 
+	public long countAllVehicles() {
+        // Log the count to verify it's being fetched correctly
+        long count = vehicleRepository.count();
+        System.out.println("Count of vehicles: " + count);
+        return count;
+    }
 }
