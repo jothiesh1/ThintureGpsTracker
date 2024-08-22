@@ -2,7 +2,7 @@ package com.GpsTracker.Thinture.service;
 
 import com.GpsTracker.Thinture.dto.LocationUpdate;
 import com.GpsTracker.Thinture.model.GpsData;
-import com.GpsTracker.Thinture.model.Vehicle;
+import com.GpsTracker.Thinture.model.vehicle;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.eclipse.paho.client.mqttv3.MqttClient;

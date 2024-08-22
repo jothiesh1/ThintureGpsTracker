@@ -1,6 +1,6 @@
 package com.GpsTracker.Thinture.service;
 
-import com.GpsTracker.Thinture.model.Vehicle;
+import com.GpsTracker.Thinture.model.vehicle;
 import com.GpsTracker.Thinture.repository.VehicleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,11 +17,11 @@ public class VehicleService {
 //        return vehicleRepository.save(vehicle);
 //    }
 //
-    public List<Vehicle> getAllVehicles() {
+    public List<vehicle> getAllVehicles() {
         return vehicleRepository.findAll();
     }
 
-    public Vehicle getVehicleById(Long id) {
+    public vehicle getVehicleById(Long id) {
         return vehicleRepository.findById(id).orElse(null);
     }
 //
@@ -32,7 +32,7 @@ public class VehicleService {
         vehicleRepository.deleteByDeviceID(deviceID);
     }
 
-	public Vehicle save(Vehicle vehicle) {
+	public vehicle save(vehicle vehicle) {
 		 return vehicleRepository.save(vehicle);// TODO Auto-generated method stub
 		
 	}

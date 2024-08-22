@@ -2,1037 +2,799 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Fleet Tracker Map</title>
-    <!-- Link to necessary styles and scripts -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>Fleet Thinture Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.0/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
-    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-
-    <style>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+	<style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
         }
-        #map {
-            width: 100%;
-            height: 120vh;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        
-        .custom-icon {
-            font-size: 32px;
-			
-        }
-        .ring-blink {
-            position: relative;
-			animation: blink 1s infinite;
-			border-color: red;
-        }
-		
-        .ring-blink::before, .ring-blink::after {
-            content: '';
-            position: absolute;
-            border-radius: 50%;
-            opacity: 0.5;
-            animation: ringBlink 1.5s infinite;
-            background-color: transparent;
-            border: 5px solid;
-        }
-        .ring-blink::before {
-            top: -10px;
-            left: -10px;
-            width: 60px;
-            height: 60px;
-            animation-delay: 0s;
-        }
-        .ring-blink::after {
-            top: -20px;
-            left: -20px;
-            width: 80px;
-            height: 80px;
-            animation-delay: 0.3s;
-        }
-        @keyframes ringBlink {
-            0% { transform: scale(0.3); opacity: 0.3; }
-            50% { transform: scale(0.5); opacity: 0.5; }
-            100% { transform: scale(1); opacity: 0; }
-        }
-        .ring-blink-red {
-            color: red;
-            border-color: red;
-        }
-        .ring-blink-green {
-            color: green;
-            border-color: green;
-        }
-		.vehicle-details {
-		    margin-top: 20px;
-		    padding: 10px;
-		    border: 1px solid #ddd;
-		    background-color: #f9f9f9;
-			
-		}
-
-        .navbar {
-            background-color: lightgray;
+        .header {
+            background-color: gray;
             color: white;
-            padding: 10px 10px;
+            padding: 10px;
+            text-align: center;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            width: 120%;
-            max-width: 900px;
-            margin: 0 auto;
-            height: 55px;
-            margin-top: -2px;
-            margin-left: 210px;
         }
-        .refresh-button {
-            position: relative;
-            display: inline-block;
+        .header h1 {
+            margin: 0;
         }
-
-        .refresh-button i {
-            transition: transform 0.3s ease;
-        }
-
-        .refresh-button.animate i {
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .navbar-brand img {
-            height: 30px;
-            margin-right: 20px;
-        }
-        .navbar-menu, .navbar-end {
+        .header .right {
             display: flex;
             align-items: center;
+            gap: 10px;
         }
-        .navbar-menu a, .navbar-end a {
-            color: white;
-            text-decoration: none;
-            margin-left: 15px;
+        .content {
+            padding: 0;
         }
-        .navbar-menu a:hover, .navbar-end a:hover {
-            text-decoration: underline;
-        }
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: white;
-            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-            z-index: 1;
-        }
-        .dropdown-content a {
-            color: black;
-            padding: 12px 12px;
-            text-decoration: none;
-            display: block;
-            width: 200px;
-        }
-        .dropdown-content a:hover {
-            background-color: #f1f1f1;
-        }
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-        .navbar-logo {
-            width: 160px;
-            height: 60px;
-        }
-        .hover-info {
-            position: absolute;
-            background: #fff;
-            padding: 5px;
-            border: 1px solid #ddd;
+        #map {
+            width: 100%;
+            height: calc(100vh - 120px); /* Adjust height to fit screen */
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            pointer-events: none;
-           
         }
-        #sidebar {
-            height: 100%;
-            width: 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background-color: lightgrey;
-            color: black;
-            transition: 0.3s;
-            overflow-x: hidden;
-            padding-top: 80px;
-            z-index: 1000;
-        }
-        #sidebar a {
-            padding: 10px 15px;
-            text-decoration: none;
-            color: white;
-            display: block;
-            font-size: 7px;
-        }
-        #sidebar a:hover {
-            background-color: white;
-            color: black;
-        }
-        #sidebar .closebtn {
-            position: absolute;
-            top: 5px;
-            right: 25px;
-            font-size: 26px;
-            margin-left: 50px;
-            background-color: white;
-            color: red;
-        }
-        #menu-toggle {
-            position: absolute;
-            top: 100px;
-            left: 50px;
-            font-size: 24px;
-            color: #333;
-            cursor: pointer;
-            z-index: 1001;
-            background-color: white;
-            color: black;
-            width: 40px;
-            text-align: center;
-        }
-        .controls {
-            position: absolute;
-            top: 250px;
-            right: 10px;
-            z-index: 1000;
-        }
-        .controls button {
-            display: block;
-            margin: 5px 0;
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .controls button:hover {
-            background-color: #0056b3;
-        }
-        .tabs {
-            display: flex;
-            background-color: #444;
-            padding: 8px;
-            font-size: 8px;
-			top:100px;
-        }
-        .tabs a {
-            flex: 1;
-            text-align: center;
-            padding: 10px;
-            color: white;
-            text-decoration: none;
-            background-color: #555;
-            border-radius: 5px;
-            margin: 0 5px;
-            cursor: pointer;
-            width: 220px;
-			font-size: 8px;
-        }
-        .tabs a.active {
-            background-color: #007bff;
-        }
-        .tab-content {
-            padding: 10px;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-			font-size: 12px;
-        }
-        .history-list {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-        }
-        .history-list li {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-        .history-list li:hover {
-            background-color: #f1f1f1;
-        }
-		.status-buttons {
-		           display: fixed;
-		           gap: 10px;
-				   
-		       }
-		       .status-button {
-		           width: 50px;
-		           height: 50px;
-		           border-radius: 50%;
-		           border: none;
-		           color: white;
-		           font-size: 8px;
-		           font-weight: bold;
-		          
-		           flex-direction: column;
-		           justify-content: center;
-		           align-items: center;
-		           cursor: pointer;
-				   top:50px;
-				  
-		       }
-		       .all {
-		           background-color: #555; /* Gray */
-		       }
-		       .running {
-		           background-color: #4CAF50; /* Green */
-		       }
-		       .stop {
-		           background-color: #FF0000; /* Red */
-		       }
-		       .idle {
-		           background-color: #FFEB3B; /* Yellow */
-		           color: #000; /* Black text */
-		       }
-		       .inactive {
-		           background-color: #3F51B5; /* Blue */
-		       }
-			   .back {
-			       background-color: #3F51B5;
-			       color: white; /* Optional: changes the text color to white for better contrast */
-			       border: none; /* Optional: removes the border if you want a cleaner look */
-			       padding: 10px 20px; /* Optional: adds some padding inside the button */
-			       margin: 10px; /* Optional: adds margin around the button */
-			       position: absolute; /* Position the button absolutely within its container */
-			       right: 0; /* Align the button to the right */
-			       top: 2px; /* Optional: align the button to the top */
-			   }
-			 
-			  .custom-popup:hover{
-			       width: 200px; /* Set the width */
-			       height: 120px; /* Set the height */
-			      
-			       padding: 10px; /* Add padding */
-			       background-color: #fff; /* Set background color */
-			       border: 1px solid #ccc; /* Add border */
-			   }
-			          
+		.container-header {
+		            padding: 20px;
+		            background-color: gray;
+		            margin-left: 10px;
+		            margin-right: 10px;
+		        }
+		.navbar {
+							    background-color: lightgray;
+							    color: white;
+							    padding: 10px 10px;
+							    display: flex;
+							    justify-content: space-between;
+							    align-items: center;
+							    width: 120%;
+							    max-width: 900px; /* Adjust as needed */
+							    margin: 0 auto;
+							    height: 55px;
+							    margin-top: -30px;
+								margin-left: 210px;
+							}
 
-			   #live-video {
-			       display: none; /* Initially hidden */
-			       position: relative;
-			       width: 100%;
-			       height: 350px; /* Adjust height as needed */
-			       margin-top: 20px;
-			   }
+							.navbar-brand {
+							    display: flex;
+							    align-items: center;
+							}
 
-			   #live-video.active {
-			       display: block; /* Display the video when active */
-			   }
+							.navbar-brand img {
+							    height: 30px;
+							    margin-right: 20px;
+							}
 
-			   #video-stream {
-			       width: 100%;
-			       height: 100%;
-			   }
+							.navbar-menu, .navbar-end {
+							    display: flex;
+							    align-items: center;
+							}
 
-			   #close-icon {
-			       position: absolute;
-			       top: 5px;
-			       right: 10px;
-			       cursor: pointer;
-			       font-size: 24px;
-			       color: #fff;
-			   }
+							.navbar-menu a, .navbar-end a {
+							    color: white;
+							    text-decoration: none;
+							    margin-left: 15px;
+							}
+
+							.navbar-menu a:hover, .navbar-end a:hover {
+							    text-decoration: underline;
+							}
+		h3{
+			text-align: center;
+		}
+		        .dropdown {
+		            position: relative;
+		            display: inline-block;
+		        }
+		        .dropdown-content {
+		            display: none;
+		            position: absolute;
+		            background-color: white;
+		            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+		            z-index: 1;
+		        }
+		        .dropdown-content a {
+		            color: black;
+		            padding: 12px 12px;
+		            text-decoration: none;
+		            display: block;
+		            width: 200px;
+		        }
+		        .dropdown-content a:hover {
+		            background-color: #f1f1f1;
+		        }
+		        .dropdown:hover .dropdown-content {
+		            display: block;
+		        }
+		        .navbar-logo {
+		            width: 160px;
+		            height: 60px;
+		        }
+			button{
+				background-color: rgb(0, 0, 64);
+			}
+			.content{
+				height: 500px;
+			}
+			#sidebar {
+			            height: 100%;
+			            width: 0;
+			            position: fixed;
+			            top: 0;
+			            left: 0;
+			            background-color: lightgrey;
+			            color: black;
+			            transition: 0.3s;
+			            overflow-x: hidden;
+			            padding-top: 80px;
+			            z-index: 1000;
+			        }
+			        #sidebar a {
+			            padding: 10px 15px;
+			            text-decoration: none;
+			            color: white;
+			            display: block;
+			            font-size: 7px;
+			        }
+			        #sidebar a:hover {
+			            background-color: white;
+			            color: black;
+			        }
+			        #sidebar .closebtn {
+			            position: absolute;
+			            top: 5px;
+			            right: 25px;
+			            font-size: 26px;
+			            margin-left: 50px;
+			            background-color: white;
+			            color: red;
+			        }
+			        #menu-toggle {
+			            position: absolute;
+			            top: 100px;
+			            left: 50px;
+			            font-size: 24px;
+			            color: #333;
+			            cursor: pointer;
+			            z-index: 1001;
+			            background-color: white;
+			            color: black;
+			            width: 40px;
+			            text-align: center;
+			        }
+			        .controls {
+			            position: absolute;
+			            top: 250px;
+			            right: 10px;
+			            z-index: 1000;
+			        }
+			        .controls button {
+			            display: block;
+			            margin: 5px 0;
+			            padding: 10px;
+			            background-color: #007bff;
+			            color: white;
+			            border: none;
+			            border-radius: 5px;
+			            cursor: pointer;
+			        }
+			        .controls button:hover {
+			            background-color: #0056b3;
+			        }
+			        .tabs {
+			            display: flex;
+			            background-color: #444;
+			            padding: 8px;
+			            font-size: 8px;
+						top:100px;
+			        }
+			        .tabs a {
+			            flex: 1;
+			            text-align: center;
+			            padding: 10px;
+			            color: white;
+			            text-decoration: none;
+			            background-color: #555;
+			            border-radius: 5px;
+			            margin: 0 5px;
+			            cursor: pointer;
+			            width: 220px;
+						font-size: 8px;
+			        }
+			        .tabs a.active {
+			            background-color: #007bff;
+			        }
+			        .tab-content {
+			            padding: 10px;
+			            background-color: #fff;
+			            border: 1px solid #ddd;
+			            border-radius: 5px;
+						font-size: 12px;
+			        }
+			        .history-list {
+			            margin: 0;
+			            padding: 0;
+			            list-style: none;
+			        }
+			        .history-list li {
+			            padding: 10px;
+			            border-bottom: 1px solid #ddd;
+			        }
+			        .history-list li:hover {
+			            background-color: #f1f1f1;
+			        }
+					.status-buttons {
+					           display: fixed;
+					           gap: 10px;
+							   
+					       }
+					       .status-button {
+					           width: 50px;
+					           height: 50px;
+					           border-radius: 50%;
+					           border: none;
+					           color: white;
+					           font-size: 8px;
+					           font-weight: bold;
+					          
+					           flex-direction: column;
+					           justify-content: center;
+					           align-items: center;
+					           cursor: pointer;
+							   top:50px;
+							  
+					       }
+					       .all {
+					           background-color: #555; /* Gray */
+					       }
+					       .running {
+					           background-color: #4CAF50; /* Green */
+					       }
+					       .stop {
+					           background-color: #FF0000; /* Red */
+					       }
+					       .idle {
+					           background-color: #FFEB3B; /* Yellow */
+					           color: #000; /* Black text */
+					       }
+					       .inactive {
+					           background-color: #3F51B5; /* Blue */
+					       }
+						   .back {
+						       background-color: #3F51B5;
+						       color: white; /* Optional: changes the text color to white for better contrast */
+						       border: none; /* Optional: removes the border if you want a cleaner look */
+						       padding: 10px 20px; /* Optional: adds some padding inside the button */
+						       margin: 10px; /* Optional: adds margin around the button */
+						       position: absolute; /* Position the button absolutely within its container */
+						       right: 0; /* Align the button to the right */
+						       top: 2px; /* Optional: align the button to the top */
+						   }
+						 
+						  .custom-popup:hover{
+						       width: 200px; /* Set the width */
+						       height: 120px; /* Set the height */
+						      
+						       padding: 10px; /* Add padding */
+						       background-color: #fff; /* Set background color */
+						       border: 1px solid #ccc; /* Add border */
+						   }
+						          
+
+						   #live-video {
+						      
+						       position: absolute;
+						       width: 250px; /* Adjust this value as needed */
+						       height: 10px; /* Adjust this value as needed */
+						       right: 20px; /* Align the live video to the right (adjust as needed) */
+						       top: 20px; /* Position the video vertically */
+						       background-color: #ffffff; /* Optional: background color to make it stand out */
+						       box-shadow: -5px 0px 15px rgba(0,0,0,0.5); /* Optional: add shadow for a pop-out effect */
+						       z-index: 1000; /* Ensure it's above other content */
+						   }
+
+						   #live-video.active {
+						       display: block; /* Display the video when active */
+						   }
+
+						   #video-stream {
+						       width: 100%; /* Make sure the video occupies the full width of its container */
+						       height: 100%; /* Make sure the video occupies the full height of its container */
+						       border: none; /* Remove default iframe border */
+						       background-color: #000; /* Optional: background color of the iframe */
+						   }
 
 
-			   #close-icon {
-			       position: absolute;
-			       top: 5px;
-			       right: 5px;
-			       width: 20px;
-			       height: 20px;
-			       background-color: #fff;
-			       color: #000;
-			       text-align: center;
-			       line-height: 20px;
-			       border-radius: 50%;
-			       cursor: pointer;
-			       font-weight: bold;
-			   }
+						   #close-icon {
+						       position: absolute;
+						       top: 5px;
+						       right: 10px;
+						       cursor: pointer;
+						       font-size: 24px;
+						       color: #fff;
+						   }
 
-			   #close-icon:hover {
-			       background-color: #ccc;
-			   }
-			   #sideTab {
-			       height: 100%;
-			       width: 0;
-			       position: fixed;
-			       top: 0;
-			       right: 0;
-			       background-color: lightsteelblue;
-			       overflow-x: hidden;
-			       transition: width 0.5s ease;
-			       padding-top: 60px;
-			       box-shadow: -5px 0px 15px rgba(0,0,0,0.5);
-			       z-index: 9999;
-			   }
 
-			   #sideTab.open {
-			       width: 300px; /* Adjust the width as needed */
-			   }
+						   #close-icon {
+						       position: absolute;
+						       top: 5px;
+						       right: 5px;
+						       width: 20px;
+						       height: 20px;
+						       background-color: #fff;
+						       color: #000;
+						       text-align: center;
+						       line-height: 20px;
+						       border-radius: 50%;
+						       cursor: pointer;
+						       font-weight: bold;
+						   }
 
-			   .tab-content {
-			       display: block; /* Ensure tab content is visible */
-			       padding: 15px; /* Add padding for better layout */
-				   font-size: 12px;
-			   }
+						   #close-icon:hover {
+						       background-color: red;
+						   }
+						   #sideTab {
+						       height: 100%; /* Start with height 0 */
+						       width: 0%; /* Full width of the screen */
+						       position: fixed;
+						       bottom: 100px; /* Position at the bottom */
+						       left: 0; /* Align to the left */
+						       background-color:lightgrey;
+						       overflow-y: hidden;
+						       transition: height 0.5s ease; /* Animate the height instead of width */
+						       padding-top: 20px; /* Adjust padding as needed */
+						       box-shadow: 0px -5px 15px rgba(0,0,0,0.5); /* Shadow on top */
+						       z-index: 9999;
+							   top:300px;
+						   }
 
-			 
-			   .closebtn {
-			       font-size: 36px;
-			       cursor: pointer;
-			       position: absolute;
-			       top: 0;
-			       right: 15px;
-				   color: #FF0000;
-			   }
-			   .card{
-				background-color:lightsteelblue ;
-	
-			   }
-.live-button{
-	
-	background-color: #3F51B5;
-			       color: white; /* Optional: changes the text color to white for better contrast */
-			       border: none; /* Optional: removes the border if you want a cleaner look */
-			       padding: 10px 20px; /* Optional: adds some padding inside the button */
-			       margin: 10px; /* Optional: adds margin around the button */
-			       position: absolute; /* Position the button absolutely within its container */
-			       right: 100px; /* Align the button to the right */
-			       top: 2px; /* Optional: align the button to the top */
-			   
-}
+						   #sideTab.active {
+						       height: 500px; /* Adjust height when active */
+						   }
+
+
+						   #sideTab.open {
+						       width: 1270px; /* Adjust the width as needed */
+						   }
+
+						   .tab-content {
+						       display: block; /* Ensure tab content is visible */
+						       padding: 15px; /* Add padding for better layout */
+							   font-size: 12px;
+						   }
+
+						 
+						   .closebtn {
+						       font-size: 36px;
+						       cursor: pointer;
+						       position: absolute;
+						       top: 0;
+						       right: 15px;
+							   color: #FF0000;
+						   }
+						   
+			.live-button{
+				
+				background-color: #3F51B5;
+						       color: white; /* Optional: changes the text color to white for better contrast */
+						       border: none; /* Optional: removes the border if you want a cleaner look */
+						       padding: 2px 2px; /* Optional: adds some padding inside the button */
+						       margin: 10px; /* Optional: adds margin around the button */
+						       position: absolute; /* Position the button absolutely within its container */
+						       right: 5px; /* Align the button to the right */
+						     width: 95px;
+							 top:-10px;
+						   }
+						   
+						   /* General button styling */
+						   .history-button {
+						       background-color: #007bff; /* Blue background */
+						       color: white; /* White text */
+						       padding: 10px 20px; /* Padding around the button */
+						       border: none; /* No border */
+						       border-radius: 5px; /* Slightly rounded corners */
+						       cursor: pointer; /* Pointer cursor on hover */
+						       font-size: 16px; /* Font size */
+						       display: inline-flex; /* Align icon and text */
+						       align-items: center; /* Center icon and text vertically */
+						       transition: background-color 0.3s ease; /* Smooth background color transition */
+						   }
+
+						   /* Button hover effect */
+						   .history-button:hover {
+						       background-color: #0056b3; /* Darker blue on hover */
+						   }
+
+						   /* Icon within the button */
+						   .history-button i {
+						       margin-right: 8px; /* Space between icon and text */
+						   }
+
+						   /* General tab pane styling */
+						   .tab-pane {
+						       display: none; /* Hide all tabs by default */
+						       padding: 20px; /* Padding inside the tab content */
+						       border: 1px solid #ddd; /* Light border around the content */
+						       border-radius: 5px; /* Rounded corners */
+						       background-color: #f9f9f9; /* Light gray background */
+						       margin-top: 10px; /* Space above the tab content */
+						   }
+
+						   .custom-icon {
+						               font-size: 32px;
+						   			
+						           }
+						           .ring-blink {
+						               position: relative;
+						   			animation: blink 1s infinite;
+						   			border-color: red;
+						           }
+						   		
+						           .ring-blink::before, .ring-blink::after {
+						               content: '';
+						               position: absolute;
+						               border-radius: 50%;
+						               opacity: 0.5;
+						               animation: ringBlink 1.5s infinite;
+						               background-color: transparent;
+						               border: 5px solid;
+						           }
+						           .ring-blink::before {
+						               top: -10px;
+						               left: -10px;
+						               width: 60px;
+						               height: 60px;
+						               animation-delay: 0s;
+						           }
+						           .ring-blink::after {
+						               top: -20px;
+						               left: -20px;
+						               width: 80px;
+						               height: 80px;
+						               animation-delay: 0.3s;
+						           }
+						           @keyframes ringBlink {
+						               0% { transform: scale(0.3); opacity: 0.3; }
+						               50% { transform: scale(0.5); opacity: 0.5; }
+						               100% { transform: scale(1); opacity: 0; }
+						           }
+						           .ring-blink-red {
+						               color: red;
+						               border-color: red;
+						           }
+						           .ring-blink-green {
+						               color: green;
+						               border-color: green;
+						           }
+						   		.vehicle-details {
+						   		    margin-top: 20px;
+						   		    padding: 10px;
+						   		    border: 1px solid #ddd;
+						   		    background-color: #f9f9f9;
+						   			
+						   		}
+
+
+						
+
+						   /* Error message styling */
+						   #error-message {
+						       color: red; /* Red text color */
+						       margin-top: 10px; /* Space above the error message */
+						   }
+
+						   /* Video player styling */
+						   #cameraScreen video {
+						       border-radius: 10px; /* Rounded corners for the video player */
+						       border: 1px solid #ddd; /* Light border around the video player */
+						   }
+						   .tab-pane {
+						           display: none; /* Hide by default */
+						       }
+						       .tab-pane.active {
+						           display: block; /* Show when active */
+						       }
+						       .event-report table {
+						           width: 100%;
+						           border-collapse: collapse;
+						           margin-top: 20px;
+								   font-size: 8px;
+						       }
+						       .event-report th, .event-report td {
+						           border: 1px solid #ddd;
+						           padding: 8px;
+						           text-align: left;
+						       }
+						       .event-report th {
+						           background-color: #f2f2f2;
+						       }
+							   .search-container {
+							       position: absolute; /* Change to absolute to position relative to parent */
+							       top: 20px; /* Adjust the top position as needed */
+							       right: 290px; /* Adjust the right position as needed */
+							       width: auto; /* Set width based on content */
+							       display: flex;
+							       align-items: center; /* Vertically center the items */
+							   }			 
+							  
+
+							  
+
+							   .live-button {
+							       background-color: #f44336; /* Red color */
+							       color: white;
+							       border: none;
+							       padding: 10px 20px;
+							       font-size: 16px;
+							       cursor: pointer;
+							       border-radius: 0 5px 5px 0; /* Rounded corners on the right side */
+							       margin-left: -1px; /* To avoid the gap between input and button */
+							       display: flex;
+							       align-items: center;
+							       justify-content: center;
+							   }
+
+
+							   .search-container .search {
+							       padding-left: 30px;
+							       height: 35px;
+							       font-size: 16px;
+							       flex: 1;
+							       margin-right: 10px; /* Add space between input and button */
+								   width:400px;
+								   
+							   }
+
+							   .search-container .fa-search {
+							       position: absolute;
+							       top: 50%;
+							       left: 10px;
+							       transform: translateY(-50%);
+							       color: #999;
+							       pointer-events: none;
+							   }
+
+							   .search-container .live-button {
+							       height: 35px;
+							       padding: 0 15px;
+							       font-size: 14px;
+							       background-color: darkblue;
+							       color: white;
+							       border: none;
+							       cursor: pointer;
+							       display: flex;
+							       align-items: center;
+							       justify-content: center;
+							       white-space: nowrap; /* Ensure text stays on one line */
+							   }
+
+							   .search-container .live-button i {
+							       margin-right: 5px;
+							   }
+
+							   .search-container .live-button:hover {
+							       background-color: #0056b3;
+							   }
+
+									  .bottom-tab {
+									             position: fixed;
+									             bottom: 0;
+									             left: 0;
+									             width: 100%;
+									             background-color: #f1f1f1;
+									             border-top: 1px solid #ccc;
+									             padding: 15px;
+									             box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+									             display: none;
+									         }
+
+									         .bottom-tab.active {
+									             display: block;
+									         }
+
+									         .bottom-tab h3 {
+									             margin: 0;
+									         }
+											 .alert-button {
+												background-color: darkred;
+															       color: white; /* Optional: changes the text color to white for better contrast */
+															       border: none; /* Optional: removes the border if you want a cleaner look */
+															       padding: 10px 20px; /* Optional: adds some padding inside the button */
+															       margin: 10px; /* Optional: adds margin around the button */
+															       position: absolute; /* Position the button absolutely within its container */
+															       right: 110px; /* Align the button to the right */
+															       top: 2px;
+																   }
+
+											 .alert-button i {
+											     margin-right: 8px; /* Space between icon and text */
+											 }
+
+
+											 .alert-button:hover {
+											     background-color: #d32f2f; /* Darker red on hover */
+											 }
+
+											 .alert-button:active {
+											     background-color: #b71c1c; /* Even darker red when clicked */
+											 }
+											 .card-sideTab{
+												background-color: darkred;
+												color: white;
+												border: none; /* Optional: removes the border if you want a cleaner look */
+											    padding: 10px 20px; /* Optional: adds some padding inside the button */
+												margin: 10px; /* Optional: adds margin around the button */
+												position: absolute; /* Position the button absolutely within its container */
+											    right: 310px; /* Align the button to the right */
+												top: 2px;																												     							
+												}
+												.closebtn {
+													font-size: 30px; /* Adjust size as needed */
+													color:red; /* Adjust color as needed */
+													cursor: pointer;
+													position: absolute;
+													top: 8px; /* Adjust positioning as needed */
+													right: 200px; /* Adjust positioning as needed */
+													z-index: 1000; /* Ensure it's above other content */
+												}
+																																										    
+																																      
+																																	 
+												#historySection {
+												position: fixed;
+												top: 0;
+												right: 0;
+												width: 300px; /* Adjust width as needed */
+												height: 100%; /* Full height of the screen */
+												background-color: #f4f4f4; /* Background color */
+												padding: 20px;
+											    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2); /* Optional shadow for depth */
+												z-index: 1000; /* Ensure it's on top of other elements */
+												overflow-y: auto; /* Scroll if content exceeds screen height */
+												}
+
+												 #searchForm {
+												margin-top: 20px; /* Space between heading and form */
+												}												     
+
+																						
+
     </style>
 </head>
-<br>
-
+<body>
 	<div id="menu-toggle" onclick="openNav()">
-		      <i class="fas fa-bars"></i>
-		  </div>
-		  <button id="back-button" class="back" onclick="history.back()">
-		      <i class="fas fa-arrow-left"></i>Back
-		  </button>
-		  <button type="menu" class="live-button" id="open">
-		      <i class="fas fa-video"></i> Live Streaming
-		  </button>
-
-		  <div class="tooltip">Vehicle Data Here</div>
-	    <div id="sidebar" class="tabopen">
-	        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-	        <div class="tabs">
-	         <!--     <a href="javascript:void(0)" onclick="showTab('search')">Search</a> -->	
-	            <a href="javascript:void(0)" onclick="showTab('vehicles')">Vehicle</a>
-	            <a href="javascript:void(0)" onclick="showTab('history')">History</a>
-				<a href="javascript:void(0)" onclick="showTab('events')">Events</a>
-				<a href="javascript:void(0)" onclick="showTab('live')">Video</a>
-				       <a href="javascript:void(0)" onclick="logout()">Logout</a>
-							
-				
-	        </div>
-			
-	      <div class="tab-content">
-	        <!--     <div id="search" class="tab-pane">
-	                <h2>Search</h2>
-	                <div id="search-container">
-	                    <input type="text" id="deviceIDSearch" list="searchHistory" placeholder="Search by Device ID" />
-	                    <button onclick="searchDevice()">Search</button>
-	                    <button onclick="clearSearchHistory()">Clear History</button>
-	                </div>
-	                <datalist id="searchHistory"></datalist>
-					
-	                <div id="report"></div> <!-- Section for displaying vehicle report -->	
+			      <i class="fas fa-bars"></i>
+			  </div>
+			  <button id="back-button" class="back" onclick="history.back()">
+			      <i class="fas fa-arrow-left"></i>Back
+			  </button>
+			  <button type="button" class="alert-button" id="alertButton">
+			      <i class="fas fa-exclamation-triangle"></i> Alert <span id="alertCount"><strong>[3]</strong></span>
+			  </button>
 
 
-				<div id="vehicles" class="tab-pane">
-				    <div class="tab-header">
-				        <input type="text" id="vehicleSearch" placeholder="Search" oninput="filterVehicles()" />
-						<button class="refresh-button" onclick="refreshVehicleList()">
-						       <i class="fa fa-sync"></i> <!-- Try using 'fa-sync' or 'fa-refresh' -->
-						   </button>
-				    </div>
-
-				    <div class="vehicle-list">
-				        <table id="vehicleTable">
-							
-							    <thead>
-							        <tr>
-										<th></th>
-							            <th>Device</th>
-							            <th><i class="material-icons">speed</i></th>
-							            <th><i class="material-icons">map</i></th>
-							        </tr>
-							    </thead>
-							    <tbody>
-							        <tr>
-							            <td class="status"><span class="dot blue"></span></td>
-							            <td class="details">
-							                <strong>25435 -jestin-Toyota 2020</strong><br>
-							                30-Jul-2024 12:05:36 PM
-							            </td>
-							            <td class="speed">0<br>KM/hr</td>
-							            <td class="distance">0<br>KM</td>
-							        </tr>
-							        <tr>
-							            <td class="status"><span class="dot blue"></span></td>
-							            <td class="details">
-							                <strong>6107-jestin-0911618682-Toyota 2020</strong><br>
-							                29-Jul-2024 06:02:50 PM
-							            </td>
-							            <td class="speed">0<br>KM/hr</td>
-							            <td class="distance">0<br>KM</td>
-							        </tr>
-							        <tr>
-							            <td class="status"><span class="dot red"></span></td>
-							            <td class="details">
-							                <strong>6085-jestin-0911617090-Toyota 2020</strong><br>
-							                06-Aug-2024 11:57:41 AM
-							            </td>
-							            <td class="speed">0<br>KM/hr</td>
-							            <td class="distance">8.47<br>KM</td>
-							        </tr>
-							        <tr>
-							            <td class="status"><span class="dot red"></span></td>
-							            <td class="details">
-							                <strong>6480-jestin -091157617568--Toyota 2023</strong><br>
-							                06-Aug-2024 12:00:59 PM
-							            </td>
-							            <td class="speed">0<br>KM/hr</td>
-							            <td class="distance">11.33<br>KM</td>
-							        </tr>
-							        <tr>
-							            <td class="status"><span class="dot red"></span></td>
-							            <td class="details">
-							                <strong>5861-jestin-0911617345-Toyota 2013</strong><br>
-							                06-Aug-2024 11:38:19 AM
-							            </td>
-							            <td class="speed">0<br>KM/hr</td>
-							            <td class="distance">18.97<br>KM</td>
-							        </tr>
-							    </tbody>
-							</table>
-				    </div>
-					<div id="vehicleDetails" class="vehicle-details" style="display: none;">
-					    <h2>Vehicle Details</h2>
-					    <div id="detailsContent"></div>
-					</div>
-				</div>
-				<div id="history" class="tab-pane">
-				        <div class="history-section">
-				            <!-- History Search Content -->
-							<div class="card">
-							       <h3>History Search</h3>
-							       <div id="searchForm">
-							           <div class="form-group">
-							               <label for="vehicleInput">Vehicle:</label>
-							               <select id="vehicleInput" placeholder="Select Vehicle ID">
-							                   <option value="">Select Vehicle ID</option>
-							                   <!-- Options will be added dynamically or statically -->
-							                   <option value="1">Vehicle 1</option>
-							                   <option value="2">Vehicle 2</option>
-							                   <option value="3">Vehicle 3</option>
-							                   <!-- Add more options as needed -->
-							               </select>
-							           </div>
-							           <div class="form-group">
-							               <label for="timeFromInput">Time From:</label>
-							               <input type="datetime-local" id="timeFromInput" />
-							           </div>
-							           <div class="form-group">
-							               <label for="timeToInput">Time To:</label>
-							               <input type="datetime-local" id="timeToInput" />
-							           </div>
-							           <div class="form-group">
-							               <label for="stopsInput">Stops:</label>
-							               <input type="text" id="stopsInput" placeholder="Enter Stops" />
-							           </div>
-							           <button onclick="searchHistory()">Show</button>
-							       </div>
-							       <!-- <button onclick="toggleForm()">Hide</button>-->
-							   </div>
-				    </div>
-	</div>
-				    <div id="events" class="tab-pane">
-				        <!-- Events Content -->
-				    </div>
-					   <div id="live" class="tab-pane active"> <!-- Set this as active -->
-					            <div class="live-video">
-									<div class="card">
-									<button type="menu" id="open">Live Streaming</button>
-									<button type="menu">Events</button>
-									
-					            </div>
-					        </div>
-					    </div>
-					</div>
-				</div>
-				
-
-	           
-	        
-	    </div>
-		
-		<div id="sideTab">
-		       <a href="javascript:void(0)" class="closebtn" id="closeSideTab">&times;</a>
-		       <div class="tab-content" id="tabContent">
-		           <div class="card">
-		               <label for="vehicle-search">Search Vehicle:</label>
-		               <input type="text" id="vehicle-search" placeholder="Enter vehicle name or ID">
-		               <br><br>
-		               <label for="camera-select">Select Camera:</label>
-		               <select id="camera-select">
-		                   <option value="front">Front</option>
-		                   <option value="rear">Rear</option>
-		               </select>
-					   <br>
-					   <br>
-		               <button class="button" id="btnLiveStream">
-		                   <i class="fas fa-video"></i> Open Live
-		               </button>
-					   <span id="error-message" style="color: red; display: none; margin-top: 10px;"></span>
-		           </div>
-		       </div>
-		       <div id="live-video">
-		           <span id="close-icon" class="closebtn">&times;</span>
-		           <iframe id="video-stream" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-		       </div>
-		   </div>
-
-		   
-		<div class="status-buttons">
-		    <button class="status-button all">
-		        5<br>All
-		    </button>
-		    <button class="status-button running">
-		        0<br>Running
-		    </button>
-		    <button class="status-button stop">
-		        2<br>Stop
-		    </button>
-		    <button class="status-button idle">
-		        0<br>Idle
-		    </button>
-		    <button class="status-button inactive">
-		        3<br>Inactive
-		    </button>
-		</div>
-
-		<!-- Form for selecting camera, vehicle ID, and date range -->
-		
-
-	    <div id="map"></div>
-		
-
-		           
-	    <div id="hover-info" class="hover-info"></div>
-		
-
+			  </div>
+	<div class="status-buttons">
+			    <button class="status-button all">
+			        5<br>All
+			    </button>
+			    <button class="status-button running">
+			        0<br>Running
+			    </button>
+			    <button class="status-button stop">
+			        2<br>Stop
+			    </button>
+			    <button class="status-button idle">
+			        0<br>Idle
+			    </button>
+			    <button class="status-button inactive">
+			        3<br>Inactive
+			    </button>
+			</div>
+    <div class="content">
+        <div id="map"></div>
+    </div>
 	
+	<!-- map code starts here below 
+	************************************
+	
+	***************
+	-->
+	<script th:inline="javascript">
+	    var map = L.map('map').setView([12.225284, 79.074699], 5); // Adjusted zoom level to show more of the map
+	    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+	    }).addTo(map);
 
-		<script>
-		document.addEventListener('DOMContentLoaded', () => {
-		    const table = document.getElementById('vehicleTable');
-		    const rows = table.getElementsByTagName('tr');
-		    const detailsSection = document.getElementById('vehicleDetails');
-		    const detailsContent = document.getElementById('detailsContent');
+	    // Dictionary to hold markers by deviceID
+	    var markers = {};
 
-		    for (let i = 1; i < rows.length; i++) { // Skip header row
-		        rows[i].addEventListener('mouseover', function () {
-		            const details = this.getElementsByClassName('details')[0].innerHTML;
-		            detailsContent.innerHTML = details; // Set the details content
-		            detailsSection.style.display = 'block'; // Show the details section
-		        });
+	    // Function to get the car icon based on the status
+	    function getCarIcon(status) {
+	        var ringClass = status === 'N1' ? 'ring-blink-red' : 'ring-blink-green';
 
-		        rows[i].addEventListener('mouseout', function () {
-		            detailsSection.style.display = 'none'; // Hide the details section when not hovering
-		        });
+	        return L.divIcon({
+	            className: 'custom-icon ring-blink ' + ringClass,
+	            html: `
+	                <div class="ring-blink">
+	                    <img src="${status === 'N1' ? 'THINTURE_IMAGE/red2.png' : 'THINTURE_IMAGE/greencar2.png'}" alt="car-icon" style="width: 38px; height: 38px;">
+	                </div>
+	            `,
+	            iconSize: [38, 38],
+	            iconAnchor: [19, 19],
+	            popupAnchor: [0, -19]
+	        });
+	    }
 
-		        // Add event listener to open details in a new tab
-		        rows[i].addEventListener('mouseover', function () {
-		            const vehicleDetails = this.getElementsByClassName('details')[0].innerHTML;
-		            const newTab = window.open('', '_blank'); // Open new tab
+	    // Function to create or update a marker
+	    function createOrUpdateMarker(vehicle) {
+	        var icon = getCarIcon(vehicle.status);
 
-		            newTab.document.write(`
-		                <html>
-		                    <head>
-		                        <title>Vehicle Details</title>
-		                        <style>
-		                            body { font-family: Arial, sans-serif; margin: 20px; }
-		                            .details { font-size: 18px; }
-		                            .status { font-size: 24px; }
-		                        </style>
-		                    </head>
-		                    <body>
-		                        <h1>Vehicle Details</h1>
-		                        <div class="details">${vehicleDetails}</div>
-		                    </body>
-		                </html>
-		            `);
-		            newTab.document.close(); // Close the document to finish loading
-		        });
-		    }
-		});
+	        var popupContent = `
+	            <strong>Device ID:</strong> ${vehicle.deviceID}<br>
+	            <strong>Timestamp:</strong> ${vehicle.timestamp}<br>
+	            <strong>Address:</strong> ${vehicle.address || 'Address not available'}<br>
+	            <strong>Latitude:</strong> ${vehicle.latitude}<br>
+	            <strong>Longitude:</strong> ${vehicle.longitude}
+	        `;
 
-		function filterVehicles() {
-		    const searchValue = document.getElementById('vehicleSearch').value.toLowerCase();
-		    const table = document.getElementById('vehicleTable');
-		    const rows = table.getElementsByTagName('tr');
-		    let found = false;
+	        if (markers[vehicle.deviceID]) {
+	            // Update existing marker
+	            markers[vehicle.deviceID].setLatLng([vehicle.latitude, vehicle.longitude])
+	                .setIcon(icon)
+	                .bindPopup(popupContent)
+	                .openPopup();
+	        } else {
+	            // Create new marker
+	            markers[vehicle.deviceID] = L.marker([vehicle.latitude, vehicle.longitude], { icon: icon })
+	                .addTo(map)
+	                .bindPopup(popupContent)
+	                .openPopup();
+	        }
+	    }
 
-		    // Remove any previous "no match" row
-		    const previousNoMatch = document.getElementById('noMatchRow');
-		    if (previousNoMatch) {
-		        previousNoMatch.remove();
-		    }
+	    // Fetch initial vehicle data from the Spring Boot application
+	    fetch('/api/vehicles')
+	        .then(response => response.json())
+	        .then(data => {
+	            if (data && data.length > 0) {
+	                data.forEach(vehicle => {
+	                    createOrUpdateMarker(vehicle);
+	                });
+	            } else {
+	                console.error('No vehicle data available');
+	            }
+	        })
+	        .catch(error => console.error('Error fetching vehicle data:', error));
 
-		    // Loop through table rows, and hide those that don't match the search query
-		    for (let i = 1; i < rows.length; i++) { // Skip header row
-		        const details = rows[i].getElementsByClassName('details')[0];
-		        const deviceIdText = details ? details.textContent.toLowerCase() : '';
+	    // WebSocket connection for real-time updates
+	    var socket = new SockJS('/gs-guide-websocket');
+	    var stompClient = Stomp.over(socket);
 
-		        if (deviceIdText.includes(searchValue)) {
-		            rows[i].style.display = ''; // Show the row if matched
-		            found = true;
-		        } else {
-		            rows[i].style.display = 'none'; // Hide the row if not matched
-		        }
-		    }
+	    stompClient.connect({}, function (frame) {
+	        stompClient.subscribe('/topic/location-updates', function (locationUpdate) {
+	            var data = JSON.parse(locationUpdate.body);
 
-		    if (!found) {
-		        const noMatchRow = document.createElement('tr');
-		        noMatchRow.id = 'noMatchRow'; // Assign an ID to easily find and remove this row later
-		        const noMatchCell = document.createElement('td');
-		        noMatchCell.colSpan = 3;
-		        noMatchCell.style.textAlign = 'center';
-		        noMatchCell.textContent = 'No matching vehicle found';
-		        noMatchRow.appendChild(noMatchCell);
-		        table.getElementsByTagName('tbody')[0].appendChild(noMatchRow);
-		    }
-		}
+	            // Update marker with the new data received via WebSocket
+	            createOrUpdateMarker(data);
 
-		// Clear the "no match" row if the search is cleared
-		function clearNoMatchRow() {
-		    const table = document.getElementById('vehicleTable');
-		    const noMatchRows = Array.from(table.getElementsByTagName('tr')).filter(row => {
-		        return row.textContent.includes('No matching vehicle found');
-		    });
+	            // Optionally center the map on the updated marker
+	            map.setView([parseFloat(data.latitude), parseFloat(data.longitude)], 13);
+	        });
+	    });
+	</script>
 
-		    noMatchRows.forEach(row => row.parentNode.removeChild(row));
-		}
+		<!--
+			 map code ending here
+		 *************************-->
 
-		// Refresh button function to reset the vehicle list
-		function refreshVehicleList() {
-		    document.getElementById('vehicleSearch').value = ''; // Clear the search box
-		    clearNoMatchRow(); // Clear the "no match" row if present
-
-		    const table = document.getElementById('vehicleTable');
-		    const rows = table.getElementsByTagName('tr');
-
-		    // Show all rows except the header
-		    for (let i = 1; i < rows.length; i++) {
-		        rows[i].style.display = '';
-		    }
-		}
-
-		document.getElementById('detailsTab').addEventListener('click', function () {
-		    // Switch to the Details tab
-		    document.querySelector('.tab-pane.active').classList.remove('active');
-		    document.getElementById('details').classList.add('active');
-
-		    // Highlight the Details tab
-		    document.querySelector('.tabs div.active').classList.remove('active');
-		    this.classList.add('active');
-		});
-		</script>
-     <!--  
-		
-		map code below all
-		
-		
-		
-		
-	 -->
-
-		<div id="map"></div>
-		<script>
-		    var map = L.map('map').setView([13.0827, 77.5776], 13);
-
-		    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-		        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-		    }).addTo(map);
-
-		    // Function to create a car icon based on status
-		    function getCarIcon(status, vehicleData) {
-		        var ringClass = status === 'N1' ? 'ring-blink-red' : 'ring-blink-green';
-		        var imageSrc = status === 'N1' ? 'THINTURE_IMAGE/red2.png' : 'THINTURE_IMAGE/greencar2.png';
-
-		        return L.divIcon({
-		            className: 'custom-icon ring-blink ' + ringClass,
-		            html: `
-		                <div class="ring-blink">
-		                    <img src="${imageSrc}" alt="car-icon" style="width: 38px; height: 38px;">
-		                    <div class="tooltip">${vehicleData}</div>
-		                </div>
-		            `,
-		            iconSize: [38, 38],
-		            iconAnchor: [19, 19],
-		            popupAnchor: [0, -19]
-		        });
-		    }
-
-		    var markers = {};
-
-		    // Function to add or update a marker on the map
-		    function addOrUpdateMarker(data) {
-		        var lat = parseFloat(data.latitude);
-		        var lon = parseFloat(data.longitude);
-		        var icon = getCarIcon(data.status, `Device ID: ${data.deviceID}`);
-
-		        var popupContent = `
-		            <b>Device ID:</b> ${data.deviceID}<br>
-		            <b>Status:</b> ${data.status === 'N1' ? 'Stopped' : 'Running'}<br>
-		            <b>Timestamp:</b> ${data.timestamp}<br>
-		            <b>Data Validity:</b> ${data.dataValidity}<br>
-		            <b>Speed:</b> ${data.speed} km/h
-		        `;
-
-		        if (markers[data.deviceID]) {
-		            markers[data.deviceID]
-		                .setLatLng([lat, lon])
-		                .setIcon(icon)
-		                .bindPopup(popupContent);
-		        } else {
-		            markers[data.deviceID] = L.marker([lat, lon], { icon: icon })
-		                .addTo(map)
-		                .bindPopup(popupContent);
-		        }
-
-		        markers[data.deviceID].openPopup();
-		        map.setView([lat, lon], 13);
-		    }
-
-		    // Fetch all locations from the server
-		    fetch('/gps/locations')
-		        .then(response => response.json())
-		        .then(data => {
-		            data.forEach(location => addOrUpdateMarker(location));
-		        })
-		        .catch(error => console.error('Error fetching initial locations:', error));
-
-		    // WebSocket to listen for real-time updates
-		    var socket = new SockJS('/gs-guide-websocket');
-		    var stompClient = Stomp.over(socket);
-
-		    stompClient.connect({}, function (frame) {
-		        stompClient.subscribe('/topic/location-updates', function (locationUpdate) {
-		            var data = JSON.parse(locationUpdate.body);
-		            addOrUpdateMarker(data);
-		        });
-		    }, function (error) {
-		        console.error('Error connecting to WebSocket:', error);
-		    });
-		
-			
-			
-			
-			
-
-				// WebSocket to listen for real-time updates
-				var socket = new SockJS('/gs-guide-websocket');
-				var stompClient = Stomp.over(socket);
-
-				stompClient.connect({}, function (frame) {
-				    stompClient.subscribe('/topic/location-updates', function (locationUpdate) {
-				        var data = JSON.parse(locationUpdate.body);
-				        addOrUpdateMarker(data);
-				    });
-				}, function (error) {
-				    console.error('Error connecting to WebSocket:', error);
-				});
-				
-				
-				///
-
-		       function showTab(tabId) {
-		           document.querySelectorAll('.tab-pane').forEach(pane => {
-		               pane.classList.remove('active');
-		           });
-		           document.getElementById(tabId).classList.add('active');
-		       }
-
-		       document.addEventListener('DOMContentLoaded', function() {
-		           let history = JSON.parse(localStorage.getItem('searchHistory')) || [];
-		           let datalist = document.getElementById('searchHistory');
-		           history.forEach(id => {
-		               let option = document.createElement('option');
-		               option.value = id;
-		               datalist.appendChild(option);
-		           });
-		       });
-
-		       function updateSearchHistory(deviceID) {
-		           let history = JSON.parse(localStorage.getItem('searchHistory')) || [];
-		           if (!history.includes(deviceID)) {
-		               history.push(deviceID);
-		               localStorage.setItem('searchHistory', JSON.stringify(history));
-		           }
-		           let datalist = document.getElementById('searchHistory');
-		           datalist.innerHTML = "";
-		           history.forEach(id => {
-		               let option = document.createElement('option');
-		               option.value = id;
-		               datalist.appendChild(option);
-		           });
-		       }
-
-		       function showHistoryForDevice(deviceID) {
-		           document.querySelectorAll('.tab-pane').forEach(pane => {
-		               pane.style.display = 'none';
-		           });
-
-		           var historyTab = document.getElementById('history');
-		           if (historyTab) {
-		               historyTab.style.display = 'block';
-		               var historyContent = getHistoryForDevice(deviceID);
-		               historyTab.innerHTML = `
-		                   <h2>History for Device ID: ${deviceID}</h2>
-		                   <div class="history-content">${historyContent}</div>
-		               `;
-		           }
-		       }
-
-		       function getHistoryForDevice(deviceID) {
-		           var historyData = {
-		               'device1': 'Device 1 History Data',
-		               'device2': 'Device 2 History Data',
-		               'device3': 'Device 3 History Data',
-		               'device4': 'Device 4 History Data'
-		           };
-		           return historyData[deviceID] || 'No history data available for this device.';
-		       }
-
-		       function clearSearchHistory() {
-		           localStorage.removeItem('searchHistory');
-		           document.getElementById('searchHistory').innerHTML = "";
-		       }
-
-		       function openNav() {
-		           document.getElementById("sidebar").style.width = "350px";
-		           showTab('search');
-		       }
-
-		       function closeNav() {
-		           document.getElementById("sidebar").style.width = "0";
-		       }
-
-		       function resetSidebar() {
-		           document.getElementById("sidebar").style.width = "-250px";
-		       }
-
-		       function openTab(evt, tabName) {
-		           const tabcontent = document.querySelectorAll(".tab-content");
-		           tabcontent.forEach(content => content.style.display = "none");
-
-		           const tablinks = document.querySelectorAll(".tabs a");
-		           tablinks.forEach(link => link.classList.remove("active"));
-
-		           document.getElementById(tabName).style.display = "block";
-		           evt.currentTarget.classList.add("active");
-		       }
-			   document.addEventListener('DOMContentLoaded', function() {
-			       // Assuming you get the user type from some source
-			       // For example, from a global variable, API call, or session
-			       var userType = 'dealer'; // Replace with actual user type retrieval logic
-
-			       // List of allowed user types
-			       var allowedUserTypes = ['dealer', 'admin', 'superadmin'];
-
-			       // Show the button if the user type is in the allowed list
-			       if (allowedUserTypes.includes(userType)) {
-			           document.getElementById('back-button').style.display = 'block';
-			       }
-			   });
-
-		   		   </script>
-				   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-				   <scriptsrc="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script><script>
-				       $(document).ready(function() {
-				           const deviceStreams = {
-				               'vehicle1-front': 'https://www.youtube.com/embed/MpoSEvSqRqg',
-				               'vehicle1-rear': 'https://www.youtube.com/embed/Xo8jdYu1B4c',
-				               'vehicle2-front': 'https://www.youtube.com/embed/rJxSlIXUGy4',
-				               'vehicle2-rear': 'https://www.youtube.com/embed/3JZ_D3ELwOQ'
-				               // Add more mappings as needed
-				           };
-
-				           $('#btnLiveStream').click(function() {
-				               $('#sideTab').addClass('open'); // Open the side tab
-
-				               const vehicleId = $('#vehicle-search').val().toLowerCase();
-				               const camera = $('#camera-select').val();
-				               const key = `${vehicleId}-${camera}`; // Corrected template literal usage
-				               const videoUrl = deviceStreams[key];
-
-				               if (videoUrl) {
-				                   $('#video-stream').attr('src', videoUrl);
-				                   $('#live-video').show().addClass('active');
-				                   $('#tabContent').show();
-				                   $('#error-message').hide(); // Hide any previous error message
-				               } else {
-				                   $('#live-video').hide().removeClass('active');
-				                   $('#tabContent').show();
-				                   $('#error-message').text('No live stream available for this vehicle and camera.').show();
-				               }
-				           });
-/ ////<!--->
- //
-  ///
-   ////
-				           // Close the side tab
-				           $('#closeSideTab').click(function() {
-				               $('#sideTab').removeClass('open');
-				               $('#live-video').hide().removeClass('active');
-				               $('#tabContent').show();
-				               $('#video-stream').attr('src', ''); // Stop the video stream
-				               $('#error-message').hide(); // Hide error message
-				           });
-
-				           // Close the live video and show tab content
-				           $('#close-icon').click(function() {
-				               $('#live-video').hide().removeClass('active');
-				               $('#tabContent').show();
-				               $('#video-stream').attr('src', ''); // Stop the video stream
-				               $('#error-message').hide(); // Hide error message
-				           });
-
-				           $('#open').click(function() {
-				               $('#sideTab').addClass('open');
-				           });
-				       });
-				   </script>
-		   </body>
-		   </html>
+</body>
+</html>

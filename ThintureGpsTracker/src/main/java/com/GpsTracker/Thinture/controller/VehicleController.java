@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import com.GpsTracker.Thinture.model.Vehicle;
+import com.GpsTracker.Thinture.model.vehicle;
 import com.GpsTracker.Thinture.service.VehicleService;
 import jakarta.validation.Valid;
 import org.springframework.validation.BindingResult;
@@ -33,7 +33,7 @@ public class VehicleController {
     }
 
     @PostMapping("/add")
-    public String addVehicle(@Valid Vehicle vehicle, BindingResult result, Model model) {
+    public String addVehicle(@Valid vehicle vehicle, BindingResult result, Model model) {
         if (result.hasErrors()) {
             model.addAttribute("errors", result.getAllErrors());
             return "add_vehicle";  // Adjust this as necessary
@@ -44,7 +44,7 @@ public class VehicleController {
     
     // code for the visible map in the javascript page
     @GetMapping("/locations")
-    public List<Vehicle> getGpsLocations() {
+    public List<vehicle> getGpsLocations() {
         return vehicleService.getAllVehicles(); // Fetches all vehicles from the database
     }
     @DeleteMapping("/delete/{deviceID}")
