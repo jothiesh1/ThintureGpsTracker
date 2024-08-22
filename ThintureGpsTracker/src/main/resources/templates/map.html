@@ -8,8 +8,15 @@
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.0/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-	<style>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+	    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+	
+		<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+		    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@6.1.2/dist/stomp.min.js"></script>
+		    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+		<style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -663,10 +670,63 @@
 
 												 #searchForm {
 												margin-top: 20px; /* Space between heading and form */
-												}												     
+												}	
+												.search-container {
+																       position: absolute; /* Change to absolute to position relative to parent */
+																       top: 20px; /* Adjust the top position as needed */
+																       right: 290px; /* Adjust the right position as needed */
+																       width: auto; /* Set width based on content */
+																       display: flex;
+																       align-items: center; /* Vertically center the items */
+																   }											     
+												.search-container .search {
+																       padding-left: 30px;
+																       height: 35px;
+																       font-size: 12px;
+																       flex: 1;
+																       margin-right: 10px; /* Add space between input and button */
+																	   width:350px;
+																	   
+																   }
 
-																						
+																   .search-container .fa-search {
+																       position: absolute;
+																       top: 50%;
+																       left: 10px;
+																       transform: translateY(-50%);
+																       color: #999;
+																       pointer-events: none;
+																   }
 
+																   .search-container .live-button {
+																       height: 35px;
+																       padding: 0 5px;
+																       font-size: 14px;
+																       background-color: darkblue;
+																       color: white;
+																       border: none;
+																       cursor: pointer;
+																       display: flex;
+																       align-items: center;
+																       justify-content: center;
+																       white-space: nowrap; /* Ensure text stays on one line */
+																	left:520px;
+																   }
+
+																   .search-container .live-button i {
+																       margin-right: 5px;
+																   }
+
+																   .search-container .live-button:hover {
+																       background-color: #0056b3;
+																   }
+.search-text{
+	
+	width:250px;
+	font-size: 16px;
+	border:solid #3F51B5;
+	height: 35px;
+}
     </style>
 </head>
 <body>
@@ -714,10 +774,19 @@
 				});
 
 			  </script>
-
+			  <!-- Search bar for device ID -->
+			  	    <div class="search-container">
+						<i class="fa search"></i>
+			  	        <input type="text" class="search-text" name="search" placeholder="Search by Device ID..." id="searchInput">
+			  	        <button type="menu" class="live-button" id="searchButton">
+			  	            <i class="fa fa-search"></i> Search
+			  	        </button>
+			  	    </div>
+					<br>
     <div class="content">
         <div id="map"></div>
     </div>
+	
 	
 
 	<!-- Top all count vehicle butto code End here  
@@ -731,90 +800,121 @@
 	
 	***************
 	-->
-	<script th:inline="javascript">
-	    var map = L.map('map').setView([12.225284, 79.074699], 5); // Adjusted zoom level to show more of the map
-	    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-	        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-	    }).addTo(map);
+<!-- Map container -->
+<div class="content">
+    <div id="map"></div>
+</div>
 
-	    // Dictionary to hold markers by deviceID
-	    var markers = {};
+<!-- Map and marker handling script -->
+<script>
+    var map = L.map('map').setView([12.225284, 79.074699], 5); // Adjusted zoom level to show more of the map
 
-	    // Function to get the car icon based on the status
-	    function getCarIcon(status) {
-	        var ringClass = status === 'N1' ? 'ring-blink-red' : 'ring-blink-green';
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
 
-	        return L.divIcon({
-	            className: 'custom-icon ring-blink ' + ringClass,
-	            html: `
-	                <div class="ring-blink">
-	                    <img src="${status === 'N1' ? 'THINTURE_IMAGE/red2.png' : 'THINTURE_IMAGE/greencar2.png'}" alt="car-icon" style="width: 38px; height: 38px;">
-	                </div>
-	            `,
-	            iconSize: [38, 38],
-	            iconAnchor: [19, 19],
-	            popupAnchor: [0, -19]
-	        });
-	    }
+    // Marker cluster group
+    var markers = L.markerClusterGroup({
+        maxClusterRadius: 50,
+        disableClusteringAtZoom: 16
+    });
+    map.addLayer(markers);
 
-	    // Function to create or update a marker
-	    function createOrUpdateMarker(vehicle) {
-	        var icon = getCarIcon(vehicle.status);
+    // Dictionary to hold markers by deviceID
+    var markerDict = {};
 
-	        var popupContent = `
-	            <strong>Device ID:</strong> ${vehicle.deviceID}<br>
-	            <strong>Timestamp:</strong> ${vehicle.timestamp}<br>
-	            <strong>Address:</strong> ${vehicle.address || 'Address not available'}<br>
-	            <strong>Latitude:</strong> ${vehicle.latitude}<br>
-	            <strong>Longitude:</strong> ${vehicle.longitude}
-	        `;
+    // Function to get the car icon based on the status
+    function getCarIcon(status) {
+        var ringClass = status === 'N1' ? 'ring-blink-red' : 'ring-blink-green';
 
-	        if (markers[vehicle.deviceID]) {
-	            // Update existing marker
-	            markers[vehicle.deviceID].setLatLng([vehicle.latitude, vehicle.longitude])
-	                .setIcon(icon)
-	                .bindPopup(popupContent)
-	                .openPopup();
-	        } else {
-	            // Create new marker
-	            markers[vehicle.deviceID] = L.marker([vehicle.latitude, vehicle.longitude], { icon: icon })
-	                .addTo(map)
-	                .bindPopup(popupContent)
-	                .openPopup();
-	        }
-	    }
+        return L.divIcon({
+            className: 'custom-icon ring-blink ' + ringClass,
+            html: `
+                <div class="ring-blink">
+                    <img src="${status === 'N1' ? 'THINTURE_IMAGE/red2.png' : 'THINTURE_IMAGE/greencar2.png'}" alt="car-icon" style="width: 38px; height: 38px;">
+                </div>
+            `,
+            iconSize: [38, 38],
+            iconAnchor: [19, 19],
+            popupAnchor: [0, -19]
+        });
+    }
 
-	    // Fetch initial vehicle data from the Spring Boot application
-	    fetch('/api/vehicles')
-	        .then(response => response.json())
-	        .then(data => {
-	            if (data && data.length > 0) {
-	                data.forEach(vehicle => {
-	                    createOrUpdateMarker(vehicle);
-	                });
-	            } else {
-	                console.error('No vehicle data available');
-	            }
-	        })
-	        .catch(error => console.error('Error fetching vehicle data:', error));
+    // Function to create or update a marker
+    function createOrUpdateMarker(vehicle) {
+        var icon = getCarIcon(vehicle.status);
+        var popupContent = `
+            <strong>Device ID:</strong> ${vehicle.deviceID}<br>
+            <strong>Timestamp:</strong> ${vehicle.timestamp}<br>
+            <strong>Address:</strong> ${vehicle.address || 'Address not available'}<br>
+            <strong>Latitude:</strong> ${vehicle.latitude}<br>
+            <strong>Longitude:</strong> ${vehicle.longitude}
+        `;
 
-	    // WebSocket connection for real-time updates
-	    var socket = new SockJS('/gs-guide-websocket');
-	    var stompClient = Stomp.over(socket);
+        if (markerDict[vehicle.deviceID]) {
+            // Update existing marker
+            markerDict[vehicle.deviceID].setLatLng([vehicle.latitude, vehicle.longitude])
+                .setIcon(icon)
+                .bindPopup(popupContent)
+                .openPopup();
+        } else {
+            // Create new marker
+            markerDict[vehicle.deviceID] = L.marker([vehicle.latitude, vehicle.longitude], { icon: icon })
+                .bindPopup(popupContent);
+            markers.addLayer(markerDict[vehicle.deviceID]);
+        }
+    }
 
-	    stompClient.connect({}, function (frame) {
-	        stompClient.subscribe('/topic/location-updates', function (locationUpdate) {
-	            var data = JSON.parse(locationUpdate.body);
+    // Fetch initial vehicle data from the Spring Boot application
+    fetch('/api/vehicles')
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                data.forEach(vehicle => {
+                    createOrUpdateMarker(vehicle);
+                });
+            } else {
+                console.error('No vehicle data available');
+            }
+        })
+        .catch(error => console.error('Error fetching vehicle data:', error));
 
-	            // Update marker with the new data received via WebSocket
-	            createOrUpdateMarker(data);
+    // WebSocket connection for real-time updates
+    var socket = new SockJS('/gs-guide-websocket');
+    var stompClient = Stomp.over(socket);
 
-	            // Optionally center the map on the updated marker
-	            map.setView([parseFloat(data.latitude), parseFloat(data.longitude)], 13);
-	        });
-	    });
-	
-<!-- map code end here -->
+    stompClient.connect({}, function (frame) {
+        stompClient.subscribe('/topic/location-updates', function (locationUpdate) {
+            var data = JSON.parse(locationUpdate.body);
+
+            // Update marker with the new data received via WebSocket
+            createOrUpdateMarker(data);
+
+            // Optionally center the map on the updated marker
+            map.setView([parseFloat(data.latitude), parseFloat(data.longitude)], 13);
+        });
+    });
+
+    // Search functionality
+    document.getElementById('searchButton').addEventListener('click', function () {
+        var searchValue = document.getElementById('searchInput').value;
+        if (searchValue) {
+            fetch(`/api/vehicles/search?deviceID=${searchValue}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Vehicle not found");
+                    }
+                    return response.json();
+                })
+                .then(vehicle => {
+                    createOrUpdateMarker(vehicle);
+                    map.setView([vehicle.latitude, vehicle.longitude], 13); // Zoom into the vehicle location
+                })
+                .catch(error => alert(error.message));
+        } else {
+            alert('Please enter a Device ID');
+        }
+    });
 </script>
 
 </body>

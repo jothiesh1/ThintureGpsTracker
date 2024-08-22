@@ -5,7 +5,9 @@ import com.GpsTracker.Thinture.repository.VehicleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class VehicleService {
@@ -44,4 +46,12 @@ public class VehicleService {
         System.out.println("Count of vehicles: " + count);
         return count;
     }
+//	 public long countNewVehiclesThisMonth() {
+//	        LocalDate firstDayOfMonth = LocalDate.now().withDayOfMonth(1);
+//	        return vehicleRepository.countByCreatedDateAfter(firstDayOfMonth);
+//	    }
+	 public Optional<vehicle> findByDeviceID(String deviceID) {
+		    return vehicleRepository.findByDeviceID(deviceID);
+		}
+
 }

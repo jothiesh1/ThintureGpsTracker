@@ -303,31 +303,59 @@
         <a href="#"><i class="fas fa-th-large"></i> Profile</a>
     </div>
     <br><br><br>
-    <div class="container">
-        <div class="dashboard">
-            <div class="card-container">
-				<a href="/total_vehicles" class="card">
-						                <h3>Total Vehicles</h3>
-										<p><i class="fas fa-car"></i></p>
-						                <p>11</p>
-						                <p>2 New This Month</p>
-						            </a>
-						            <a href="/total_users" class="card">
-						                <h3>All Users</h3>
-										<i class="fas fa-users"></i>
-						                <p>1</p>
-						                <p>0 New This Month</p>
-						            </a>
-						            <a href="/total_expire" class="card">
-						                <h3>Vehicle Expiring</h3>
-						                <p>0</p>
-						                <p>0 in next 30 days</p>
-						            </a>
-		
-             
-				
-            </div>
-        </div>
+	<script>
+		function fetchVehicleCount() {
+		    $.ajax({
+		        url: '/api/vehicles/countAll',
+		        method: 'GET',
+		        success: function(count) {
+		            console.log("Fetched vehicle count:", count);
+		            $('.card .total-vehicles').text(count);
+		        },
+		        error: function(error) {
+		            console.log("Error fetching vehicle count:", error);
+		        }
+		    });
+		}
+
+		function fetchNewVehiclesThisMonth() {
+		    $.ajax({
+		        url: '/api/vehicles/newThisMonth',
+		        method: 'GET',
+		        success: function(count) {
+		            console.log("Fetched new vehicles this month count:", count);
+		            $('.card .new-vehicles-this-month').text(count + " New This Month");
+		        },
+		        error: function(error) {
+		            console.log("Error fetching new vehicles count:", error);
+		        }
+		    });
+		}
+
+	</script>
+
+	<div class="dashboard">
+	    <div class="card-container">
+	        <a href="/total_vehicles" class="card">
+	            <h3>Total Vehicles</h3>
+	            <p><i class="fas fa-car"></i></p>
+	            <p class="total-vehicles">Loading...</p>
+	            <p class="new-vehicles-this-month">Loading...</p>
+	        </a>
+	        <a href="/total_users" class="card">
+	            <h3>All Users</h3>
+	            <i class="fas fa-users"></i>
+	            <p>1</p>
+	            <p>0 New This Month</p>
+	        </a>
+	        <a href="/total_expire" class="card">
+	            <h3>Vehicle Expiring</h3>
+	            <p>0</p>
+	            <p>0 in next 30 days</p>
+	        </a>
+	    </div>
+	</div>
+
 		<div class="cards">
 		            
 		        </div>
