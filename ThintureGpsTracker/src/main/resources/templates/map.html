@@ -55,867 +55,829 @@
 		            margin-left: 10px;
 		            margin-right: 10px;
 		        }
-		.navbar {
-							    background-color: lightgray;
-							    color: white;
-							    padding: 10px 10px;
-							    display: flex;
-							    justify-content: space-between;
-							    align-items: center;
-							    width: 120%;
-							    max-width: 900px; /* Adjust as needed */
-							    margin: 0 auto;
-							    height: 55px;
-							    margin-top: -30px;
-								margin-left: 210px;
-							}
-
-							.navbar-brand {
-							    display: flex;
-							    align-items: center;
-							}
-
-							.navbar-brand img {
-							    height: 30px;
-							    margin-right: 20px;
-							}
-
-							.navbar-menu, .navbar-end {
-							    display: flex;
-							    align-items: center;
-							}
-
-							.navbar-menu a, .navbar-end a {
-							    color: white;
-							    text-decoration: none;
-							    margin-left: 15px;
-							}
-
-							.navbar-menu a:hover, .navbar-end a:hover {
-							    text-decoration: underline;
-							}
-		h3{
-			text-align: center;
-		}
-		        .dropdown {
-		            position: relative;
-		            display: inline-block;
-		        }
-		        .dropdown-content {
-		            display: none;
-		            position: absolute;
-		            background-color: white;
-		            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-		            z-index: 1;
-		        }
-		        .dropdown-content a {
-		            color: black;
-		            padding: 12px 12px;
-		            text-decoration: none;
-		            display: block;
-		            width: 200px;
-		        }
-		        .dropdown-content a:hover {
-		            background-color: #f1f1f1;
-		        }
-		        .dropdown:hover .dropdown-content {
-		            display: block;
-		        }
-		        .navbar-logo {
-		            width: 160px;
-		            height: 60px;
-		        }
-			button{
-				background-color: rgb(0, 0, 64);
-			}
+		
 			.content{
 				height: 500px;
 			}
-			#sidebar {
-			            height: 100%;
-			            width: 0;
-			            position: fixed;
-			            top: 0;
-			            left: 0;
-			            background-color: lightgrey;
-			            color: black;
-			            transition: 0.3s;
-			            overflow-x: hidden;
-			            padding-top: 80px;
-			            z-index: 1000;
-			        }
-			        #sidebar a {
-			            padding: 10px 15px;
-			            text-decoration: none;
-			            color: white;
-			            display: block;
-			            font-size: 7px;
-			        }
-			        #sidebar a:hover {
-			            background-color: white;
-			            color: black;
-			        }
-			        #sidebar .closebtn {
-			            position: absolute;
-			            top: 5px;
-			            right: 25px;
-			            font-size: 26px;
-			            margin-left: 50px;
-			            background-color: white;
-			            color: red;
-			        }
-			        #menu-toggle {
-			            position: absolute;
-			            top: 100px;
-			            left: 50px;
-			            font-size: 24px;
-			            color: #333;
-			            cursor: pointer;
-			            z-index: 1001;
-			            background-color: white;
-			            color: black;
-			            width: 40px;
-			            text-align: center;
-			        }
-			        .controls {
-			            position: absolute;
-			            top: 250px;
-			            right: 10px;
-			            z-index: 1000;
-			        }
-			        .controls button {
-			            display: block;
-			            margin: 5px 0;
-			            padding: 10px;
-			            background-color: #007bff;
-			            color: white;
-			            border: none;
-			            border-radius: 5px;
-			            cursor: pointer;
-			        }
-			        .controls button:hover {
-			            background-color: #0056b3;
-			        }
-			        .tabs {
-			            display: flex;
-			            background-color: #444;
-			            padding: 8px;
-			            font-size: 8px;
-						top:100px;
-			        }
-			        .tabs a {
-			            flex: 1;
-			            text-align: center;
-			            padding: 10px;
-			            color: white;
-			            text-decoration: none;
-			            background-color: #555;
-			            border-radius: 5px;
-			            margin: 0 5px;
-			            cursor: pointer;
-			            width: 220px;
-						font-size: 8px;
-			        }
-			        .tabs a.active {
-			            background-color: #007bff;
-			        }
-			        .tab-content {
-			            padding: 10px;
-			            background-color: #fff;
-			            border: 1px solid #ddd;
-			            border-radius: 5px;
-						font-size: 12px;
-			        }
-			        .history-list {
-			            margin: 0;
-			            padding: 0;
-			            list-style: none;
-			        }
-			        .history-list li {
-			            padding: 10px;
-			            border-bottom: 1px solid #ddd;
-			        }
-			        .history-list li:hover {
-			            background-color: #f1f1f1;
-			        }
-					.status-buttons {
-					           display: fixed;
-					           gap: 10px;
-							   
-					       }
-					       .status-button {
-					           width: 50px;
-					           height: 50px;
-					           border-radius: 50%;
-					           border: none;
-					           color: white;
-					           font-size: 8px;
-					           font-weight: bold;
-					          
-					           flex-direction: column;
-					           justify-content: center;
-					           align-items: center;
-					           cursor: pointer;
-							   top:50px;
-							  
-					       }
-					       .all {
-					           background-color: #555; /* Gray */
-					       }
-					       .running {
-					           background-color: #4CAF50; /* Green */
-					       }
-					       .stop {
-					           background-color: #FF0000; /* Red */
-					       }
-					       .idle {
-					           background-color: #FFEB3B; /* Yellow */
-					           color: #000; /* Black text */
-					       }
-					       .inactive {
-					           background-color: #3F51B5; /* Blue */
-					       }
-						   .back {
-						       background-color: #3F51B5;
-						       color: white; /* Optional: changes the text color to white for better contrast */
-						       border: none; /* Optional: removes the border if you want a cleaner look */
-						       padding: 10px 20px; /* Optional: adds some padding inside the button */
-						       margin: 10px; /* Optional: adds margin around the button */
-						       position: absolute; /* Position the button absolutely within its container */
-						       right: 0; /* Align the button to the right */
-						       top: 2px; /* Optional: align the button to the top */
-						   }
-						 
-						  .custom-popup:hover{
-						       width: 200px; /* Set the width */
-						       height: 120px; /* Set the height */
-						      
-						       padding: 10px; /* Add padding */
-						       background-color: #fff; /* Set background color */
-						       border: 1px solid #ccc; /* Add border */
-						   }
-						          
+			.custom-icon {
+			           font-size: 32px;
+			       }
+			       .car-icon {
+			           width: 50px; /* Medium size */
+			           height: 50px; /* Medium size */
+			       }
+			       .ring-blink {
+			           position: relative;
+			           animation: blink 1s infinite;
+			           border-color: red;
+			       }
+			       .ring-blink::before, .ring-blink::after {
+			           content: '';
+			           position: absolute;
+			           border-radius: 50%;
+			           opacity: 0.1;
+			           animation: ringBlink 1.5s infinite;
+			           background-color: transparent;
+			           border: 5px solid;
+			       }
+			       .ring-blink::before {
+			           top: -10px;
+			           left: -10px;
+			           width: 70px;
+			           height: 70px;
+			           animation-delay: 0s;
+			       }
+			       .ring-blink::after {
+			           top: -20px;
+			           left: -20px;
+			           width: 90px;
+			           height: 90px;
+			           animation-delay: 0.3s;
+			       }
+			       @keyframes ringBlink {
+			           0% { transform: scale(0.3); opacity: 0.3; }
+			           50% { transform: scale(0.5); opacity: 0.5; }
+			           100% { transform: scale(1); opacity: 0; }
+			       }
+			       .ring-blink-red {
+			           color: red;
+			           border-color: red;
+			       }
+			       .ring-blink-green {
+			           color: green;
+			           border-color: green;
+			       }
+				.status-buttons {
+				    display: flex;
+				    justify-content: center; /* Center the buttons horizontally */
+				    gap: 15px; /* Space between buttons */
+				    flex-wrap: wrap; /* Wrap buttons on smaller screens */
+				    margin: 20px 0; /* Margin around buttons */
+				}
 
-						   #live-video {
-						      
-						       position: absolute;
-						       width: 250px; /* Adjust this value as needed */
-						       height: 10px; /* Adjust this value as needed */
-						       right: 20px; /* Align the live video to the right (adjust as needed) */
-						       top: 20px; /* Position the video vertically */
-						       background-color: #ffffff; /* Optional: background color to make it stand out */
-						       box-shadow: -5px 0px 15px rgba(0,0,0,0.5); /* Optional: add shadow for a pop-out effect */
-						       z-index: 1000; /* Ensure it's above other content */
-						   }
+				.status-button {
+				    background-color: transparent; /* Transparent background */
+				    color: #555; /* Default text color */
+				    border: 2px solid #555; /* Border color matching the text */
+				    border-radius: 8px; /* Slightly rounded corners */
+				    padding: 10px 20px; /* Padding inside buttons */
+				    font-size: 14px; /* Font size for button text */
+				    font-weight: bold; /* Bold text */
+				    cursor: pointer; /* Pointer cursor on hover */
+				    display: flex;
+				    align-items: center;
+				    justify-content: center;
+				    box-shadow: none; /* Remove shadow for a cleaner look */
+				    transition: background-color 0.3s, color 0.3s, border-color 0.3s; /* Smooth transitions */
+				}
 
-						   #live-video.active {
-						       display: block; /* Display the video when active */
-						   }
+				.status-button:hover {
+				    background-color: #555; /* Dark gray background on hover */
+				    color: white; /* White text on hover */
+				    border-color: #555; /* Dark gray border on hover */
+				}
 
-						   #video-stream {
-						       width: 100%; /* Make sure the video occupies the full width of its container */
-						       height: 100%; /* Make sure the video occupies the full height of its container */
-						       border: none; /* Remove default iframe border */
-						       background-color: #000; /* Optional: background color of the iframe */
-						   }
+				.status-button .status-count {
+				    font-size: 18px; /* Larger font size for the count */
+				    margin-right: 10px; /* Space between count and label */
+				}
 
+				.status-button.all {
+				    color: #555; /* Gray */
+				    border-color: #555;
+				}
 
-						   #close-icon {
-						       position: absolute;
-						       top: 5px;
-						       right: 10px;
-						       cursor: pointer;
-						       font-size: 24px;
-						       color: #fff;
-						   }
+				.status-button.running {
+				    color: #4CAF50; /* Green */
+				    border-color: #4CAF50;
+				}
 
+				.status-button.stop {
+				    color: #FF0000; /* Red */
+				    border-color: #FF0000;
+				}
 
-						   #close-icon {
-						       position: absolute;
-						       top: 5px;
-						       right: 5px;
-						       width: 20px;
-						       height: 20px;
-						       background-color: #fff;
-						       color: #000;
-						       text-align: center;
-						       line-height: 20px;
-						       border-radius: 50%;
-						       cursor: pointer;
-						       font-weight: bold;
-						   }
+				.status-button.idle {
+				    color: #FFEB3B; /* Yellow */
+				    border-color: #FFEB3B;
+				}
 
-						   #close-icon:hover {
-						       background-color: red;
-						   }
-						   #sideTab {
-						       height: 100%; /* Start with height 0 */
-						       width: 0%; /* Full width of the screen */
-						       position: fixed;
-						       bottom: 100px; /* Position at the bottom */
-						       left: 0; /* Align to the left */
-						       background-color:lightgrey;
-						       overflow-y: hidden;
-						       transition: height 0.5s ease; /* Animate the height instead of width */
-						       padding-top: 20px; /* Adjust padding as needed */
-						       box-shadow: 0px -5px 15px rgba(0,0,0,0.5); /* Shadow on top */
-						       z-index: 9999;
-							   top:300px;
-						   }
+				.status-button.inactive {
+				    color: #3F51B5; /* Blue */
+				    border-color: #3F51B5;
+				}
 
-						   #sideTab.active {
-						       height: 500px; /* Adjust height when active */
-						   }
+			.back {
+							   			       background-color: #3F51B5;
+							   			       color: white; /* Optional: changes the text color to white for better contrast */
+							   			       border: none; /* Optional: removes the border if you want a cleaner look */
+							   			       padding: 10px 20px; /* Optional: adds some padding inside the button */
+							   			       margin: 10px; /* Optional: adds margin around the button */
+							   			       position: absolute; /* Position the button absolutely within its container */
+							   			       right: 0; /* Align the button to the right */
+							   			       top: 2px; /* Optional: align the button to the top */
+							   			   }
+							   			 
+							   			  .custom-popup:hover{
+							   			       width: 200px; /* Set the width */
+							   			       height: 120px; /* Set the height */
+							   			      
+							   			       padding: 10px; /* Add padding */
+							   			       background-color: #fff; /* Set background color */
+							   			       border: 1px solid #ccc; /* Add border */
+							   			   }
+							   			          
 
+										   #sideTab {
+										       width: 100%; /* Full width of the screen */
+										       height: 50%; /* Adjust height as needed */
+										       background: #f8f9fa;
+										       padding: 10px;
+										       position: fixed;
+										       bottom: 0; /* Align to bottom */
+										       left: 0;
+										       z-index: 1000;
+										       display: flex; /* Use Flexbox for layout */
+										       justify-content: space-between; /* Space sections apart */
+										       box-shadow: 0 -2px 5px rgba(0,0,0,0.3); /* Optional: add shadow for better visibility */
+										       transition: height 0.3s; /* Smooth transition for height */
+										       display: none; /* Initially hidden */
+											   font-size: 14px;
+										   }
 
-						   #sideTab.open {
-						       width: 1270px; /* Adjust the width as needed */
-						   }
+										   .section {
+										       width: 50%; /* Each section takes up half the space */
+										       padding: 10px;
+										       box-sizing: border-box;
+										       overflow: auto; /* Ensure overflow is handled */
+										   }
 
-						   .tab-content {
-						       display: block; /* Ensure tab content is visible */
-						       padding: 15px; /* Add padding for better layout */
-							   font-size: 12px;
-						   }
+										   #live-video-section {
+										       background: #e9ecef; /* Optional: Different background color for live video section */
+										   }
 
-						 
-						   .closebtn {
-						       font-size: 36px;
-						       cursor: pointer;
-						       position: absolute;
-						       top: 0;
-						       right: 15px;
-							   color: #FF0000;
-						   }
-						   
-			.live-button{
-				
-				background-color: #3F51B5;
-						       color: white; /* Optional: changes the text color to white for better contrast */
-						       border: none; /* Optional: removes the border if you want a cleaner look */
-						       padding: 2px 2px; /* Optional: adds some padding inside the button */
-						       margin: 10px; /* Optional: adds margin around the button */
-						       position: absolute; /* Position the button absolutely within its container */
-						       right: 5px; /* Align the button to the right */
-						     width: 95px;
-							 top:-10px;
-						   }
-						   
-						   /* General button styling */
-						   .history-button {
-						       background-color: #007bff; /* Blue background */
-						       color: white; /* White text */
-						       padding: 10px 20px; /* Padding around the button */
-						       border: none; /* No border */
-						       border-radius: 5px; /* Slightly rounded corners */
-						       cursor: pointer; /* Pointer cursor on hover */
-						       font-size: 16px; /* Font size */
-						       display: inline-flex; /* Align icon and text */
-						       align-items: center; /* Center icon and text vertically */
-						       transition: background-color 0.3s ease; /* Smooth background color transition */
-						   }
+										   #history-section {
+										       background: #f1f1f1; /* Optional: Different background color for history section */
+										   }
 
-						   /* Button hover effect */
-						   .history-button:hover {
-						       background-color: #0056b3; /* Darker blue on hover */
-						   }
+										   .closebtn {
+										       font-size: 36px;
+										       color: #000;
+										       text-decoration: none;
+										       cursor: pointer;
+										       position: absolute;
+										       top: 10px; /* Adjust as needed */
+										       right: 20px; /* Adjust as needed */
+										   }
 
-						   /* Icon within the button */
-						   .history-button i {
-						       margin-right: 8px; /* Space between icon and text */
-						   }
+										   .closebtn:hover {
+										       color: red;
+										   }
 
-						   /* General tab pane styling */
-						   .tab-pane {
-						       display: none; /* Hide all tabs by default */
-						       padding: 20px; /* Padding inside the tab content */
-						       border: 1px solid #ddd; /* Light border around the content */
-						       border-radius: 5px; /* Rounded corners */
-						       background-color: #f9f9f9; /* Light gray background */
-						       margin-top: 10px; /* Space above the tab content */
-						   }
+							
+.nav-container {
+position: sticky;
+								      display: flex;
+								      align-items: center; /* Align items vertically center */
+								      justify-content: space-between; /* Space between brand and search container */
+								      background-color:	darkblue;
+								      padding: 10px 20px; /* Padding around the container */
+									  width:100%;
+								    }
+									.search-container {
+									    display: flex; /* Flexbox layout */
+									    align-items: center; /* Center items vertically */
+									    gap: 10px; /* Space between elements */
+										
+										
+									  }
 
-						   .custom-icon {
-						               font-size: 32px;
-						   			
-						           }
-						           .ring-blink {
-						               position: relative;
-						   			animation: blink 1s infinite;
-						   			border-color: red;
-						           }
-						   		
-						           .ring-blink::before, .ring-blink::after {
-						               content: '';
-						               position: absolute;
-						               border-radius: 50%;
-						               opacity: 0.5;
-						               animation: ringBlink 1.5s infinite;
-						               background-color: transparent;
-						               border: 5px solid;
-						           }
-						           .ring-blink::before {
-						               top: -10px;
-						               left: -10px;
-						               width: 60px;
-						               height: 60px;
-						               animation-delay: 0s;
-						           }
-						           .ring-blink::after {
-						               top: -20px;
-						               left: -20px;
-						               width: 80px;
-						               height: 80px;
-						               animation-delay: 0.3s;
-						           }
-						           @keyframes ringBlink {
-						               0% { transform: scale(0.3); opacity: 0.3; }
-						               50% { transform: scale(0.5); opacity: 0.5; }
-						               100% { transform: scale(1); opacity: 0; }
-						           }
-						           .ring-blink-red {
-						               color: red;
-						               border-color: red;
-						           }
-						           .ring-blink-green {
-						               color: green;
-						               border-color: green;
-						           }
-						   		.vehicle-details {
-						   		    margin-top: 20px;
-						   		    padding: 10px;
-						   		    border: 1px solid #ddd;
-						   		    background-color: #f9f9f9;
-						   			
-						   		}
+									  .search-container .search {
+									  
+									    height: 45px; /* Height of the input box */
+									    font-size: 16px; /* Font size of the text */
+									    border: 1px solid #ccc; /* Border around the input */
+									    border-radius: 10px; /* Rounded corners */
+										margin-left: -20%;
+										width: 250px;
+									 
+									  }
 
+									  .search-container .live-button {
+										background-color: #d9534f; /* Dark background color for buttons */
+																				     color: white; /* Text color */
+																				     border: none; /* Remove default button border */
+																				     padding: 10px 20px; /* Padding inside buttons */
+																				     border-radius: 5px; /* Rounded corners */
+																				     font-size: 16px; /* Font size for text */
+																				     display: flex; /* Flexbox for layout inside button */
+																				     align-items: center; /* Center items vertically */
+																				     cursor: pointer; /* Pointer cursor on hover */
+																					 height: 45px;
+																					 }
 
-						
+									  .search-container .live-button i {
+									    margin-right: 5px; /* Space between icon and text */
+									  }
+									
+									  .search-container .live-button:hover {
+									    background-color: #0056b3; /* Background color on hover */
+									    color: white; /* Text color on hover */
+									  }
 
-						   /* Error message styling */
-						   #error-message {
-						       color: red; /* Red text color */
-						       margin-top: 10px; /* Space above the error message */
-						   }
+									  .alert {
+									    position: relative; /* Position relative for positioning the notification count */
+									  }
 
-						   /* Video player styling */
-						   #cameraScreen video {
-						       border-radius: 10px; /* Rounded corners for the video player */
-						       border: 1px solid #ddd; /* Light border around the video player */
-						   }
-						   .tab-pane {
-						           display: none; /* Hide by default */
-						       }
-						       .tab-pane.active {
-						           display: block; /* Show when active */
-						       }
-						       .event-report table {
-						           width: 100%;
-						           border-collapse: collapse;
-						           margin-top: 20px;
-								   font-size: 8px;
-						       }
-						       .event-report th, .event-report td {
-						           border: 1px solid #ddd;
-						           padding: 8px;
-						           text-align: left;
-						       }
-						       .event-report th {
-						           background-color: #f2f2f2;
-						       }
-							   .search-container {
-							       position: absolute; /* Change to absolute to position relative to parent */
-							       top: 20px; /* Adjust the top position as needed */
-							       right: 290px; /* Adjust the right position as needed */
-							       width: auto; /* Set width based on content */
-							       display: flex;
-							       align-items: center; /* Vertically center the items */
-							   }			 
-							  
+									  #alert-button {
+									    background-color:#d9534f ; /* Remove default button background */
+										color:white;
+									    border: none; /* Remove default button border */
+									    cursor: pointer; /* Pointer cursor on hover */
+									    display: flex; /* Flexbox for layout inside button */
+									    align-items: center; /* Center items vertically */
+										height: 45px;
+										top:7px;
+									  }
 
-							  
+									  #notification-icon {
+									    font-size: 20px; /* Font size of the notification icon */
+									    color: white; /* Default color of the icon */
+									    border: 2px solid transparent; /* Default border */
+									    border-radius: 50%; /* Round border */
+									    padding: 5px; /* Space around the icon */
+									    transition: color 0.3s, border-color 0.3s; /* Smooth transition */
+									  }
 
-							   .live-button {
-							       background-color: #f44336; /* Red color */
-							       color: white;
-							       border: none;
-							       padding: 10px 20px;
-							       font-size: 16px;
-							       cursor: pointer;
-							       border-radius: 0 5px 5px 0; /* Rounded corners on the right side */
-							       margin-left: -1px; /* To avoid the gap between input and button */
-							       display: flex;
-							       align-items: center;
-							       justify-content: center;
-							   }
+									  .notification-count {
+									    position: absolute; /* Absolute positioning */
+									    top: -5px; /* Position count above icon */
+									    right: 5px; /* Position count to the right of icon */
+									    background-color: red; /* Background color of the badge */
+									    color: white; /* Text color of the badge */
+									    border-radius: 50%; /* Round badge */
+									    padding: 2px 6px; /* Padding inside badge */
+									    font-size: 12px; /* Font size of the badge text */
+									    font-weight: bold; /* Bold text */
+									    display: flex; /* Flexbox for centering text */
+									    align-items: center; /* Center text vertically */
+									    justify-content: center; /* Center text horizontally */
+									  }
+									  .logo {
+									        background-color: white;
+									        width: 190px;
+									        height: 90px;
+									        margin-left: 25px;
+											margin-top: 20px;
+									        padding: 10px;
+									        border-radius: 15px;
+									        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+									        border: 2px solid #ffffff; /* White border */
+											
+									      }
+										  .button-container {
+										     display: flex;
+										     gap: 10px; /* Space between buttons */
+										   }
 
+										   .panic-button, .logout-button {
+										     background-color: #333; /* Dark background color for buttons */
+										     color: white; /* Text color */
+										     border: none; /* Remove default button border */
+										     padding: 10px 20px; /* Padding inside buttons */
+										     border-radius: 5px; /* Rounded corners */
+										     font-size: 16px; /* Font size for text */
+										     display: flex; /* Flexbox for layout inside button */
+										     align-items: center; /* Center items vertically */
+										     cursor: pointer; /* Pointer cursor on hover */
+											 height: 45px;
+										   }
 
-							   .search-container .search {
-							       padding-left: 30px;
-							       height: 35px;
-							       font-size: 16px;
-							       flex: 1;
-							       margin-right: 10px; /* Add space between input and button */
-								   width:400px;
-								   
-							   }
+										   .panic-button {
+										     background-color: #d9534f; /* Red color for Panic button */
+										   }
 
-							   .search-container .fa-search {
-							       position: absolute;
-							       top: 50%;
-							       left: 10px;
-							       transform: translateY(-50%);
-							       color: #999;
-							       pointer-events: none;
-							   }
+										   .logout-button {
+										     background-color: #d9534f; /* Blue color for Logout button */
+										   }
 
-							   .search-container .live-button {
-							       height: 35px;
-							       padding: 0 15px;
-							       font-size: 14px;
-							       background-color: darkblue;
-							       color: white;
-							       border: none;
-							       cursor: pointer;
-							       display: flex;
-							       align-items: center;
-							       justify-content: center;
-							       white-space: nowrap; /* Ensure text stays on one line */
-							   }
+										   .panic-button:hover, .logout-button:hover {
+										     opacity: 0.8; /* Slightly transparent on hover */
+										   }
 
-							   .search-container .live-button i {
-							       margin-right: 5px;
-							   }
+										   .panic-button i, .logout-button i {
+										     margin-right: 8px; /* Space between icon and text */
+										   }
+										   .back-button {
+										       background-color: #0056b3; /* Dark blue background color */
+										       color: #e9ecef; /* Light color for text */
+										       border: none; /* Remove default border */
+										       border-radius: 4px; /* Slightly rounded corners */
+										       padding: 10px 20px; /* Padding inside the button */
+										       font-size: 16px; /* Font size for the text */
+										       cursor: pointer; /* Pointer cursor on hover */
+										       position: absolute; /* Positioning the button */
+										       top: 180px; /* Distance from the top */
+										       right: 20px; /* Distance from the right */
+										       transition: background-color 0.3s, color 0.3s; /* Smooth transitions */
+										   }
 
-							   .search-container .live-button:hover {
-							       background-color: #0056b3;
-							   }
+										   .back-button:hover {
+										       background-color: #004494; /* Darker blue on hover */
+										       color: #ffffff; /* White text on hover */
+										   }
+										   .user-menu-container {
+										       position:  absolute; /* Positioning the button */
+										       top: 46px;
+										       left: 91%;
+										       color: #ffffff;
+										       font-size: 16px;
+										       cursor: pointer;
+										       z-index: 1000;
+											   padding: 10px 20px; /* Padding inside buttons */
+											   									     border-radius: 5px; /* Rounded corners */
+											   									     font-size: 16px; /* Font size for text */
+											   									     display: flex; /* Flexbox for layout inside button */
+											   									     align-items: center; /* Center items vertically */
+											   									     cursor: pointer; /* Pointer cursor on hover */
+											   										 height: 47px;
+										   }
 
-									  .bottom-tab {
-									             position: fixed;
-									             bottom: 0;
-									             left: 0;
-									             width: 100%;
-									             background-color: #f1f1f1;
-									             border-top: 1px solid #ccc;
-									             padding: 15px;
-									             box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-									             display: none;
-									         }
+										   .username {
+										       display: flex;
+										       align-items: center;
+										       background-color: #0056b3;
+										       padding: 10px 15px;
+										       border-radius: 4px;
+										       transition: background-color 0.3s;
+										   }
 
-									         .bottom-tab.active {
-									             display: block;
-									         }
+										   .username:hover {
+										       background-color: #004494;
+										   }
 
-									         .bottom-tab h3 {
-									             margin: 0;
-									         }
-											 .alert-button {
-												background-color: darkred;
-															       color: white; /* Optional: changes the text color to white for better contrast */
-															       border: none; /* Optional: removes the border if you want a cleaner look */
-															       padding: 10px 20px; /* Optional: adds some padding inside the button */
-															       margin: 10px; /* Optional: adds margin around the button */
-															       position: absolute; /* Position the button absolutely within its container */
-															       right: 110px; /* Align the button to the right */
-															       top: 2px;
-																   }
+										   .dropdown-menu {
+										       display: none;
+										       position: absolute;
+										       top: 100%; /* Position it below the username */
+										       right: 0;
+										       background-color: #ffffff;
+										       border: 1px solid #ddd;
+										       border-radius: 4px;
+										       box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+										       min-width: 150px;
+										       z-index: 1001;
+										   }
 
-											 .alert-button i {
-											     margin-right: 8px; /* Space between icon and text */
-											 }
+										   .dropdown-menu a,
+										   .dropdown-menu .logout-button {
+										       display: block;
+										       padding: 10px 15px;
+										       color: #333;
+										       text-decoration: none;
+										       background: none;
+										       border: none;
+										       text-align: left;
+										       width: 100%;
+										       cursor: pointer;
+										   }
 
+										   .dropdown-menu a:hover,
+										   .dropdown-menu .logout-button:hover {
+										       background-color: #f1f1f1;
+										       color: #0056b3;
+										   }
 
-											 .alert-button:hover {
-											     background-color: #d32f2f; /* Darker red on hover */
-											 }
+										   .dropdown-menu .logout-button {
+										       color: #d9534f; /* Red color for logout button */
+										       font-weight: bold;
+										   }
 
-											 .alert-button:active {
-											     background-color: #b71c1c; /* Even darker red when clicked */
-											 }
-											 .card-sideTab{
-												background-color: darkred;
-												color: white;
-												border: none; /* Optional: removes the border if you want a cleaner look */
-											    padding: 10px 20px; /* Optional: adds some padding inside the button */
-												margin: 10px; /* Optional: adds margin around the button */
-												position: absolute; /* Position the button absolutely within its container */
-											    right: 310px; /* Align the button to the right */
-												top: 2px;																												     							
-												}
-												.closebtn {
-													font-size: 30px; /* Adjust size as needed */
-													color:red; /* Adjust color as needed */
-													cursor: pointer;
-													position: absolute;
-													top: 8px; /* Adjust positioning as needed */
-													right: 200px; /* Adjust positioning as needed */
-													z-index: 1000; /* Ensure it's above other content */
-												}
-																																										    
-																																      
-																																	 
-												#historySection {
-												position: fixed;
-												top: 0;
-												right: 0;
-												width: 300px; /* Adjust width as needed */
-												height: 100%; /* Full height of the screen */
-												background-color: #f4f4f4; /* Background color */
-												padding: 20px;
-											    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2); /* Optional shadow for depth */
-												z-index: 1000; /* Ensure it's on top of other elements */
-												overflow-y: auto; /* Scroll if content exceeds screen height */
-												}
+										   .dropdown-menu .logout-button:hover {
+										       background-color: #f1f1f1;
+										       color: #c9302c; /* Darker red on hover */
+										   }
 
-												 #searchForm {
-												margin-top: 20px; /* Space between heading and form */
-												}	
-												.search-container {
-																       position: absolute; /* Change to absolute to position relative to parent */
-																       top: 20px; /* Adjust the top position as needed */
-																       right: 290px; /* Adjust the right position as needed */
-																       width: auto; /* Set width based on content */
-																       display: flex;
-																       align-items: center; /* Vertically center the items */
-																   }											     
-												.search-container .search {
-																       padding-left: 30px;
-																       height: 35px;
-																       font-size: 12px;
-																       flex: 1;
-																       margin-right: 10px; /* Add space between input and button */
-																	   width:350px;
-																	   
-																   }
-
-																   .search-container .fa-search {
-																       position: absolute;
-																       top: 50%;
-																       left: 10px;
-																       transform: translateY(-50%);
-																       color: #999;
-																       pointer-events: none;
-																   }
-
-																   .search-container .live-button {
-																       height: 35px;
-																       padding: 0 5px;
-																       font-size: 14px;
-																       background-color: darkblue;
-																       color: white;
-																       border: none;
-																       cursor: pointer;
-																       display: flex;
-																       align-items: center;
-																       justify-content: center;
-																       white-space: nowrap; /* Ensure text stays on one line */
-																	left:520px;
-																   }
-
-																   .search-container .live-button i {
-																       margin-right: 5px;
-																   }
-
-																   .search-container .live-button:hover {
-																       background-color: #0056b3;
-																   }
-.search-text{
-	
-	width:250px;
-	font-size: 16px;
-	border:solid #3F51B5;
-	height: 35px;
-}
+										   .user-menu-container:hover .dropdown-menu {
+										       display: block;
+										   }
     </style>
 </head>
 <body>
-	<div id="menu-toggle" onclick="openNav()">
-			      <i class="fas fa-bars"></i>
-			  </div>
-			  <button id="back-button" class="back" onclick="history.back()">
-			      <i class="fas fa-arrow-left"></i>Back
-			  </button>
-			  <button type="button" class="alert-button" id="alertButton">
-			      <i class="fas fa-exclamation-triangle"></i> Alert <span id="alertCount"><strong>[3]</strong></span>
-			  </button>
+    <div class="nav-container">
+        <a class="navbar-brand" href="#">
+            <img src="THINTURE_IMAGE/thinture.jpg" class="logo" alt="FleetTrack Logo">
+        </a>
+        <!-- Form for selecting camera, vehicle ID, and date range -->
+        <div class="search-container">
+            <input type="text" name="search" class="search" placeholder="Search..." id="searchInput">
+            <button type="menu" class="live-button" id="open">
+                <i class="fas fa-video"></i> <strong> View Stream</strong>
+            </button>
+            <div class="button-container">
+                <button class="panic-button">
+                    <i class="fas fa-briefcase"></i> <strong>Immediate Response</strong>
+                </button>
+            </div>
+            <button id="alert-button" class="alert">
+                <i class="fas fa-bell" id="notification-icon"></i><strong>Alert</strong>
+                <span class="notification-count"><strong>6</strong></span>
+            </button>
+            <div class="user-menu-container">
+                <span class="username">ThintureAdmin <i class="fas fa-envelope"></i></span>
+                <div class="dropdown-menu">
+                    <a href="#settings">Settings</a>
+                    <button class="logout-button">
+                        <i class="fas fa-power-off"></i><strong> Logout</strong>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-			  <!-- Top all count vehicle butto code starts here below 
-			  	************************************
-			  	
-			  	***************
-			  	-->
-			  </div>
-			  <div class="status-buttons">
-			      <button class="status-button all">
-			          0<br>All
-			      </button>
-			      <!-- Other buttons... -->
-			  </div>
+    <!-- Status Buttons -->
+   
+	<div class="status-buttons">
+	    <button class="status-button all">0<br>All</button>
+	    <button class="status-button running">0<br>Running</button>
+	    <button class="status-button stop">0<br>Stop</button>
+	    <button class="status-button idle">0<br>Idle</button>
+	    <button class="status-button inactive">0<br>Inactive</button>
+	</div>
 
-			  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-			  <script >
-				function updateVehicleCount() {
-				    $.ajax({
-				        url: '/api/vehicles/countAll', // Ensure this URL is correct
-				        method: 'GET',
-				        success: function(count) {
-				            console.log("Fetched vehicle count:", count); // Add this line to log the count
-				            $('.status-button.all').html(count + "<br>All");
-				        },
-				        error: function(error) {
-				            console.log("Error fetching vehicle count:", error);
-				        }
-				    });
-				}
 
-				$(document).ready(function() {
-				    updateVehicleCount(); // Call the function when the page loads
-				});
+    <!-- Side Tab for Video -->
+    <div id="sideTab">
+        <a href="javascript:void(0)" class="closebtn" id="closeSideTab">&times;</a>
+        <!-- Live Video Section -->
+        <div id="live-video-section">
+            <button id="closeLiveVideo" class="close-video-btn">&times;</button>
+            <h4><strong>Live Stream</strong></h4>
+            <label for="camera-select-live">Select Camera:</label>
+            <select id="camera-select-live">
+                <option value="front">Front</option>
+                <option value="rear">Rear</option>
+            </select>
+            <button type="button" id="btnLiveStream">
+                <i class="fas fa-video"></i> Open Live Stream
+            </button>
+            <iframe id="video-stream" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- History Section -->
+        <div id="history-section">
+            <h4><strong>History</strong></h4>
+            <label for="camera-select-history">Select Camera:</label>
+            <select id="camera-select-history">
+                <option value="front">Front</option>
+                <option value="rear">Rear</option>
+            </select>
+            <div style="margin-top: 10px;">
+                <label for="from-date">From:</label>
+                <input type="datetime-local" id="from-date">
+                <label for="to-date" style="margin-left: 10px;">To:</label>
+                <input type="datetime-local" id="to-date">
+            </div>
+            <button type="button" id="btnSubmitHistory" style="margin-top: 10px;">Submit</button>
+            <!-- History Video Section -->
+            <div id="history-video-section" style="display:none;">
+                <button id="closeHistoryVideo" class="close-video-btn">&times;</button>
+                <iframe id="history-video" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
 
-			  </script>
-			  <!-- Search bar for device ID -->
-			  	    <div class="search-container">
-						<i class="fa search"></i>
-			  	        <input type="text" class="search-text" name="search" placeholder="Search by Device ID..." id="searchInput">
-			  	        <button type="menu" class="live-button" id="searchButton">
-			  	            <i class="fa fa-search"></i> Search
-			  	        </button>
-			  	    </div>
-					<br>
+    <!-- Map Section -->
     <div class="content">
         <div id="map"></div>
     </div>
-	
-	
 
-	<!-- Top all count vehicle butto code End here  
-		************************************
+    <!-- Scripts for Map and Functions -->
+	<script>
+	    // Initialize the map
+	    var map = L.map('map').setView([12.225284, 79.074699], 5);
+
+	    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+	    }).addTo(map);
+
+	    // Marker cluster group
+	    var markers = L.markerClusterGroup({
+	        maxClusterRadius: 50,
+	        disableClusteringAtZoom: 16
+	    });
+
+	    map.addLayer(markers);
+
+	    // Dictionary to hold markers and route layers by deviceID
+	    var markerDict = {};
+	    var routeLayers = {};
+
+	    // Function to get the car icon based on the status
+	    function getCarIcon(status) {
+	        var ringClass = status === 'N2' ? 'ring-blink-red' : 'ring-blink-green';
+	        return L.divIcon({
+	            className: 'custom-icon ring-blink ' + ringClass,
+	            html: `
+	                <div class="ring-blink">
+	                    <img src="${status === 'N2' ? 'THINTURE_IMAGE/red2.png' : 'THINTURE_IMAGE/greencar2.png'}" alt="car-icon" style="width: 38px; height: 38px;">
+	                </div>
+	            `,
+	            iconSize: [38, 38],
+	            iconAnchor: [19, 19],
+	            popupAnchor: [0, -19]
+	        });
+	    }
+
+	    // Function to create or update a marker
+	    function createOrUpdateMarker(vehicle) {
+	        if (!vehicle.latitude || !vehicle.longitude) {
+	            console.error('Invalid latitude or longitude for vehicle:', vehicle);
+	            return;
+	        }
+
+	        var icon = getCarIcon(vehicle.status);
+	        var popupContent = `
+	            <strong>Device ID:</strong> ${vehicle.deviceId || 'Unknown'}<br>
+	            <strong>Timestamp:</strong> ${vehicle.timestamp}<br>
+	            <strong>Address:</strong> ${vehicle.address || 'Address not available'}<br>
+	            <strong>Latitude:</strong> ${vehicle.latitude}<br>
+	            <strong>Longitude:</strong> ${vehicle.longitude}
+	        `;
+
+	        if (markerDict[vehicle.deviceId]) {
+	            // Update existing marker
+	            markerDict[vehicle.deviceId].setLatLng([vehicle.latitude, vehicle.longitude])
+	                .setIcon(icon)
+	                .bindPopup(popupContent)
+	                .openPopup();
+	        } else {
+	            // Create new marker
+	            markerDict[vehicle.deviceId] = L.marker([vehicle.latitude, vehicle.longitude], { icon: icon })
+	                .bindPopup(popupContent);
+	            markers.addLayer(markerDict[vehicle.deviceId]);
+	        }
+	    }
+
+	    // Fetch all vehicle data and update markers
+	    fetch('/api/vehicles/last-known')
+	        .then(response => response.json())
+	        .then(data => {
+	            console.log('Fetched data:', data); // Log the fetched data
+
+	            if (Array.isArray(data)) {
+	                data.forEach(vehicle => {
+	                    console.log('Processing vehicle:', vehicle); // Log each vehicle data
+	                    createOrUpdateMarker(vehicle); // Create or update marker for each vehicle
+	                });
+	            } else {
+	                console.error('Data is not an array or no data available');
+	            }
+	        })
+	        .catch(error => console.error('Error fetching vehicle data:', error));
+			// WebSocket connection for real-time updates
+			    var socket = new SockJS('/gs-guide-websocket');
+			    var stompClient = Stomp.over(socket);
+
+			    stompClient.connect({}, function (frame) {
+			        stompClient.subscribe('/topic/location-updates', function (locationUpdate) {
+			            var data = JSON.parse(locationUpdate.body);
+
+			            // Update marker with the new data received via WebSocket
+			            createOrUpdateMarker(data);
+
+			            // Optionally center the map on the updated marker
+			            map.setView([parseFloat(data.latitude), parseFloat(data.longitude)], 13);
+			        });
+			    });
+	</script>
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+	    // Function to count all vehicles
+	    function updateVehicleCount() {
+	        $.ajax({
+	            url: '/api/vehicles/countAll',
+	            method: 'GET',
+	            success: function(count) {
+	                console.log("Fetched total vehicle count:", count);
+	                $('.status-button.all').html(count + "<br>All");
+	            },
+	            error: function(error) {
+	                console.log("Error fetching total vehicle count:", error);
+	            }
+	        });
+	    }
+
+	    
+		function countStoppedVehicles() {
+		    $.ajax({
+		        url: '/api/countByStatus?status=N2', // Corrected URL to pass status as a query parameter
+		        method: 'GET',
+		        success: function(count) {
+		            console.log("Stopped vehicles:", count);
+		            $('.status-button.stop').html(count + "<br>Stop");
+		        },
+		        error: function(error) {
+		            console.error("Error fetching stopped vehicle count:", error);
+		        }
+		    });
+		}
+
+		function countRunningVehicles() {
+		    $.ajax({
+		        url: '/api/vehicles/countByStatus?status=N1', // Corrected URL to pass status as a query parameter
+		        method: 'GET',
+		        success: function(count) {
+		            console.log("Running vehicles:", count);
+		            $('.status-button.running').html(count + "<br>Running");
+		        },
+		        error: function(error) {
+		            console.error("Error fetching running vehicle count:", error);
+		        }
+		    });
+		}
+
+
+	    $(document).ready(function() {
+	        updateVehicleCount(); // Call the function to update total vehicle count
+	        countStoppedVehicles(); // Call the function to update stopped vehicle count
+	        countRunningVehicles(); // Call the function to update running vehicle count
+	    });
+	</script>
+
+
+
+
+	
+	<script>						 						  
 		
-		***************
-		-->
+		document.getElementById('open').addEventListener('click', function () {
+		    // Show the side tab and adjust layout
+		    document.getElementById('sideTab').style.height = '50%'; // Adjust height as needed
+		    document.getElementById('sideTab').style.display = 'flex'; // Ensure the side tab is visible
+		    document.getElementById('live-video-section').style.display = 'block'; // Ensure the live video section is visible
+		    document.getElementById('history-section').style.display = 'block'; // Ensure the history section is visible
+		});
+
+		document.getElementById('btnSubmitHistory').addEventListener('click', function () {
+		    var camera = document.getElementById('camera-select-history').value;
+		    var fromDate = document.getElementById('from-date').value;
+		    var toDate = document.getElementById('to-date').value;
+
+		    console.log('History Camera:', camera);
+		    console.log('History From Date:', fromDate);
+		    console.log('History To Date:', toDate);
+
+		    // Display the history video section with the appropriate camera stream
+		    document.getElementById('history-video-section').style.display = 'block';
+		    
+		    // Corrected URL construction with backticks
+		    let historyUrl = `https://www.youtube.com/embed/MpoSEvSqRqg?camera=${camera}&from=${fromDate}&to=${toDate}`;
+		    document.getElementById('history-video').src = historyUrl;
+		});
+
+		document.getElementById('btnLiveStream').addEventListener('click', function () {
+		    var camera = document.getElementById('camera-select-live').value;
+
+		    console.log('Live Stream Camera:', camera);
+
+		    let liveStreamUrl;
+		    
+		    // Corrected URL construction with backticks
+		    if (camera === 'front') {
+		        liveStreamUrl = `https://www.youtube.com/embed/MpoSEvSqRqg`;
+		    } else if (camera === 'rear') {
+		        liveStreamUrl = `https://www.youtube.com/embed/RearCameraStreamURL`;
+		    } else {
+		        console.error('Unknown camera selected');
+		        return;
+		    }
+
+		    document.getElementById('live-video-section').style.display = 'block';
+		    document.getElementById('video-stream').src = liveStreamUrl;
+		});
+
+		document.getElementById('closeSideTab').addEventListener('click', function () {
+		    document.getElementById('sideTab').style.height = '0'; // Hide the side tab
+		    document.getElementById('sideTab').style.display = 'none'; // Ensure the side tab is hidden
+		});
+
+
+		// Example data for testing
+		var exampleData = {
+		    id: 'car2',
+		    lat: 12.9715987,
+		    lng: 77.594566,
+		    status: 'N1',
+		    startPoint: [12.9715917, 77.594516],
+		    endPoint: [12.976, 77.605]
+		};
+		updateCarLocation(exampleData);
+		var map = L.map('map').setView([12.9716, 77.5946], 13);
+
+		// Add a tile layer to the map
+		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		    maxZoom: 19,
+		}).addTo(map);
+
+		// Function to update the map with the vehicle's location
+		function updateCarLocation(data) {
+		    var marker = L.marker([data.lat, data.lng]).addTo(map);
+		    marker.bindPopup(`
+		        <strong>Tracker Name:</strong> ${data.id}<br>
+		        <strong>Status:</strong> ${data.status}<br>
+		        <strong>Alarm Time:</strong> ${data.alarmTime}
+		    `).openPopup();
+		}
+
+		// Example usage to update map with car location
+		var exampleData = {
+		    id: 'car1',
+		    lat: 12.9715987,
+		    lng: 77.594566,
+		    status: 'N1',
+		    alarmTime: '2023-11-25 10:28:48',
+		    startPoint: [12.9715917, 77.594516],
+		    endPoint: [12.976, 77.605]
+		};
+		cars.forEach(function(car) {
+		            L.marker([car.lat, car.lng], { icon: carIcon })
+		                .bindPopup("<b>" + car.info + "</b>", { className: 'custom-popup' })
+		                .addTo(map);
+		        });
+		// Assuming you have a map instance created somewhere, like this:
+		var map = L.map('map').setView([12.9715987, 77.594566], 13);
+
+		// Custom car icon
+		var carIcon = L.icon({
+		    iconUrl: 'THINTURE_IMAGE/redcar2.png', // Replace with your car icon path
+		    iconSize: [32, 37], // Size of the icon
+		    iconAnchor: [16, 37], // Point of the icon which will correspond to marker's location
+		    popupAnchor: [0, -37] // Point from which the popup should open relative to the iconAnchor
+		});
+
+		// Function to update car location and add a popup
+		function updateCarLocation(data) {
+		    var marker = L.marker([data.lat, data.lng], { icon: carIcon }).addTo(map);
+		    
+		    // Creating the content for the popup
+		    var popupContent = `
+		        <b>Car ID:</b> ${data.id}<br>
+		        <b>Status:</b> ${data.status}<br>
+		        <b>Alarm Time:</b> ${data.alarmTime}<br>
+		        <b>Start Point:</b> [${data.startPoint[0]}, ${data.startPoint[1]}]<br>
+		        <b>End Point:</b> [${data.endPoint[0]}, ${data.endPoint[1]}]
+		    `;
+		    
+		    // Binding the popup to the marker
+		    marker.bindPopup(popupContent).openPopup();
+		}
+
+		updateCarLocation(exampleData);
+
 	
-	<!-- map code starts here below 
-	************************************
+		
+		document.getElementById('closeLiveVideo').addEventListener('click', function () {
+		    document.getElementById('live-video-section').style.display = 'none';
+		    document.getElementById('video-stream').src = ''; // Stop the live stream
+		});
+
+		document.getElementById('closeHistoryVideo').addEventListener('click', function () {
+		    document.getElementById('history-video-section').style.display = 'none';
+		    document.getElementById('history-video').src = ''; // Stop the history video
+		});
+
+		function goBack() {
+		       window.history.back();
+		   }
+		   document.addEventListener('click', function(event) {
+		       var dropdown = document.querySelector('.dropdown-menu');
+		       var username = document.querySelector('.username');
+		       
+		       if (!username.contains(event.target)) {
+		           dropdown.style.display = 'none';
+		       } else {
+		           dropdown.style.display = 'block';
+		       }
+		   });
+
+		   document.addEventListener('DOMContentLoaded', function() {
+		              document.querySelector('.logout-button').addEventListener('click', function() {
+		                  alert('Logging out...');
+		              });
+		          });
+				  
+
+	</script>
+	<script>
+	        // Ensure the script runs after the DOM is loaded
+	        document.addEventListener('DOMContentLoaded', function() {
+	            document.getElementById('alert-button').addEventListener('click', function() {
+	                // Redirect to alerts.html
+	                window.location.href = 'alerts.html';
+	            });
+	        });
+	    </script>
 	
-	***************
-	-->
-<!-- Map container -->
-<div class="content">
-    <div id="map"></div>
-</div>
-
-<!-- Map and marker handling script -->
-<script>
-    var map = L.map('map').setView([12.225284, 79.074699], 5); // Adjusted zoom level to show more of the map
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-    // Marker cluster group
-    var markers = L.markerClusterGroup({
-        maxClusterRadius: 50,
-        disableClusteringAtZoom: 16
-    });
-    map.addLayer(markers);
-
-    // Dictionary to hold markers by deviceID
-    var markerDict = {};
-
-    // Function to get the car icon based on the status
-    function getCarIcon(status) {
-        var ringClass = status === 'N1' ? 'ring-blink-red' : 'ring-blink-green';
-
-        return L.divIcon({
-            className: 'custom-icon ring-blink ' + ringClass,
-            html: `
-                <div class="ring-blink">
-                    <img src="${status === 'N1' ? 'THINTURE_IMAGE/red2.png' : 'THINTURE_IMAGE/greencar2.png'}" alt="car-icon" style="width: 38px; height: 38px;">
-                </div>
-            `,
-            iconSize: [38, 38],
-            iconAnchor: [19, 19],
-            popupAnchor: [0, -19]
-        });
-    }
-
-    // Function to create or update a marker
-    function createOrUpdateMarker(vehicle) {
-        var icon = getCarIcon(vehicle.status);
-        var popupContent = `
-            <strong>Device ID:</strong> ${vehicle.deviceID}<br>
-            <strong>Timestamp:</strong> ${vehicle.timestamp}<br>
-            <strong>Address:</strong> ${vehicle.address || 'Address not available'}<br>
-            <strong>Latitude:</strong> ${vehicle.latitude}<br>
-            <strong>Longitude:</strong> ${vehicle.longitude}
-        `;
-
-        if (markerDict[vehicle.deviceID]) {
-            // Update existing marker
-            markerDict[vehicle.deviceID].setLatLng([vehicle.latitude, vehicle.longitude])
-                .setIcon(icon)
-                .bindPopup(popupContent)
-                .openPopup();
-        } else {
-            // Create new marker
-            markerDict[vehicle.deviceID] = L.marker([vehicle.latitude, vehicle.longitude], { icon: icon })
-                .bindPopup(popupContent);
-            markers.addLayer(markerDict[vehicle.deviceID]);
-        }
-    }
-
-    // Fetch initial vehicle data from the Spring Boot application
-    fetch('/api/vehicles')
-        .then(response => response.json())
-        .then(data => {
-            if (data && data.length > 0) {
-                data.forEach(vehicle => {
-                    createOrUpdateMarker(vehicle);
-                });
-            } else {
-                console.error('No vehicle data available');
-            }
-        })
-        .catch(error => console.error('Error fetching vehicle data:', error));
-
-    // WebSocket connection for real-time updates
-    var socket = new SockJS('/gs-guide-websocket');
-    var stompClient = Stomp.over(socket);
-
-    stompClient.connect({}, function (frame) {
-        stompClient.subscribe('/topic/location-updates', function (locationUpdate) {
-            var data = JSON.parse(locationUpdate.body);
-
-            // Update marker with the new data received via WebSocket
-            createOrUpdateMarker(data);
-
-            // Optionally center the map on the updated marker
-            map.setView([parseFloat(data.latitude), parseFloat(data.longitude)], 13);
-        });
-    });
-
-    // Search functionality
-    document.getElementById('searchButton').addEventListener('click', function () {
-        var searchValue = document.getElementById('searchInput').value;
-        if (searchValue) {
-            fetch(`/api/vehicles/search?deviceID=${searchValue}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("Vehicle not found");
-                    }
-                    return response.json();
-                })
-                .then(vehicle => {
-                    createOrUpdateMarker(vehicle);
-                    map.setView([vehicle.latitude, vehicle.longitude], 13); // Zoom into the vehicle location
-                })
-                .catch(error => alert(error.message));
-        } else {
-            alert('Please enter a Device ID');
-        }
-    });
-</script>
-
 </body>
 </html>

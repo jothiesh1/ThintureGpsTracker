@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Alerts</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <style>
+        #map-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        #map {
+            flex: 2;
+            width: 100%;
+        }
+
+        #video-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            flex: 1;
+        }
+
+        .video-feed {
+            flex: 1;
+            margin: 5px;
+            position: relative;
+        }
+
+        #event-report {
+            margin-top: 10px;
+            flex: 1;
+            right: 80%;
+        }
+
+        table {
+            width: 50%;
+            border-collapse: collapse;
+			
+        }
+
+        th, td {
+            padding: 2px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #warning-container {
+            display: none;
+            color: red;
+            padding: 10px;
+            border: 1px solid red;
+            margin-bottom: 10px;
+        }
+
+        .alert {
+            padding: 10px 20px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .alert:hover {
+            background-color: darkred;
+        }
+
+        .solve-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .solve-button:hover {
+            background-color: #0056b3;
+        }
+        .back-button {
+            background-color: #0056b3; /* Dark blue background color */
+            color: #e9ecef; /* Light color for text */
+            border: none; /* Remove default border */
+            border-radius: 4px; /* Slightly rounded corners */
+            padding: 10px 20px; /* Padding inside the button */
+            font-size: 16px; /* Font size for the text */
+            cursor: pointer; /* Pointer cursor on hover */
+            position: fixed; /* Changed to fixed positioning */
+            top: 20px; /* Distance from the top */
+            right: 20px; /* Distance from the right */
+            transition: background-color 0.3s, color 0.3s; /* Smooth transitions */
+        }
+
+        .back-button:hover {
+            background-color: #004494; /* Darker blue on hover */
+            color: #ffffff; /* White text on hover */
+        }
+
+        .video-screen {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100%;
+            background-color: #f1f1f1;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        #video-selector {
+            padding: 10px;
+        }
+
+        .video-feed {
+            margin-bottom: 15px;
+        }
+
+        .close-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .close-button:hover {
+            background-color: #c82333;
+        }
+
+        .table-alert {
+            padding: 10px;
+            gap: 5px;
+        }
+		.back-button {
+		    background-color: #0056b3; /* Dark blue background color */
+		    color: #e9ecef; /* Light color for text */
+		    border: none; /* Remove default border */
+		    border-radius: 4px; /* Slightly rounded corners */
+		    padding: 10px 20px; /* Padding inside the button */
+		    font-size: 16px; /* Font size for the text */
+		    cursor: pointer; /* Pointer cursor on hover */
+		    position: fixed; /* Fixed positioning */
+		    top: 20px; /* Distance from the top */
+		    right: 20px; /* Distance from the right */
+		    transition: background-color 0.3s, color 0.3s; /* Smooth transitions */
+		    z-index: 1001; /* Ensure it's on top of other elements */
+		}
+
+		.back-button:hover {
+		    background-color: #004494; /* Darker blue on hover */
+		    color: #ffffff; /* White text on hover */
+		}
+
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="goBack()">
+        <i class="fas fa-arrow-left"></i> Back
+    </button>
+
+    <div id="map-container">
+        <div id="map"></div>
+
+       
+
+        <div id="event-report" class="table-alert">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tracker Name</th>
+                        <th>Alarm Time</th>
+                        <th>Alarm Info</th>
+                        <th>GPS Time</th>
+                        <th>Receiving Time</th>
+						<th>Video</th>
+                        <th>Action</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Populate with event data -->
+                </tbody>
+            </table>
+        </div>
+
+        <audio id="alert-sound" src="THINTURE_IMAGE/alert.wav" preload="auto"></audio>
+    </div>
+
+    <div id="video-screen" class="video-screen">
+        <div id="video-selector">
+            <button class="close-button" onclick="closeVideoScreen()">X</button>
+            <h2><strong>View Camera Footage</strong></h2>
+            <div class="video-feed">
+                <video id="rear-camera" controls></video>
+                <label>Rear Camera</label>
+            </div>
+            <div class="video-feed">
+                <video id="front-camera" controls></video>
+                <label>Front Camera</label>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([12.9716, 77.5946], 13);
+
+        // Add a tile layer to the map
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 20,
+        }).addTo(map);
+
+        // Function to update the map with the vehicle's location
+        function updateCarLocation(data) {
+            var marker = L.marker([data.lat, data.lng]).addTo(map);
+            marker.bindPopup(`
+                <strong>Tracker Name:</strong> ${data.id}<br>
+                <strong>Status:</strong> ${data.status}<br>
+                <strong>Alarm Time:</strong> ${data.alarmTime}
+            `).openPopup();
+
+            // Check for specific conditions to show a warning
+            if (data.status === 'N1') {
+                showWarning("Warning: Vehicle is in critical status!");
+            }
+        }
+
+        // Function to show a warning message
+        function showWarning(message) {
+            var warningContainer = document.getElementById('warning-container');
+            var warningMessage = document.getElementById('warning-message');
+
+            warningMessage.textContent = message;
+            warningContainer.style.display = 'block';
+        }
+
+        // Load the video streams (replace URLs with actual streams)
+        document.getElementById('rear-camera').src = 'path/to/rear-camera-stream.mp4';
+        document.getElementById('front-camera').src = 'path/to/front-camera-stream.mp4';
+
+        // Populate the event report table
+        var eventData = [
+            { tracker: 'Thinture-GPS', alarmTime: '2023-11-25 10:28:48', alarmInfo: 'Not wearing a seatbelt', gpsTime: '2023-11-25 10:28:12', receivingTime: '2023-11-25 10:28:12' },
+            { tracker: 'Thinture-GPS', alarmTime: '2023-11-25 11:00:00', alarmInfo: 'Speeding', gpsTime: '2023-11-25 10:58:30', receivingTime: '2023-11-25 10:58:45' },
+            { tracker: 'Thinture-GPS', alarmTime: '2023-11-25 11:15:00', alarmInfo: 'Sudden braking', gpsTime: '2023-11-25 11:13:30', receivingTime: '2023-11-25 11:13:45' },
+            { tracker: 'Thinture-GPS', alarmTime: '2023-11-25 12:00:00', alarmInfo: 'Harsh cornering', gpsTime: '2023-11-25 11:59:00', receivingTime: '2023-11-25 12:00:15' },
+            { tracker: 'Thinture-GPS', alarmTime: '2023-11-25 12:30:00', alarmInfo: 'Engine temperature high', gpsTime: '2023-11-25 12:28:00', receivingTime: '2023-11-25 12:28:30' },
+            { tracker: 'Thinture-GPS', alarmTime: '2023-11-25 13:00:00', alarmInfo: 'Low fuel', gpsTime: '2023-11-25 12:58:00', receivingTime: '2023-11-25 12:58:15' },
+            { tracker: 'Thinture-GPS', alarmTime: '2023-11-25 13:30:00', alarmInfo: 'Tire pressure low', gpsTime: '2023-11-25 13:28:00', receivingTime: '2023-11-25 13:28:30' },
+            { tracker: 'Thinture-GPS', alarmTime: '2023-11-25 14:00:00', alarmInfo: 'Oil level low', gpsTime: '2023-11-25 13:58:00', receivingTime: '2023-11-25 13:58:15' },
+            { tracker: 'Thinture-GPS', alarmTime: '2023-11-25 14:30:00', alarmInfo: 'Battery low', gpsTime: '2023-11-25 14:28:00', receivingTime: '2023-11-25 14:28:30' },
+            { tracker: 'Thinture-GPS', alarmTime: '2023-11-25 15:00:00', alarmInfo: 'Vehicle not starting', gpsTime: '2023-11-25 14:58:00', receivingTime: '2023-11-25 14:58:15' }
+        ];
+
+        var tableBody = document.querySelector('#event-report tbody');
+        eventData.forEach(event => {
+            var row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${event.tracker}</td>
+                <td>${event.alarmTime}</td>
+                <td>${event.alarmInfo}</td>
+                <td>${event.gpsTime}</td>
+                <td>${event.receivingTime}</td>
+				<td><button class="solve-button" onclick="stream()">Video</button></td>
+                <td><button class="solve-button" onclick="solveEvent()">Solve</button></td>
+                
+            `;
+            tableBody.appendChild(row);
+        });
+
+        function solveEvent() {
+            alert('The event has been marked as resolved. Please ensure all necessary follow-up actions are completed.');
+            // Implement the logic to handle the solve action
+        }
+
+        function stream() {
+            document.getElementById('video-screen').style.display = 'block';
+        }
+
+        function closeVideoScreen() {
+            document.getElementById('video-screen').style.display = 'none';
+        }
+
+        // Example usage to update map with car location
+        var exampleData = {
+            id: 'car1',
+            lat: 12.9715987,
+            lng: 77.594566,
+            status: 'N1', // This will trigger the warning
+            alarmTime: '2023-11-25 10:28:48',
+            startPoint: [12.9715917, 77.594516],
+            endPoint: [12.976, 77.605]
+        };
+        updateCarLocation(exampleData);
+
+        // Add event listener to play sound when the alert button is clicked
+        document.getElementById('alert-button').addEventListener('click', function() {
+            var audio = document.getElementById('alert-sound');
+            audio.play();
+        });
+
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>

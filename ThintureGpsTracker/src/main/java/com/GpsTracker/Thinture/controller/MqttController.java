@@ -9,8 +9,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
+/** ࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏࿏
+ * Author: Jothiesh ☃☃☃☃☃☃☃
+ *  Developer, R&D 
+ * ⁂⁂⁂⁂⁂⁂⁂⁂⁂⁂⁂⁂⁂⁂⁂⁂⁂⁂⁂⁂⁂⁂⁂⁂⁂
+ * 
+ */
 @RestController
+@RequestMapping("/api/mqtt")
 public class MqttController {
 
     private static final Logger logger = LoggerFactory.getLogger(MqttController.class);
@@ -28,12 +39,11 @@ public class MqttController {
             if (message.startsWith("{")) {
                 gpsData = objectMapper.readValue(message, GpsData.class);
             } else {
-                gpsData = new GpsData(); // Create a new GpsData object with default values
-                gpsData.setAdditionalData(message); // Assuming you want to store the message as additional data
+                gpsData = new GpsData();
+                gpsData.setAdditionalData(message);
             }
             logger.info("Received request to publish GPS data: {}", gpsData);
 
-            // Convert the GPS data object to JSON string
             String jsonPayload = objectMapper.writeValueAsString(gpsData);
             logger.info("Publishing JSON payload: {}", jsonPayload);
 
@@ -46,5 +56,3 @@ public class MqttController {
         }
     }
 }
-
-

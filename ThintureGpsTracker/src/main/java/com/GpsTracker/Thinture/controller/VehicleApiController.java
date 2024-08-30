@@ -7,11 +7,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.GpsTracker.Thinture.model.vehicle;
+import com.GpsTracker.Thinture.model.Vehicle;
+import com.GpsTracker.Thinture.model.VehicleLastLocation;
+import com.GpsTracker.Thinture.service.VehicleLastLocationService;
+//import com.GpsTracker.Thinture.model.vehicle;
 import com.GpsTracker.Thinture.service.VehicleService;
 
 @RestController
@@ -20,34 +26,71 @@ public class VehicleApiController {
 
     @Autowired
     private VehicleService vehicleService;
-
+    @Autowired
+    private VehicleLastLocationService vehicleLastLocationService;
     // API method to return vehicle data as JSON
     @GetMapping("/vehicles")
-    public List<vehicle> getVehicles() {
+    public List<Vehicle> getVehicles() {
         return vehicleService.getAllVehicles();
     }
- // API method to return the count of all vehicles
+    
+    // API method to return the count of all vehicles
     @GetMapping("/vehicles/countAll")
     public ResponseEntity<Long> countAllVehicles() {
         long count = vehicleService.countAllVehicles();
         return new ResponseEntity<>(count, HttpStatus.OK);
     }
-
-	/*
-	 * @GetMapping("/vehicles/newThisMonth") public ResponseEntity<Long>
-	 * countNewVehiclesThisMonth() { long count =
-	 * vehicleService.countNewVehiclesThisMonth(); return new
-	 * ResponseEntity<>(count, HttpStatus.OK); }
-	 */
-    // API method to search by deviceID
-    // API method to search by deviceID
-    @GetMapping("/vehicles/search")
-    public ResponseEntity<vehicle> searchVehicleByDeviceID(@RequestParam String deviceID) {
-        Optional<vehicle> vehicle = vehicleService.findByDeviceID(deviceID);
-        if (vehicle.isPresent()) {
-            return new ResponseEntity<>(vehicle.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    @GetMapping("/vehicles/last-known")
+    public ResponseEntity<List<VehicleLastLocation>> getAllLastKnownLocations() {
+        List<VehicleLastLocation> vehicleLastLocations = vehicleLastLocationService.getAllLastKnownLocations();
+        return new ResponseEntity<>(vehicleLastLocations, HttpStatus.OK);
     }
-}
+    @GetMapping("/api/vehicles/last-known")
+    public List<VehicleLastLocation> getLastKnownLocations() {
+        return vehicleService.getAllLastKnownLocations();
+    }
+
+    // API endpoint to get the last known location by device ID
+    @GetMapping("/vehicles/last-known/{deviceId}")
+    public Optional<VehicleLastLocation> getLastKnownLocationByDeviceId(@PathVariable String deviceId) {
+        return vehicleService.getLastKnownLocationByDeviceId(deviceId);
+    }
+    //Ui button stop button for map code
+    // API method to return the count of all vehicles
+
+    // Search vehicle by device ID
+    @GetMapping("/countByStatus")
+    public ResponseEntity<Long> countVehiclesByStatus(@RequestParam String status) {
+        long count = vehicleLastLocationService.countVehiclesByStatus(status);
+        return new ResponseEntity<>(count, HttpStatus.OK);
+    }
+        
+        
+        //Ui button stop button for map code
+        // API method to return the count of all vehicles
+      
+    }
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -181,275 +181,71 @@
         h3 {
             text-align: center;
         }
-		.delete-button{
+		.delete-button {
 			background-color: darkblue;
 			color: white;
 		}
     </style>
-    <script>
-        function refreshPage() {
-            window.location.reload();
-        }
+    
+	<head>
+	    <meta charset="UTF-8">
+	    <title>Vehicle Management</title>
+	    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	</head>
+	<body>
+	    <div class="container mt-5">
+	        <h3>Vehicles Details</h3>
+	        <div class="mb-3">
+	            <button id="addVehicle" class="btn btn-primary">Add Vehicle</button>
+	        </div>
 
-        function searchTable() {
-            var input, filter, table, tr, td, i, j, txtValue;
-            input = document.getElementById("search");
-            filter = input.value.toUpperCase();
-            table = document.getElementById("vehicleTable");
-            tr = table.getElementsByTagName("tr");
+	        <table id="vehicleTable" class="table table-bordered">
+	            <thead>
+	                <tr>
+	                    <th>DeviceID</th>
+	                </tr>
+	            </thead>
+	            <tbody>
+	                <tr th:each="vehicle : ${vehicles}">
+	                    <td th:text="${vehicle.deviceID}"></td>
+	                </tr>
+	            </tbody>
+	        </table>
+	    </div>
 
-            for (i = 1; i < tr.length; i++) {
-                tr[i].style.display = "none";
-                td = tr[i].getElementsByTagName("td");
-                for (j = 0; j < td.length; j++) {
-                    if (td[j]) {
-                        txtValue = td[j].textContent || td[j].innerText;
-                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                            tr[i].style.display = "";
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-</head>
-<body>
-    <div class="container-header">
-        <br>
-        <div class="header">
-            <img src="THINTURE_IMAGE/logo2.jpg" alt="THINTURE Logo" class="navbar-logo">
-        </div>
-    </div>
-    <div class="navbar">
-        <a href="/dashboard" class="active"><i class="fas fa-home"></i> Dashboard</a>
-        <a href="/map"><i class="fas fa-map"></i> Map</a>
-        <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i> View</a>
-            <div class="dropdown-content">
-                <a href="/total_users">Users</a>
-                <a href="/total_vehicles">Vehicle</a>
-                <a href="/tracking_details">Tracking Details</a>
-                <a href="#">Calendar</a>
-            </div>
-        </div>
-        <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i> Utility</a>
-            <div class="dropdown-content">
-                <a href="#">Support & Feedback</a>
-                <a href="#">Announcement</a>
-                <a href="#">Send Notification</a>
-            </div>
-        </div>
-        <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i> Report</a>
-            <div class="dropdown-content">
-                <a href="#">Admin</a>
-                <a href="#">Dealer</a>
-                <a href="#">Users</a>
-            </div>
-        </div>
-        <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i> Accounts</a>
-            <div class="dropdown-content">
-                <a href="#">Renewal</a>
-            </div>
-        </div>
-        <a href="#"><i class="fas fa-th-large"></i>Profile</a>
-    </div>
+	    <!-- Add Vehicle Modal -->
+	    <div class="modal fade" id="addVehicleModal" tabindex="-1" role="dialog" aria-labelledby="addVehicleModalLabel" aria-hidden="true">
+	        <div class="modal-dialog" role="document">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <h5 class="modal-title" id="addVehicleModalLabel">Add New Vehicle</h5>
+	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	                        <span aria-hidden="true">&times;</span>
+	                    </button>
+	                </div>
+	                <div class="modal-body">
+	                    <form id="addVehicleForm" th:action="@{/total_vehicles/add}" method="post">
+	                        <div class="form-group">
+	                            <label for="deviceID">Device ID</label>
+	                            <input type="text" class="form-control" id="deviceID" name="deviceID" required>
+	                        </div>
+	                        <button type="submit" class="btn btn-primary">Submit</button>
+	                    </form>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
 
-    <div class="container mt-5">
-        <h3><stong>Vehicles Details</stong></h3>
-        <div class="mb-3">
-            <button id="addVehicle" class="btn btn-primary">Add Vehicle</button>
-            <button class="btn btn-primary" onclick="exportToExcel()">Download Excel</button>
-            <button class="btn btn-primary" onclick="refreshPage()">Refresh</button>
-        </div>
-        <br><br>
-        <div class="search-container">
-            <input type="text" id="search" name="search" placeholder="Search" onkeyup="searchTable()">
-            <i class="fas fa-search search-icon"></i>
-        </div>
-        <br><br>
-
-        <table id="vehicleTable" class="display nowrap" style="width:100%">
-            <thead>
-                <tr>
-                    <th>DeviceID</th>
-                    <th>Timestamp</th>
-                    <th>DataValidity</th>
-                    <th>Status</th>
-                    <th>Latitude</th>
-                    <th>Longitude</th>
-                    <th>Speed</th>
-                    <th>Course</th>
-                    <th>AdditionalData</th>
-                    <th>SequenceNumber</th>
-					<th>Delete</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="vehicle : ${vehicles}">
-                    <td th:text="${vehicle.deviceID}"></td>
-                    <td th:text="${vehicle.timestamp}"></td>
-                    <td th:text="${vehicle.dataValidity}"></td>
-                    <td th:text="${vehicle.status}"></td>
-                    <td th:text="${vehicle.latitude}"></td>
-                    <td th:text="${vehicle.longitude}"></td>
-                    <td th:text="${vehicle.speed}"></td>
-                    <td th:text="${vehicle.course}"></td>
-                    <td th:text="${vehicle.additionalData}"></td>
-                    <td th:text="${vehicle.sequenceNumber}"></td>
-										<td>
-					    <button type="button" class="btn btn-danger delete-button" data-device-id="${vehicle.deviceID}">Delete</button>
-					
-</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Add Vehicle Modal -->
-    <div class="modal fade" id="addVehicleModal" tabindex="-1" role="dialog" aria-labelledby="addVehicleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addVehicleModalLabel">Add New Vehicle</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="addVehicleForm" action="/total_vehicles/add" method="post">
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="vehicleType">Vehicle Type</label>
-                                <select class="form-control" name="vehicletype" id="vehicleType" required>
-                                    <option value="">Select Vehicle Type</option>
-                                    <option value="Car">Car</option>
-                                    <option value="Bike">Bike</option>
-                                    <option value="Bus">Bus</option>
-                                </select>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="deviceid">Device ID</label>
-                                <input type="text" class="form-control" name="deviceID" id="deviceid" required>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="timestamp">Time Stamp</label>
-                                <input type="text" class="form-control" name="timestamp" id="timestamp">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="datavalidity">Data Validity</label>
-                                <input type="text" class="form-control" name="dataValidity" id="datavalidity">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="status">Status</label>
-                                <input type="text" class="form-control" name="status" id="status">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="latitude">Latitude</label>
-                                <input type="text" class="form-control" name="latitude" id="latitude">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="longitude">Longitude</label>
-                                <input type="text" class="form-control" name="longitude" id="longitude">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="speed">Speed</label>
-                                <input type="text" class="form-control" name="speed" id="speed">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="course">Course</label>
-                                <input type="text" class="form-control" name="course" id="course">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="additionalData">Additional Data</label>
-                                <input type="text" class="form-control" name="additionalData" id="additionalData">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="sequenceNumber">Sequence Number</label>
-                                <input type="text" class="form-control" name="sequenceNumber" id="sequenceNumber">
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Show Add Vehicle Modal
-            $('#addVehicle').on('click', function() {
-                $('#addVehicleModal').modal('show');
-            });
-
-            // Handle Add Vehicle Form Submission
-            $('#addVehicleForm').on('submit', function(e) {
-                // Remove e.preventDefault(); to allow form submission
-                alert('Vehicle added!');
-                $('#addVehicleModal').modal('hide');
-            });
-        });
-    </script>
-	<script>
-	    // Function to handle delete button clicks
-	    function handleDeleteClick(event) {
-	        const button = event.target;
-	        const deviceID = button.getAttribute('data-device-id');
-	        const row = button.closest('tr');
-
-	        if (!confirm('Are you sure you want to delete this vehicle?')) {
-	            return;
-	        }
-
-	        fetch(`/gps/delete/${deviceID}`, {
-	            method: 'DELETE'
-	        })
-	        .then(response => {
-	            if (response.ok) {
-	                row.remove(); // Remove the row from the table
-	                alert('Vehicle deleted successfully.');
-	            } else {
-	                alert('Failed to delete the vehicle.');
-	            }
-	        })
-	        .catch(error => {
-	            console.error('Error deleting vehicle:', error);
-	            alert('Error deleting the vehicle.');
+	    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	    <script>
+	        $(document).ready(function() {
+	            $('#addVehicle').on('click', function() {
+	                $('#addVehicleModal').modal('show');
+	            });
 	        });
-	    }
-
-	    // Add event listeners to all delete buttons
-	    document.addEventListener('DOMContentLoaded', () => {
-	        document.querySelectorAll('.delete-button').forEach(button => {
-	            button.addEventListener('click', handleDeleteClick);
-	        });
-	    });
-
-	    // Function to export table data to Excel (Example using SheetJS library)
-	    function exportToExcel() {
-	        const wb = XLSX.utils.table_to_book(document.getElementById('vehicleTable'), {sheet: "Sheet1"});
-	        XLSX.writeFile(wb, 'vehicles.xlsx');
-	    }
-
-	    // Function to refresh the page
-	    function refreshPage() {
-	        location.reload();
-	    }
-	</script>
-
+	    </script>
+	</body>
+	</html>
 </body>
 </html>

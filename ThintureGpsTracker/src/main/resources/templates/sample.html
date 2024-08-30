@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fleet Tracker Map</title>
+    <!-- Link to necessary styles and scripts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.0/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+	    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+		<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+		   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+		   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+    <style>
+		#map {
+		           width: 100%;
+		           height: 120vh;
+		           border-radius: 10px;
+		           box-shadow: 0 0 10px rgba(0,0,0,0.1);
+		       }
+        .custom-icon {
+            font-size: 32px;
+        }
+        .car-icon {
+            width: 50px; /* Medium size */
+            height: 50px; /* Medium size */
+        }
+        .ring-blink {
+            position: relative;
+            animation: blink 1s infinite;
+            border-color: red;
+        }
+        .ring-blink::before, .ring-blink::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: ringBlink 1.5s infinite;
+            background-color: transparent;
+            border: 5px solid;
+        }
+        .ring-blink::before {
+            top: -10px;
+            left: -10px;
+            width: 70px;
+            height: 70px;
+            animation-delay: 0s;
+        }
+        .ring-blink::after {
+            top: -20px;
+            left: -20px;
+            width: 90px;
+            height: 90px;
+            animation-delay: 0.3s;
+        }
+        @keyframes ringBlink {
+            0% { transform: scale(0.3); opacity: 0.3; }
+            50% { transform: scale(0.5); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+        .ring-blink-red {
+            color: red;
+            border-color: red;
+        }
+        .ring-blink-green {
+            color: green;
+            border-color: green;
+        }
+		.status-buttons {
+		    display: flex;
+		    justify-content: center; /* Center the buttons horizontally */
+		    gap: 15px; /* Space between buttons */
+		    flex-wrap: wrap; /* Wrap buttons on smaller screens */
+		    margin: 20px 0; /* Margin around buttons */
+		}
+
+		.status-button {
+		    background-color: transparent; /* Transparent background */
+		    color: #555; /* Default text color */
+		    border: 2px solid #555; /* Border color matching the text */
+		    border-radius: 8px; /* Slightly rounded corners */
+		    padding: 10px 20px; /* Padding inside buttons */
+		    font-size: 14px; /* Font size for button text */
+		    font-weight: bold; /* Bold text */
+		    cursor: pointer; /* Pointer cursor on hover */
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    box-shadow: none; /* Remove shadow for a cleaner look */
+		    transition: background-color 0.3s, color 0.3s, border-color 0.3s; /* Smooth transitions */
+		}
+
+		.status-button:hover {
+		    background-color: #555; /* Dark gray background on hover */
+		    color: white; /* White text on hover */
+		    border-color: #555; /* Dark gray border on hover */
+		}
+
+		.status-button .status-count {
+		    font-size: 18px; /* Larger font size for the count */
+		    margin-right: 10px; /* Space between count and label */
+		}
+
+		.status-button.all {
+		    color: #555; /* Gray */
+		    border-color: #555;
+		}
+
+		.status-button.running {
+		    color: #4CAF50; /* Green */
+		    border-color: #4CAF50;
+		}
+
+		.status-button.stop {
+		    color: #FF0000; /* Red */
+		    border-color: #FF0000;
+		}
+
+		.status-button.idle {
+		    color: #FFEB3B; /* Yellow */
+		    border-color: #FFEB3B;
+		}
+
+		.status-button.inactive {
+		    color: #3F51B5; /* Blue */
+		    border-color: #3F51B5;
+		}
+
+ .back {
+					   			       background-color: #3F51B5;
+					   			       color: white; /* Optional: changes the text color to white for better contrast */
+					   			       border: none; /* Optional: removes the border if you want a cleaner look */
+					   			       padding: 10px 20px; /* Optional: adds some padding inside the button */
+					   			       margin: 10px; /* Optional: adds margin around the button */
+					   			       position: absolute; /* Position the button absolutely within its container */
+					   			       right: 0; /* Align the button to the right */
+					   			       top: 2px; /* Optional: align the button to the top */
+					   			   }
+					   			 
+					   			  .custom-popup:hover{
+					   			       width: 200px; /* Set the width */
+					   			       height: 120px; /* Set the height */
+					   			      
+					   			       padding: 10px; /* Add padding */
+					   			       background-color: #fff; /* Set background color */
+					   			       border: 1px solid #ccc; /* Add border */
+					   			   }
+					   			          
+
+								   #sideTab {
+								       width: 100%; /* Full width of the screen */
+								       height: 50%; /* Adjust height as needed */
+								       background: #f8f9fa;
+								       padding: 10px;
+								       position: fixed;
+								       bottom: 0; /* Align to bottom */
+								       left: 0;
+								       z-index: 1000;
+								       display: flex; /* Use Flexbox for layout */
+								       justify-content: space-between; /* Space sections apart */
+								       box-shadow: 0 -2px 5px rgba(0,0,0,0.3); /* Optional: add shadow for better visibility */
+								       transition: height 0.3s; /* Smooth transition for height */
+								       display: none; /* Initially hidden */
+									   font-size: 14px;
+								   }
+
+								   .section {
+								       width: 50%; /* Each section takes up half the space */
+								       padding: 10px;
+								       box-sizing: border-box;
+								       overflow: auto; /* Ensure overflow is handled */
+								   }
+
+								   #live-video-section {
+								       background: #e9ecef; /* Optional: Different background color for live video section */
+								   }
+
+								   #history-section {
+								       background: #f1f1f1; /* Optional: Different background color for history section */
+								   }
+
+								   .closebtn {
+								       font-size: 36px;
+								       color: #000;
+								       text-decoration: none;
+								       cursor: pointer;
+								       position: absolute;
+								       top: 10px; /* Adjust as needed */
+								       right: 20px; /* Adjust as needed */
+								   }
+
+								   .closebtn:hover {
+								       color: red;
+								   }
+								   .nav-container {
+									position: sticky;
+								      display: flex;
+								      align-items: center; /* Align items vertically center */
+								      justify-content: space-between; /* Space between brand and search container */
+								      background-color:	darkblue;
+								      padding: 10px 20px; /* Padding around the container */
+									  width:100%;
+								    }
+									.search-container {
+									    display: flex; /* Flexbox layout */
+									    align-items: center; /* Center items vertically */
+									    gap: 10px; /* Space between elements */
+										
+										
+									  }
+
+									  .search-container .search {
+									  
+									    height: 45px; /* Height of the input box */
+									    font-size: 16px; /* Font size of the text */
+									    border: 1px solid #ccc; /* Border around the input */
+									    border-radius: 10px; /* Rounded corners */
+										margin-left: -20%;
+										width: 250px;
+									 
+									  }
+
+									  .search-container .live-button {
+										background-color: #d9534f; /* Dark background color for buttons */
+																				     color: white; /* Text color */
+																				     border: none; /* Remove default button border */
+																				     padding: 10px 20px; /* Padding inside buttons */
+																				     border-radius: 5px; /* Rounded corners */
+																				     font-size: 16px; /* Font size for text */
+																				     display: flex; /* Flexbox for layout inside button */
+																				     align-items: center; /* Center items vertically */
+																				     cursor: pointer; /* Pointer cursor on hover */
+																					 height: 45px;
+																					 }
+
+									  .search-container .live-button i {
+									    margin-right: 5px; /* Space between icon and text */
+									  }
+									
+									  .search-container .live-button:hover {
+									    background-color: #0056b3; /* Background color on hover */
+									    color: white; /* Text color on hover */
+									  }
+
+									  .alert {
+									    position: relative; /* Position relative for positioning the notification count */
+									  }
+
+									  #alert-button {
+									    background-color:#d9534f ; /* Remove default button background */
+										color:white;
+									    border: none; /* Remove default button border */
+									    cursor: pointer; /* Pointer cursor on hover */
+									    display: flex; /* Flexbox for layout inside button */
+									    align-items: center; /* Center items vertically */
+										height: 45px;
+										top:7px;
+									  }
+
+									  #notification-icon {
+									    font-size: 20px; /* Font size of the notification icon */
+									    color: white; /* Default color of the icon */
+									    border: 2px solid transparent; /* Default border */
+									    border-radius: 50%; /* Round border */
+									    padding: 5px; /* Space around the icon */
+									    transition: color 0.3s, border-color 0.3s; /* Smooth transition */
+									  }
+
+									  .notification-count {
+									    position: absolute; /* Absolute positioning */
+									    top: -5px; /* Position count above icon */
+									    right: 5px; /* Position count to the right of icon */
+									    background-color: red; /* Background color of the badge */
+									    color: white; /* Text color of the badge */
+									    border-radius: 50%; /* Round badge */
+									    padding: 2px 6px; /* Padding inside badge */
+									    font-size: 12px; /* Font size of the badge text */
+									    font-weight: bold; /* Bold text */
+									    display: flex; /* Flexbox for centering text */
+									    align-items: center; /* Center text vertically */
+									    justify-content: center; /* Center text horizontally */
+									  }
+									  .logo {
+									        background-color: white;
+									        width: 190px;
+									        height: 90px;
+									        margin-left: 25px;
+											margin-top: 20px;
+									        padding: 10px;
+									        border-radius: 15px;
+									        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+									        border: 2px solid #ffffff; /* White border */
+											
+									      }
+										  .button-container {
+										     display: flex;
+										     gap: 10px; /* Space between buttons */
+										   }
+
+										   .panic-button, .logout-button {
+										     background-color: #333; /* Dark background color for buttons */
+										     color: white; /* Text color */
+										     border: none; /* Remove default button border */
+										     padding: 10px 20px; /* Padding inside buttons */
+										     border-radius: 5px; /* Rounded corners */
+										     font-size: 16px; /* Font size for text */
+										     display: flex; /* Flexbox for layout inside button */
+										     align-items: center; /* Center items vertically */
+										     cursor: pointer; /* Pointer cursor on hover */
+											 height: 45px;
+										   }
+
+										   .panic-button {
+										     background-color: #d9534f; /* Red color for Panic button */
+										   }
+
+										   .logout-button {
+										     background-color: #d9534f; /* Blue color for Logout button */
+										   }
+
+										   .panic-button:hover, .logout-button:hover {
+										     opacity: 0.8; /* Slightly transparent on hover */
+										   }
+
+										   .panic-button i, .logout-button i {
+										     margin-right: 8px; /* Space between icon and text */
+										   }
+										   .back-button {
+										       background-color: #0056b3; /* Dark blue background color */
+										       color: #e9ecef; /* Light color for text */
+										       border: none; /* Remove default border */
+										       border-radius: 4px; /* Slightly rounded corners */
+										       padding: 10px 20px; /* Padding inside the button */
+										       font-size: 16px; /* Font size for the text */
+										       cursor: pointer; /* Pointer cursor on hover */
+										       position: absolute; /* Positioning the button */
+										       top: 180px; /* Distance from the top */
+										       right: 20px; /* Distance from the right */
+										       transition: background-color 0.3s, color 0.3s; /* Smooth transitions */
+										   }
+
+										   .back-button:hover {
+										       background-color: #004494; /* Darker blue on hover */
+										       color: #ffffff; /* White text on hover */
+										   }
+										   .user-menu-container {
+										       position:  absolute; /* Positioning the button */
+										       top: 46px;
+										       left: 91%;
+										       color: #ffffff;
+										       font-size: 16px;
+										       cursor: pointer;
+										       z-index: 1000;
+											   padding: 10px 20px; /* Padding inside buttons */
+											   									     border-radius: 5px; /* Rounded corners */
+											   									     font-size: 16px; /* Font size for text */
+											   									     display: flex; /* Flexbox for layout inside button */
+											   									     align-items: center; /* Center items vertically */
+											   									     cursor: pointer; /* Pointer cursor on hover */
+											   										 height: 47px;
+										   }
+
+										   .username {
+										       display: flex;
+										       align-items: center;
+										       background-color: #0056b3;
+										       padding: 10px 15px;
+										       border-radius: 4px;
+										       transition: background-color 0.3s;
+										   }
+
+										   .username:hover {
+										       background-color: #004494;
+										   }
+
+										   .dropdown-menu {
+										       display: none;
+										       position: absolute;
+										       top: 100%; /* Position it below the username */
+										       right: 0;
+										       background-color: #ffffff;
+										       border: 1px solid #ddd;
+										       border-radius: 4px;
+										       box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+										       min-width: 150px;
+										       z-index: 1001;
+										   }
+
+										   .dropdown-menu a,
+										   .dropdown-menu .logout-button {
+										       display: block;
+										       padding: 10px 15px;
+										       color: #333;
+										       text-decoration: none;
+										       background: none;
+										       border: none;
+										       text-align: left;
+										       width: 100%;
+										       cursor: pointer;
+										   }
+
+										   .dropdown-menu a:hover,
+										   .dropdown-menu .logout-button:hover {
+										       background-color: #f1f1f1;
+										       color: #0056b3;
+										   }
+
+										   .dropdown-menu .logout-button {
+										       color: #d9534f; /* Red color for logout button */
+										       font-weight: bold;
+										   }
+
+										   .dropdown-menu .logout-button:hover {
+										       background-color: #f1f1f1;
+										       color: #c9302c; /* Darker red on hover */
+										   }
+
+										   .user-menu-container:hover .dropdown-menu {
+										       display: block;
+										   }
+
+
+																			   
+    </style>
+</head>
+<body>
+	
+	
+
+			
+
+
+	
+
+<div class="nav-container">
+
+	<a class="navbar-brand" href="#">
+	       <img src="THINTURE_IMAGE/Thinture.png" class="logo" alt="FleetTrack Logo">
+	     </a>
+
+	<!-- Form for selecting camera, vehicle ID, and date range -->
+
+	<div class="search-container">
+				   
+				    <input type="text" name="search" class="search" placeholder="Search..." id="searchInput">
+					<button type="menu" class="live-button" id="open">
+						   <i class="fas fa-video"></i> <strong> View Stream</strong>
+						  </button>
+						  <div class="button-container">
+						  				    <button class="panic-button">
+						  				        <i class="fas fa-briefcase"></i> <strong>Immediate Response</strong>
+						  				    </button>
+						  				    
+						  				</div>
+						  <button id="alert-button" class="alert">
+							<i class="fas fa-bell" id="notification-icon"></i><strong>Alert</strong>
+
+						      <span class="notification-count"><strong>6</strong></span> <!-- Replace 5 with your count -->
+						  </button>
+						  <div class="user-menu-container">
+						      <span class="username">ThintureAdmin <i class="fas fa-envelope"></i></span>
+						      <div class="dropdown-menu">
+						          <a href="#settings">Settings</a>
+						          <button class="logout-button">
+						              <i class="fas fa-power-off"></i><strong> Logout</strong>
+						          </button>
+						      </div>
+						  </div>
+
+				</div>
+				
+				</div>
+				<div class="status-buttons">
+					    <button class="status-button all">
+					        5<br>All
+					    </button>
+					    <button class="status-button running">
+					        0<br>Running
+					    </button>
+					    <button class="status-button stop">
+					        2<br>Stop
+					    </button>
+					    <button class="status-button idle">
+					        0<br>Idle
+					    </button>
+					    <button class="status-button inactive">
+					        3<br>Inactive
+					    </button>
+						
+					</div>
+					<button class="back-button">
+					    <i class="fas fa-arrow-left"></i> Back
+					</button>
+					
+	<div id="sideTab">
+	    <a href="javascript:void(0)" class="closebtn" id="closeSideTab">&times;</a>
+
+	    <div id="live-video-section">
+			<button id="closeLiveVideo" class="close-video-btn">&times;</button>
+	        <h4><strong>Live Stream</strong></h4>
+	        <label for="camera-select-live">Select Camera:</label>
+	        <select id="camera-select-live">
+	            <option value="front">Front</option>
+	            <option value="rear">Rear</option>
+	        </select>
+
+	        <button type="button" id="btnLiveStream" >
+	            <i class="fas fa-video"></i> Open Live Stream
+	        </button>
+
+	        <iframe id="video-stream" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen "></iframe>
+	    </div>
+	   
+	    <div id="history-section">
+	        <h4><storng>History</storng></h4>
+	        <div id="history-form">
+	            <label for="camera-select-history">Select Camera:</label>
+	            <select id="camera-select-history">
+	                <option value="front">Front</option>
+	                <option value="rear">Rear</option>
+	            </select>
+
+	            <div style="margin-top: 10px;">
+	                <label for="from-date">From:</label>
+	                <input type="datetime-local" id="from-date">
+
+	                <label for="to-date" style="margin-left: 10px;">To:</label>
+	                <input type="datetime-local" id="to-date">
+	            </div>
+
+	            <button type="button" id="btnSubmitHistory" style="margin-top: 10px;">Submit</button>
+	        </div>
+
+	        <!-- History Video Section -->
+	        <div id="history-video-section" style="display:none;">
+				<button id="closeHistoryVideo" class="close-video-btn">&times;</button>
+	            <iframe id="history-video" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen "></iframe>
+	        </div>
+	    </div>
+	</div>
+	
+
+	<div id="map"></div>
+	
+
+
+	
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([12.9715987, 77.594566], 13);
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 20
+        }).addTo(map);
+
+        // Function to get the car icon based on status
+        function getCarIcon(status) {
+            var ringClass = status === 'N1' ? 'ring-blink-red' : 'ring-blink-green';
+            return L.divIcon({
+                className: 'custom-icon ring-blink ' + ringClass,
+                html: `
+                    <div class="ring-blink">
+                        <img src="${status === 'N1' ? 'THINTURE_IMAGE/red2.png' : 'THINTURE_IMAGE/greencar2.png'}" alt="car-icon" class="car-icon">
+                    </div>
+                `,
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+                popupAnchor: [0, -25]
+            });
+        }
+
+        // Initialize markers storage
+        var carMarkers = {};
+
+        // Function to update car location
+        function updateCarLocation(data) {
+            var { id, lat, lng, status, startPoint, endPoint } = data;
+            var carIcon = getCarIcon(status);
+
+            if (carMarkers[id]) {
+                carMarkers[id].setLatLng([lat, lng]);
+                carMarkers[id].setIcon(carIcon);
+            } else {
+                carMarkers[id] = L.marker([lat, lng], { icon: carIcon }).addTo(map);
+            }
+
+            if (status === 'N2') {
+                getRouteAndAnimate(startPoint, endPoint, id);
+            }
+        }
+
+        // Function to fetch and animate the car along the route
+        function getRouteAndAnimate(start, end, carId) {
+            var osrmURL = `https://router.project-osrm.org/route/v1/driving/${start[1]},${start[0]};${end[1]},${end[0]}?overview=full&geometries=geojson`;
+
+            fetch(osrmURL)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.routes || data.routes.length === 0) {
+                        console.error('No routes found');
+                        return;
+                    }
+
+                    var route = data.routes[0].geometry.coordinates;
+                    var latLngRoute = route.map(coord => [coord[1], coord[0]]);
+
+                    // Add the route as a polyline on the map
+                    L.polyline(latLngRoute, {
+                        color: 'blue',
+                        weight: 5,
+                        opacity: 0.7
+                    }).addTo(map);
+
+                    // Animate the car along the route
+                    if (carMarkers[carId]) {
+                        animateCar(carMarkers[carId], latLngRoute);
+                    } else {
+                        console.error('Car marker not found for ID:', carId);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching route:', error);
+                });
+        }
+
+        function animateCar(carMarker, route) {
+            let index = 0;
+            let startTime = null;
+
+            function moveCar(timestamp) {
+                if (!startTime) startTime = timestamp;
+
+                if (index < route.length - 1) {
+                    let currentPoint = route[index];
+                    let nextPoint = route[index + 1];
+
+                    // Calculate distance and duration to move between points
+                    let distance = map.distance(currentPoint, nextPoint);
+                    let moveDuration = distance / 80 * 1000; // Speed (pixels per second) in milliseconds
+                    let elapsedTime = timestamp - startTime;
+                    let fraction = Math.min(elapsedTime / moveDuration, 1);
+
+                    // Calculate new position
+                    let latLng = [
+                        currentPoint[0] + fraction * (nextPoint[0] - currentPoint[0]),
+                        currentPoint[1] + fraction * (nextPoint[1] - currentPoint[1])
+                    ];
+
+                    // Set marker position and rotation
+                    carMarker.setLatLng(latLng);
+                    carMarker.setIcon(L.divIcon({
+                        className: 'custom-icon ring-blink ring-blink-green',
+                        html: `<div style="transform: rotate(${calculateAngle(currentPoint, nextPoint)}deg);">
+                                <img src="THINTURE_IMAGE/greencar2.png" class="car-icon">
+                            </div>`,
+                        iconSize: [38, 38],
+                        iconAnchor: [19, 19]
+                    }));
+
+                    if (fraction < 1) {
+                        requestAnimationFrame(moveCar);
+                    } else {
+                        startTime = null; // Reset startTime for the next segment
+                        index++;
+                        setTimeout(() => requestAnimationFrame(moveCar), 100); // Adjust delay between segments
+                    }
+                } else {
+                    // Ensure final position is set
+                    carMarker.setLatLng(route[route.length - 1]);
+                    carMarker.setIcon(getCarIcon('N2'));
+                }
+            }
+
+            requestAnimationFrame(moveCar);
+        }
+
+        // Helper function to calculate angle between two points
+        function calculateAngle(startPoint, endPoint) {
+            return Math.atan2(endPoint[1] - startPoint[1], endPoint[0] - startPoint[0]) * 180 / Math.PI;
+        }
+
+        // Function to fetch history data and load video
+        function fetchHistory() {
+            var carId = document.getElementById('car-id').value;
+            var startDate = document.getElementById('start-date').value;
+            var endDate = document.getElementById('end-date').value;
+
+            if (!carId || !startDate || !endDate) {
+                alert('Please fill in all fields.');
+                return;
+            }
+
+            // Log the selected date and time range for verification
+            console.log('Car ID:', carId);
+            console.log('Start Date and Time:', startDate);
+            console.log('End Date and Time:', endDate);
+
+            // Example URL to fetch history data (Replace with your own endpoint)
+            var historyURL = `https://your-api-endpoint.com/history?carId=${carId}&startDate=${startDate}&endDate=${endDate}`;
+
+            fetch(historyURL)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data || !data.videoUrl || !data.route) {
+                        console.error('No video URL or route data found');
+                        return;
+                    }
+
+                    var videoElement = document.getElementById('history-video');
+                    videoElement.src = data.videoUrl;
+                    videoElement.load();
+
+                    // Clear previous route and markers
+                    map.eachLayer(layer => {
+                        if (layer instanceof L.Polyline || layer instanceof L.Marker) {
+                            map.removeLayer(layer);
+                        }
+                    });
+
+                    // Plot the route
+                    var route = data.route.map(coord => [coord.lat, coord.lng]);
+                    L.polyline(route, {
+                        color: 'blue',
+                        weight: 5,
+                        opacity: 0.7
+                    }).addTo(map);
+
+                    // Add markers for each point in the route
+                    route.forEach((point, index) => {
+                        L.marker(point, {
+                            icon: getCarIcon('N2')
+                        }).addTo(map);
+                    });
+
+                    // Adjust map view to fit route
+                    if (route.length) {
+                        var bounds = L.latLngBounds(route);
+                        map.fitBounds(bounds);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching history data:', error);
+                });
+        }
+
+        // Example to initialize a car marker and animate
+        updateCarLocation({
+            id: 'car2',
+            lat: 12.965,
+            lng: 77.605,
+            status: 'N2',
+            startPoint: [12.965, 77.605],
+            endPoint: [12.975, 77.615]
+        });
+		function showTab(tabId) {
+			           document.querySelectorAll('.tab-pane').forEach(pane => {
+			               pane.classList.remove('active');
+			           });
+			           document.getElementById(tabId).classList.add('active');
+			       }
+
+			       document.addEventListener('DOMContentLoaded', function() {
+			           let history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+			           let datalist = document.getElementById('searchHistory');
+			           history.forEach(id => {
+			               let option = document.createElement('option');
+			               option.value = id;
+			               datalist.appendChild(option);
+			           });
+			       });
+
+			       function updateSearchHistory(deviceID) {
+			           let history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+			           if (!history.includes(deviceID)) {
+			               history.push(deviceID);
+			               localStorage.setItem('searchHistory', JSON.stringify(history));
+			           }
+			           let datalist = document.getElementById('searchHistory');
+			           datalist.innerHTML = "";
+			           history.forEach(id => {
+			               let option = document.createElement('option');
+			               option.value = id;
+			               datalist.appendChild(option);
+			           });
+			       }
+
+			       function showHistoryForDevice(deviceID) {
+			           document.querySelectorAll('.tab-pane').forEach(pane => {
+			               pane.style.display = 'none';
+			           });
+
+			           var historyTab = document.getElementById('history');
+			           if (historyTab) {
+			               historyTab.style.display = 'block';
+			               var historyContent = getHistoryForDevice(deviceID);
+			               historyTab.innerHTML = `
+			                   <h2>History for Device ID: ${deviceID}</h2>
+			                   <div class="history-content">${historyContent}</div>
+			               `;
+			           }
+			       }
+
+			       function getHistoryForDevice(deviceID) {
+			           var historyData = {
+			               'device1': 'Device 1 History Data',
+			               'device2': 'Device 2 History Data',
+			               'device3': 'Device 3 History Data',
+			               'device4': 'Device 4 History Data'
+			           };
+			           return historyData[deviceID] || 'No history data available for this device.';
+			       }
+
+			       function clearSearchHistory() {
+			           localStorage.removeItem('searchHistory');
+			           document.getElementById('searchHistory').innerHTML = "";
+			       }
+
+			       function openNav() {
+			           document.getElementById("sidebar").style.width = "350px";
+			           showTab('search');
+			       }
+
+			       function closeNav() {
+			           document.getElementById("sidebar").style.width = "0";
+			       }
+
+			       function resetSidebar() {
+			           document.getElementById("sidebar").style.width = "-250px";
+			       }
+
+			       function openTab(evt, tabName) {
+			           const tabcontent = document.querySelectorAll(".tab-content");
+			           tabcontent.forEach(content => content.style.display = "none");
+
+			           const tablinks = document.querySelectorAll(".tabs a");
+			           tablinks.forEach(link => link.classList.remove("active"));
+
+			           document.getElementById(tabName).style.display = "block";
+			           evt.currentTarget.classList.add("active");
+			       }
+				   document.addEventListener('DOMContentLoaded', function() {
+				       // Assuming you get the user type from some source
+				       // For example, from a global variable, API call, or session
+				       var userType = 'dealer'; // Replace with actual user type retrieval logic
+
+				       // List of allowed user types
+				       var allowedUserTypes = ['dealer', 'admin', 'superadmin'];
+
+				       // Show the button if the user type is in the allowed list
+				       if (allowedUserTypes.includes(userType)) {
+				           document.getElementById('back-button').style.display = 'block';
+				       }
+				   });
+				   // Add the cluster group to the map
+				   		        map.addLayer(markerClusterGroup);
+
+				   		        // Fetch and update markers dynamically via AJAX
+				   		        fetch('/gps/locations')
+				   		            .then(response => response.json())
+				   		            .then(data => {
+				   		                data.forEach(location => addOrUpdateMarker(location));
+				   		            })
+				   		            .catch(error => console.error('Error fetching initial locations:', error));
+
+				   		        // WebSocket to receive real-time location updates
+				   		        var socket = new SockJS('/gs-guide-websocket');
+				   		        var stompClient = Stomp.over(socket);
+
+				   		        stompClient.connect({}, function (frame) {
+				   		            stompClient.subscribe('/topic/location-updates', function (locationUpdate) {
+				   		                var data = JSON.parse(locationUpdate.body);
+				   		                addOrUpdateMarker(data);
+				   		            });
+				   		        }, function (error) {
+				   		            console.error('Error connecting to WebSocket:', error);
+				   		        });
+			   		   </script>
+					   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+					       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>						 						  
+	
+	document.getElementById('open').addEventListener('click', function () {
+	    // Show the side tab and adjust layout
+	    document.getElementById('sideTab').style.height = '50%'; // Adjust height as needed
+	    document.getElementById('sideTab').style.display = 'flex'; // Ensure the side tab is visible
+	    document.getElementById('live-video-section').style.display = 'block'; // Ensure the live video section is visible
+	    document.getElementById('history-section').style.display = 'block'; // Ensure the history section is visible
+	});
+
+	document.getElementById('btnSubmitHistory').addEventListener('click', function () {
+	    var camera = document.getElementById('camera-select-history').value;
+	    var fromDate = document.getElementById('from-date').value;
+	    var toDate = document.getElementById('to-date').value;
+
+	    console.log('History Camera:', camera);
+	    console.log('History From Date:', fromDate);
+	    console.log('History To Date:', toDate);
+
+	    // Display the history video section with the appropriate camera stream
+	    document.getElementById('history-video-section').style.display = 'block';
+	    let historyUrl = `https://www.youtube.com/embed/MpoSEvSqRqg?camera=${camera}&from=${fromDate}&to=${toDate}`;
+	    document.getElementById('history-video').src = historyUrl;
+	});
+
+	document.getElementById('btnLiveStream').addEventListener('click', function () {
+	    var camera = document.getElementById('camera-select-live').value;
+
+	    console.log('Live Stream Camera:', camera);
+
+	    let liveStreamUrl;
+	    if (camera === 'front') {
+	        liveStreamUrl = `https://www.youtube.com/embed/MpoSEvSqRqg`;
+	    } else if (camera === 'rear') {
+	        liveStreamUrl = `https://www.youtube.com/embed/RearCameraStreamURL`;
+	    } else {
+	        console.error('Unknown camera selected');
+	        return;
+	    }
+
+	    document.getElementById('live-video-section').style.display = 'block';
+	    document.getElementById('video-stream').src = liveStreamUrl;
+	});
+
+	document.getElementById('closeSideTab').addEventListener('click', function () {
+	    document.getElementById('sideTab').style.height = '0'; // Hide the side tab
+	    document.getElementById('sideTab').style.display = 'none'; // Ensure the side tab is hidden
+	});
+	
+
+	// Example data for testing
+	var exampleData = {
+	    id: 'car2',
+	    lat: 12.9715987,
+	    lng: 77.594566,
+	    status: 'N1',
+	    startPoint: [12.9715917, 77.594516],
+	    endPoint: [12.976, 77.605]
+	};
+	updateCarLocation(exampleData);
+	var map = L.map('map').setView([12.9716, 77.5946], 13);
+
+	// Add a tile layer to the map
+	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	    maxZoom: 19,
+	}).addTo(map);
+
+	// Function to update the map with the vehicle's location
+	function updateCarLocation(data) {
+	    var marker = L.marker([data.lat, data.lng]).addTo(map);
+	    marker.bindPopup(`
+	        <strong>Tracker Name:</strong> ${data.id}<br>
+	        <strong>Status:</strong> ${data.status}<br>
+	        <strong>Alarm Time:</strong> ${data.alarmTime}
+	    `).openPopup();
+	}
+
+	// Example usage to update map with car location
+	var exampleData = {
+	    id: 'car1',
+	    lat: 12.9715987,
+	    lng: 77.594566,
+	    status: 'N1',
+	    alarmTime: '2023-11-25 10:28:48',
+	    startPoint: [12.9715917, 77.594516],
+	    endPoint: [12.976, 77.605]
+	};
+	cars.forEach(function(car) {
+	            L.marker([car.lat, car.lng], { icon: carIcon })
+	                .bindPopup("<b>" + car.info + "</b>", { className: 'custom-popup' })
+	                .addTo(map);
+	        });
+	// Assuming you have a map instance created somewhere, like this:
+	var map = L.map('map').setView([12.9715987, 77.594566], 13);
+
+	// Custom car icon
+	var carIcon = L.icon({
+	    iconUrl: 'THINTURE_IMAGE/redcar2.png', // Replace with your car icon path
+	    iconSize: [32, 37], // Size of the icon
+	    iconAnchor: [16, 37], // Point of the icon which will correspond to marker's location
+	    popupAnchor: [0, -37] // Point from which the popup should open relative to the iconAnchor
+	});
+
+	// Function to update car location and add a popup
+	function updateCarLocation(data) {
+	    var marker = L.marker([data.lat, data.lng], { icon: carIcon }).addTo(map);
+	    
+	    // Creating the content for the popup
+	    var popupContent = `
+	        <b>Car ID:</b> ${data.id}<br>
+	        <b>Status:</b> ${data.status}<br>
+	        <b>Alarm Time:</b> ${data.alarmTime}<br>
+	        <b>Start Point:</b> [${data.startPoint[0]}, ${data.startPoint[1]}]<br>
+	        <b>End Point:</b> [${data.endPoint[0]}, ${data.endPoint[1]}]
+	    `;
+	    
+	    // Binding the popup to the marker
+	    marker.bindPopup(popupContent).openPopup();
+	}
+
+	updateCarLocation(exampleData);
+
+	// Populate the event report table
+	var eventData = [
+	    { tracker: 'QSG_MD101', alarmTime: '2023-11-25 10:28:48', alarmInfo: 'Not wearing a seatbelt', gpsTime: '2023-11-25 10:28:12', receivingTime: '2023-11-25 10:28:12' },
+	    // Add more events here
+	];
+
+	var tableBody = document.querySelector('#event-report tbody');
+	eventData.forEach(event => {
+	    var row = document.createElement('tr');
+	    row.innerHTML = `<td>${event.tracker}</td><td>${event.alarmTime}</td><td>${event.alarmInfo}</td><td>${event.gpsTime}</td><td>${event.receivingTime}</td>`;
+	    tableBody.appendChild(row);
+	});
+
+	document.getElementById('closeLiveVideo').addEventListener('click', function () {
+	    document.getElementById('live-video-section').style.display = 'none';
+	    document.getElementById('video-stream').src = ''; // Stop the live stream
+	});
+
+	document.getElementById('closeHistoryVideo').addEventListener('click', function () {
+	    document.getElementById('history-video-section').style.display = 'none';
+	    document.getElementById('history-video').src = ''; // Stop the history video
+	});
+
+	function goBack() {
+	       window.history.back();
+	   }
+	   document.addEventListener('click', function(event) {
+	       var dropdown = document.querySelector('.dropdown-menu');
+	       var username = document.querySelector('.username');
+	       
+	       if (!username.contains(event.target)) {
+	           dropdown.style.display = 'none';
+	       } else {
+	           dropdown.style.display = 'block';
+	       }
+	   });
+
+	   document.addEventListener('DOMContentLoaded', function() {
+	              document.querySelector('.logout-button').addEventListener('click', function() {
+	                  alert('Logging out...');
+	              });
+	          });
+			  
+
+</script>
+<script>
+        // Ensure the script runs after the DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('alert-button').addEventListener('click', function() {
+                // Redirect to alerts.html
+                window.location.href = 'alerts.html';
+            });
+        });
+    </script>
+</body>
+</html>
+
