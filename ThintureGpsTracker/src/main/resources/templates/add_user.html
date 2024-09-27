@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THINTURE - Add New Dealer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('THINTURE_IMAGE/background4.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 20%;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 30px;
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #e2e2e2, #ffffff);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 10px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"],
+        .form-group input[type="password"] {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+			width: 60%;
+        }
+
+		.form-group input[type="submit"] {
+		    width: auto; /* Adjust width to content size */
+		    padding: 12px 20px; /* Adjust padding as needed */
+		    background-color: #007bff;
+		    color: white;
+		    border: none;
+		    border-radius: 10px;
+		    font-size: 16px;
+		    cursor: pointer;
+		    transition: background-color 0.3s ease;
+		  
+		    right: 80px; /* Align to the right edge of the container */
+		    bottom: 0; /* Align to the bottom of the form group */
+			
+		}
+        .form-group input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 12px 20px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+	<div class="container">
+	    <h2>Add New User</h2>
+	    <a href="/dashboard" class="back-btn">Back</a> <!-- Redirects to dashboard -->
+	    <form id="addUserForm"> <!-- Added id to form for easier targeting -->
+	        <div class="form-group">
+	            <label for="companyName">Company Name</label>
+	            <input type="text" id="companyName" name="companyName" required>
+	        </div>
+	        <div class="form-group">
+	            <label for="address">Address</label>
+	            <input type="text" id="address" name="address" required>
+	        </div>
+	        <div class="form-group">
+	            <label for="email">Email</label>
+	            <input type="email" id="email" name="email" required>
+	        </div>
+	        <div class="form-group">
+	            <label for="phone">Phone</label>
+	            <input type="text" id="phone" name="phone" required>
+	        </div>
+	        <div class="form-group">
+	            <label for="country">Country</label>
+	            <input type="text" id="country" name="country" required>
+	        </div>
+	        <div class="form-group">
+	            <label for="password">Password</label>
+	            <input type="password" id="password" name="password" required>
+	        </div>
+	        <div class="form-group">
+	            <label for="c_password">Confirm Password</label>
+	            <input type="password" id="c_password" name="c_password" required>
+	        </div>
+
+	        <div class="form-group">
+	            <input type="submit" value="Add User">
+	        </div>
+	    </form>
+	</div>
+
+	<script>
+	    document.addEventListener('DOMContentLoaded', function() {
+	        const form = document.getElementById('addUserForm'); // Use the form id here
+	        form.addEventListener('submit', function(event) {
+	            event.preventDefault(); // Prevent form from submitting traditionally
+
+	            const userrData = {
+	                companyName: document.getElementById('companyName').value,
+	                address: document.getElementById('address').value,
+	                email: document.getElementById('email').value,
+	                phone: document.getElementById('phone').value,
+	                country: document.getElementById('country').value,
+	                password: document.getElementById('password').value
+	            };
+
+	            const confirmPassword = document.getElementById('c_password').value;
+
+	            if (userrData.password !== confirmPassword) {
+	                alert("Passwords do not match!");
+	                return;
+	            }
+
+	            fetch('/users/add', { // Ensure this is the correct endpoint
+	                method: 'POST',
+	                headers: {
+	                    'Content-Type': 'application/json'
+	                },
+	                body: JSON.stringify(userrData)
+	            })
+	            .then(response => {
+	                if (response.ok) {
+	                    alert('User added successfully!');
+	                    window.location.href = "/dashboard"; // Redirects to the dashboard
+	                } else {
+	                    return response.text().then(text => { throw new Error(text) });
+	                }
+	            })
+	            .catch(error => alert('Error: ' + error.message));
+	        });
+	    });
+	</script>
+</body>
+</html>

@@ -461,6 +461,66 @@ position: sticky;
 										   .user-menu-container:hover .dropdown-menu {
 										       display: block;
 										   }
+										   
+										   
+										   
+										   #replayPanel {
+										       font-family: Arial, sans-serif;
+										   }
+
+										   #replayPanel input[type="date"],
+										   #replayPanel select,
+										   #replayPanel button {
+										       margin: 5px;
+										       padding: 5px;
+										   }
+
+										   #replaySlider {
+										       width: 80%;
+										       margin: 10px 0;
+										   }
+
+										   #closeReplayPanel {
+										       background: none;
+										       border: none;
+										       font-size: 20px;
+										       cursor: pointer;
+										   }
+										   
+										   #replay-panel {
+										       display: none; /* Hidden by default */
+										       position: fixed; /* Fixed position at the bottom */
+										       bottom: 0; /* Align to the bottom */
+										       left: 50%; /* Center horizontally */
+										       transform: translateX(-50%); /* Center horizontally */
+										       background-color: white;
+										       padding: 20px;
+										       border-radius: 8px;
+										       box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+										       width: 80%; /* Adjust width as needed */
+										       z-index: 1000; /* Ensure it appears above other elements */
+										   }
+
+
+						
+										   #vehicle-details {
+										           max-width: 300px;
+										           z-index: 1000; /* Ensure it appears above other elements */
+										       }
+										       #search-input {
+										           padding: 5px;
+										           margin-right: 5px;
+										       }
+										       #search-button {
+										           padding: 5px 10px;
+										           background-color: #4CAF50;
+										           color: white;
+										           border: none;
+										           border-radius: 5px;
+										           cursor: pointer;
+										       }
+										   
+										   				   
     </style>
 </head>
 <body>
@@ -503,7 +563,16 @@ position: sticky;
 	    <button class="status-button stop">0<br>Stop</button>
 	    <button class="status-button idle">0<br>Idle</button>
 	    <button class="status-button inactive">0<br>Inactive</button>
+		
 	</div>
+	<div class="header">
+	    <!-- Existing buttons and content -->
+	    <input type="text" id="search-input" placeholder="Enter Device ID">
+	    <button id="search-button" onclick="searchVehicleById()">Search</button>
+	</div>
+
+	<!-- Vehicle details panel (if not already present) -->
+	<div id="vehicle-details" style="display: none; position: absolute; top: 100px; right: 50px; background-color: white; border: 1px solid black; padding: 10px;"></div>
 
 
     <!-- Side Tab for Video -->
@@ -550,334 +619,565 @@ position: sticky;
     <div class="content">
         <div id="map"></div>
     </div>
+	<!-- HTML Code -->
+	<input type="text" id="device-id-input" placeholder="Enter Device ID" style="display: none;">
 
-    <!-- Scripts for Map and Functions -->
-	<script>
-	    // Initialize the map
-	    var map = L.map('map').setView([12.225284, 79.074699], 5);
+	<!-- Replay Panel -->
+	    <div id="replay-panel" style="display: none;">
+	        <div>
+	            <label for="from-date">From:</label>
+	            <input type="date" id="from-date">
+	            <label for="to-date">To:</label>
+	            <input type="date" id="to-date">
+	            <button id="show-replay">Show</button>
+	        </div>
+	        <div>
+	            <label>
+	                <input type="checkbox" id="show-trail"> Trail
+	            </label>
+	            <select id="replay-speed">
+	                <option value="normal">Normal</option>
+	                <option value="fast">Fast</option>
+	                <option value="slow">Slow</option>
+	            </select>
+	        </div>
+	        <div>
+	            <button id="play-replay">Play</button>
+	            <input type="range" id="replay-slider" min="0" max="100" value="0" style="width: 70%;">
+	            <span id="replay-time">00:00:00</span>
+	        </div>
+	    </div>
+	    
+	    <div id="map"></div>
 
-	    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-	        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-	    }).addTo(map);
+	    <script>
+	        // Initialize the map
+	        var map = L.map('map').setView([12.225284, 79.074699], 5);
 
-	    // Marker cluster group
-	    var markers = L.markerClusterGroup({
-	        maxClusterRadius: 50,
-	        disableClusteringAtZoom: 16
-	    });
+	        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+	        }).addTo(map);
 
-	    map.addLayer(markers);
-
-	    // Dictionary to hold markers and route layers by deviceID
-	    var markerDict = {};
-	    var routeLayers = {};
-
-	    // Function to get the car icon based on the status
-	    function getCarIcon(status) {
-	        var ringClass = status === 'N2' ? 'ring-blink-red' : 'ring-blink-green';
-	        return L.divIcon({
-	            className: 'custom-icon ring-blink ' + ringClass,
-	            html: `
-	                <div class="ring-blink">
-	                    <img src="${status === 'N2' ? 'THINTURE_IMAGE/red2.png' : 'THINTURE_IMAGE/greencar2.png'}" alt="car-icon" style="width: 38px; height: 38px;">
-	                </div>
-	            `,
-	            iconSize: [38, 38],
-	            iconAnchor: [19, 19],
-	            popupAnchor: [0, -19]
+	        var markers = L.markerClusterGroup({
+	            maxClusterRadius: 50,
+	            disableClusteringAtZoom: 16
 	        });
-	    }
+	        map.addLayer(markers);
 
-	    // Function to create or update a marker
-	    function createOrUpdateMarker(vehicle) {
+	        var carMarkers = {};
+	        var markerDict = {};
+	        var liveDevices = new Set();
+	        var deviceLastUpdate = {};
+	        var inactivityThreshold = 30000;
+	        var polyline;
+
+	        function getCarIcon(status) {
+	            var ringClass = status === 'N2' ? 'ring-blink-red' : 'ring-blink-green';
+	            return L.divIcon({
+	                className: 'custom-icon ring-blink ' + ringClass,
+	                html: `<div class="ring-blink">
+	                          <img src="${status === 'N2' ? 'THINTURE_IMAGE/red2.png' : 'THINTURE_IMAGE/greencar2.png'}" 
+	                          alt="car-icon" style="width: 38px; height: 38px;">
+	                       </div>`,
+	                iconSize: [38, 38],
+	                iconAnchor: [19, 19],
+	                popupAnchor: [0, -19]
+	            });
+	        }
+
+	        function fetchAndUpdateVehicleData(url, isLive = false) {
+	            fetch(url)
+	                .then(response => {
+	                    if (!response.ok) {
+	                        throw new Error('Network response was not ok ' + response.statusText);
+	                    }
+	                    return response.json();
+	                })
+	                .then(data => {
+	                    if (Array.isArray(data)) {
+	                        data.forEach(vehicle => {
+	                            createOrUpdateMarker(vehicle, isLive);
+	                        });
+	                    } else {
+	                        console.error('Data is not an array or no data available');
+	                    }
+	                })
+	                .catch(error => console.error('Error fetching vehicle data:', error));
+	        }
+
+	        function onShowButtonClick() {
+	            console.log('Show button clicked');
+	            const deviceId = getSelectedDeviceId();
+	            if (deviceId) {
+	                console.log(`Device ID selected: ${deviceId}`);
+	                replayVehicle(deviceId);
+	            } else {
+	                console.error('No device ID found.');
+	            }
+	        }
+
+	        function getSelectedDeviceId() {
+	            const selectedMarker = Object.values(markerDict).find(marker => marker.isSelected);
+	            if (selectedMarker) {
+	                console.log(`Selected Marker Device ID: ${selectedMarker.deviceId}`);
+	            } else {
+	                console.warn('No marker is selected.');
+	            }
+	            return selectedMarker ? selectedMarker.deviceId : null;
+	        }
+
+	        function replayVehicle(deviceId) {
+	            console.log(`Starting replay for vehicle: ${deviceId}`);
+	            document.getElementById('replay-panel').style.display = 'block';
+	            const fromDateInput = document.getElementById('from-date').value.trim();
+	            const toDateInput = document.getElementById('to-date').value.trim();
+
+	            if (!fromDateInput || !toDateInput) {
+	                alert('Please select both From and To dates.');
+	                console.warn('Date inputs are missing.');
+	                return;
+	            }
+
+	            const fromDate = new Date(fromDateInput).toISOString();
+	            const toDate = new Date(toDateInput).toISOString();
+	            console.log(`Fetching data from: ${fromDate} to: ${toDate}`);
+
+	            fetch(`/api/history/${deviceId}?from=${fromDate}&to=${toDate}`)
+	                .then(response => {
+	                    if (!response.ok) {
+	                        throw new Error('Network response was not ok ' + response.statusText);
+	                    }
+	                    return response.json();
+	                })
+	                .then(data => {
+	                    if (Array.isArray(data) && data.length > 0) {
+	                        populateReplayPanel(data);
+	                        window.replayData = data;
+	                        console.log('Replay data is set:', window.replayData);
+	                    } else {
+	                        alert('No historical data available for this vehicle.');
+	                        console.error('No historical data returned from the API.');
+	                    }
+	                })
+	                .catch(error => console.error(`Error fetching historical data for ${deviceId}:`, error));
+	        }
+
+	        function startReplayAction() {
+	            console.log('Play button clicked');
+	            const replayData = window.replayData;
+	            if (replayData) {
+	                console.log('Replay data available:', replayData);
+	                startReplay(replayData);
+	            } else {
+	                console.error('No replay data available. Please load data first.');
+	                alert('Please click the "Show" button to load data before playing.');
+	            }
+	        }
+
+	        function populateReplayPanel(data) {
+	            const fromDate = document.getElementById('from-date');
+	            const toDate = document.getElementById('to-date');
+	            const replayTime = document.getElementById('replay-time');
+
+	            fromDate.value = new Date(data[0].timestamp).toISOString().substring(0, 10);
+	            toDate.value = new Date(data[data.length - 1].timestamp).toISOString().substring(0, 10);
+	            replayTime.textContent = "00:00:00";
+	            console.log('Replay panel populated with data range.');
+	        }
+
+	        function startReplay(historyData) {
+	            console.log('Starting replay with data:', historyData);
+	            map.eachLayer(function (layer) {
+	                if (layer instanceof L.Marker || layer instanceof L.Polyline) {
+	                    map.removeLayer(layer);
+	                }
+	            });
+
+	            let currentIndex = 0;
+	            const replaySpeed = 1000;
+	            const routeCoordinates = [];
+
+	            historyData.forEach(data => {
+	                routeCoordinates.push([data.latitude, data.longitude]);
+	            });
+
+	            polyline = L.polyline(routeCoordinates, { color: 'blue', weight: 5, opacity: 0.7 }).addTo(map);
+
+	            function updatePosition() {
+	                if (currentIndex >= historyData.length) {
+	                    console.log('Replay finished');
+	                    clearInterval(replayInterval);
+	                    return;
+	                }
+
+	                const vehicle = historyData[currentIndex];
+	                if (currentIndex < historyData.length - 1) {
+	                    const nextVehicle = historyData[currentIndex + 1];
+	                    getRouteAndAnimate([vehicle.latitude, vehicle.longitude], [nextVehicle.latitude, nextVehicle.longitude], vehicle.deviceId);
+	                }
+	                currentIndex++;
+	            }
+
+	            const replayInterval = setInterval(updatePosition, replaySpeed);
+	            console.log('Replay started.');
+	        }
+
+	        function getRouteAndAnimate(start, end, carId) {
+	            console.log('Fetching route for animation...');
+	            var osrmURL = `https://router.project-osrm.org/route/v1/driving/${start[1]},${start[0]};${end[1]},${end[0]}?overview=full&geometries=geojson`;
+
+	            fetch(osrmURL)
+	                .then(response => response.json())
+	                .then(data => {
+	                    if (!data.routes || data.routes.length === 0) {
+	                        console.error('No routes found');
+	                        return;
+	                    }
+
+	                    var route = data.routes[0].geometry.coordinates;
+	                    var latLngRoute = route.map(coord => [coord[1], coord[0]]);
+
+	                    L.polyline(latLngRoute, {
+	                        color: 'blue',
+	                        weight: 5,
+	                        opacity: 0.7
+	                    }).addTo(map);
+
+	                    if (carMarkers[carId]) {
+	                        animateCar(carMarkers[carId], latLngRoute);
+	                    } else {
+	                        carMarkers[carId] = L.marker(latLngRoute[0], { icon: getCarIcon('N1') }).addTo(map);
+	                        animateCar(carMarkers[carId], latLngRoute);
+	                    }
+	                })
+	                .catch(error => console.error('Error fetching route:', error));
+	        }
+
+	        function animateCar(carMarker, route) {
+	            console.log('Starting car animation along the route.');
+	            let index = 0;
+	            let startTime = null;
+
+	            function moveCar(timestamp) {
+	                if (!startTime) startTime = timestamp;
+
+	                if (index < route.length - 1) {
+	                    let currentPoint = route[index];
+	                    let nextPoint = route[index + 1];
+	                    let distance = map.distance(currentPoint, nextPoint);
+	                    let moveDuration = distance / 100 * 1000;
+	                    let elapsedTime = timestamp - startTime;
+	                    let fraction = Math.min(elapsedTime / moveDuration, 1);
+
+	                    let latLng = [
+	                        currentPoint[0] + fraction * (nextPoint[0] - currentPoint[0]),
+	                        currentPoint[1] + fraction * (nextPoint[1] - currentPoint[1])
+	                    ];
+
+	                    carMarker.setLatLng(latLng);
+	                    carMarker.setIcon(L.divIcon({
+	                        className: 'custom-icon ring-blink ring-blink-green',
+	                        html: `<div style="transform: rotate(${calculateAngle(currentPoint, nextPoint)}deg);">
+	                                <img src="THINTURE_IMAGE/greencar2.png" class="car-icon">
+	                            </div>`,
+	                        iconSize: [55, 55],
+	                        iconAnchor: [25, 25]
+	                    }));
+
+	                    if (fraction < 1) {
+	                        requestAnimationFrame(moveCar);
+	                    } else {
+	                        startTime = null;
+	                        index++;
+	                        setTimeout(() => requestAnimationFrame(moveCar), 20);
+	                    }
+	                } else {
+	                    carMarker.setLatLng(route[route.length - 1]);
+	                    carMarker.setIcon(getCarIcon('N2'));
+	                    console.log('Car animation finished.');
+	                }
+	            }
+
+	            requestAnimationFrame(moveCar);
+	        }
+
+	        function calculateAngle(startPoint, endPoint) {
+	            return Math.atan2(endPoint[1] - startPoint[1], endPoint[0] - startPoint[0]) * 180 / Math.PI;
+	        }
+
+	        // Add event listeners
+	        document.getElementById('show-replay').addEventListener('click', onShowButtonClick);
+	        document.getElementById('play-replay').addEventListener('click', startReplayAction);
+	    
+		
+		
+		
+		
+
+	    function createOrUpdateMarker(vehicle, isLive = false) {
 	        if (!vehicle.latitude || !vehicle.longitude) {
 	            console.error('Invalid latitude or longitude for vehicle:', vehicle);
 	            return;
 	        }
+			
+			
+			
+			
+
+	        var deviceId = vehicle.deviceId || 'Unknown';
+
+	        console.log('Creating or updating marker for vehicle ID:', deviceId);
 
 	        var icon = getCarIcon(vehicle.status);
 	        var popupContent = `
-	            <strong>Device ID:</strong> ${vehicle.deviceId || 'Unknown'}<br>
-	            <strong>Timestamp:</strong> ${vehicle.timestamp}<br>
-	            <strong>Address:</strong> ${vehicle.address || 'Address not available'}<br>
-	            <strong>Latitude:</strong> ${vehicle.latitude}<br>
-	            <strong>Longitude:</strong> ${vehicle.longitude}
+	            <div style="min-width: 200px;">
+	                <strong>Device ID:</strong> ${deviceId}<br>
+	                <strong>Timestamp:</strong> ${vehicle.timestamp}<br>
+	                <strong>Address:</strong> ${vehicle.address || 'Address not available'}<br>
+	                <strong>Latitude:</strong> ${vehicle.latitude}<br>
+	                <strong>Longitude:</strong> ${vehicle.longitude}<br>
+	                <strong>Status:</strong> ${vehicle.status === 'N2' ? 'Ignition Off' : 'Ignition On'}<br>
+	                <strong>Type:</strong> ${isLive ? 'Live' : 'Last Known'}
+	                <div style="margin-top: 10px; text-align: center;">
+	                    <button style="padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;" 
+	                    onclick="replayVehicle('${deviceId}')">Replay</button>
+	                    <button style="padding: 5px 10px; background-color: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer;" 
+	                    onclick="showVehicleDetails('${deviceId}')">Details</button>
+	                </div>
+	            </div>
 	        `;
 
-	        if (markerDict[vehicle.deviceId]) {
-	            // Update existing marker
-	            markerDict[vehicle.deviceId].setLatLng([vehicle.latitude, vehicle.longitude])
+	        if (markerDict[deviceId]) {
+	            markerDict[deviceId].setLatLng([vehicle.latitude, vehicle.longitude])
 	                .setIcon(icon)
 	                .bindPopup(popupContent)
 	                .openPopup();
 	        } else {
-	            // Create new marker
-	            markerDict[vehicle.deviceId] = L.marker([vehicle.latitude, vehicle.longitude], { icon: icon })
-	                .bindPopup(popupContent);
-	            markers.addLayer(markerDict[vehicle.deviceId]);
+	            markerDict[deviceId] = L.marker([vehicle.latitude, vehicle.longitude], { icon: icon })
+	                .bindPopup(popupContent)
+	                .on('click', function () {
+	                    showVehicleDetails(deviceId);
+	                })
+	                .addTo(map)
+	                .openPopup();
+	            markers.addLayer(markerDict[deviceId]);
 	        }
+
+	        deviceLastUpdate[deviceId] = Date.now();
 	    }
 
-	    // Fetch all vehicle data and update markers
-	    fetch('/api/vehicles/last-known')
-	        .then(response => response.json())
-	        .then(data => {
-	            console.log('Fetched data:', data); // Log the fetched data
+	    fetchAndUpdateVehicleData('/api/vehicles/last-known');
 
-	            if (Array.isArray(data)) {
-	                data.forEach(vehicle => {
-	                    console.log('Processing vehicle:', vehicle); // Log each vehicle data
-	                    createOrUpdateMarker(vehicle); // Create or update marker for each vehicle
-	                });
-	            } else {
-	                console.error('Data is not an array or no data available');
-	            }
-	        })
-	        .catch(error => console.error('Error fetching vehicle data:', error));
-			// WebSocket connection for real-time updates
-			    var socket = new SockJS('/gs-guide-websocket');
-			    var stompClient = Stomp.over(socket);
+		// Establish the WebSocket connection
+		var socket = new SockJS('/gs-guide-websocket');
+		var stompClient = Stomp.over(socket);
 
-			    stompClient.connect({}, function (frame) {
-			        stompClient.subscribe('/topic/location-updates', function (locationUpdate) {
-			            var data = JSON.parse(locationUpdate.body);
+		// Function to initialize WebSocket connection and handle real-time updates
+		function initializeWebSocket() {
+		    stompClient.connect({}, function (frame) {
+		        console.log('Connected to WebSocket:', frame);
 
-			            // Update marker with the new data received via WebSocket
-			            createOrUpdateMarker(data);
+		        // Subscribe to the location updates topic
+		        stompClient.subscribe('/topic/location-updates', function (locationUpdate) {
+		            var data = JSON.parse(locationUpdate.body);
+		            console.log('Received WebSocket data:', data);
 
-			            // Optionally center the map on the updated marker
-			            map.setView([parseFloat(data.latitude), parseFloat(data.longitude)], 13);
-			        });
-			    });
-	</script>
+		            if (!data.deviceId || data.deviceId.trim() === "") {
+		                console.warn('Received update with missing deviceId:', data);
+		                data.deviceId = 'Unknown';
+		            }
 
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script>
-	    // Function to count all vehicles
-	    function updateVehicleCount() {
-	        $.ajax({
-	            url: '/api/vehicles/countAll',
-	            method: 'GET',
-	            success: function(count) {
-	                console.log("Fetched total vehicle count:", count);
-	                $('.status-button.all').html(count + "<br>All");
-	            },
-	            error: function(error) {
-	                console.log("Error fetching total vehicle count:", error);
-	            }
-	        });
-	    }
+		            // Update marker on the map with the received data
+		            createOrUpdateMarker(data, true);
 
-	    
-		function countStoppedVehicles() {
-		    $.ajax({
-		        url: '/api/countByStatus?status=N2', // Corrected URL to pass status as a query parameter
-		        method: 'GET',
-		        success: function(count) {
-		            console.log("Stopped vehicles:", count);
-		            $('.status-button.stop').html(count + "<br>Stop");
-		        },
-		        error: function(error) {
-		            console.error("Error fetching stopped vehicle count:", error);
-		        }
+		            // Optionally, adjust the zoom level or center the map if needed
+		            adjustMapZoomAndCenter(data);
+		        });
 		    });
 		}
 
-		function countRunningVehicles() {
-		    $.ajax({
-		        url: '/api/vehicles/countByStatus?status=N1', // Corrected URL to pass status as a query parameter
-		        method: 'GET',
-		        success: function(count) {
-		            console.log("Running vehicles:", count);
-		            $('.status-button.running').html(count + "<br>Running");
-		        },
-		        error: function(error) {
-		            console.error("Error fetching running vehicle count:", error);
-		        }
-		    });
-		}
-
-
-	    $(document).ready(function() {
-	        updateVehicleCount(); // Call the function to update total vehicle count
-	        countStoppedVehicles(); // Call the function to update stopped vehicle count
-	        countRunningVehicles(); // Call the function to update running vehicle count
-	    });
-	</script>
-
-
-
-
-	
-	<script>						 						  
-		
-		document.getElementById('open').addEventListener('click', function () {
-		    // Show the side tab and adjust layout
-		    document.getElementById('sideTab').style.height = '50%'; // Adjust height as needed
-		    document.getElementById('sideTab').style.display = 'flex'; // Ensure the side tab is visible
-		    document.getElementById('live-video-section').style.display = 'block'; // Ensure the live video section is visible
-		    document.getElementById('history-section').style.display = 'block'; // Ensure the history section is visible
-		});
-
-		document.getElementById('btnSubmitHistory').addEventListener('click', function () {
-		    var camera = document.getElementById('camera-select-history').value;
-		    var fromDate = document.getElementById('from-date').value;
-		    var toDate = document.getElementById('to-date').value;
-
-		    console.log('History Camera:', camera);
-		    console.log('History From Date:', fromDate);
-		    console.log('History To Date:', toDate);
-
-		    // Display the history video section with the appropriate camera stream
-		    document.getElementById('history-video-section').style.display = 'block';
-		    
-		    // Corrected URL construction with backticks
-		    let historyUrl = `https://www.youtube.com/embed/MpoSEvSqRqg?camera=${camera}&from=${fromDate}&to=${toDate}`;
-		    document.getElementById('history-video').src = historyUrl;
-		});
-
-		document.getElementById('btnLiveStream').addEventListener('click', function () {
-		    var camera = document.getElementById('camera-select-live').value;
-
-		    console.log('Live Stream Camera:', camera);
-
-		    let liveStreamUrl;
-		    
-		    // Corrected URL construction with backticks
-		    if (camera === 'front') {
-		        liveStreamUrl = `https://www.youtube.com/embed/MpoSEvSqRqg`;
-		    } else if (camera === 'rear') {
-		        liveStreamUrl = `https://www.youtube.com/embed/RearCameraStreamURL`;
-		    } else {
-		        console.error('Unknown camera selected');
+		// Function to create or update a marker for a vehicle
+		function createOrUpdateMarker(vehicle, isLive = false) {
+		    if (!vehicle.latitude || !vehicle.longitude) {
+		        console.error('Invalid latitude or longitude for vehicle:', vehicle);
 		        return;
 		    }
 
-		    document.getElementById('live-video-section').style.display = 'block';
-		    document.getElementById('video-stream').src = liveStreamUrl;
-		});
+		    var deviceId = vehicle.deviceId || 'Unknown';
 
-		document.getElementById('closeSideTab').addEventListener('click', function () {
-		    document.getElementById('sideTab').style.height = '0'; // Hide the side tab
-		    document.getElementById('sideTab').style.display = 'none'; // Ensure the side tab is hidden
-		});
+		    console.log('Creating or updating marker for vehicle ID:', deviceId);
 
+			var icon = getCarIcon(vehicle.status);
+			var popupContent = `
+			    <div style="min-width: 200px;">
+			        <strong>Device ID:</strong> ${deviceId}<br>
+			        <strong>Timestamp:</strong> ${vehicle.timestamp}<br>
+			        <strong>Address:</strong> ${vehicle.address || 'Address not available'}<br>
+			        <strong>Latitude:</strong> ${vehicle.latitude}<br>
+			        <strong>Longitude:</strong> ${vehicle.longitude}<br>
+			        <strong>Status:</strong> ${vehicle.status === 'N2' ? 'Ignition Off' : 'Ignition On'}<br>
+			        <strong>Type:</strong> ${isLive ? 'Live' : 'Last Known'}
+			        <div style="margin-top: 10px; text-align: center;">
+			            <button style="padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;" 
+			                    onclick="openReplayPage('${deviceId}')">
+			                Replay
+			            </button>
 
-		// Example data for testing
-		var exampleData = {
-		    id: 'car2',
-		    lat: 12.9715987,
-		    lng: 77.594566,
-		    status: 'N1',
-		    startPoint: [12.9715917, 77.594516],
-		    endPoint: [12.976, 77.605]
-		};
-		updateCarLocation(exampleData);
-		var map = L.map('map').setView([12.9716, 77.5946], 13);
+			            <button style="padding: 5px 10px; background-color: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer;" 
+			                    onclick="showVehicleDetails('${deviceId}')">Details</button>
+			        </div>
+			    </div>
+			`;
 
-		// Add a tile layer to the map
-		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-		    maxZoom: 19,
-		}).addTo(map);
+			// Define the openReplayPage function
+						function openReplayPage(deviceId) {
+						    // Open the replay page and pass the deviceId as a query parameter
+						    window.location.href = `/replay.html?deviceId=${deviceId}`;
+						}
+						
+						
+						
+		    if (markerDict[deviceId]) {
+		        markerDict[deviceId].setLatLng([vehicle.latitude, vehicle.longitude])
+		            .setIcon(icon)
+		            .bindPopup(popupContent)
+		            .openPopup();
+		    } else {
+		        markerDict[deviceId] = L.marker([vehicle.latitude, vehicle.longitude], { icon: icon })
+		            .bindPopup(popupContent)
+		            .on('click', function () {
+		                showVehicleDetails(deviceId);
+		            })
+		            .addTo(map)
+		            .openPopup();
+		        markers.addLayer(markerDict[deviceId]);
+		    }
 
-		// Function to update the map with the vehicle's location
-		function updateCarLocation(data) {
-		    var marker = L.marker([data.lat, data.lng]).addTo(map);
-		    marker.bindPopup(`
-		        <strong>Tracker Name:</strong> ${data.id}<br>
-		        <strong>Status:</strong> ${data.status}<br>
-		        <strong>Alarm Time:</strong> ${data.alarmTime}
-		    `).openPopup();
+		    deviceLastUpdate[deviceId] = Date.now();
 		}
 
-		// Example usage to update map with car location
-		var exampleData = {
-		    id: 'car1',
-		    lat: 12.9715987,
-		    lng: 77.594566,
-		    status: 'N1',
-		    alarmTime: '2023-11-25 10:28:48',
-		    startPoint: [12.9715917, 77.594516],
-		    endPoint: [12.976, 77.605]
-		};
-		cars.forEach(function(car) {
-		            L.marker([car.lat, car.lng], { icon: carIcon })
-		                .bindPopup("<b>" + car.info + "</b>", { className: 'custom-popup' })
-		                .addTo(map);
-		        });
-		// Assuming you have a map instance created somewhere, like this:
-		var map = L.map('map').setView([12.9715987, 77.594566], 13);
+		// Function to adjust zoom level and center the map based on incoming data
+		function adjustMapZoomAndCenter(data) {
+		    var latLng = [data.latitude, data.longitude];
 
-		// Custom car icon
-		var carIcon = L.icon({
-		    iconUrl: 'THINTURE_IMAGE/redcar2.png', // Replace with your car icon path
-		    iconSize: [32, 37], // Size of the icon
-		    iconAnchor: [16, 37], // Point of the icon which will correspond to marker's location
-		    popupAnchor: [0, -37] // Point from which the popup should open relative to the iconAnchor
-		});
-
-		// Function to update car location and add a popup
-		function updateCarLocation(data) {
-		    var marker = L.marker([data.lat, data.lng], { icon: carIcon }).addTo(map);
-		    
-		    // Creating the content for the popup
-		    var popupContent = `
-		        <b>Car ID:</b> ${data.id}<br>
-		        <b>Status:</b> ${data.status}<br>
-		        <b>Alarm Time:</b> ${data.alarmTime}<br>
-		        <b>Start Point:</b> [${data.startPoint[0]}, ${data.startPoint[1]}]<br>
-		        <b>End Point:</b> [${data.endPoint[0]}, ${data.endPoint[1]}]
-		    `;
-		    
-		    // Binding the popup to the marker
-		    marker.bindPopup(popupContent).openPopup();
+		    // Check if the marker is already within the visible bounds of the map
+		    if (!map.getBounds().contains(latLng)) {
+		        map.setView(latLng, Math.min(map.getZoom(), 40)); // Set zoom level if the marker is out of bounds
+		    }
 		}
 
-		updateCarLocation(exampleData);
+		// Initialize WebSocket connection
+		initializeWebSocket();
 
-	
-		
-		document.getElementById('closeLiveVideo').addEventListener('click', function () {
-		    document.getElementById('live-video-section').style.display = 'none';
-		    document.getElementById('video-stream').src = ''; // Stop the live stream
-		});
+	    function checkInactiveDevices() {
+	        var now = Date.now();
+	        liveDevices.forEach(deviceId => {
+	            if (now - deviceLastUpdate[deviceId] > inactivityThreshold) {
+	                console.log('Device became inactive:', deviceId);
+	                liveDevices.delete(deviceId);
+	                fetchAndUpdateVehicleData(`/api/vehicles/last-known/${deviceId}`);
+	            }
+	        });
+	    }
 
-		document.getElementById('closeHistoryVideo').addEventListener('click', function () {
-		    document.getElementById('history-video-section').style.display = 'none';
-		    document.getElementById('history-video').src = ''; // Stop the history video
-		});
-
-		function goBack() {
-		       window.history.back();
-		   }
-		   document.addEventListener('click', function(event) {
-		       var dropdown = document.querySelector('.dropdown-menu');
-		       var username = document.querySelector('.username');
-		       
-		       if (!username.contains(event.target)) {
-		           dropdown.style.display = 'none';
-		       } else {
-		           dropdown.style.display = 'block';
-		       }
-		   });
-
-		   document.addEventListener('DOMContentLoaded', function() {
-		              document.querySelector('.logout-button').addEventListener('click', function() {
-		                  alert('Logging out...');
-		              });
-		          });
-				  
+	    setInterval(checkInactiveDevices, inactivityThreshold);
 
 	</script>
-	<script>
-	        // Ensure the script runs after the DOM is loaded
-	        document.addEventListener('DOMContentLoaded', function() {
-	            document.getElementById('alert-button').addEventListener('click', function() {
-	                // Redirect to alerts.html
-	                window.location.href = 'alerts.html';
-	            });
-	        });
-	    </script>
+
 	
-</body>
+	
+	<script>
+	// Function to handle the search button click
+	function searchVehicleById() {
+	    const deviceId = document.getElementById('search-input').value.trim();
+	    
+	    if (!deviceId) {
+	        alert('Please enter a Device ID.');
+	        return;
+	    }
+
+	    console.log(`Searching for vehicle with Device ID: ${deviceId}`);
+
+	    // Fetch vehicle details from the backend API
+	    fetch(`/api/vehicles/details/${deviceId}`)
+	        .then(response => {
+	            if (response.ok) {
+	                return response.json();
+	            } else {
+	                throw new Error('Vehicle not found.');
+	            }
+	        })
+	        .then(data => {
+	            console.log('Fetched vehicle details:', data); // Log the data
+
+	            if (data) {
+	                // Display vehicle details in a popup or a dedicated panel
+	                const vehicleDetailsPanel = document.getElementById('vehicle-details');
+	                vehicleDetailsPanel.innerHTML = `
+	                    <h3>Vehicle Details</h3>
+	                    <p><strong>Device ID:</strong> ${data.deviceId}</p>
+	                    <p><strong>Timestamp:</strong> ${data.timestamp}</p>
+	                    <p><strong>Address:</strong> ${data.address || 'Address not available'}</p>
+	                    <p><strong>Latitude:</strong> ${data.latitude}</p>
+	                    <p><strong>Longitude:</strong> ${data.longitude}</p>
+	                    <p><strong>Status:</strong> ${data.status}</p>
+	                `;
+	                vehicleDetailsPanel.style.display = 'block'; // Show the panel
+	                
+	                // Center map on the fetched vehicle location
+	                if (data.latitude && data.longitude) {
+	                    const vehicleLatLng = [data.latitude, data.longitude];
+	                    map.setView(vehicleLatLng, 13); // Adjust the zoom level as needed
+
+	                    // Add or update marker on the map
+	                    if (markerDict[data.deviceId]) {
+	                        markerDict[data.deviceId].setLatLng(vehicleLatLng).openPopup();
+	                    } else {
+	                        const marker = L.marker(vehicleLatLng, { icon: getCarIcon(data.status) })
+	                            .bindPopup(`
+	                                <strong>Device ID:</strong> ${data.deviceId}<br>
+	                                <strong>Status:</strong> ${data.status}<br>
+	                                <button onclick="replayVehicle('${data.deviceId}')">Replay</button>
+	                                <button onclick="showVehicleDetails('${data.deviceId}')">Details</button>
+	                            `)
+	                            .addTo(map)
+	                            .openPopup();
+
+	                        markerDict[data.deviceId] = marker; // Store the marker in the dictionary
+	                    }
+	                } else {
+	                    alert('Location data not available for this vehicle.');
+	                }
+	            } else {
+	                alert('No details available for this vehicle.');
+	            }
+	        })
+	        .catch(error => {
+	            console.error(`Error fetching vehicle details: ${error.message}`);
+	            alert('Error: ' + error.message);
+	        });
+	}
+	</script>
+
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 </html>
+</body>

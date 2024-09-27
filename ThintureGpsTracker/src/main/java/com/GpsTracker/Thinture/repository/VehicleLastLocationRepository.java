@@ -19,4 +19,5 @@ public interface VehicleLastLocationRepository extends JpaRepository<VehicleLast
 
     // Count by status
     long countByStatus(String status);
+    
 }

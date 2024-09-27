@@ -78,6 +78,7 @@
 			<artifactId>log4j-over-slf4j</artifactId>
 		</dependency>
 
+
 		<!-- MQTT Integration -->
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
@@ -88,6 +89,12 @@
 			<artifactId>org.eclipse.paho.client.mqttv3</artifactId>
 			<version>1.2.5</version>
 		</dependency>
+<dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>javax.servlet-api</artifactId>
+    <version>4.0.1</version> <!-- You can adjust the version as needed -->
+    <scope>provided</scope>
+</dependency>
 
 		<!-- MySQL Connector -->
 		<dependency>
@@ -95,6 +102,26 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>8.0.33</version>
 		</dependency>
+		
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-web</artifactId>
+    <version>6.3.3</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+    <version>3.1.0</version> <!-- Make sure the version is compatible -->
+</dependency>
+
+
+<dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+    <version>1.18.26</version> <!-- Use the latest version -->
+    <scope>provided</scope>
+</dependency>
 
 		<!-- Javax Annotation -->
 		<dependency>

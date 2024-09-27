@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Replay</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Add your CSS file here -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+</head>
+<body>
+    <!-- Replay Panel -->
+    <div id="replay-panel">
+        <div>
+            <label for="device-id">Device ID:</label>
+            <input type="text" id="device-id" placeholder="Enter Device ID">
+        </div>
+        <div>
+            <label for="from-date">From:</label>
+            <input type="datetime-local" id="from-date">
+            <label for="to-date">To:</label>
+            <input type="datetime-local" id="to-date">
+            <button id="show-replay">Show</button>
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" id="show-trail"> Trail
+            </label>
+            <select id="replay-speed">
+                <option value="normal">Normal</option>
+                <option value="fast">Fast</option>
+                <option value="slow">Slow</option>
+            </select>
+        </div>
+        <div>
+            <button id="play-replay" disabled>Play</button>
+            <input type="range" id="replay-slider" min="0" max="100" value="0" style="width: 70%;">
+            <span id="replay-time">00:00:00</span>
+        </div>
+    </div>
+
+    <div id="map" style="height: 500px;"></div>
+
+	<script>
+	    var map = L.map('map').setView([12.225284, 79.074699], 5);
+	    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+	    }).addTo(map);
+
+	    var carMarker;
+	    var routePolyline;
+	    var replayData = [];
+	    var currentIndex = 0;
+	    var replayInterval;
+
+	    // Create a Leaflet control to display the total distance
+	    var distanceControl = L.control({ position: 'topright' });
+	    distanceControl.onAdd = function(map) {
+	        this._div = L.DomUtil.create('div', 'leaflet-control-distance');
+	        this.update();
+	        return this._div;
+	    };
+	    distanceControl.update = function(totalDistance) {
+	        this._div.innerHTML = 'Total Distance: ' + (totalDistance ? totalDistance.toFixed(2) + ' km' : '0 km');
+	    };
+	    distanceControl.addTo(map);
+
+	    // Fetch vehicle history from the backend
+	    function fetchVehicleHistory(deviceID, fromDate, toDate) {
+	        fetch(`/api/history/${deviceID}?from=${fromDate}&to=${toDate}`)
+	            .then(response => {
+	                if (response.ok) {
+	                    return response.json();
+	                } else {
+	                    throw new Error('No data found for the specified device or date range.');
+	                }
+	            })
+	            .then(data => {
+	                replayData = data.map(d => [d.latitude, d.longitude]); // Extract latitude and longitude
+	                drawPolyline(replayData); // Draw the polyline using the fetched data
+	                document.getElementById('replay-slider').max = replayData.length - 1;
+	                console.log('Fetched vehicle history:', replayData);
+	                if (replayData.length > 0) {
+	                    document.getElementById('play-replay').disabled = false; // Enable play button
+	                }
+	            })
+	            .catch(error => alert('Error fetching vehicle history: ' + error.message));
+	    }
+
+	    // Function to draw polyline on the map using fetched data
+	    function drawPolyline(routeData) {
+	        if (routePolyline) {
+	            map.removeLayer(routePolyline); // Remove existing polyline if any
+	        }
+
+	        routePolyline = L.polyline(routeData, { color: 'blue', weight: 5, opacity: 0.7 }).addTo(map);
+
+	        // Add a marker at the start position
+	        if (carMarker) {
+	            map.removeLayer(carMarker); // Remove existing marker if any
+	        }
+
+	        let initialAngle = 0; // Default angle for the initial position
+	        carMarker = L.marker(routeData[0], {
+	            icon: L.divIcon({
+	                className: 'custom-icon ring-blink ring-blink-green',
+	                html: `<div style="transform: rotate(${initialAngle}deg);">
+	                        <img src="/THINTURE_IMAGE/greencar2.png" class="car-icon" style="width: 30px; height: 30px;">
+	                       </div>`,
+	                iconSize: [30, 30], // Adjust size
+	                iconAnchor: [15, 15] // Center the icon
+	            })
+	        }).addTo(map);
+	    }
+
+	    // Function to start the replay
+	    function startReplay() {
+	        if (replayData.length === 0) {
+	            alert('No replay data available. Please load data first.');
+	            return;
+	        }
+
+	        var replaySpeed = document.getElementById('replay-speed').value;
+	        var speed = replaySpeed === 'fast' ? 500 : replaySpeed === 'slow' ? 2000 : 1000;
+
+	        currentIndex = 0;
+	        clearInterval(replayInterval); // Clear any existing replay intervals
+	        replayInterval = setInterval(() => {
+	            if (currentIndex >= replayData.length) {
+	                clearInterval(replayInterval);
+	                console.log("Replay finished");
+	                return;
+	            }
+
+	            let [lat, lng] = replayData[currentIndex];
+	            updateMarkerPosition(lat, lng);
+
+	            // Calculate angle for car rotation only if there is a next point
+	            if (currentIndex < replayData.length - 1) {
+	                let nextPoint = replayData[currentIndex + 1];
+	                let angle = calculateAngle([lat, lng], nextPoint);
+
+	                // Set the icon with the calculated angle
+	                carMarker.setIcon(L.divIcon({
+	                    className: 'custom-icon ring-blink ring-blink-green',
+	                    html: `<div style="transform: rotate(${angle}deg);">
+	                                <img src="THINTURE_IMAGE/greencar2.png" class="car-icon" style="width: 30px; height: 30px;">
+	                           </div>`,
+	                    iconSize: [30, 30], // Adjust size to match the actual dimensions
+	                    iconAnchor: [15, 15] // Adjust anchor to center the icon
+	                }));
+	            }
+
+	            document.getElementById('replay-slider').value = currentIndex;
+	            document.getElementById('replay-time').textContent = new Date().toLocaleTimeString();
+
+	            currentIndex++;
+	        }, speed);
+	    }
+
+	    // Update marker position
+	    function updateMarkerPosition(lat, lng) {
+	        if (carMarker) {
+	            carMarker.setLatLng([lat, lng]);
+	        }
+	    }
+
+	    function calculateAngle(startPoint, endPoint) {
+	        return Math.atan2(endPoint[1] - startPoint[1], endPoint[0] - startPoint[0]) * 180 / Math.PI;
+	    }
+
+	    // Fetch total distance from the backend and update the map control
+	    function fetchTotalDistance(deviceID, fromDate, toDate) {
+	        fetch(`/api/distance/${deviceID}?from=${fromDate}&to=${toDate}`)
+	            .then(response => response.json())
+	            .then(data => {
+	                distanceControl.update(data); // Update the Leaflet control with the total distance
+	            })
+	            .catch(error => console.error('Error fetching total distance:', error));
+	    }
+
+	    // Event listeners for user actions
+	    document.getElementById('show-replay').addEventListener('click', function() {
+	        var deviceID = document.getElementById('device-id').value.trim();
+	        var fromDate = document.getElementById('from-date').value;
+	        var toDate = document.getElementById('to-date').value;
+
+	        if (!deviceID || !fromDate || !toDate) {
+	            alert('Please enter a device ID and select both From and To dates.');
+	            return;
+	        }
+
+	        fromDate = new Date(fromDate).toISOString();
+	        toDate = new Date(toDate).toISOString();
+
+	        console.log(`Requesting history for deviceID: ${deviceID} from: ${fromDate} to: ${toDate}`);
+
+	        fetchVehicleHistory(deviceID, fromDate, toDate);
+	        fetchTotalDistance(deviceID, fromDate, toDate); // Fetch and display the total distance on the map
+	    });
+
+	    document.getElementById('play-replay').addEventListener('click', startReplay);
+	</script>
+
+</body>
+</html>

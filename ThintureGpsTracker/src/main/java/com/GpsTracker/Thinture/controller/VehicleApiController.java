@@ -1,9 +1,11 @@
 package com.GpsTracker.Thinture.controller;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.GpsTracker.Thinture.model.Vehicle;
+import com.GpsTracker.Thinture.model.VehicleHistory;
 import com.GpsTracker.Thinture.model.VehicleLastLocation;
+import com.GpsTracker.Thinture.service.VehicleHistoryService;
 import com.GpsTracker.Thinture.service.VehicleLastLocationService;
 //import com.GpsTracker.Thinture.model.vehicle;
 import com.GpsTracker.Thinture.service.VehicleService;
@@ -23,6 +27,8 @@ import com.GpsTracker.Thinture.service.VehicleService;
 @RestController
 @RequestMapping("/api")
 public class VehicleApiController {
+	 @Autowired
+	    private VehicleHistoryService vehicleHistoryService;
 
     @Autowired
     private VehicleService vehicleService;
@@ -45,10 +51,10 @@ public class VehicleApiController {
         List<VehicleLastLocation> vehicleLastLocations = vehicleLastLocationService.getAllLastKnownLocations();
         return new ResponseEntity<>(vehicleLastLocations, HttpStatus.OK);
     }
-    @GetMapping("/api/vehicles/last-known")
-    public List<VehicleLastLocation> getLastKnownLocations() {
-        return vehicleService.getAllLastKnownLocations();
-    }
+	/*
+	 * @GetMapping("/api/vehicles/last-known") public List<VehicleLastLocation>
+	 * getLastKnownLocations() { return vehicleService.getAllLastKnownLocations(); }
+	 */
 
     // API endpoint to get the last known location by device ID
     @GetMapping("/vehicles/last-known/{deviceId}")
@@ -69,6 +75,11 @@ public class VehicleApiController {
         //Ui button stop button for map code
         // API method to return the count of all vehicles
       
+    
+    
+    
+    
+    
     }
     
 

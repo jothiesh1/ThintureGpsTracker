@@ -55,8 +55,8 @@ public class MqttService {
     @Autowired
     private MqttClient mqttClient;
 
-    @Value("${mqtt.topic}")
-    private String topic;
+    @Value("${mqtt.topics}")
+    private String[] topics;  // Load multiple topics from the application.properties
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -71,31 +71,38 @@ public class MqttService {
     private VehicleHistoryService vehicleHistoryService;
 
     @Autowired
-    private VehicleLastLocationRepository vehicleLastLocationRepository; // Repository for last known locations
+    private VehicleLastLocationRepository vehicleLastLocationRepository;
 
     @PostConstruct
     public void subscribe() {
         try {
-            mqttClient.subscribe(topic, (topic, message) -> {
-                String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
-                logger.info("Raw payload received: {}", payload);
-
-                try {
-                    String processedPayload = isHexadecimal(payload) ? hexToAscii(payload) : payload;
-                    logger.info("Processed payload: {}", processedPayload);
-
-                    processPayload(processedPayload);
-                } catch (Exception e) {
-                    logger.error("Failed to process payload: {}", payload, e);
+            for (String topic : topics) {
+                if (!topic.endsWith("#") && topic.contains("#")) {
+                    logger.error("Invalid topic: {}. Multi-level wildcard (#) can only appear at the end.", topic);
+                    continue;
                 }
-            });
-            logger.info("Subscribed to topic: {}", topic);
+
+                mqttClient.subscribe(topic.trim(), (t, message) -> {
+                    String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
+                    logger.info("Raw payload received on topic {}: {}", t, payload);
+
+                    try {
+                        String processedPayload = isHexadecimal(payload) ? hexToAscii(payload) : payload;
+                        logger.info("Processed payload on topic {}: {}", t, processedPayload);
+
+                        processPayload(processedPayload);
+                    } catch (Exception e) {
+                        logger.error("Failed to process payload on topic {}: {}", t, payload, e);
+                    }
+                });
+                logger.info("Subscribed to topic: {}", topic);
+            }
         } catch (MqttException e) {
-            logger.error("Error while subscribing to topic: {}", e.getMessage(), e);
+            logger.error("Error while subscribing to topics: {}", e.getMessage(), e);
         }
     }
 
-    public void publish(String message) {
+    public void publish(String topic, String message) {
         try {
             MqttMessage mqttMessage = new MqttMessage(message.getBytes(StandardCharsets.UTF_8));
             mqttMessage.setQos(2); // Set Quality of Service level to 2 (Exactly once delivery)
@@ -118,7 +125,9 @@ public class MqttService {
             GpsData gpsData = objectMapper.readValue(cleanedPayload, GpsData.class);
 
             // Validate essential fields
-            if (gpsData.getDeviceID() == null || gpsData.getLatitude() == null || gpsData.getLongitude() == null || gpsData.getTimestamp() == null) {
+            if (gpsData.getDeviceID() == null || gpsData.getLatitude() == null || 
+                gpsData.getLongitude() == null || gpsData.getTimestamp() == null || 
+                gpsData.getStatus() == null) { // Add validation for status
                 logger.error("Invalid GPS data received: {}", gpsData);
                 return;
             }
@@ -144,12 +153,17 @@ public class MqttService {
                 // Update the last known location
                 VehicleLastLocation lastLocation = vehicleLastLocationRepository.findByDeviceId(gpsData.getDeviceID())
                     .orElse(new VehicleLastLocation());
+
                 lastLocation.setDeviceId(gpsData.getDeviceID());
                 lastLocation.setLatitude(latitude);
                 lastLocation.setLongitude(longitude);
                 lastLocation.setTimestamp(Timestamp.valueOf(gpsData.getTimestamp()));
-                vehicleLastLocationRepository.save(lastLocation);
+                lastLocation.setStatus(gpsData.getStatus()); // Ensure you set the status correctly
 
+                // Log status before saving
+                logger.info("Updating last location with status: {} for device ID: {}", gpsData.getStatus(), gpsData.getDeviceID());
+
+                vehicleLastLocationRepository.save(lastLocation);
                 logger.info("Updated last known location for device ID: {}", gpsData.getDeviceID());
 
                 // Send location update to the frontend
@@ -163,6 +177,27 @@ public class MqttService {
             logger.error("Failed to parse or process payload: {}", payload, e);
         }
     }
+ // Helper method to fix timestamp format
+    private String fixTimestampFormat(String rawTimestamp) {
+        try {
+            // Assuming rawTimestamp is like "2024-8-252 11:32:24"
+            String[] parts = rawTimestamp.split(" ");
+            String datePart = parts[0];
+            String timePart = parts[1];
+
+            // Split the date part
+            String[] dateElements = datePart.split("-");
+            String year = dateElements[0];
+            String month = String.format("%02d", Integer.parseInt(dateElements[1])); // Ensure two digits for month
+            String day = String.format("%02d", Integer.parseInt(dateElements[2])); // Ensure two digits for day
+
+            return year + "-" + month + "-" + day + " " + timePart; // Combine into correct format
+        } catch (Exception e) {
+            logger.error("Failed to fix timestamp format: {}", rawTimestamp, e);
+            throw new IllegalArgumentException("Invalid timestamp format: " + rawTimestamp, e);
+        }
+    }
+
 
     private double parseCoordinate(String coordinate) {
         char direction = coordinate.charAt(coordinate.length() - 1);

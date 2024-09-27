@@ -1,12 +1,20 @@
 package com.GpsTracker.Thinture.model;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 //import javax.persistence.*;
 import java.sql.Timestamp;
@@ -18,12 +26,22 @@ public class VehicleHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "device_id", referencedColumnName = "deviceID", nullable = false)
     private Vehicle vehicle;
 
-   
-    // Getters and Setters...
+////18/09/2024 10am joins for report  
+//
+//  @ManyToOne(fetch = FetchType.LAZY)
+//  @JsonIgnore
+//    @JoinColumn(name = "superadmin_id", referencedColumnName = "id", nullable = false)  // Foreign key reference to SuperAdmin
+//    private SuperAdmin superAdmin;
+// 
+//  @ManyToOne(fetch = FetchType.EAGER)
+//  private Admin admin;
+
+
+    @Column(name = "timestamp")
     private Timestamp timestamp;
     private Double latitude;
     private Double longitude;
@@ -33,6 +51,24 @@ public class VehicleHistory {
     private Integer sequenceNumber;
 
     // Getters and Setters
+   // Getters and Setters
+    
+//    public Admin getAdmin() {
+//		return admin;
+//	}
+//
+//	public void setAdmin(Admin admin) {
+//		this.admin = admin;
+//	}
+//
+//	public SuperAdmin getSuperAdmin() {
+//		return superAdmin;
+//	}
+//
+//	public void setSuperAdmin(SuperAdmin superAdmin) {
+//		this.superAdmin = superAdmin;
+//	}
+    
     public Long getId() {
         return id;
     }
@@ -104,4 +140,16 @@ public class VehicleHistory {
     public void setSequenceNumber(Integer sequenceNumber) {
         this.sequenceNumber = sequenceNumber;
     }
+  //Bidirectional relationship with ViolationReport
+@OneToMany(mappedBy = "vehicleHistory", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+private List<ViolationReport> violationReports;
+
+public List<ViolationReport> getViolationReports() {
+	return violationReports;
+}
+
+public void setViolationReports(List<ViolationReport> violationReports) {
+	this.violationReports = violationReports;
+}
+
 }

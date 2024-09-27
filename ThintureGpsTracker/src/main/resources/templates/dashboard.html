@@ -248,6 +248,47 @@
         button {
             background-color: rgb(0, 0, 64);
         }
+		
+		
+		
+		.feature-section {
+		    display: flex;
+		    justify-content: space-around;
+		    flex-wrap: wrap;
+		    margin-top: 20px;
+		}
+		.feature-card {
+		    background-color: #ffffff;
+		    border-radius: 10px;
+		    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+		    margin: 10px;
+		    padding: 20px;
+		    width: calc(50% - 20px);
+		    max-width: 400px;
+		}
+		.feature-card h3 {
+		    color: #0056b3;
+		    margin-top: 0;
+		}
+		.feature-card ul {
+		    list-style-type: none;
+		    padding-left: 0;
+		}
+		.feature-card li {
+		    margin-bottom: 5px;
+		}
+		.feature-card img {
+		    width: 100%;
+		    height: auto;
+		    border-radius: 5px;
+		    margin-top: 10px;
+		}
+		@media (max-width: 768px) {
+		    .feature-card {
+		        width: calc(100% - 20px);
+		    }
+		}
+		
     </style>
 </head>
 <body>
@@ -279,11 +320,17 @@
         <div class="dropdown">
             <a href="#"><i class="fas fa-th-large"></i> Reports</a>
             <div class="dropdown-content">
-				
+				<a href="/createdevices">Installation</a>
+				<a href="/dealers/add">Add new dealer</a>
                 <a href="/total_users">Users</a>
 				<a href="/total_vehicles">Vehicle</a>
                 <a href="/tracking_details">Tracking Details</a>
+				<a href="admins/add">add admin new</a>
+				<a href="/users/add">add  user</a>
+				<a href="drivers/add">add driver</a>
+				<a href="/replay">replay</a>
                 <a href="/calender">Calendar</a>
+				
             </div>
         </div>
         <div class="dropdown">
@@ -295,9 +342,12 @@
             </div>
         </div>
         <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i> Accounts</a>
+            <a href="#"><i class="fas fa-th-large"></i>Information</a>
             <div class="dropdown-content">
-                <a href="#">Renewal</a>
+                <a href="dealers/view">Dealer details</a>
+				<a href="/drivers/view">driver details</a>
+				<a href="/driver-report">Driver_report</a>
+				<a href="/vehicle_report">vehicle_report</a>
             </div>
         </div>
         <a href="#"><i class="fas fa-th-large"></i> Profile</a>
@@ -542,6 +592,43 @@
         }
     </script>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+	<div class="feature-section">
+	    <div class="feature-card" onclick="window.location.href='/map'">
+	        <h3><i class="fas fa-map-marked-alt"></i> Go to Map</h3>
+	        <ul>
+	            <li>Vehicle History</li>
+	            <li>Replay View</li>
+	            <li>Live Location</li>
+	            <li>Immobilize Status</li>
+	        </ul>
+	        <img src="THINTURE_IMAGE/map_placeholder.jpg" alt="Map Features">
+	    </div>
+	    <div class="feature-card" onclick="window.location.href='/report'">
+	        <h3><i class="fas fa-file-alt"></i> Go to Report</h3>
+	        <ul>
+	            <li>Vehicle Log</li>
+	            <li>Over Speed Report</li>
+	            <li>Detail Summary</li>
+	            <li>Timeline</li>
+	            <li>Driven Summary</li>
+	        </ul>
+			<img src="THINTURE_IMAGE/report.jpg" alt="Report Features" style="width: 150%; max-width: 300px; height: 200;">
+			    </div>
+	    </div>
+	</div>
+
+
+	<script>
+	    // JavaScript function to handle navigation
+	    function navigateTo(page) {
+	        if (page === 'map') {
+	            window.location.href = '/map'; // Navigate to the map page
+	        } else if (page === 'report') {
+	            window.location.href = '/report'; // Navigate to the report page
+	        }
+	    }
+	</script>
+
 </body>
 </html>
 //

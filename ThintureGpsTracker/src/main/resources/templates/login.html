@@ -25,6 +25,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             flex: 1;
             margin: 10px;
+            position: relative;
         }
         .left-section {
             flex: 2;
@@ -40,11 +41,25 @@
         }
         .content {
             margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .main-image {
             width: 100%;
             height: auto;
             border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .bottom-image {
+            width: 200px; /* Increase the size as needed */
+            height: auto;
+            margin-top: 15px; /* Space between the "Forgot Password?" link and the image */
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
         .content p.title {
             font-size: 1.5em;
@@ -124,42 +139,37 @@
 </head>
 <body>
     <div class="container">
-        <div class="left-section">
-            <div class="header">
-                <img src="THINTURE_IMAGE/logot.jpg" alt="THINTURE Logo" class="navbar-logo">
-                <p>Stop Searching for Self-Hosted GPS Software</p>
-            </div>
-            <div class="content">
-                <img src="THINTURE_IMAGE/first.jpg" alt="Car" class="main-image"/>
-                <p class="title">Logistics</p>
-                <p class="description">Automate your business through cutting-edge IoT automation tools</p>
-            </div>
-        </div>
-        <br><br>
-        <div class="right-section">
-            <div class="login-container">
-                <h2>Welcome to Thinture Technologies Pvt. Ltd!</h2>
-                <p>Login</p>
-                <form th:action="@{/login}" method="post">
-                    <div class="input">
-                        <label for="usertype">User Type</label>
-                        <select id="usertype" name="usertype" required>
-                            <option value="SuperAdmin">SuperAdmin</option>
-              
-							              <option value="Admin">Admin</option>
-                            <option value="dealer">Dealer</option>
-                            <option value="user">User</option>
-                        </select>
-                        <label for="username">Username</label>
-                        <input type="text" id="username" name="username" required>
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" required>
-                        <button type="submit">Log In</button>
-                        <a href="#" class="forgot-password">Forgot Password?</a>
-                    </div>
-                </form>
-            </div>
+        <div class="login-container">
+            <h2>Welcome to Thinture Technologies Pvt. Ltd!</h2>
+            <p>Login</p>
+            <form th:action="@{/login}" method="post" onsubmit="logLoginAttempt()">
+                <div class="input">
+                    <label for="usertype">User Type</label>
+                    <select id="usertype" name="usertype" required>
+                        <option value="SuperAdmin">SuperAdmin</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Dealer">Dealer</option>
+                        <option value="Client">Client</option>
+                        <option value="User">User</option>
+                    </select>
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                    <button type="submit">Log In</button>
+                    <a href="#" class="forgot-password">Forgot Password?</a>
+                </div>
+            </form>
         </div>
     </div>
+
+    <script>
+        function logLoginAttempt() {
+            var usertype = document.getElementById("usertype").value;
+            var username = document.getElementById("username").value;
+            console.log("Login attempt for user: " + username + " with user type: " + usertype);
+        }
+    </script>
 </body>
+
 </html>

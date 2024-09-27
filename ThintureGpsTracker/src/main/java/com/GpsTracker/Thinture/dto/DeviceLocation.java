@@ -47,4 +47,13 @@ public class DeviceLocation {
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
+    @Override
+    public String toString() {
+        return "DeviceLocation{" +
+                "deviceId='" + deviceId + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", timestamp='" + timestamp + '\'' +
+                '}';
+    }
 }
