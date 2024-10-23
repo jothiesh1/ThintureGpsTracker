@@ -1,48 +1,98 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Navigation</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<meta charset="UTF-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	
+
+    <title>THINTURE - Fleet Management</title>
+    
 </head>
 <body>
-    <div class="container-header">
-        <br>
-        <div class="header">
-            <img th:src="@{/images/logo.jpg}" alt="THINTURE Logo" class="navbar-logo">
-        </div>
-    </div>
-    <div class="navbar">
-        <a th:href="@{/dashboard}" class="active"><i class="fas fa-home"></i> Dashboard</a>
-        <a href="@{/map}"><i class="fas fa-map"></i> Map</a>
-        <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i> View</a>
-            <div class="dropdown-content">
-                <a th:href="@{/total-users}">Users</a>
-                <a th:href="@{/total-vehicles}">Vehicle</a>
-                <a th:href="@{/tracking_details}">Tracking Details</a>
-                <a href="#">Calendar</a>
+    <!-- navigation.html -->
+    <div th:fragment="navbar">
+        <nav class="navbar">
+			
+            <div class="navbar-container">
+                <a href="#" class="logo">
+                    <img src="/THINTURE_IMAGE/Thinture.jpg" alt="Fleet Tracking Logo">
+                </a>
+                <ul>
+                    <li>
+                        <a href="#" class="dropdown-toggle"><strong>SUPERADMIN</strong></a>
+                        <div class="dropdown-content">
+                            <a href="admins/add">Add Admin</a>
+                            <a href="/dealers/add">Add Dealer</a>
+                            <a href="/add_driver">Add Driver</a>
+                            <a href="/add_client">Add Client</a>
+                            <a href="/users/add">Add User</a>
+							 <a href="/panic">panic</a>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#" class="dropdown-toggle"><strong>TRACKING</strong></a>
+                        <div class="dropdown-content">
+                            <a href="/map">LiveTracking</a>
+                            <a href="#history">History</a>
+                            <a href="#reports">Reports</a>
+							<a href="/replay">rplay</a>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#" class="dropdown-toggle"><strong>INSTALLATION</strong></a>
+                        <div class="dropdown-content">
+                            <a href="/createdevices">Install</a>
+                            <a href="#renewal">Renewal</a>
+                            <a href="#search">Search</a>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#" class="dropdown-toggle"><strong>REPORTS</strong></a>
+                        <div class="dropdown-content">
+                            <a href="/admin">Admin Reports</a>
+                            <a href="/dealer">Dealer Reports</a>
+                            <a href="/clients">Clients Reports</a>
+                            <a href="/driver-report">Driver Reports</a>
+                            <a href="/vehicle_report">Vehicle Reports</a>
+							<a href="/vehicle-violations">vehicle-violations_report</a>
+                            <a href="#monthly">Monthly Reports</a>
+							<a href="/map"> map </a>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#" class="dropdown-toggle"><strong>INFORMATIONS</strong></a>
+                        <div class="dropdown-content">
+                            <a href="Admin_details.html">Admin</a>
+                           <a href="dealers/view">Dealer</a>
+                            <a href="Client_details.html">Client</a>
+                            <a href="/total_users">User</a>
+							
+										<a href="/drivers/view">driver details</a>
+							<a href="/total_vehicles">Vehicle</a>
+                            <a href="#settings">Settings</a>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#" class="dropdown-toggle"><strong>HELP & SUPPORT</strong></a>
+                        <div class="dropdown-content">
+                            <a href="#faq">FAQ</a>
+                            <a href="#contact">Contact Us</a>
+                            <a href="#guides">Guides</a>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#" class="dropdown-toggle"><strong>PROFILE</strong></a>
+                        <div class="dropdown-content">
+                            <a href="#view-profile">View Profile</a>
+                            <a href="#logout">Logout</a>
+                        </div>
+                    </li>
+                </ul>
             </div>
-        </div>
-		<!--->
-        <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i> Utility</a>
-            <div class="dropdown-content">
-                <a href="#">Support & Feedback</a>
-                <a href="#">Announcement</a>
-                <a href="#">Send Notification</a>
-            </div>
-        </div>
-        <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i> Accounts</a>
-            <div class="dropdown-content">
-                <a href="#">Renewal</a>
-            </div>
-        </div>
-        <a href="#"><i class="fas fa-th-large"></i> Profile</a>
+        </nav>
     </div>
 </body>
 </html>

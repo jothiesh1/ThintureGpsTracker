@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fleet Tracking Report with Date Range and Driver Filter</title>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script> <!-- Include XLSX library -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+	
+
 	<style>
 	html, body {
 			           height: 100%;
@@ -18,106 +22,9 @@
 					            background-position: center;
 					            overflow: hidden;
 				}
-				.navbar {
-						    background: linear-gradient(135deg, white, white,#151B54,#151B54,#151B54,#151B54); /* Gradient from light to dark blue */
-						    width: 100%;
-						    position: fixed;
-						    height: 110px;
-							
-						    top: 0;
-						    z-index: 1000;
-							box-shadow: 
-							        0 2px 5px rgba(0, 0, 0, 0.3),  /* Soft shadow */
-							        0 6px 15px rgba(0, 0, 169, 0.5); /* Deeper shadow for 3D effect, more focused at the bottom */
-						   
-						}
-
-
-								       .navbar-container {
-								           display: flex;
-								           align-items: center;
-								           justify-content: space-between;
-								           padding: 10px 20px;
-								           margin-right: 60px;
-								       }
-
-								       .navbar h1 {
-								           margin: 0;
-								           font-size: 20px;
-								       }
-
-								       .navbar ul {
-								           list-style-type: none;
-								           padding: 0;
-								           margin: 0;
-								           display: flex;
-										   font-weight: bold;
-										  
-								       }
-
-								       .navbar ul li {
-								           position: relative;
-								           margin: 0 10px;
-										   font-size: 14PX;
-										   
-								       }
-
-								       .navbar ul li a {
-								           color:white;
-										   text-decoration: NONE; 
-								           padding: 10px;
-								           display: block;
-										   font-style: normal;
-										   
-										  
-								       }
-
-								       .navbar ul li a:hover {
-								           background-color: #34495e;
-								           border-radius: 5px;
-										   text-decoration: underline; 
-								       }
-
-								       .navbar ul li .dropdown-content {
-								           display: none;
-								           position: absolute;
-								           top: 100%;
-								           left: 0;
-								           background-color: #ffffff;
-								           color: #000000;
-								           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-								           border-radius: 5px;
-								           min-width: 160px;
-								           z-index: 1000;
-								       }
-
-								       .navbar ul li:hover .dropdown-content {
-								           display: block;
-								       }
-
-								       .navbar ul li .dropdown-content a {
-								           color: #000000;
-								           padding: 10px;
-								           display: block;
-								           text-decoration: none;
-								       }
-
-								       .navbar ul li .dropdown-content a:hover {
-								           background-color: #f0f0f0;
-								       }
-
-								       .content {
-								           padding: 20px;
-								           margin-top: 120px; /* Adjust according to navbar height */
-								       }
-
-								       .logo img {
-								           height: 90px;
-								           width: 210px;
-								           margin-right: 10px;
-								       }
+				
 				.container {
-					background-color: rgba(240, 248, 255, 0.3); /* 70% transparent aliceblue */
+					background-color: rgba(240, 248, 255, 0.8); /* 70% transparent aliceblue */
 					width: 70%;
 					position: absolute;
 					right: 10%;
@@ -153,7 +60,7 @@
 				        
 			}
 			td {
-	            padding: 2px;
+	            padding: 4px;
 	            text-align: center;
 	        }
 			
@@ -176,7 +83,7 @@
 	        .tab-button {
 	            padding: 10px 20px;
 	            cursor: pointer;
-	            background-color: #f1f1f1;
+	            background-color: darkblue;
 	            border: 1px solid #ccc;
 	            border-bottom: none;
 	            margin-right: 5px;
@@ -319,84 +226,25 @@
 		font-size: 11px;
 		height: 27px;
 	}
-
+	.rag-red {
+	            background-color: #FF6347;
+	            color: white;
+	        }
+	        .rag-amber {
+	            background-color: #FFD700;
+	        }
+	        .rag-green {
+	            background-color: #32CD32;
+	            color: white;
+	        }
 
 	    </style>
 </head>
 <body>
-	<div class="navbar">
-	      <div class="navbar-container">
-	          <a href="#" class="logo">
-	              <img src="THINTURE_IMAGE/Thinture.png" alt="Fleet Tracking Logo">
-	          </a>
-	          <ul>
-	              <li>
-	                  <a href="#" class="dropdown-toggle"><strong>SuperAdmin</strong></a>
-	                  <div class="dropdown-content">
-	                      <a href="Add_admin.html">Add Admin</a>
-	                      <a href="Add_dealer.html">Add Dealer </a>
-						<a href="Add_Driver.html">Add Driver</a>
-	                      <a href="add_client.html">Add client</a>
-	                      <a href="add_user.html"> Add user</a>
-						
-	                  </div>
-	              </li>
-	              <li>
-	                  <a href="#" class="dropdown-toggle"><strong>Tracking</strong></a>
-	                  <div class="dropdown-content">
-	                      <a href="demo.html">Live Tracking</a>
-	                      <a href="#history">History</a>
-	                      <a href="#reports">Reports</a>
-	                  </div>
-	              </li>
-				  <li>
-				  				                    <a href="#" class="dropdown-toggle"><strong>Installation</strong></a>
-				  				                    <div class="dropdown-content">
-				  				                        <a href="createdivces.html">install</a>
-				  				                        <a href="#history">Renewal</a>
-				  				                        <a href="#reports">Search</a>
-				  				                    </div>
-				  				                </li>
-	              <li>
-	                  <a href="#" class="dropdown-toggle"><strong>Reports</strong></a>
-	                  <div class="dropdown-content">
-	                      <a href="#annual">Admin Reports</a>
-	                      <a href="#annual">Dealer Reports</a>
-	                      <a href="#">Clients Reports</a>
-	                      <a href="Driver_report.html">Driver Reports</a>
-	                      <a href="Vehicle_report.html">Vehicle Reports</a>
-	                      <a href="#monthly">Monthly Reports</a>
-	                  </div>
-	              </li>
-	              <li>
-	                  <a href="#" class="dropdown-toggle"><strong>Infomations</strong></a>
-	                  <div class="dropdown-content">
-						<a href="Admin_details.html">Admin</a>
-						<a href="Dealer_details.html">Dealer</a>
-						<a href="Client_deatils.html">Client</a>
-						<a href="User_details.html">User</a>
-	                      <a href="Driver_details.html">Driver</a>
-	                      <a href="#settings">Settings</a>
-	                  </div>
-	              </li>
-	              <li>
-	                  <a href="#" class="dropdown-toggle"><strong>Help & Support</strong></a>
-	                  <div class="dropdown-content">
-	                      <a href="#faq">FAQ</a>
-	                      <a href="#contact">Contact Us</a>
-	                      <a href="#guides">Guides</a>
-	                  </div>
-	              </li>
-	              <li>
-	                  <a href="#" class="dropdown-toggle"><strong>Profile</strong></a>
-	                  <div class="dropdown-content">
-	                      <a href="#view-profile">View Profile</a>
-	                      <a href="#logout">Logout</a>
-	                  </div>
-	              </li>
-	          </ul>
-	      </div>
-	  </div>
+	<!-- Insert the navigation fragment -->
+		<div th:insert="navigation :: navbar"></div>
+		
+		
 	  <body class="container">
 	      <h2><strong>Driver Management Report</strong></h2>
 
@@ -432,8 +280,34 @@
 	          <label for="filterDriverOrVehicleNo">Driver/Vehicle ID:</label>
 	          <input type="text" id="filterDriverOrVehicleNo" placeholder="Enter Driver/Vehicle ID" />
 
-	          <button onclick="filterData()">Filter</button>
-	          <button onclick="exportToExcel()">Download Excel</button>
+	          <button  class="filterv"onclick="filterData()">Filter</button>
+	          <button class="filterv"onclick="exportToExcel()">Download Excel</button>
+			  <script>
+				function exportToExcel() {
+				    // Get the table element
+				    const table = document.getElementById('vehicle-table');
+
+				    // Check if table exists
+				    if (!table) {
+				        alert("Table not found!");
+				        return;
+				    }
+
+				    // Create a new Workbook from the table
+				    const wb = XLSX.utils.table_to_book(table, { sheet: "Driver Report" });
+
+				    // Generate a file name based on the current date
+				    const fileName = `Driver_Report_${new Date().toISOString().slice(0, 10)}.xlsx`;
+
+				    // Export the file
+				    XLSX.writeFile(wb, fileName);
+				}
+
+			  					</script>
+			  
+			  
+			  
+			  
 	      </div>
 
 	      <!-- Table Section -->
@@ -495,53 +369,74 @@
 
 	      <script>
 	          // Filter data function
-	          async function filterData() {
-	              const month = document.getElementById('start-month').value;
-	              const year = document.getElementById('filterYears').value;
-	              const vehicleId = document.getElementById('filterDriverOrVehicleNo').value;
+			  async function filterData() {
+			      const month = document.getElementById('start-month').value;
+			      const year = document.getElementById('filterYears').value;
+			      const vehicleId = document.getElementById('filterDriverOrVehicleNo').value;
 
-	              console.log(`Fetching data for Month: ${month}, Year: ${year}, Vehicle ID: ${vehicleId}`);
+			      console.log(`Fetching data for Month: ${month}, Year: ${year}, Vehicle ID: ${vehicleId}`);
 
-	              try {
-	                  const response = await fetch(`/api/reports?month=${month}&year=${year}&vehicleId=${vehicleId}`);
-	                  
-	                  if (!response.ok) {
-	                      throw new Error('Error fetching report data');
-	                  }
+			      try {
+			          const response = await fetch(`/api/reports?month=${month}&year=${year}&vehicleId=${vehicleId}`);
+			          
+			          if (!response.ok) {
+			              throw new Error('Error fetching report data');
+			          }
 
-	                  const data = await response.json();
-	                  const tbody = document.getElementById('vehicle-table-body');
-	                  tbody.innerHTML = ''; // Clear previous data
+			          const data = await response.json();
+			          const tbody = document.getElementById('vehicle-table-body');
+			          tbody.innerHTML = ''; // Clear previous data
 
-	                  if (data.length === 0) {
-	                      alert("No data found for the selected criteria.");
-	                  } else {
-	                      data.forEach(report => {
-	                          const row = `
-	                              <tr>
-	                                  <td>${report.deviceId ?? 'N/A'}</td>
-	                                  <td>${report.driverName ?? 'N/A'}</td>
-	                                  <td>${report.ivmsKey ?? 'N/A'}</td>
-	                                  <td>${report.performanceCategory ?? 'N/A'}</td>
-	                                  <td>${report.status ?? 'N/A'}</td>
-	                                  <td>${report.location ?? 'N/A'}</td>
-	                                  <td>${report.date ?? 'N/A'}</td>
-	                                  <td>${report.kilometresDriven ?? 'N/A'}</td>
-	                                  <td>${report.totalTime ?? 'N/A'}</td>
-	                                  <td>${report.maxSpeed ?? 'N/A'}</td>
-	                                  <td>${report.score ?? 'N/A'}</td>
-	                                  <td><button onclick="showSummary('${report.deviceId}')">View</button></td>
-									  <td><button onclick="showViolations('${report.deviceId}', '${report.driverName}')">View</button></td>
+			          if (data.length === 0) {
+			              alert("No data found for the selected criteria.");
+			          } else {
+			              data.forEach(report => {
+			                  const score = report.score ?? 0;  // Get score from the report data, default to 0 if missing
+			                  const performance = classifyPerformance(score);  // Classify based on the score
 
-	                              </tr>
-	                          `;
-	                          tbody.innerHTML += row;
-	                      });
-	                  }
-	              } catch (error) {
-	                  console.error('Error fetching data:', error);
-	              }
-	          }
+			                  const row = `
+			                      <tr>
+			                          <td>${report.deviceId ?? 'N/A'}</td>
+			                          <td>${report.driverName ?? 'N/A'}</td>
+			                          <td>${report.ivmsKey ?? 'N/A'}</td>
+			                          <td class="${performance.cssClass}">${performance.category}</td>  <!-- RAG Performance column -->
+			                          <td>${report.status ?? 'N/A'}</td>
+			                          <td>${report.location ?? 'N/A'}</td>
+			                          <td>${report.date ?? 'N/A'}</td>
+			                          <td>${report.kilometresDriven ?? 'N/A'}</td>
+			                          <td>${report.totalTime ?? 'N/A'}</td>
+			                          <td>${report.maxSpeed ?? 'N/A'}</td>
+			                          <td>30</td>  <!-- Display actual score here -->
+			                          <td><button onclick="showSummary('${report.deviceId}')">View</button></td>
+			                          <td><button onclick="showViolations('${report.deviceId}', '${report.driverName}')">View</button></td>
+			                      </tr>
+			                  `;
+			                  tbody.innerHTML += row;
+			              });
+			          }
+			      } catch (error) {
+			          console.error('Error fetching data:', error);
+			      }
+			  }
+
+			  // Define thresholds for RAG classification
+			  const scoreThresholds = {
+			      green: 80,  // Green: Score >= 80
+			      amber: 50,  // Amber: Score between 50 and 80
+			      red: 0      // Red: Score < 50
+			  };
+
+			  // Function to classify performance based on score
+			  function classifyPerformance(score) {
+			      if (score >= scoreThresholds.green) {
+			          return { category: 'Green', cssClass: 'rag-green' };
+			      } else if (score >= scoreThresholds.amber) {
+			          return { category: 'Amber', cssClass: 'rag-amber' };
+			      } else {
+			          return { category: 'Red', cssClass: 'rag-red' };
+			      }
+			  }
+
 
 			  function showSummary(deviceId) {
 			             // Populate the side panel with dummy content
@@ -620,6 +515,31 @@
 				          filterData();
 				      };
 
+					  
+					  
+					  function exportDriverViolationsToExcel(tableID, filename = '') {
+					  						        const table = document.getElementById(tableID);
+					  						        let csv = [];
+					  						        for (let i = 0; i < table.rows.length; i++) {
+					  						            let row = [];
+					  						            for (let j = 0; j < table.rows[i].cells.length; j++) {
+					  						                row.push(table.rows[i].cells[j].innerText);
+					  						            }
+					  						            csv.push(row.join(","));
+					  						        }
+					  						        const csvString = csv.join("\n");
+					  						        const blob = new Blob([csvString], { type: 'text/csv' });
+					  						        const url = URL.createObjectURL(blob);
+					  						        const a = document.createElement('a');
+					  						        a.href = url;
+					  						        a.download = filename + '.csv';
+					  						        document.body.appendChild(a);
+					  						        a.click();
+					  						        document.body.removeChild(a);
+					  						    }
+
+					  						    // Populate the initial table with all sample data
+					  						    populateVehicleTable();
 	      </script>
 	  </body>
 

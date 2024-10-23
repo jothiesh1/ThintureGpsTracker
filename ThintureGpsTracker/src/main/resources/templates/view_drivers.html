@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
     <title>Driver Details</title>
     <style>
         body {
@@ -16,7 +17,7 @@
         }
 
         .container {
-            width: 50%;
+            width: 100%;
             margin: 0 auto;
             padding: 20px;
             background: linear-gradient(135deg, #74ebd5, gray);
@@ -58,18 +59,19 @@
         }
 
         table {
-            width: 90%;
+			position: relative;
+            width: 40%;
             border-collapse: collapse;
             margin: 20px auto;
-            font-size: 12px;
-            text-align: left;
+            font-size: 10px;
+            text-align: center;
             background-color: white;
             border-radius: 5px;
         }
 
         th,
         td {
-            padding: 12px;
+            padding: 5px;
             border-bottom: 1px solid #ddd;
         }
 
@@ -104,6 +106,7 @@
 
 
 <body>
+	<div th:insert="navigation :: navbar"></div>
     <div class="container">
         <h2><strong>DRIVER DETAILS</strong></h2>
 
@@ -133,6 +136,8 @@
 			            <th>Manager Email</th>
 			            <th>Focal Point Name</th>
 			            <th>Focal Point Email</th>
+						<th>Edit</th>
+						<th>Delete</th>
 			        </tr>
 			    </thead>
                 <tbody>

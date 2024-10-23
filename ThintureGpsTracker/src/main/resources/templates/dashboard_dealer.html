@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <title>THINTURE - Fleet Management</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(to bottom, #e3f2fd, #cfd8dc);
+        }
+
+      
+
+        .content {
+            padding: 120px 20px 20px; /* Adjust according to navbar height */
+            text-align: center;
+        }
+
+		h2 {
+				    text-align: center;
+				    font-size: 2em; /* Adjust size as needed */
+					font-weight: 400;
+				    color:black; /* Text color */
+				    text-shadow: 
+					1px 1px 2px rgba(0, 0, 0, 0.4), /* First shadow for initial depth */
+					        3px 3px 5px rgba(0, 0, 0, 0.3), /* Slightly darker shadow for increased depth */
+					        6px 6px 8px rgba(0, 0, 0, 0.2); /* Darker shadow for stronger 3D effect */
+					}
+					.contentp{
+							    text-align: center;
+							    font-size: 1em; /* Adjust size as needed */
+								font-weight: 400;
+							    color:darkblue; /* Text color */
+							    text-shadow: 
+								1px 1px 2px rgba(0, 0, 0, 0.4), /* First shadow for initial depth */
+								        3px 3px 5px rgba(0, 0, 0, 0.3), /* Slightly darker shadow for increased depth */
+								        6px 6px 8px rgba(0, 0, 0, 0.2); /* Darker shadow for stronger 3D effect */
+								}
+
+								.footer {
+								      background-color: #151B54; /* Gradient from light to dark blue */
+								    color: WHITE;
+								    position: fixed;
+								    width: 100%;
+								    bottom: 0;
+								    display: flex;
+								    flex-direction: column; /* Set column direction to stack content */
+								    justify-content: center;
+								    align-items: center;
+								    padding: 20px 20px; /* Adjust padding */
+								}
+
+								.footer p {
+								    margin: 10px 0; /* Adjust margin */
+								   
+								    text-align: center;
+								}
+
+								.certificate-wrapper {
+								    position: absolute;
+								    right: 50px;
+								    top: 20px;
+								    text-align: center;
+								}
+
+								.certificateqr {
+								    height: 70px;
+								    width: auto;
+								    display: block;
+								}
+
+								.certificate-wrapper label {
+								    font-size: 16px;
+								    margin-top: 10px;
+								    color: white;
+								    display: block;
+								}
+
+								.social-icons {
+								    display: flex;
+								    justify-content: center; /* Center the icons */
+								    align-items: center; /* Vertically align icons */
+								    margin-top: 10px; /* Add space between icons and other content */
+								}
+
+								.social-icons a {
+								    color: WHITE;
+								    margin: 0 15px;
+								    text-decoration: none;
+								    font-size: 24px;
+								    transition: color 0.3s ease;
+								}
+
+								.social-icons a:hover {
+								    color: #ffdd57; /* Change color on hover */
+								}
+
+
+       
+		
+				
+    </style>
+</head>
+<body>
+	<div th:insert="navigation_dealer :: navbar_dealer"></div>
+    <div class="content">
+        <h2>Welcome to Thinture Technologies Pvt. Ltd. Fleet Management</h2>
+        <p class="contentp">Optimize your fleet operations with our advanced tracking and management solutions.</p>
+        <button id="panicButton" class="panicb">Panic Alert</button>
+        <audio id="panicAlertSound" src="THINTURE_IMAGE/emergency-alarm-with-reverb-29431.mp3" preload="auto"></audio>
+    </div>
+
+	<div class="footer">
+	    <p>&copy; 2024 Thinture Technologies Pvt. Ltd. All rights reserved.</p>
+	   
+		<div class="social-icons">
+		           <a href="https://facebook.com" target="_blank" class="facebook">
+		               <i class="fab fa-facebook"></i>
+		           </a>
+		           <a href="https://twitter.com" target="_blank" class="twitter">
+		               <i class="fab fa-twitter"></i>
+		           </a>
+		           <a href="https://linkedin.com" target="_blank" class="linkedin">
+		               <i class="fab fa-linkedin"></i>
+		           </a>
+		           <a href="https://instagram.com" target="_blank" class="instagram">
+		               <i class="fab fa-instagram"></i>
+		           </a>
+		       </div>
+	</div>
+
+
+    <script>
+        // Panic Button Functionality
+        document.getElementById('panicButton').addEventListener('click', function() {
+            const sound = document.getElementById('panicAlertSound');
+            sound.currentTime = 0; // Reset sound to start
+            sound.play();
+
+            // Show an alert message
+            alert('Panic Alert Activated! Please take necessary action.');
+        });
+    </script>
+</body>
+</html>

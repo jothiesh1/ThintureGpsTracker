@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panic Button Alert Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 300px;
+            padding: 20px;
+        }
+
+        .modal-header {
+            font-weight: bold;
+            color: red;
+            margin-bottom: 10px;
+        }
+
+        .modal-body {
+            margin-bottom: 10px;
+        }
+
+        .closeButton {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 15px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .closeButton:hover {
+            background-color: #0056b3;
+        }
+
+        .notification-tab {
+            display: none; /* Hidden, no button needed */
+            align-items: center;
+            cursor: pointer;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 150px;
+            margin-bottom: 20px;
+        }
+
+        .notification-icon {
+            margin-right: 10px;
+            color: red;
+            font-size: 20px;
+        }
+
+        .notification-count {
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 50%;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Vehicle Monitoring System</h1>
+
+    <!-- Modal -->
+    <div id="alertModal" class="modal">
+        <div class="modal-header">Panic Button Alert</div>
+        <div class="modal-body" id="alertMessage">No panic alerts found!</div>
+        <div class="modal-body" id="vehicleDetails"></div>
+        <div class="modal-body" id="driverDetails"></div>
+        <div class="modal-footer">
+            <button id="closeModal" class="closeButton">Close</button>
+        </div>
+    </div>
+
+    <!-- Sound Notifications -->
+    <audio id="successSound" src="THINTURE_IMAGE/emergency.mp3" preload="auto"></audio>
+    <audio id="errorSound" src="THINTURE_IMAGE/emergency.mp3" preload="auto"></audio>
+
+	<script>
+	    const alertModal = document.getElementById('alertModal');
+	    const alertMessage = document.getElementById('alertMessage');
+	    const vehicleDetails = document.getElementById('vehicleDetails');
+	    const driverDetails = document.getElementById('driverDetails');
+	    const closeModalButton = document.getElementById('closeModal');
+	    const successSound = document.getElementById('successSound');
+	    const errorSound = document.getElementById('errorSound');
+
+	    let alertInterval; // To store interval reference
+	    let alertCount = 0; // To track number of alerts
+
+	    // Function to append multiple alerts to the modal
+	    function appendAlertToModal(vehicleInfo, driverInfo) {
+	        const vehicleRow = document.createElement('div');
+	        vehicleRow.textContent = `Vehicle: ${vehicleInfo} | Driver: ${driverInfo}`;
+	        vehicleDetails.appendChild(vehicleRow);
+	    }
+
+	    // Show the modal with the panic alert details
+	    function showModal(message) {
+	        alertMessage.textContent = message;
+	        alertModal.style.display = 'block';
+	    }
+
+	    // Close the modal and stop the sound
+	    function closeModal() {
+	        alertModal.style.display = 'none';
+	        successSound.pause();
+	        errorSound.pause();
+	        successSound.currentTime = 0;
+	        errorSound.currentTime = 0;
+	        clearInterval(alertInterval); // Stop the interval when modal is closed
+	        vehicleDetails.innerHTML = ''; // Clear previous rows when modal is closed
+	    }
+
+	    // Function to fetch panic alerts and automatically trigger alerts
+	    function fetchPanicAlerts() {
+	        fetch('/api/panic-alerts')
+	            .then(response => response.json())
+	            .then(alerts => {
+	                if (alerts.length > 0) {
+	                    showModal('Panic alerts detected!');
+
+	                    // Loop through each alert and append to the modal
+	                    alerts.forEach(alert => {
+	                        const vehicleInfo = alert.vehicleId || 'Unknown Vehicle';
+	                        const driverInfo = 'Driver info not available';  // Modify based on your DTO structure
+
+	                        appendAlertToModal(vehicleInfo, driverInfo);
+	                    });
+
+	                    successSound.play().catch(error => console.error('Error playing sound:', error));
+
+	                    alertCount += alerts.length;  // Increment the alert count by the number of alerts
+	                } else {
+	                    errorSound.play().catch(error => console.error('Error playing sound:', error));
+	                    showModal('No panic alerts found!');
+	                }
+	            })
+	            .catch(error => {
+	                console.error('Error fetching panic alerts:', error);
+	                errorSound.play().catch(error => console.error('Error playing sound:', error));
+	                showModal('Failed to fetch panic alerts!');
+	            });
+	    }
+
+	    // Automatically play sound for alerts with 6 seconds interval and pause
+	    function playSoundWithPause() {
+	        successSound.play().catch(error => console.error('Error playing sound:', error));
+	        setTimeout(() => {
+	            successSound.pause();
+	            successSound.currentTime = 0;
+	            setTimeout(() => {
+	                playRepeatedly();
+	            }, 6000); // 6 second pause
+	        }, 6000); // Play sound for 6 seconds
+	    }
+
+	    // Function to play the sound repeatedly every 20 seconds
+	    function playRepeatedly() {
+	        alertInterval = setInterval(() => {
+	            successSound.play().catch(error => console.error('Error playing sound:', error));
+	            setTimeout(() => {
+	                successSound.pause();
+	                successSound.currentTime = 0;
+	            }, 6000); // Pause after 6 seconds
+	        }, 20000); // Play every 20 seconds
+	    }
+
+	    // Automatically start fetching panic alerts and sound handling when the page loads
+	    setTimeout(() => {
+	        fetchPanicAlerts(); // Fetch alerts
+	        playSoundWithPause(); // Start sound with pause
+	    }, 1000); // Start 1 second after page load
+
+	    closeModalButton.addEventListener('click', closeModal);
+
+	</script>
+
+</body>
+</html>

@@ -95,7 +95,6 @@ public class DealerController {
                 model.addAttribute("error", "User is not authorized to add a dealer.");
                 return "error";  // Return to error page
             }
-
             // Save the dealer entity
             try {
                 dealerService.saveDealer(dealer);
@@ -112,14 +111,6 @@ public class DealerController {
             return "login";  // Redirect to login page if not authenticated
         }
     }
-
-
-
-
-
-
-
-
     /**
      * Handle JSON request for adding a dealer.
      */

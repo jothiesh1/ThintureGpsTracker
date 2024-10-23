@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	
+
+    <title>THINTURE - Fleet Management</title>
+    
+</head>
+<body>
+    <!-- navigation.html -->
+    <div th:fragment="navbar_dealer">
+        <nav class="navbar">
+			
+            <div class="navbar-container">
+                <a href="#" class="logo">
+                    <img src="/THINTURE_IMAGE/Thinture.jpg" alt="Fleet Tracking Logo">
+                </a>
+                <ul>
+                    <li>
+                        <a href="#" class="dropdown-toggle"><strong>MANAGER</strong></a>
+                        <div class="dropdown-content">
+                            
+                            <a href="/add_driver">Add DDriver</a>
+                            <a href="/add_client">Add Client</a>
+                            <a href="/users/add">Add User</a>
+							<a href="#">Add Device to client</a>
+							<a href="#">Add Monitoring Department</a>
+							 
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#" class="dropdown-toggle"><strong>TRACKING</strong></a>
+                        <div class="dropdown-content">
+                            <a href="/map">LiveTracking</a>
+                            <a href="#history">History</a>
+                            <a href="#reports">Reports</a>
+							<a href="/replay">replay</a>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#" class="dropdown-toggle"><strong>INSTALLATION</strong></a>
+                        <div class="dropdown-content">
+                            <a href="#">Install</a>
+                            <a href="#renewal">Renewal</a>
+                            <a href="#search">Search</a>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#" class="dropdown-toggle"><strong>REPORTS</strong></a>
+                        <div class="dropdown-content">
+                           
+                            <a href="">Dealer Reports</a>
+                            <a href="">Clients Reports</a>
+                            <a href="">Driver Reports</a>
+                            <a href="">Vehicle Reports</a>
+							<a href="">vehicle-violations_report</a>
+                            <a href="#monthly">Monthly Reports</a>
+							<a href="/map"> map </a>
+                        </div>
+                    </li>
+                    
+                    <li>
+                        <a href="#" class="dropdown-toggle"><strong>HELP & SUPPORT</strong></a>
+                        <div class="dropdown-content">
+                            <a href="#faq">FAQ</a>
+                            <a href="#contact">Contact Us</a>
+                            <a href="#guides">Guides</a>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#" class="dropdown-toggle"><strong>PROFILE</strong></a>
+                        <div class="dropdown-content">
+                            <a href="#view-profile">View Profile</a>
+                            <a href="#logout">Logout</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</body>
+</html>

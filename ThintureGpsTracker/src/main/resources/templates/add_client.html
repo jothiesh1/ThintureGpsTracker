@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THINTURE - Add New Dealer</title>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('THINTURE_IMAGE/driver_report.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 0;
+        }
+		
+							   .container {
+							               width: 20%;
+							               max-width: 900px;
+							               margin: 250px auto;
+							   			right:55%;
+							               padding: 30px;
+							               background: linear-gradient(135deg, #74ebd5, gray); 
+							               border: 1px solid #ddd;
+							               border-radius: 10px;
+							               box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+							   			position: fixed;
+							           }
+
+
+        h2 {
+			text-align: center;
+					    font-size: 2em; /* Adjust size as needed */
+						font-weight: 400;
+					    color:black; /* Text color */
+					    text-shadow: 
+						1px 1px 2px rgba(0, 0, 0, 0.4), /* First shadow for initial depth */
+						        3px 3px 5px rgba(0, 0, 0, 0.3), /* Slightly darker shadow for increased depth */
+						        6px 6px 8px rgba(0, 0, 0, 0.2); /* Darker shadow for stronger 3D effect */
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 10px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"],
+        .form-group input[type="password"] {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+            width: 60%;
+            height: 5px;
+        }
+
+        .form-group input[type="text"].error,
+        .form-group input[type="email"].error,
+        .form-group input[type="tel"].error,
+        .form-group input[type="password"].error {
+            border-color: red;
+        }
+
+        .form-group input[type="submit"] {
+            width: auto; /* Adjust width to content size */
+            padding: 12px 20px; /* Adjust padding as needed */
+            background-color: darkblue;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            position: absolute;
+            right: 150px; /* Align to the right edge of the container */
+        }
+
+        .form-group input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 12px 20px;
+            color: white;
+            background-color: darkblue;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .error-message {
+            color: red;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+		.dropdown-toggle{
+			text-transform: uppercase;
+			}
+    </style>
+</head>
+<body>
+	<div th:insert="navigation :: navbar"></div>
+    <div class="container">
+        <h2><strong>ADD CLIENT</strong></h2>
+        <form id="add-dealer-form" action="/dealers/add" method="post">
+            <div class="form-group">
+                <label for="companyName">Company Name</label>
+                <input type="text" id="companyName" name="companyName">
+                <span class="error-message" id="companyName-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" id="address" name="address">
+                <span class="error-message" id="address-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email">
+                <span class="error-message" id="email-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" name="phone">
+                <span class="error-message" id="phone-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="country">Country</label>
+                <input type="text" id="country" name="country">
+                <span class="error-message" id="country-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password">
+                <span class="error-message" id="password-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="c_password">Confirm Password</label>
+                <input type="password" id="c_password" name="c_password">
+                <span class="error-message" id="c_password-error"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Add User">
+            </div>
+        </form>
+    </div>
+	<script>
+	    document.addEventListener('DOMContentLoaded', function() {
+	        const form = document.getElementById('add-dealer-form');
+	        
+	        form.addEventListener('submit', function(event) {
+	            let isValid = true;
+
+	            // Clear previous error messages
+	            document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+
+	            // Validate fields
+	            const companyName = document.getElementById('companyName');
+	            if (companyName.value.trim() === '') {
+	                document.getElementById('companyName-error').textContent = 'Company name is required.';
+	                isValid = false;
+	            }
+
+	            const address = document.getElementById('address');
+	            if (address.value.trim() === '') {
+	                document.getElementById('address-error').textContent = 'Address is required.';
+	                isValid = false;
+	            }
+
+	            const email = document.getElementById('email');
+	            if (!/^\S+@\S+\.\S+$/.test(email.value)) {
+	                document.getElementById('email-error').textContent = 'Invalid email address.';
+	                isValid = false;
+	            }
+
+	            const phone = document.getElementById('phone');
+	            if (phone.value.trim() === '') {
+	                document.getElementById('phone-error').textContent = 'Phone number is required.';
+	                isValid = false;
+	            }
+
+	            const password = document.getElementById('password');
+	            const confirmPassword = document.getElementById('c_password');
+	            if (password.value.trim() === '' || password.value !== confirmPassword.value) {
+	                document.getElementById('password-error').textContent = 'Passwords do not match.';
+	                document.getElementById('c_password-error').textContent = 'Passwords do not match.';
+	                isValid = false;
+	            }
+
+	            if (!isValid) {
+	                event.preventDefault(); // Prevent form submission
+	            }
+	        });
+	    });
+	</script>
+
+</body>
+</html>

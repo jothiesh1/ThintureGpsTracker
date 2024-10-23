@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
     <title>THINTURE - Add New Dealer</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-image: url('THINTURE_IMAGE/background4.jpg');
+            background-image: url('/THINTURE_IMAGE/background4.jpg');
             background-size: cover;
             background-repeat: no-repeat;
             margin: 0;
@@ -97,6 +99,7 @@
     </style>
 </head>
 <body>
+	<div th:insert="navigation :: navbar"></div>
 	<div class="container">
 	    <h2>Add New User</h2>
 	    <a href="/dashboard" class="back-btn">Back</a> <!-- Redirects to dashboard -->

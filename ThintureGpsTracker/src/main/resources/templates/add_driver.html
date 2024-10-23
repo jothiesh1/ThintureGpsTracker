@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
     <title>THINTURE - DRIVER</title>
     <style>
         body {
@@ -13,95 +14,7 @@
             margin: 0;
             padding: 0;
         }
-		.navbar {
-				          background: linear-gradient(135deg, white,white, lightgray, darkblue, darkblue, black); /* Gradient from light to dark blue */
-				           color: white;
-				           width: 100%;
-				           position: fixed;
-				           height: 110px; /* Adjust height as needed */
-				           top: 0;
-				           left: 0;
-				           z-index: 1000;
-				           border: 2px solid darkblue; /* Border on all sides */
-				           text-align: center;
-				       }
-
-				       .navbar-container {
-				           display: flex;
-				           align-items: center;
-				           justify-content: space-between;
-				           padding: 10px 20px;
-						   margin-right: 60px;
-				       }
-
-				       .navbar h1 {
-				           margin: 0;
-				           font-size: 20px;
-				       }
-
-				       .navbar ul {
-				           list-style-type: none;
-				           padding: 0;
-				           margin: 0;
-				           display: flex;
-				       }
-
-				       .navbar ul li {
-				           position: relative;
-				           margin: 0 10px;
-				       }
-
-				       .navbar ul li a {
-				           color: white;
-				           text-decoration: none;
-				           padding: 10px;
-				           display: block;
-				       }
-
-				       .navbar ul li a:hover {
-				           background-color: #34495e;
-				           border-radius: 5px;
-				       }
-
-				       .navbar ul li .dropdown-content {
-				           display: none;
-				           position: absolute;
-				           top: 100%;
-				           left: 0;
-				           background-color: #ffffff;
-				           color: #000000;
-				           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-				           border-radius: 5px;
-				           min-width: 160px;
-				           z-index: 1000;
-				       }
-
-				       .navbar ul li:hover .dropdown-content {
-				           display: block;
-				       }
-
-				       .navbar ul li .dropdown-content a {
-				           color: #000000;
-				           padding: 10px;
-				           display: block;
-				           text-decoration: none;
-						 
-				       }
-
-				       .navbar ul li .dropdown-content a:hover {
-				           background-color: #f0f0f0;
-				       }
-
-				       .content {
-				           padding: 20px;
-				           margin-top: 120px; /* Adjust according to navbar height */
-				       }
-
-				       .logo img {
-				           height: 90px;
-				           width: 210px;
-				           margin-right: 10px;
-				       }
+		
 
         .container {
 			
@@ -207,73 +120,7 @@
     </style>
 </head>
 <body>
-	<div class="navbar">
-	       <div class="navbar-container">
-	           <a href="#" class="logo">
-	               <img src="THINTURE_IMAGE/Thinture.png" alt="Fleet Tracking Logo">
-	           </a>
-	           <ul>
-				<li>
-				                   <a href="#" class="dropdown-toggle"><strong>SuperAdmin</strong></a>
-				                   <div class="dropdown-content">
-				                       <a href="Add_admin.html">Add Admin</a>
-				                       <a href="Add_dealer.html">Add Dealer </a>
-									<a href="Add_Driver.html">Add Driver</a>
-				                       <a href="add_client.html">Add client</a>
-				                       <a href="add_user.html"> Add user</a>
-									
-				                   </div>
-				               </li>
-				               <li>
-				                   <a href="#" class="dropdown-toggle"><strong>Tracking</strong></a>
-				                   <div class="dropdown-content">
-				                       <a href="demo.html">Live Tracking</a>
-				                       <a href="#history">History</a>
-				                       <a href="#reports">Reports</a>
-				                   </div>
-				               </li>
-	               <li>
-	                   <a href="#" class="dropdown-toggle"><strong>Reports</strong></a>
-	                   <div class="dropdown-content">
-						
-	                      
-						   <a href="#annual">Admin Reports</a>
-						   <a href="#annual">Dealer Reports</a>
-						   <a href="#annual">Clients Reports</a>
-						   <a href="#annual">Driver Reports</a>
-	                       <a href="#custom">Vehicle Reports</a>
-						   <a href="#monthly">Monthly Reports</a>
-	                   </div>
-	               </li>
-	               
-	               <li>
-	                   <a href="#" class="dropdown-toggle"><strong>Alerts</strong></a>
-	                   <div class="dropdown-content">
-	                       <a href="#notifications">Notifications</a>
-	                       <a href="#settings">Settings</a>
-	                   </div>
-	               </li>
-	               
-	               <li>
-	                   <a href="#" class="dropdown-toggle"><strong>Help & Support</strong></a>
-	                   <div class="dropdown-content">
-	                       <a href="#faq">FAQ</a>
-	                       <a href="#contact">Contact Us</a>
-	                       <a href="#guides">Guides</a>
-	                   </div>
-	               </li>
-	               <li>
-	                   <a href="#" class="dropdown-toggle"><strong>Profile</strong></a>
-	                   <div class="dropdown-content">
-	                       <a href="#view-profile">View Profile</a>
-	                      
-	                       <a href="#logout">Logout</a>
-	                   </div>
-	               </li>
-	              
-	           </ul>
-	       </div>
-	   </div>
+	<div th:insert="navigation :: navbar"></div>
 	   <div class="container">
 	       <h2><strong>DRIVER</strong></h2>
 	       <form id="ivms-request-form" action="" method="post" onsubmit="submitDriverForm(event);">
@@ -378,7 +225,7 @@
 	               focalPointEmail: document.getElementById('focalPointEmail').value
 	           };
 
-	           // Send the form data using AJAX
+	           // Send the fo/driversrm data using AJAX
 			   fetch('/drivers/add', {
 			       method: 'POST',
 			       headers: {

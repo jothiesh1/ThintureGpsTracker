@@ -1,6 +1,7 @@
 package com.GpsTracker.Thinture.repository;
 //package com.GpsTracker.Thinture.repository;
 
+import com.GpsTracker.Thinture.model.Vehicle;
 import com.GpsTracker.Thinture.model.VehicleHistory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,57 @@ import java.util.List;
 @Repository
 public interface VehicleHistoryRepository extends JpaRepository<VehicleHistory, Long> {
     
+	@Query("SELECT vh FROM VehicleHistory vh WHERE vh.vehicle.deviceID = :deviceID AND vh.timestamp BETWEEN :startDate AND :endDate ORDER BY vh.timestamp ASC")
+	List<VehicleHistory> findHistoryByDeviceIDAndDateRange(
+	    @Param("deviceID") String deviceID,
+	    @Param("startDate") Timestamp startDate,
+	    @Param("endDate") Timestamp endDate);
+
+
+    @Query("SELECT vh FROM VehicleHistory vh WHERE vh.vehicle.deviceID = :deviceID ORDER BY vh.timestamp ASC")
+    List<VehicleHistory> findHistoryByDeviceID(@Param("deviceID") String deviceID);
+
+    @Query("SELECT vh FROM VehicleHistory vh WHERE vh.vehicle.deviceID IN :deviceIDs AND vh.timestamp BETWEEN :startDate AND :endDate ORDER BY vh.timestamp ASC")
+    List<VehicleHistory> findHistoryByMultipleDeviceIDsAndDateRange(
+            @Param("deviceIDs") List<String> deviceIDs,
+            @Param("startDate") Timestamp startDate,
+            @Param("endDate") Timestamp endDate);
+
+    VehicleHistory findTopByVehicle_DeviceIDOrderByTimestampDesc(String deviceID);
+    
+    @Query("SELECT vh FROM VehicleHistory vh WHERE vh.vehicle.deviceID = :vehicleId AND YEAR(vh.timestamp) = :year")
+    List<VehicleHistory> findByVehicleIdAndYear(
+        @Param("vehicleId") String vehicleId, 
+        @Param("year") int year
+    );
+
+    @Query("SELECT vh FROM VehicleHistory vh WHERE vh.vehicle.deviceID = :vehicleId")
+    List<VehicleHistory> findByVehicleId(@Param("vehicleId") String vehicleId);
+
+    // New query for vehicle violations and vehicle report
+    @Query("SELECT vh FROM VehicleHistory vh LEFT JOIN FETCH vh.violationReports WHERE vh.vehicle.deviceID = :deviceID")
+    List<VehicleHistory> findByDeviceIDWithViolations(@Param("deviceID") String deviceID);
+
+    // Query for fetching based on device ID, month, and year
+    @Query("SELECT vh FROM VehicleHistory vh WHERE vh.vehicle.deviceID = :deviceId AND MONTH(vh.timestamp) = :month AND YEAR(vh.timestamp) = :year")
+    List<VehicleHistory> findByDeviceIDMonthYear(
+        @Param("deviceId") String deviceId, 
+        @Param("month") int month, 
+        @Param("year") int year
+    );
+    @Query("SELECT vh FROM VehicleHistory vh WHERE vh.vehicle.deviceID = :deviceID AND vh.panic = 1 ORDER BY vh.timestamp DESC")
+    List<VehicleHistory> findPanicAlertsByDeviceID(@Param("deviceID") String deviceID);
+
+    @Query("SELECT vh FROM VehicleHistory vh WHERE vh.panic = 1")
+    List<VehicleHistory> findAllPanicAlerts();
+
+    @Query("SELECT vh FROM VehicleHistory vh WHERE vh.vehicle.deviceID = :deviceID ORDER BY vh.timestamp DESC")
+    VehicleHistory findLatestByDeviceID(@Param("deviceID") String deviceID);
+}
+
+	
+// this command for panic button 17/10/2024
+    /*
     @Query("SELECT vh FROM VehicleHistory vh WHERE vh.vehicle.deviceID = :deviceID AND vh.timestamp BETWEEN :startDate AND :endDate ORDER BY vh.timestamp ASC")
     List<VehicleHistory> findHistoryByDeviceIDAndDateRange(
             @Param("deviceID") String deviceID,
@@ -77,10 +129,15 @@ public interface VehicleHistoryRepository extends JpaRepository<VehicleHistory, 
     List<Object[]> findVehicleReportByDeviceIdAndDateRange(@Param("deviceID") String deviceID,
                                                            @Param("startDate") String startDate,
                                                            @Param("endDate") String endDate);
+    //new code panic
+    
+    // Fetch all panic alerts where panic = 1 for a specific deviceID
+    List<VehicleHistory> findByDevice_DeviceIDAndPanic(String deviceID, int panic);
+    
 }
 
 
-
+*/
 
 
 

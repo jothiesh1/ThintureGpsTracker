@@ -6,363 +6,193 @@
 	
     <title>Multi-Part GPS Vehicle Installation Form</title>
 	
-	<link rel="stylesheet" href="style.css">
+
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
 	<style>
 			/* Navigation Menu Styles */
-			body {
-				    margin: 0;
-				    font-family: Arial, sans-serif;
-				}
+			 body {
+			            font-family: Arial, sans-serif;
+						background-image: url('THINTURE_IMAGE/background4.jpg');
+						   background-size: cover; /* Cover the entire element */
+						   background-position: center; /* Center the image */
+						   background-repeat: no-repeat;
+			            display: flex;
+			            justify-content: center;
+			            align-items: center;
+			            height: 100vh;
+			            margin: 0;
+			        }
 
-				.navbar {
-				    background-color:lightseagreen;
-				    color: white;
-				    width: 100%;
-				    position: fixed;
-				    top: 0;
-				    left: 0;
-				    z-index: 1000;
-				}
+			        .form-container {
+			            max-width: 600px;
+			            width: 100%;
+			            padding: 20px;
+			            border: 1px solid #ccc;
+			            border-radius: 8px;
+			            background-color: #fff;
+			            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+						background: linear-gradient(135deg, #74ebd5, gray); 
+			        }
 
-				.navbar-container {
-				    display: flex;
-				    align-items: center;
-				    justify-content: space-between;
-				    padding: 10px 20px;
-				}
+			        fieldset {
+			            border: none;
+			            padding: 0;
+			        }
 
-				.navbar h1 {
-				    margin: 0;
-				    font-size: 20px;
-				}
+			        legend {
+			            font-size: 1.5em;
+			            margin-bottom: 10px;
+			            color: #333;
+			        }
 
-				.navbar ul {
-				    list-style-type: none;
-				    padding: 0;
-				    margin: 0;
-				    display: flex;
-				}
+			        label {
+			            display: block;
+			            margin-bottom: 8px;
+			            color: #333;
+			        }
 
-				.navbar ul li {
-				    margin: 0 10px;
-				}
+			        input[type="text"], input[type="date"], input[type="tel"], select, textarea {
+			            width: 55%;
+			            padding: 8px;
+			            margin-bottom: 12px;
+			            border: 1px solid #ccc;
+			            border-radius: 4px;
+			            box-sizing: border-box;
+			        }
+					.form-group input[type="email"] {
+						width: 145px;
+						           padding: 8px;
+						           margin-bottom: 12px;
+						           border: 1px solid #ccc;
+						           border-radius: 4px;
+						           box-sizing: border-box;
+					}
+			        button {
+			            display: block;
+			            width: 100%;
+			            padding: 10px;
+			            border: none;
+			            border-radius: 4px;
+			            background-color: darkblue;
+			            color: white;
+			            font-size: 1em;
+			            cursor: pointer;
+			            box-sizing: border-box;
+			        }
 
-				.navbar ul li a {
-				    color: white;
-				    text-decoration: none;
-				    padding: 10px;
-				    display: block;
-				}
+			        button:hover {
+			            background-color: #0056b3;
+			        }
 
-				.navbar ul li a:hover {
-				    background-color: #34495e;
-				    border-radius: 5px;
-				}
+			        .hidden {
+			            display: none;
+			        }
 
-				.content {
-				    padding: 20px;
-				    margin-top: 50px; /* Adjust according to navbar height */
-				}
-				.logo {
-				    display: flex;
-				    align-items: center;
-				    text-decoration: none;
-				    color: black; /* Adjust text color as needed */
-				    background-color: white;
-				    border-radius: 100%; /* Makes the background circular */
-				    padding: 10px; /* Space around the content */
-				    box-shadow: 0 8px 8px rgba(0, 0, 0, 0.2); /* Adds a subtle shadow */
-				    overflow: hidden; /* Ensures content stays within the rounded background */
-					height: 60px;
-					width:200px;
-				}
+			        .error {
+			            color: red;
+			            font-size: 0.875em;
+			            margin-top: -10px;
+			            margin-bottom: 10px;
+			        }
 
-				.logo img {
-					height: 60px;
-								width:190px;
-				    margin-right: 10px;
-				}
+			        .submitted-data p {
+			            margin: 8px 0;
+			        }
 
+			        .form-container {
+			            width: 60%;
+			            margin: 0 auto;
+			        }
 
-	        body {
-	            font-family: Arial, sans-serif;
-				background-image: url('THINTURE_IMAGE/background4.jpg');
-				   background-size: cover; /* Cover the entire element */
-				   background-position: center; /* Center the image */
-				   background-repeat: no-repeat;
-	            display: flex;
-	            justify-content: center;
-	            align-items: center;
-	            height: 100vh;
-	            margin: 0;
-	        }
+			        .form-row {
+			            display: flex;
+			            justify-content: space-between;
+			            margin-bottom: 15px;
+			        }
 
-	        .form-container {
-	            max-width: 600px;
-	            width: 100%;
-	            padding: 20px;
-	            border: 1px solid #ccc;
-	            border-radius: 8px;
-	            background-color: #fff;
-	            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-				background: linear-gradient(135deg, #74ebd5, gray); 
-	        }
+			        .form-group {
+			            width: 80%;
+			        }
 
-	        fieldset {
-	            border: none;
-	            padding: 0;
-	        }
+			        fieldset {
+			            padding: 20px;
+			            border: 1px solid #ccc;
+			            margin-bottom: 20px;
+			        }
 
-	        legend {
-	            font-size: 1.5em;
-	            margin-bottom: 10px;
-	            color: #333;
-	        }
+			        legend {
+			            font-weight: bold;
+			        }
 
-	        label {
-	            display: block;
-	            margin-bottom: 8px;
-	            color: #333;
-	        }
+			        button {
+			            margin-top: 20px;
+			        }
 
-	        input[type="text"], input[type="date"], input[type="tel"], select, textarea {
-	            width: 55%;
-	            padding: 8px;
-	            margin-bottom: 12px;
-	            border: 1px solid #ccc;
-	            border-radius: 4px;
-	            box-sizing: border-box;
-	        }
-			.form-group input[type="email"] {
-				width: 145px;
-				           padding: 8px;
-				           margin-bottom: 12px;
-				           border: 1px solid #ccc;
-				           border-radius: 4px;
-				           box-sizing: border-box;
-			}
-	        button {
-	            display: block;
-	            width: 100%;
-	            padding: 10px;
-	            border: none;
-	            border-radius: 4px;
-	            background-color: darkblue;
-	            color: white;
-	            font-size: 1em;
-	            cursor: pointer;
-	            box-sizing: border-box;
-	        }
+			        .review-section p {
+			            font-weight: bold;
+			        }
 
-	        button:hover {
-	            background-color: #0056b3;
-	        }
+			        #add-vehicle-section {
+			            margin-top: 20px;
+			            padding: 20px;
+			            border: 1px solid #ccc;
+			            border-radius: 8px;
+			            background-color: #fff;
+			            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+			        }
 
-	        .hidden {
-	            display: none;
-	        }
+			        /* Styles for the autocomplete container */
+			        .autocomplete {
+			            position: relative;
+			            display: inline-block;
+			            width: 100%;
+			        }
 
-	        .error {
-	            color: red;
-	            font-size: 0.875em;
-	            margin-top: -10px;
-	            margin-bottom: 10px;
-	        }
+			        .autocomplete-items {
+			            position: absolute;
+			            border: 1px solid #d4d4d4;
+			            border-bottom: none;
+			            border-top: none;
+			            z-index: 99;
+			            top: 100%;
+			            left: 0;
+			            right: 0;
+			        }
 
-	        .submitted-data p {
-	            margin: 8px 0;
-	        }
+			        .autocomplete-items div {
+			            padding: 10px;
+			            cursor: pointer;
+			            background-color: #fff;
+			            border-bottom: 1px solid #d4d4d4;
+			        }
 
-	        .form-container {
-	            width: 60%;
-	            margin: 0 auto;
-	        }
+			        .autocomplete-items div:hover {
+			            background-color: #e9e9e9;
+			        }
 
-	        .form-row {
-	            display: flex;
-	            justify-content: space-between;
-	            margin-bottom: 15px;
-	        }
+			        .autocomplete-active {
+			            background-color: DodgerBlue !important;
+			            color: #ffffff;
+			        }
+					.input-container {
+					    position: relative;
+					    width: 100%;
+					}
 
-	        .form-group {
-	            width: 80%;
-	        }
-
-	        fieldset {
-	            padding: 20px;
-	            border: 1px solid #ccc;
-	            margin-bottom: 20px;
-	        }
-
-	        legend {
-	            font-weight: bold;
-	        }
-
-	        button {
-	            margin-top: 20px;
-	        }
-
-	        .review-section p {
-	            font-weight: bold;
-	        }
-
-	        #add-vehicle-section {
-	            margin-top: 20px;
-	            padding: 20px;
-	            border: 1px solid #ccc;
-	            border-radius: 8px;
-	            background-color: #fff;
-	            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	        }
-
-	        /* Styles for the autocomplete container */
-	        .autocomplete {
-	            position: relative;
-	            display: inline-block;
-	            width: 100%;
-	        }
-
-	        .autocomplete-items {
-	            position: absolute;
-	            border: 1px solid #d4d4d4;
-	            border-bottom: none;
-	            border-top: none;
-	            z-index: 99;
-	            top: 100%;
-	            left: 0;
-	            right: 0;
-	        }
-
-	        .autocomplete-items div {
-	            padding: 10px;
-	            cursor: pointer;
-	            background-color: #fff;
-	            border-bottom: 1px solid #d4d4d4;
-	        }
-
-	        .autocomplete-items div:hover {
-	            background-color: #e9e9e9;
-	        }
-
-	        .autocomplete-active {
-	            background-color: DodgerBlue !important;
-	            color: #ffffff;
-	        }
-			.input-container {
-			    position: relative;
-			    width: 100%;
-			}
-
-			.input-container input[type="text"] {
-			    width: calc(11
-				
-				
-				0% - 120px); /* Adjust the width to account for the button */
-			    padding-right: 120px; /* Ensure padding is added to make space for the button */
-			}
-			
-			.add-vehicle-button {
-				
-									    position: absolute;
-									    right: -290px;
-									    top: -135px;
-									    height: 75%;
-									    width: 110px; /* Set a fixed width for the button */
-									    border: none;
-									    border-left: 1px solid #ccc; /* Border to separate the button from the input */
-									    background-color:darkblue;
-									    color: white;
-									    cursor: pointer;
-									    box-sizing: border-box;
-										font-size: 10px;
-									}
-
-									.add-vehicle-button:hover {
-									    background-color: #0056b3;
-									}
-
-	
-	.form-group	.search-bar {
-			    position: absolute;
-			    right: 54.4%;
-			    top: 265px;
-			    height: 32px;
-			    width: 200px; /* Adjusted width */
-			    border: none;
-			    border-left: 1px solid #ccc; /* Border to separate the button from the input */
-			    background-color: white;
-			    color: black;
-			    cursor: pointer;
-			    box-sizing: border-box;
-			    font-size: 10px;
-			}
-
-	/* Modal Styles */
-	.modal {
-	  
-	    position: fixed; /* Stay in place */
-	    z-index: 1; /* Sit on top */
-	    left: 550px;
-	    top: 0;
-	    width: 50%; /* Full width */
-	    height: 100%; /* Full height */
-	    overflow: auto; /* Enable scroll if needed */
-	    background-color: rgb(0,0,0); /* Fallback color */
-	    background-color: transparent; /* Black w/ opacity */
-	}
-
-	.modal-content {
-	    background-color: #fefefe;
-	    margin: 15% auto; /* 15% from the top and centered */
-	    padding: 20px;
-	    border: 1px solid #888;
-	    width: 80%; /* Could be more or less, depending on screen size */
-	}
-
-	.close {
-	    color: #aaa;
-	    float: right;
-	    font-size: 28px;
-	    font-weight: bold;
-	}
-
-	.close:hover,
-	.close:focus {
-	    color:red;
-	    text-decoration: none;
-	    cursor: pointer;
-	}
-
-	/* Ensure the form-row divs use flexbox for the layout */
-	.form-row {
-	    display: flex;
-	    flex-wrap: wrap; /* Wrap to next line if needed */
-	    margin-bottom: 15px; /* Spacing between rows */
-	}
-
-	/* Each form-group will take up half of the row width */
-	.form-group {
-	    flex: 1 1 50%; /* Grow to fill space and take up 50% of the width */
-	    padding: 0 10px; /* Spacing between columns */
-	    box-sizing: border-box; /* Include padding in width calculation */
-	}
-
-	/* Optional: Adjust label and input width to fit nicely */
-	.form-group label {
-	    display: block;
-	    margin-bottom: 5px;
-	}
-
-	.form-group input {
-	    width: 55%; /* Make input take full width of the form-group */
-	}
-	.add-driver{
-		
-		position: absolute;
-					    right: 600px;
-					    top: 190px;
-					    height: 4%;
-					    width: 105px; /* Set a fixed width for the button */
+					.input-container input[type="text"] {
+					    width: calc(11
+						
+						
+						0% - 120px); /* Adjust the width to account for the button */
+					    padding-right: 120px; /* Ensure padding is added to make space for the button */
+					}
+					
+					.add-vehicle-button {
+					    position: absolute;
+					    right: -290px;
+					    top: -105px;
+					    height: 90%;
+					    width: 110px; /* Set a fixed width for the button */
 					    border: none;
 					    border-left: 1px solid #ccc; /* Border to separate the button from the input */
 					    background-color:darkblue;
@@ -370,104 +200,182 @@
 					    cursor: pointer;
 					    box-sizing: border-box;
 						font-size: 14px;
-			
-	}
-	/* Hidden class to hide elements */
+					}
 
+					.add-vehicle-button:hover {
+					    background-color: #0056b3;
+					}
+			.add-driver{
+				
+				position: absolute;
+						    right: -290px;
+						    top: -105px;
+						    height: 90%;
+						    width: 110px; /* Set a fixed width for the button */
+						    border: none;
+						    border-left: 1px solid #ccc; /* Border to separate the button from the input */
+						    background-color: mediumaquamarine;
+						    color: white;
+						    cursor: pointer;
+						    box-sizing: border-box;
+							font-size: 14px;
+				
+			}
+			.search{
+				position: absolute;
+					    right: 940px;
+					    top: 288px;
+					    height: 43px;
+					    width: 120px; /* Set a fixed width for the button */
+					    border: none;
+					    border-left: 1px solid #ccc; /* Border to separate the button from the input */
+					    background-color: mediumaquamarine;
+					    color: white;
+					    cursor: pointer;
+					    box-sizing: border-box;
+						font-size: 14px;
+				
+			}
+			.search-bar{
+				width:20px;
+			}
+			/* Modal Styles */
+			.modal {
+			  
+			    position: fixed; /* Stay in place */
+			    z-index: 1; /* Sit on top */
+			    left: 550px;
+			    top: 0;
+			    width: 50%; /* Full width */
+			    height: 100%; /* Full height */
+			    overflow: auto; /* Enable scroll if needed */
+			    background-color: rgb(0,0,0); /* Fallback color */
+			    background-color: transparent; /* Black w/ opacity */
+			}
 
-	/* Style for the add vehicle section as a modal */
-	#add-vehicle-section {
-	    padding: 20px;
-	    border: 1px solid #ddd;
-	    margin-top: 20px;
-	    background-color: #f4f4f4;
-	    position: fixed;
-	    top: 50%;
-	    left: 50%;
-	    transform: translate(-50%, -50%);
-	    width: 300px;
-	    z-index: 1000;
-	    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-	}
+			.modal-content {
+			    background-color: #fefefe;
+			    margin: 15% auto; /* 15% from the top and centered */
+			    padding: 20px;
+			    border: 1px solid #888;
+			    width: 80%; /* Could be more or less, depending on screen size */
+			}
 
-	/* Style for the close button */
-	.close {
-	    color: #aaa;
-	    float: right;
-	    font-size: 28px;
-	    font-weight: bold;
-	}
+			.close {
+			    color: #aaa;
+			    float: right;
+			    font-size: 28px;
+			    font-weight: bold;
+			}
 
-	.close:hover,
-	.close:focus {
-	    color: red;
-	    text-decoration: none;
-	    cursor: pointer;
-	}
-
-	/* Optional: Style for background overlay */
-	body.modal-open {
-	    overflow: hidden;
-	    position: relative;
-	}
-
-	body.modal-open::before {
-	    content: '';
-	    position: fixed;
-	    top: 0;
-	    left: 0;
-	    right: 0;
-	    bottom: 0;
-	    background-color: rgba(0, 0, 0, 0.4);
-	    z-index: 999;
-	}
-	.add-vechile input[type="text"], .add-vechile select {
-	    width: 180px;
-	}
-
-	.error {
-	    color: red;
-	    font-size: 12px;
-	}
-
-	.search-button {
-			    position: absolute;
-			    right: 844px;
-			    top: 243px;
-			    height: 4.1%;
-			    width: 100px; /* Set a fixed width for the button */
-			    border: none;
-			    border-left: 1px solid #ccc; /* Border to separate the button from the input */
-			    background-color: darkblue;
-			    color: white;
+			.close:hover,
+			.close:focus {
+			    color:red;
+			    text-decoration: none;
 			    cursor: pointer;
-			    box-sizing: border-box;
-			    font-size: 14px;
-			    border-radius: 8px; /* Rounds all corners of the button */
+			}
+
+			/* Ensure the form-row divs use flexbox for the layout */
+			.form-row {
+			    display: flex;
+			    flex-wrap: wrap; /* Wrap to next line if needed */
+			    margin-bottom: 15px; /* Spacing between rows */
+			}
+
+			/* Each form-group will take up half of the row width */
+			.form-group {
+			    flex: 1 1 50%; /* Grow to fill space and take up 50% of the width */
+			    padding: 0 10px; /* Spacing between columns */
+			    box-sizing: border-box; /* Include padding in width calculation */
+			}
+
+			/* Optional: Adjust label and input width to fit nicely */
+			.form-group label {
+			    display: block;
+			    margin-bottom: 5px;
+			}
+
+			.form-group input {
+			    width: 55%; /* Make input take full width of the form-group */
+			}
+			.add-driver{
+				
+				position: absolute;
+							    right: 670px;
+							    top: 270px;
+							    height: 5%;
+							    width: 105px; /* Set a fixed width for the button */
+							    border: none;
+							    border-left: 1px solid #ccc; /* Border to separate the button from the input */
+							    background-color:darkblue;
+							    color: white;
+							    cursor: pointer;
+							    box-sizing: border-box;
+								font-size: 14px;
+					
+			}
+			/* Hidden class to hide elements */
+
+
+			/* Style for the add vehicle section as a modal */
+			#add-vehicle-section {
+			    padding: 20px;
+			    border: 1px solid #ddd;
+			    margin-top: 20px;
+			    background-color: #f4f4f4;
+			    position: fixed;
+			    top: 50%;
+			    left: 50%;
+			    transform: translate(-50%, -50%);
+			    width: 300px;
+			    z-index: 1000;
+			    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+			}
+
+			/* Style for the close button */
+			.close {
+			    color: #aaa;
+			    float: right;
+			    font-size: 28px;
+			    font-weight: bold;
+			}
+
+			.close:hover,
+			.close:focus {
+			    color: red;
+			    text-decoration: none;
+			    cursor: pointer;
+			}
+
+			/* Optional: Style for background overlay */
+			body.modal-open {
+			    overflow: hidden;
+			    position: relative;
+			}
+
+			body.modal-open::before {
+			    content: '';
+			    position: fixed;
+			    top: 0;
+			    left: 0;
+			    right: 0;
+			    bottom: 0;
+			    background-color: rgba(0, 0, 0, 0.4);
+			    z-index: 999;
+			}
+			.add-vechile input[type="text"], .add-vechile select {
+			    width: 180px;
+			}
+
+			.error {
+			    color: red;
+			    font-size: 12px;
 			}
 
 	    </style>
 </head>
 
-<div class="navbar">
-	        <div class="navbar-container">
-	            <a href="#" class="logo">
-	                <img src="THINTURE_IMAGE/Thinture.png" alt="Fleet Tracking Logo">
-	               
-	            </a>
-	            <ul>
-                <li><a href="#dashboard">Dashboard</a></li>
-                <!-- <li><a href="#fleet-management">Fleet Management</a></li>-->
-                <li><a href="#tracking">Tracking</a></li>
-                <li><a href="#reports">Reports</a></li>
-                <li><a href="#maintenance">Maintenance</a></li>
-                <li><a href="#alerts">Alerts</a></li>
-                <li><a href="#settings">Settings</a></li>
-                <li><a href="#help">Help & Support</a></li>
-                <li><a href="#profile">Profile</a></li>
-            </ul>
-        </div>
-    </div>
+<div th:insert="navigation :: navbar"></div>
 
    
 	<div class="form-container">
@@ -520,7 +428,7 @@
 	                    <span id="model-error" class="error"></span>
 	                </div>
 	            </div>
-	            <button type="button" onclick="showPart2()">Next</button>
+	            <button type="button" onclick="showPart3()">Next</button>
 	        </fieldset>
 	    </form>
 	
@@ -792,7 +700,7 @@
 			
 			
 						<fieldset id="part3" class="hidden">
-						    <legend>Part 3: Device Information</legend>
+						    <legend>Part 2: Device Information</legend>
 						    <div class="form-row">
 						        <div class="form-group">
 						            <label for="installation-date">Installation Date:</label>
@@ -842,7 +750,7 @@
 						        </div>
 						    </div>
 						    <button type="button" onclick="addDevice()">Submit</button>
-						    <button type="button" onclick="showPart2()">Back</button>
+						    <button type="button" onclick="showPart1()">Back</button>
 						</fieldset>
 						</div>
 						<script>
@@ -959,26 +867,27 @@
 		    <p id="add-vehicle-error" class="error"></p>
 		</div>
 	
-	<script>
-	    function showPart2() {
-	        document.getElementById('part1').classList.add('hidden');
-	        document.getElementById('part2').classList.remove('hidden');
-	        document.getElementById('part3').classList.add('hidden');
-	        document.getElementById('review-section').classList.add('hidden');
-	    }
+		<script>
+			    /*function showPart2() {
+			        document.getElementById('part1').classList.add('hidden');
+			        document.getElementById('part2').classList.remove('hidden');
+			        document.getElementById('part3').classList.add('hidden');
+			        document.getElementById('review-section').classList.add('hidden');
+			    }*/
 
-	    function showPart3() {
-	        document.getElementById('part2').classList.add('hidden');
-	        document.getElementById('part3').classList.remove('hidden');
-	        document.getElementById('review-section').classList.add('hidden');
-	    }
+			    function showPart3() {
+			        document.getElementById('part1').classList.add('hidden');
+			        document.getElementById('part3').classList.remove('hidden');
+			        document.getElementById('review-section').classList.add('hidden');
+			    }
 
-	    function showPart1() {
-	        document.getElementById('part1').classList.remove('hidden');
-	        document.getElementById('part2').classList.add('hidden');
-	        document.getElementById('part3').classList.add('hidden');
-	        document.getElementById('review-section').classList.add('hidden');
-	    }
+			    function showPart1() {
+			        document.getElementById('part1').classList.remove('hidden');
+			       // document.getElementById('part2').classList.add('hidden');
+			        document.getElementById('part3').classList.add('hidden');
+			        document.getElementById('review-section').classList.add('hidden');
+			    }
+
 
 	    function showReview() {
 	        document.getElementById('part3').classList.add('hidden');

@@ -27,4 +27,6 @@ public interface ViolationReportRepository extends JpaRepository<ViolationReport
     }
 
     List<ViolationReport> findByVehicle_DeviceID(String deviceID);
+   // Query to fetch violation reports based on deviceID and date range
+   // List<ViolationReport> findByVehicle_DeviceIDAndViolationDateBetween(String deviceID, Timestamp startDate, Timestamp endDate);
 }

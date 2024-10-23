@@ -2,6 +2,7 @@ package com.GpsTracker.Thinture.model;
 
 import java.sql.Date;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,6 +25,7 @@ public class Device {
     private String dealerName;
     private String addressPhone;
     private String country;
+    
 	public Long getId() {
 		return id;
 	}
@@ -79,5 +81,29 @@ public class Device {
 	public void setCountry(String country) {
 		this.country = country;
 	}
-    
 }
+	/*
+	//     panic code 17/10/2024
+
+	// Panic field to store 0 or 1
+	@Column(name = "panic")
+	private Integer panic;
+
+	// Getters and Setters
+	public Integer getPanic() {
+	    return panic;
+	}
+
+	public void setPanic(Integer panic) {
+	    this.panic = panic;
+	}
+
+//	// Optional: Convenience method to interpret panic as a boolean
+//	public boolean isPanicActive() {
+//	    return panic != null && panic == 1;
+//	}
+ * */
+ 
+	
+
+    

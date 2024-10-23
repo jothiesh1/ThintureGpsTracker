@@ -1,5 +1,6 @@
 package com.GpsTracker.Thinture.service;
 import com.GpsTracker.Thinture.dto.DeviceLocation;
+import com.GpsTracker.Thinture.dto.PanicAlertDTO;
 import com.GpsTracker.Thinture.model.GpsData;
 //Import SLF4J Logger
 import org.slf4j.Logger;
@@ -90,11 +91,13 @@ public class VehicleHistoryService {
                         point2.getLongitude()
                 );
             }
+            logger.info("Total distance calculated: {}", totalDistance);
 
             logger.info("Total distance calculated for deviceID: {} is {} km", deviceID, totalDistance);
             return totalDistance;
         } catch (Exception e) {
             logger.error("Error calculating total distance for deviceID: {} - {}", deviceID, e.getMessage(), e);
+            
             return 0;
         }
     }
@@ -280,36 +283,44 @@ public class VehicleHistoryService {
             return Collections.emptyList();
         }
     }
-}
+    
+    // new code 17/10/2024
+ // Fetch panic alerts for a specific device
+    public List<PanicAlertDTO> getPanicAlertsForDevice(String deviceID) {
+        List<VehicleHistory> panicAlerts = vehicleHistoryRepository.findPanicAlertsByDeviceID(deviceID);
+        if (panicAlerts.isEmpty()) {
+            logger.info("No panic alerts found for deviceID: {}", deviceID);
+        } else {
+            logger.info("{} panic alert(s) found for deviceID: {}", panicAlerts.size(), deviceID);
+        }
 
+        // Convert entities to DTOs
+        return panicAlerts.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    // Fetch all panic alerts
+    public List<PanicAlertDTO> getAllPanicAlerts() {
+        logger.info("Fetching all panic alerts");
+        List<VehicleHistory> panicAlerts = vehicleHistoryRepository.findAllPanicAlerts();
+
+        // Convert entities to DTOs
+        return panicAlerts.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    // Helper method to convert VehicleHistory to PanicAlertDTO
+    private PanicAlertDTO convertToDTO(VehicleHistory vehicleHistory) {
+        PanicAlertDTO dto = new PanicAlertDTO();
+        dto.setId(vehicleHistory.getId());
+        dto.setVehicleId(vehicleHistory.getVehicle().getDeviceID());  // Assuming this field is properly loaded
+        dto.setLatitude(vehicleHistory.getLatitude());
+        dto.setLongitude(vehicleHistory.getLongitude());
+        dto.setTimestamp(vehicleHistory.getTimestamp());
+        dto.setPanic(vehicleHistory.getPanic());
+        return dto;
+    }
+}
 	
-	//command for harvsine formula for distnce 23/09/2024
-	/*
-    @Autowired
-    private VehicleHistoryRepository vehicleHistoryRepository;
-
-    private static final Logger logger = LoggerFactory.getLogger(VehicleHistoryService.class);
-
-    public void saveVehicleHistory(VehicleHistory history) {
-        logger.info("Saving vehicle history: {}", history);
-        try {
-            vehicleHistoryRepository.save(history);
-            logger.info("Vehicle history saved successfully for deviceID: {}", history.getVehicle().getDeviceID());
-        } catch (Exception e) {
-            logger.error("Error saving vehicle history: {}", e.getMessage(), e);
-        }
-    }
-
-    public List<VehicleHistory> getVehicleHistory(String deviceID, Timestamp startDate, Timestamp endDate) {
-        logger.info("Fetching vehicle history for deviceID: {} from {} to {}", deviceID, startDate, endDate);
-        try {
-            List<VehicleHistory> history = vehicleHistoryRepository.findHistoryByDeviceIDAndDateRange(deviceID, startDate, endDate);
-            logger.info("Fetched {} records for deviceID: {}", history.size(), deviceID);
-            return history;
-        } catch (Exception e) {
-            logger.error("Error fetching vehicle history: {}", e.getMessage(), e);
-            return null;
-        }
-    }
-}
-*/

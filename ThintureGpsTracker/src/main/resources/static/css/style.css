@@ -1,79 +1,224 @@
-.container-header {
-    padding: 20px;
-    font-size: 10px;
-    background-color: gray;
-    margin-left: 10px;
-}
-
 .navbar {
-    background-color: lightgray;
-    color: white;
-    padding: 10px 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    position: absolute;
+    background: linear-gradient(135deg, white, white, #151B54, #151B54, #151B54, #151B54); /* Gradient from light to dark blue */
     width: 100%;
-    max-width: 1200px; /* Adjust as needed */
-    margin: 0 auto;
-    height: 55px;
-    margin-top: -25px;
+    position: fixed;
+    height: 100px;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 
+        0 2px 5px rgba(0, 0, 0, 0.3),  /* Soft shadow */
+        0 6px 15px rgba(0, 0, 169, 0.5); /* Deeper shadow for 3D effect */
 }
 
-.navbar-brand {
+.navbar-container {
+    position: relative;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    padding: 35px 20px;
 }
 
-.navbar-brand img {
-    height: 30px;
-    margin-right: 10px;
+.navbar h1 {
+    margin: 0;
+    font-size: 20px;
 }
 
-.navbar-menu, .navbar-end {
+.navbar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
     display: flex;
-    align-items: center;
+    font-weight: bold;
 }
 
-.navbar-menu a, .navbar-end a {
+.navbar ul li {
+    position: relative;
+    margin: 0 5px;
+    font-size: 14px;
+}
+
+.navbar ul li a {
     color: white;
     text-decoration: none;
-    margin-left: 15px;
+    padding: 10px;
+    display: block;
+    font-style: normal;
 }
 
-.navbar-menu a:hover, .navbar-end a:hover {
+.navbar ul li a:hover {
+    background-color: #34495e;
+    border-radius: 5px;
     text-decoration: underline;
 }
 
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-.dropdown-content {
+.navbar ul li .dropdown-content {
     display: none;
     position: absolute;
-    background-color: white;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
+    top: 100%;
+    left: 0;
+    background-color: #ffffff;
+    color: #000000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    min-width: 160px;
+    z-index: 1000;
 }
 
-.dropdown-content a {
-    color: black;
-    padding: 12px 16px;
+.navbar ul li:hover .dropdown-content {
+    display: block;
+}
+
+.navbar ul li .dropdown-content a {
+    color: #000000;
+    padding: 10px;
+    display: block;
     text-decoration: none;
+}
+
+.navbar ul li .dropdown-content a:hover {
+    background-color: #f0f0f0;
+}
+
+.content {
+    padding: 20px;
+    margin-top: 120px; /* Adjust according to navbar height */
+    text-align: center;
+}
+
+.logo img {
+    position: absolute;
+    top: 15px;
+    height: 70px;
+    width: 170px;
+    margin-right: 20px;
+}
+
+h2 {
+    text-align: center;
+    font-size: 2em; /* Adjust size as needed */
+    font-weight: 400;
+    color: black; /* Text color */
+    text-shadow: 
+        1px 1px 2px rgba(0, 0, 0, 0.4), /* First shadow for initial depth */
+        3px 3px 5px rgba(0, 0, 0, 0.3), /* Slightly darker shadow for increased depth */
+        6px 6px 8px rgba(0, 0, 0, 0.2); /* Darker shadow for stronger 3D effect */
+}
+
+.footer {
+    background-color: #151B54; /* Gradient from light to dark blue */
+    color: white;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    display: flex;
+    flex-direction: column; /* Set column direction to stack content */
+    justify-content: center;
+    align-items: center;
+    padding: 23px 20px; /* Adjust padding */
+}
+
+.footer p {
+    margin: 10px 0; /* Adjust margin */
+    text-align: center;
+}
+
+.certificate-wrapper {
+    position: absolute;
+    right: 50px;
+    top: 20px;
+    text-align: center;
+}
+
+.certificateqr {
+    position: absolute;
+    height: 120px;
+    width: auto;
     display: block;
-    width: 200px;
+    right: 20px;
+    top: -25px;
 }
 
-.dropdown-content a:hover {
-    background-color: #f1f1f1;
-}
-
-.dropdown:hover .dropdown-content {
+.certificate-wrapper label {
+    position: absolute;
+    font-size: 16px;
+    margin-top: 80px;
+    color: white;
     display: block;
+    right: 30px;
 }
 
-.navbar-logo {
-    width: 190px;
-    height: 60px;
+.social-icons {
+    display: flex;
+    justify-content: center; /* Center the icons */
+    align-items: center; /* Vertically align icons */
+    margin-top: 10px; /* Add space between icons and other content */
+}
+
+.social-icons a {
+    color: white;
+    margin: 0 15px;
+    text-decoration: none;
+    font-size: 24px;
+    transition: color 0.3s ease;
+}
+
+.social-icons a:hover {
+    color: #ffdd57; /* Change color on hover */
+}
+
+.reports-section {
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+}
+
+.report {
+    margin: 20px 0;
+}
+
+.panicb {
+    background-color: red;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    position: fixed;
+    top: 150px;
+    right: 20px;
+    z-index: 2000; /* Ensure it's on top of all other elements */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add some depth to make it more prominent */
+    cursor: pointer;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .navbar h1 {
+        font-size: 18px;
+    }
+
+    .navbar ul li {
+        font-size: 12px;
+    }
+
+    .content {
+        padding: 10px;
+    }
+
+    .footer {
+        flex-direction: column;
+        padding: 15px 10px;
+    }
+
+    .social-icons a {
+        margin: 0 10px;
+    }
+
+    .panicb {
+        top: 100px;
+        right: 10px;
+        padding: 8px 15px;
+    }
 }

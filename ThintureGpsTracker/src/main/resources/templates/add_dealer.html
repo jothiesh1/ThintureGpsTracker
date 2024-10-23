@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
     <title>THINTURE - Add New Dealer</title>
     <style>
         body {
@@ -97,6 +98,7 @@
     </style>
 </head>
 <body>
+	<div th:insert="navigation :: navbar"></div>
     <div class="container">
         <h2>Add New Dealer</h2>
         <a href="/dashboard" class="back-btn">Back</a> <!-- Redirects to dashboard -->

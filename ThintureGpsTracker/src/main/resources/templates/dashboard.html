@@ -1,634 +1,432 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thinture Fleet Dashboard</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <title>THINTURE - Fleet Management</title>
     <style>
-        body {
-			
-			    font-family: Arial, sans-serif;
-			    margin: 0;
-			    padding: 0;
-			    font-size: 14px;
-			    background-image: url('THINTURE_IMAGE/locate2.jpg');
-			    background-size: cover; /* Ensures the image covers the entire background */
-			    background-position: center; /* Centers the background image */
-			    background-repeat: no-repeat; /* Prevents repeating the image */
-			
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(to bottom, #e3f2fd, #cfd8dc);
+        }
 
-        }
-        .container {
-            padding: 20px;
-            font-size: 14px;
-        }
-        .card-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 25px;
-			
-        }
-        .card {
-            background-color: #0056b3;
-            padding: 10px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            color: white;
+												       
+
+        .content {
+            padding: 10px 20px 20px; /* Adjust according to navbar height */
             text-align: center;
-		
-      width: 350px;
-            box-sizing: border-box;
-            display: inline-block;
-            text-decoration: none;
         }
-        .card:hover {
-            background-color: darkblue;
-            color: white;
+
+        h2 {
+            font-size: 28px;
+            color: #00796b;
+            margin: 20px 0;
         }
-        .card h3 {
-            margin: 0;
-        }
-		h1{
-			font-size: 10px;
-		}
-        .tabs {
+
+        .charts-container {
             display: flex;
-            cursor: pointer;
-            margin-bottom: 20px;
-        }
-        .tabs div {
-            padding: 10px 20px;
-            background-color: darkblue;
-            color: white;
-            border-radius: 5px 5px 0 0;
-            margin-right: 5px;
-            flex: 1;
-            text-align: center;
-            border: none;
-            outline: none;
-        }
-        .tabs div.active {
-            background-color: white;
-            color: #4b9cd3;
-            border-bottom: 2px solid white;
-        }
-        .tab-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 0 0 5px 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            display: none;
-        }
-        .card-user {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .form-row {
-            display: flex;
+            justify-content: space-around;
             flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 15px;
+            padding: 20px 0;
         }
-        .form-column {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            flex: 1;
+
+        .chart-container {
+            width: 20%;
+            margin: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            padding: 20px;
+            position: relative;
         }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 15px;
-        }
-        .form-group label {
+
+        .chart-title {
+            text-align: center;
             font-weight: bold;
+            margin-bottom: 15px;
         }
-        .form-group input {
-            padding: 1px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            width: 60%;
+
+		.footer {
+										      background-color: #151B54; /* Gradient from light to dark blue */
+										    color: WHITE;
+										    position: fixed;
+										    width: 100%;
+										    bottom: 0;
+										    display: flex;
+										    flex-direction: column; /* Set column direction to stack content */
+										    justify-content: center;
+										    align-items: center;
+										    padding: 23px 20px; /* Adjust padding */
+										}
+
+										.footer p {
+										    margin: 10px 0; /* Adjust margin */
+										   
+										    text-align: center;
+										}
+
+										.certificate-wrapper {
+										    position: absolute;
+										    right: 50px;
+										    top: 20px;
+										    text-align: center;
+										}
+
+										.certificateqr {
+											position: absolute;
+										    height: 120px;
+										    width: auto;
+										    display: block;
+											right: 20px;
+											top:-25px;
+										}
+
+										.certificate-wrapper label {
+											position: absolute;
+										    font-size: 16px;
+										    margin-top: 80px;
+										    color: white;
+										    display: block;
+											right:30px;
+										}
+
+										.social-icons {
+										    display: flex;
+										    justify-content: center; /* Center the icons */
+										    align-items: center; /* Vertically align icons */
+										    margin-top: 10px; /* Add space between icons and other content */
+										}
+
+										.social-icons a {
+										    color: WHITE;
+										    margin: 0 15px;
+										    text-decoration: none;
+										    font-size: 24px;
+										    transition: color 0.3s ease;
+										}
+
+										.social-icons a:hover {
+										    color: #ffdd57; /* Change color on hover */
+										}
+
+        .reports-section {
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
         }
-        .button-container {
-            text-align: center;
-            margin-top: 20px;
-            color: #f1f1f1;
-			
+
+        .report {
+            margin: 20px 0;
         }
-        .tab-content button {
-            border: 2px solid gray;
-            background-color: darkblue;
-            padding: 10px 20px;
-            margin-top: 20px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .tab-content button:hover {
-            background-color: orange;
-        }
-        .footer {
-            background-color:transparent;
-            color: white;
-            text-align: center;
-            padding: 10px;
-            position: fixed;
-            width: 100%;
-            bottom: 0;
-        }
-        .footer ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
-        .footer ul li {
-            display: inline;
-            margin: 0 10px;
-        }
-        .footer ul li a {
-            color: white;
-            text-decoration: none;
-        }
-        .footer ul li a:hover {
-            text-decoration: underline;
-        }
+
         @media (max-width: 768px) {
-            .card {
-                width: calc(100% - 20px);
-                max-width: none;
+            .chart-container {
+                width: 100%;
             }
         }
-        .close-btn {
-            background-color: darkblue;
-            color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .close-btn:hover {
-            background-color: rgb(0, 0, 64);
-        }
-		.container-header {
-		          padding: 20px;
-		          font-size: 20px;
-		          background-color:transparent;
-		          margin-left: 2px;
-				  margin-top: -10px;
-		      }
-        .navbar {
-            background-color: lightgray;
-            color: white;
-            padding: 10px 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 120%;
-            max-width: 900px;
-            margin: 0 auto;
-            height: 55px;
-            margin-top: -30px;
-            margin-left: 210px;
-        }
-        .navbar-brand {
-            display: flex;
-            align-items: center;
-        }
-        .navbar-brand img {
-            height: 30px;
-            margin-right: 20px;
-        }
-        .navbar-menu, .navbar-end {
-            display: flex;
-            align-items: center;
-        }
-        .navbar-menu a, .navbar-end a {
-            color: white;
-            text-decoration: none;
-            margin-left: 15px;
-        }
-        .navbar-menu a:hover, .navbar-end a:hover {
-            text-decoration: underline;
-        }
-        h3 {
-            text-align: center;
-        }
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: white;
-            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-            z-index: 1;
-        }
-		
-        .dropdown-content a {
-            color: black;
-            padding: 12px 12px;
-            text-decoration: none;
-            display: block;
-            width: 200px;
-			font-size: 10px;
-        }
-        .dropdown-content a:hover {
-            background-color: #f1f1f1;
-        }
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-        .navbar-logo {
-            width: 160px;
-            height: 60px;
-        }
-        button {
-            background-color: rgb(0, 0, 64);
-        }
-		
-		
-		
-		.feature-section {
-		    display: flex;
-		    justify-content: space-around;
-		    flex-wrap: wrap;
-		    margin-top: 20px;
-		}
-		.feature-card {
-		    background-color: #ffffff;
-		    border-radius: 10px;
-		    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-		    margin: 10px;
-		    padding: 20px;
-		    width: calc(50% - 20px);
-		    max-width: 400px;
-		}
-		.feature-card h3 {
-		    color: #0056b3;
-		    margin-top: 0;
-		}
-		.feature-card ul {
-		    list-style-type: none;
-		    padding-left: 0;
-		}
-		.feature-card li {
-		    margin-bottom: 5px;
-		}
-		.feature-card img {
-		    width: 100%;
-		    height: auto;
-		    border-radius: 5px;
-		    margin-top: 10px;
-		}
-		@media (max-width: 768px) {
-		    .feature-card {
-		        width: calc(100% - 20px);
-		    }
-		}
-		
+		h2 {
+				    text-align: center;
+				    font-size: 2em; /* Adjust size as needed */
+					font-weight: 400;
+				    color:black; /* Text color */
+				    text-shadow: 
+					1px 1px 2px rgba(0, 0, 0, 0.4), /* First shadow for initial depth */
+					        3px 3px 5px rgba(0, 0, 0, 0.3), /* Slightly darker shadow for increased depth */
+					        6px 6px 8px rgba(0, 0, 0, 0.2); /* Darker shadow for stronger 3D effect */
+					}
+					.panicb {
+					    background-color: red;
+					    color: white;
+					    padding: 10px 20px;
+					    border: none;
+					    border-radius: 5px;
+					    position: fixed;
+					    top: 150px;
+					    right: 20px;
+					    z-index: 2000; /* Ensure it's on top of all other elements */
+					    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add some depth to make it more prominent */
+					    cursor: pointer;
+					}
+					
+
     </style>
 </head>
 <body>
-    <div class="container-header">
-        <div class="header">
-            <img src="THINTURE_IMAGE/logo2.jpg" alt="THINTURE Logo" class="navbar-logo">
+	<!-- Insert the navigation fragment -->
+	<div th:insert="navigation :: navbar"></div>
+    <div class="content">
+        <h2>Welcome to Thinture Technologies Pvt. Ltd. Fleet Management</h2>
+        <p>Optimize your fleet operations with our advanced tracking and management solutions.</p>
+		<button id="panicButton" class="panicb" >
+		            <i class="fas fa-exclamation-triangle" style="margin-right: 5px;"></i>
+		            Panic Button
+		        </button>
+
+			        
+			           
+					<audio id="panicAlertSound" src="THINTURE_IMAGE/emergency-alarm-with-reverb-29431.mp3"></audio>
+        <div class="reports-section">
+            <h2>Comprehensive Reporting</h2>
+            <div class="charts-container">
+                <div class="chart-container">
+                    <div class="chart-title">Fleet Tracking Reports</div>
+                    <canvas id="fleetStatusChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Driver Performance Reports</div>
+                    <canvas id="driverPerformanceChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">User Reports</div>
+                    <canvas id="userReportsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Vehicle Reports</div>
+                    <canvas id="vehicleReportsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Fuel Consumption Reports</div>
+                    <canvas id="fuelConsumptionChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Maintenance Schedule</div>
+                    <canvas id="maintenanceScheduleChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Trip Analytics</div>
+                    <canvas id="tripAnalyticsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Monthly Reports</div>
+                    <canvas id="monthlyReportsChart"></canvas>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="navbar">
-        <a href="/dashboard" class="active"><i class="fas fa-home"></i> Dashboard</a>
-		<div class="dropdown">
-		            <a href="#"><i class="fas fa-th-large"></i> Superadmin</a>
-		            <div class="dropdown-content">
-		                <a href="javascript:void(0);" onclick="openAddPage('addAdmin')">
-		                    <h1>Add Admin</h1>
-		                </a>
-		                <a href="javascript:void(0);" onclick="openAddPage('addDealer')">
-		                    <h1>Add Dealer</h3>
-		                </a>
-						<a href="javascript:void(0);" onclick="openAddPage('addAdmin')">
-								                    <h1>Add Client</h1>
-								                </a>
-		                <a href="javascript:void(0);" onclick="openAddPage('addUser')">
-		                    <h1>Add User</h1>
-		                </a>
-		            </div>
-		        </div>
-		 <a href="/map"><i class="fas fa-map"></i> Map</a>
-        <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i> Reports</a>
-            <div class="dropdown-content">
-				<a href="/createdevices">Installation</a>
-				<a href="/dealers/add">Add new dealer</a>
-                <a href="/total_users">Users</a>
-				<a href="/total_vehicles">Vehicle</a>
-                <a href="/tracking_details">Tracking Details</a>
-				<a href="admins/add">add admin new</a>
-				<a href="/users/add">add  user</a>
-				<a href="drivers/add">add driver</a>
-				<a href="/replay">replay</a>
-                <a href="/calender">Calendar</a>
+
+		<div class="footer">
+			    <p>&copy; 2024 Thinture Technologies Pvt. Ltd. All rights reserved.</p>
+			    <div class="certificate-wrapper">
+			       	<img class="certificateqr" src="THINTURE_IMAGE/location.png" alt="QR Code" />
 				
-            </div>
-        </div>
-        <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i> Utility</a>
-            <div class="dropdown-content">
-                <a href="#">Support & Feedback</a>
-                <a href="#">Announcement</a>
-                <a href="#">Send Notification</a>
-            </div>
-        </div>
-        <div class="dropdown">
-            <a href="#"><i class="fas fa-th-large"></i>Information</a>
-            <div class="dropdown-content">
-                <a href="dealers/view">Dealer details</a>
-				<a href="/drivers/view">driver details</a>
-				<a href="/driver-report">Driver_report</a>
-				<a href="/vehicle_report">vehicle_report</a>
-            </div>
-        </div>
-        <a href="#"><i class="fas fa-th-large"></i> Profile</a>
+					<label for="certificate-qr">Location</label>
+			    </div>
+				<div class="social-icons">
+				           <a href="https://facebook.com" target="_blank" class="facebook">
+				               <i class="fab fa-facebook"></i>
+				           </a>
+				           <a href="https://twitter.com" target="_blank" class="twitter">
+				               <i class="fab fa-twitter"></i>
+				           </a>
+				           <a href="https://linkedin.com" target="_blank" class="linkedin">
+				               <i class="fab fa-linkedin"></i>
+				           </a>
+				           <a href="https://instagram.com" target="_blank" class="instagram">
+				               <i class="fab fa-instagram"></i>
+				           </a>
+				       </div>
     </div>
-    <br><br><br>
-	<script>
-		function fetchVehicleCount() {
-		    $.ajax({
-		        url: '/api/vehicles/countAll',
-		        method: 'GET',
-		        success: function(count) {
-		            console.log("Fetched vehicle count:", count);
-		            $('.card .total-vehicles').text(count);
-		        },
-		        error: function(error) {
-		            console.log("Error fetching vehicle count:", error);
-		        }
-		    });
-		}
 
-		function fetchNewVehiclesThisMonth() {
-		    $.ajax({
-		        url: '/api/vehicles/newThisMonth',
-		        method: 'GET',
-		        success: function(count) {
-		            console.log("Fetched new vehicles this month count:", count);
-		            $('.card .new-vehicles-this-month').text(count + " New This Month");
-		        },
-		        error: function(error) {
-		            console.log("Error fetching new vehicles count:", error);
-		        }
-		    });
-		}
-
-	</script>
-
-	<div class="dashboard">
-	    <div class="card-container">
-	        <a href="/total_vehicles" class="card">
-	            <h3>Total Vehicles</h3>
-	            <p><i class="fas fa-car"></i></p>
-	            <p class="total-vehicles">Loading...</p>
-	            <p class="new-vehicles-this-month">Loading...</p>
-	        </a>
-	        <a href="/total_users" class="card">
-	            <h3>All Users</h3>
-	            <i class="fas fa-users"></i>
-	            <p>1</p>
-	            <p>0 New This Month</p>
-	        </a>
-	        <a href="/total_expire" class="card">
-	            <h3>Vehicle Expiring</h3>
-	            <p>0</p>
-	            <p>0 in next 30 days</p>
-	        </a>
-	    </div>
-	</div>
-
-		<div class="cards">
-		            
-		        </div>
-		    </div>
-        <div id="add-section" style="display:none;">
-            <div id="addAdmin" class="tab-content card-user">
-                <h3>ADMIN</h3>
-                <form>
-                    <button class="close-btn" type="button" onclick="closeAddSection()">Close</button>
-                    <div class="form-row">
-                        <div class="form-column">
-                            <div class="form-group">
-                                <label for="adminName">Name</label>
-                                <input type="text" id="adminName" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="adminEmail">Email</label>
-                                <input type="email" id="adminEmail" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="adminAddress">Address</label>
-                                <input type="text" id="adminAddress" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="adminPhone">Phone</label>
-                                <input type="text" id="adminPhone" required>
-                            </div>
-                        </div>
-                        <div class="form-column">
-                            <div class="form-group">
-                                <label for="adminCountry">Country</label>
-                                <input type="text" id="adminCountry" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="adminPassword">Password</label>
-                                <input type="password" id="adminPassword" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="adminConfirmPassword">Confirm Password</label>
-                                <input type="password" id="adminConfirmPassword" required>
-                                <div class="button-container">
-                                    <button type="submit" style="color:white ;">ADD</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div id="addDealer" class="tab-content card-user" style="display:none;">
-                <h3>DEALER</h3>
-                <form>
-                    <button class="close-btn" type="button" onclick="closeAddSection()">Close</button>
-                    <div class="form-row">
-                        <div class="form-column">
-                            <div class="form-group">
-                                <label for="dealerName">Name</label>
-                                <input type="text" id="dealerName" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="dealerEmail">Email</label>
-                                <input type="email" id="dealerEmail" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="dealerAddress">Address</label>
-                                <input type="text" id="dealerAddress" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="dealerPhone">Phone</label>
-                                <input type="text" id="dealerPhone" required>
-                            </div>
-                        </div>
-                        <div class="form-column">
-                            <div class="form-group">
-                                <label for="dealerCountry">Country</label>
-                                <input type="text" id="dealerCountry" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="dealerPassword">Password</label>
-                                <input type="password" id="dealerPassword" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="dealerConfirmPassword">Confirm Password</label>
-                                <input type="password" id="dealerConfirmPassword" required>
-                                <div class="button-container">
-                                    <button type="submit" style="color:white ;">ADD</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div id="addUser" class="tab-content card-user" style="display:none;">
-                <h3>USER</h3>
-                <form>
-                    <button class="close-btn" type="button" onclick="closeAddSection()">Close</button>
-                    <div class="form-row">
-                        <div class="form-column">
-                            <div class="form-group">
-                                <label for="userName">Name</label>
-                                <input type="text" id="userName" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="userEmail">Email</label>
-                                <input type="email" id="userEmail" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="userAddress">Address</label>
-                                <input type="text" id="userAddress" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="userPhone">Phone</label>
-                                <input type="text" id="userPhone" required>
-                            </div>
-                        </div>
-                        <div class="form-column">
-                            <div class="form-group">
-                                <label for="userCountry">Country</label>
-                                <input type="text" id="userCountry" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="userPassword">Password</label>
-                                <input type="password" id="userPassword" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="userConfirmPassword">Confirm Password</label>
-                                <input type="password" id="userConfirmPassword" required>
-                                <div class="button-container">
-                                    <button type="submit" style="color:white ;">ADD</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-	<br>
-	<br>
-	<br>
-    <footer class="footer">
-        <ul>
-            <li><a href="privacy.html">Privacy Policy</a></li>
-            <li><a href="terms.html">Terms of Service</a></li>
-            <li><a href="newsletter.html">Newsletter Signup</a></li>
-        </ul>
-        <p>&copy; 2024 <strong>Thinture Technologies Pvt. Ltd!</strong>. All rights reserved.</p>
-    </footer>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.tabs div').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    openTab(this.dataset.tab);
-                });
-            });
+        // Fleet Status Chart
+        const ctx1 = document.getElementById('fleetStatusChart').getContext('2d');
+        const fleetStatusChart = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: ['Operational', 'In Maintenance', 'Out of Service'],
+                datasets: [{
+                    label: 'Fleet Status',
+                    data: [120, 30, 10],
+                    backgroundColor: [
+                        'rgba(76, 175, 80, 0.6)',
+                        'rgba(255, 235, 59, 0.6)',
+                        'rgba(244, 67, 54, 0.6)',
+                    ],
+                }],
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                    },
+                },
+            },
         });
 
-        function openAddPage(section) {
-            document.getElementById('add-section').style.display = 'block';
-            openTab(section);
-        }
+        // Driver Performance Chart
+        const ctx2 = document.getElementById('driverPerformanceChart').getContext('2d');
+        const driverPerformanceChart = new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                datasets: [{
+                    label: 'Driver Performance',
+                    data: [85, 90, 75, 88],
+                    borderColor: 'rgba(63, 81, 181, 1)',
+                    backgroundColor: 'rgba(63, 81, 181, 0.2)',
+                    fill: true,
+                }],
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                    },
+                },
+            },
+        });
 
-        function closeAddSection() {
-            document.getElementById('add-section').style.display = 'none';
-        }
+        // User Reports Chart
+        const ctx3 = document.getElementById('userReportsChart').getContext('2d');
+        const userReportsChart = new Chart(ctx3, {
+            type: 'pie',
+            data: {
+                labels: ['Active Users', 'Inactive Users'],
+                datasets: [{
+                    data: [300, 50],
+                    backgroundColor: [
+                        'rgba(156, 39, 176, 0.6)',
+                        'rgba(244, 67, 54, 0.6)',
+                    ],
+                }],
+            },
+            options: {
+                responsive: true,
+            },
+        });
 
-        function openTab(tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-            }
-            tablinks = document.querySelectorAll('.tabs div');
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].classList.remove("active");
-            }
-            var activeTab = document.getElementById(tabName);
-            if (activeTab) {
-                activeTab.style.display = "block";
-                var tabElement = Array.from(tablinks).find(link => link.dataset.tab === tabName);
-                if (tabElement) {
-                    tabElement.classList.add("active");
-                }
-            }
-        }
+        // Vehicle Reports Chart
+        const ctx4 = document.getElementById('vehicleReportsChart').getContext('2d');
+        const vehicleReportsChart = new Chart(ctx4, {
+            type: 'doughnut',
+            data: {
+                labels: ['Available Vehicles', 'Unavailable Vehicles'],
+                datasets: [{
+                    data: [200, 30],
+                    backgroundColor: [
+                        'rgba(76, 175, 80, 0.6)',
+                        'rgba(255, 152, 0, 0.6)',
+                    ],
+                }],
+            },
+            options: {
+                responsive: true,
+            },
+        });
+
+        // Fuel Consumption Chart
+        const ctx5 = document.getElementById('fuelConsumptionChart').getContext('2d');
+        const fuelConsumptionChart = new Chart(ctx5, {
+            type: 'bar',
+            data: {
+                labels: ['January', 'February', 'March', 'April'],
+                datasets: [{
+                    label: 'Fuel Consumption (Liters)',
+                    data: [1200, 1100, 1500, 1400],
+                    backgroundColor: 'rgba(0, 150, 136, 0.6)',
+                }],
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                    },
+                },
+            },
+        });
+
+        // Maintenance Schedule Chart
+        const ctx6 = document.getElementById('maintenanceScheduleChart').getContext('2d');
+        const maintenanceScheduleChart = new Chart(ctx6, {
+            type: 'line',
+            data: {
+                labels: ['January', 'February', 'March', 'April'],
+                datasets: [{
+                    label: 'Scheduled Maintenance',
+                    data: [10, 15, 8, 20],
+                    borderColor: 'rgba(233, 30, 99, 1)',
+                    backgroundColor: 'rgba(233, 30, 99, 0.2)',
+                    fill: true,
+                }],
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                    },
+                },
+            },
+        });
+
+        // Trip Analytics Chart
+        const ctx7 = document.getElementById('tripAnalyticsChart').getContext('2d');
+        const tripAnalyticsChart = new Chart(ctx7, {
+            type: 'bar',
+            data: {
+                labels: ['Trip 1', 'Trip 2', 'Trip 3', 'Trip 4'],
+                datasets: [{
+                    label: 'Distance (km)',
+                    data: [50, 75, 40, 90],
+                    backgroundColor: 'rgba(33, 150, 243, 0.6)',
+                }],
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                    },
+                },
+            },
+        });
+
+        // Monthly Reports Chart
+        const ctx8 = document.getElementById('monthlyReportsChart').getContext('2d');
+        const monthlyReportsChart = new Chart(ctx8, {
+            type: 'line',
+            data: {
+                labels: ['January', 'February', 'March', 'April'],
+                datasets: [{
+                    label: 'Monthly Expenses',
+                    data: [3000, 2800, 3500, 3200],
+                    borderColor: 'rgba(255, 87, 34, 1)',
+                    backgroundColor: 'rgba(255, 87, 34, 0.2)',
+                    fill: true,
+                }],
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                    },
+                },
+            },
+        });
+		// Panic Button Functionality
+		       document.getElementById('panicButton').addEventListener('click', function() {
+		           // Play the alert sound
+		           const sound = document.getElementById('panicAlertSound');
+		           sound.play();
+
+		           // Show an alert message
+		           alert('Panic Alert Activated! Please take necessary action.');
+		       });
+
+		       // Example JavaScript for charts or additional functionality
     </script>
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-	<div class="feature-section">
-	    <div class="feature-card" onclick="window.location.href='/map'">
-	        <h3><i class="fas fa-map-marked-alt"></i> Go to Map</h3>
-	        <ul>
-	            <li>Vehicle History</li>
-	            <li>Replay View</li>
-	            <li>Live Location</li>
-	            <li>Immobilize Status</li>
-	        </ul>
-	        <img src="THINTURE_IMAGE/map_placeholder.jpg" alt="Map Features">
-	    </div>
-	    <div class="feature-card" onclick="window.location.href='/report'">
-	        <h3><i class="fas fa-file-alt"></i> Go to Report</h3>
-	        <ul>
-	            <li>Vehicle Log</li>
-	            <li>Over Speed Report</li>
-	            <li>Detail Summary</li>
-	            <li>Timeline</li>
-	            <li>Driven Summary</li>
-	        </ul>
-			<img src="THINTURE_IMAGE/report.jpg" alt="Report Features" style="width: 150%; max-width: 300px; height: 200;">
-			    </div>
-	    </div>
-	</div>
-
-
-	<script>
-	    // JavaScript function to handle navigation
-	    function navigateTo(page) {
-	        if (page === 'map') {
-	            window.location.href = '/map'; // Navigate to the map page
-	        } else if (page === 'report') {
-	            window.location.href = '/report'; // Navigate to the report page
-	        }
-	    }
-	</script>
-
 </body>
 </html>
-//

@@ -23,6 +23,12 @@ public class DashboardController {
     public String getCreateDevices() {
         return "createdevices";  // Ensure this matches the path in the templates directory
     }
+    // Mapping to show the add driver form
+    @GetMapping("/add_driver")
+    public String showAddDriverPage() {
+       // logger.info("Navigating to add_driver.html page.");
+        return "add_driver"; // This should match the name of your HTML file (without the .html extension)
+    }
 }
 /*
  * @GetMapping("/total_vehicles") public String getTotalVehicles () { return

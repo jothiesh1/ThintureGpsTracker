@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import com.GpsTracker.Thinture.model.Vehicle;
 import com.GpsTracker.Thinture.service.DeviceService;
 import com.GpsTracker.Thinture.service.DriverService;
+import com.GpsTracker.Thinture.service.MailService;
 import com.GpsTracker.Thinture.service.VehicleService;
 
 import jakarta.validation.ConstraintViolationException;
@@ -45,6 +45,14 @@ public class VehicleController {
 
     @Autowired
     private DeviceService deviceService;
+    //new code vehicle report mail
+  //09/10/2024 mail for vehicle report 
+    
+    @Autowired
+    private MailService mailService;
+    
+    
+    
     
     
 //    @GetMapping("/createdevices")
@@ -109,11 +117,12 @@ public class VehicleController {
             logger.error("Error occurred while adding device information: ", e);
             return ResponseEntity.status(500).body("Error adding device information");
         }
-    }
-
-
-    }
-
+    
+    //new code vehicle report mail
+    //09/10/2024 mail for vehicle report 
+      
+    
+    }}
     
     
     

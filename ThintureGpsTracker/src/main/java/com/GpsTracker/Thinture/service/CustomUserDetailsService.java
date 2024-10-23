@@ -1,6 +1,8 @@
 package com.GpsTracker.Thinture.service;
 
 import java.util.Collections;
+
+
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +40,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
-    
-    
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         logger.info("Attempting to load user by username: {}", username);
@@ -68,11 +69,61 @@ public class CustomUserDetailsService implements UserDetailsService {
             return new CustomUserDetails(deal);
         }
 
+        // Add logic for regular User login
+        Optional<com.GpsTracker.Thinture.model.User> user = Optional.ofNullable(userRepository.findByEmail(username));
+        if (user.isPresent()) {
+            com.GpsTracker.Thinture.model.User usr = user.get();
+            logger.info("User found with email: {}", username);
+            return new CustomUserDetails(usr);
+        }
+
         // If no entity was found, throw exception
         logger.error("User not found with email: {}", username);
         throw new UsernameNotFoundException("User not found with email: " + username);
     }
 }
+
+/*
+ * @Service public class CustomUserDetailsService implements UserDetailsService
+ * {
+ * 
+ * private static final Logger logger =
+ * LoggerFactory.getLogger(CustomUserDetailsService.class);
+ * 
+ * @Autowired private SuperAdminRepository superAdminRepository;
+ * 
+ * @Autowired private AdminRepository adminRepository;
+ * 
+ * @Autowired private DealerRepository dealerRepository;
+ * 
+ * @Autowired private UserRepository userRepository;
+ * 
+ * 
+ * @Override public UserDetails loadUserByUsername(String username) throws
+ * UsernameNotFoundException {
+ * logger.info("Attempting to load user by username: {}", username);
+ * 
+ * // Add logic for Admin login FIRST Optional<Admin> admin =
+ * Optional.ofNullable(adminRepository.findByEmailIgnoreCase(username)); if
+ * (admin.isPresent()) { logger.info("Admin found with email: {}", username);
+ * Admin adm = admin.get(); return new CustomUserDetails(adm); }
+ * 
+ * // Fetch SuperAdmin by email NEXT Optional<SuperAdmin> superAdmin =
+ * Optional.ofNullable(superAdminRepository.findByEmail(username)); if
+ * (superAdmin.isPresent()) { SuperAdmin spradmin = superAdmin.get();
+ * logger.info("SuperAdmin found with email: {}", username); return new
+ * CustomUserDetails(spradmin); }
+ * 
+ * // Add logic for Dealer login (if needed) Optional<Dealer> dealer =
+ * Optional.ofNullable(dealerRepository.findByEmail(username)); if
+ * (dealer.isPresent()) { Dealer deal = dealer.get();
+ * logger.info("Dealer found with email: {}", username); return new
+ * CustomUserDetails(deal); }
+ * 
+ * // If no entity was found, throw exception
+ * logger.error("User not found with email: {}", username); throw new
+ * UsernameNotFoundException("User not found with email: " + username); } }
+ */
     
     
     

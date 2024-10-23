@@ -152,4 +152,24 @@ public void setViolationReports(List<ViolationReport> violationReports) {
 	this.violationReports = violationReports;
 }
 
+
+//panic code 17/10/2024
+
+// Panic field to store 0 or 1
+@Column(name = "panic")
+private Integer panic;
+
+public Integer getPanic() {
+	return panic;
+}
+
+public void setPanic(Integer panic) {
+	this.panic = panic;
+}
+
+
+// Optional: Convenience method to interpret panic as a boolean
+/*
+ * public boolean isPanicActive() { return panic != null && panic == 1; }
+ */
 }

@@ -7,13 +7,20 @@
     <link rel="stylesheet" href="styles.css"> <!-- Add your CSS file here -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+	<style>
+		.panel{
+			
+			width:50%;
+			height:50%;
+		}
+	</style>
 </head>
 <body>
     <!-- Replay Panel -->
-    <div id="replay-panel">
+    <div id="replay-panel" class="panel">
         <div>
             <label for="device-id">Device ID:</label>
-            <input type="text" id="device-id" placeholder="Enter Device ID">
+            <input type="text" id="device-id" value="">
         </div>
         <div>
             <label for="from-date">From:</label>
@@ -65,27 +72,36 @@
 	    };
 	    distanceControl.addTo(map);
 
-	    // Fetch vehicle history from the backend
-	    function fetchVehicleHistory(deviceID, fromDate, toDate) {
-	        fetch(`/api/history/${deviceID}?from=${fromDate}&to=${toDate}`)
-	            .then(response => {
-	                if (response.ok) {
-	                    return response.json();
-	                } else {
-	                    throw new Error('No data found for the specified device or date range.');
-	                }
-	            })
-	            .then(data => {
-	                replayData = data.map(d => [d.latitude, d.longitude]); // Extract latitude and longitude
-	                drawPolyline(replayData); // Draw the polyline using the fetched data
-	                document.getElementById('replay-slider').max = replayData.length - 1;
-	                console.log('Fetched vehicle history:', replayData);
-	                if (replayData.length > 0) {
-	                    document.getElementById('play-replay').disabled = false; // Enable play button
-	                }
-	            })
-	            .catch(error => alert('Error fetching vehicle history: ' + error.message));
-	    }
+		// Fetch vehicle history from the backend
+		
+		function fetchVehicleHistory(deviceID, fromDate, toDate) {
+		   // Log the parameters before making the fetch request
+		   console.log(`Fetching history for Device ID: ${deviceID}, From: ${fromDate}, To: ${toDate}`);
+		   
+		   fetch(`/api/vehicle/history/${deviceID}?from=${fromDate}&to=${toDate}`)
+		        .then(response => {
+		            if (response.ok) {
+		                return response.json();
+		            } else {
+		                throw new Error('No data found for the specified device or date range.');
+		            }
+		        })
+		        .then(data => {
+		            // Log the data received from the backend
+		            console.log('Fetched vehicle history:', data);
+
+		            replayData = data.map(d => [d.latitude, d.longitude]); // Extract latitude and longitude
+		            drawPolyline(replayData); // Draw the polyline using the fetched data
+		            document.getElementById('replay-slider').max = replayData.length - 1;
+
+		            if (replayData.length > 0) {
+		                document.getElementById('play-replay').disabled = false; // Enable play button
+		            }
+		        })
+		        .catch(error => alert('Error fetching vehicle history: ' + error.message));
+		}
+
+
 
 	    // Function to draw polyline on the map using fetched data
 	    function drawPolyline(routeData) {
@@ -170,7 +186,7 @@
 	    }
 
 	    // Fetch total distance from the backend and update the map control
-	    function fetchTotalDistance(deviceID, fromDate, toDate) {
+	/*    function fetchTotalDistance(deviceID, fromDate, toDate) {
 	        fetch(`/api/distance/${deviceID}?from=${fromDate}&to=${toDate}`)
 	            .then(response => response.json())
 	            .then(data => {
@@ -178,6 +194,7 @@
 	            })
 	            .catch(error => console.error('Error fetching total distance:', error));
 	    }
+		*/
 
 	    // Event listeners for user actions
 	    document.getElementById('show-replay').addEventListener('click', function() {
@@ -196,11 +213,28 @@
 	        console.log(`Requesting history for deviceID: ${deviceID} from: ${fromDate} to: ${toDate}`);
 
 	        fetchVehicleHistory(deviceID, fromDate, toDate);
-	        fetchTotalDistance(deviceID, fromDate, toDate); // Fetch and display the total distance on the map
+	     //   fetchTotalDistance(deviceID, fromDate, toDate); // Fetch and display the total distance on the map
 	    });
 
 	    document.getElementById('play-replay').addEventListener('click', startReplay);
 	</script>
+	<script>
+	        // Function to extract the query parameter from the URL
+	        function getQueryParam(param) {
+	            const urlParams = new URLSearchParams(window.location.search);
+	            return urlParams.get(param);
+	        }
+
+	        document.addEventListener('DOMContentLoaded', function() {
+	            // Get deviceId from the URL query parameter
+	            var deviceId = getQueryParam('deviceId');
+
+	            // If deviceId exists in the URL, set it in the input field
+	            if (deviceId) {
+	                document.getElementById('device-id').value = deviceId;
+	            }
+	        });
+	    </script>
 
 </body>
 </html>
