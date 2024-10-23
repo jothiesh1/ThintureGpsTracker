@@ -9,24 +9,9 @@ import org.slf4j.LoggerFactory;
 @Repository
 public interface ViolationReportRepository extends JpaRepository<ViolationReport, Long> {
 
-    static final Logger logger = LoggerFactory.getLogger(ViolationReportRepository.class);
-
     // Query to fetch violation reports based on deviceID and a date range
     List<ViolationReport> findByVehicle_DeviceIDAndViolationDateBetween(String deviceID, Timestamp startDate, Timestamp endDate);
 
-    default List<ViolationReport> logFindByVehicleDeviceID(String deviceID) {
-        logger.info("Querying violation reports for deviceId: {}", deviceID);
-        try {
-            List<ViolationReport> results = findByVehicle_DeviceID(deviceID);
-            logger.info("Query successful, found {} violation reports for deviceId: {}", results.size(), deviceID);
-            return results;
-        } catch (Exception e) {
-            logger.error("Error querying violation reports for deviceId: {}", deviceID, e);
-            throw e;
-        }
-    }
-
+    // Query to fetch violation reports based on deviceID
     List<ViolationReport> findByVehicle_DeviceID(String deviceID);
-   // Query to fetch violation reports based on deviceID and date range
-   // List<ViolationReport> findByVehicle_DeviceIDAndViolationDateBetween(String deviceID, Timestamp startDate, Timestamp endDate);
 }

@@ -1,4 +1,10 @@
 package com.GpsTracker.Thinture.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +37,7 @@ public class SecurityConfig {
             .authorizeRequests(authorizeRequests -> {
                 // Permit login, static resources, and map access for all users
                 authorizeRequests
-                    .requestMatchers("/login", "/resources/**", "/map").permitAll()
+                    .requestMatchers("/login", "/resources/", "/map").permitAll()
                     // Allow both SUPERADMIN and ADMIN to access /dashboard
                     .requestMatchers("/dashboard").hasAnyRole("SUPERADMIN", "ADMIN")
                     // Restrict /dashboard_dealer access to DEALER role
@@ -79,7 +85,7 @@ public class SecurityConfig {
             .csrf().disable()
             .authorizeRequests(authorizeRequests -> {
                 authorizeRequests
-                    .requestMatchers("/login", "/resources/**").permitAll();
+                    .requestMatchers("/login", "/resources/").permitAll();
                 logger.info("Permit all requests to /login and static resources.");
                 
                 authorizeRequests
@@ -114,5 +120,3 @@ public PasswordEncoder passwordEncoder() {
    }
 
 */
-
-
