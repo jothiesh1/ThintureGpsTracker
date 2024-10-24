@@ -1,347 +1,121 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Fleet Thinture - Login</title>
-    
-	<style>
-	       body {
-	           margin: 0;
-	           font-family: 'Arial', sans-serif;
-	           color: #333;
-	           height: 100vh;
-	           display: flex;
-	           align-items: center;
-	           justify-content: center;
-	           background-image: url('t');
-	           background-size: cover;
-	           background-position: center;
-	         
-	       }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map with Speedometer and Moving Car</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <style>
+        /* Set the map container */
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
 
-	       .container {
-	           display: flex;
-	           justify-content: space-between;
-	           padding: 20px;
-	           max-width: 1200px;
-	           margin: auto;
-	           border-radius: 15px;
-	           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.9);
-	           backdrop-filter: blur(10px);
-	       }
+        /* Speedometer container on the map */
+        #speedometer-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 200px;
+            height: 200px;
+            z-index: 1000; /* Ensure it is above the map */
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
 
-	       .left-section, .right-section {
-	           background-color: white;
-	           padding: 30px;
-	           border-radius: 15px;
-	           box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-	           flex: 1;
-	           margin: 5px;
-	           position: relative;
-	           color: #2c3e50; /* Darker text for better contrast */
-	       }
-
-	       .header img {
-	           height: 70px;
-	           width: auto;
-	           margin-bottom: 20px;
-	           z-index: 1;
-	           position: relative;
-	       }
-
-	       .header p {
-	           font-size: 1.2em;
-	           margin: 10px 0;
-	           z-index: 1;
-	           position: relative;
-	       }
-
-	       .content {
-	           margin-top: 20px;
-	           z-index: 1;
-	           position: relative;
-	       }
-
-	       .main-image {
-	           width: 100%;
-	           height: auto;
-	           border-radius: 10px;
-	           animation: fadeIn 1s;
-	           z-index: 1;
-	           position: relative;
-	       }
-
-	       .login-container {
-	           text-align: center;
-	           padding: 30px;
-	           border-radius: 10px;
-	           z-index: 1;
-	           position: relative;
-	           width: 60%;
-	           height: 65%;
-	           min-width: 300px;
-	           box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-	           right: -12%;
-	       }
-
-	       .login-container label {
-	           display: block;
-	           text-align: left;
-	           margin-top: 10px;
-	           font-weight: bold;
-	           color: #2c3e50; /* Label color */
-	           padding: 2px;
-	       }
-
-	       .login-container input,
-	       .login-container select {
-	           width: 40%;
-	           padding: 5px;
-	           margin-top: 2px;
-	           margin-bottom: 15px;
-	           border: 1px solid #ccc; /* Border color */
-	           border-radius: 9px;
-	           font-size: 1em;
-	           transition: border-color 0.3s ease;
-	       }
-
-	       .login-container input:focus,
-	       .login-container select:focus {
-	           border-color: #1abc9c; /* Focus color */
-	           outline: none;
-	       }
-
-	       .login-container button {
-	           width: 100%;
-	           padding: 15px;
-	           background-color: #3498db;
-	           color: white;
-	           border: none;
-	           border-radius: 5px;
-	           font-size: 1.2em;
-	           cursor: pointer;
-	           transition: background-color 0.3s ease, transform 0.2s ease;
-	       }
-
-	       h2 {
-	           text-align: center;
-	           font-size: 1.5em; /* Adjust size as needed */
-	           font-weight: 650;
-	           color: darkgreen; /* Text color */
-	           text-shadow: 
-	               1px 1px 2px rgba(0, 0, 0, 0.8), /* First shadow for initial depth */
-	               3px 3px 5px rgba(0, 0, 0, 0.3), /* Slightly darker shadow for increased depth */
-	               6px 6px 8px rgba(0, 0, 0, 0.1); /* Darker shadow for stronger 3D effect */
-	       }
-
-	       h3 {
-	           text-align: center;
-	           font-size: 1em; /* Adjust size as needed */
-	           font-weight: 200;
-	           color: black; /* Text color */
-	           text-shadow: 
-	               1px 1px 2px rgba(0, 0, 0, 0.8), /* First shadow for initial depth */
-	               3px 3px 5px rgba(0, 0, 0, 0.3), /* Slightly darker shadow for increased depth */
-	               6px 6px 8px rgba(0, 0, 0, 0.3); /* Darker shadow for stronger 3D effect */
-	       }
-
-	       .login-container button:hover {
-	           background-color: #2980b9;
-	           transform: translateY(-2px); /* Button hover effect */
-	       }
-
-	       .forgot-password {
-	           display: block;
-	           text-align: right;
-	           margin-top: 10px;
-	           color: darkblue;
-	           text-decoration: none;
-	           font-size: 0.9em;
-	       }
-
-	       .forgot-password:hover {
-	           text-decoration: underline;
-	       }
-
-	       .additional-info {
-	           margin-top: 20px;
-	           color: #333;
-	           font-size: 1em;
-	           text-align: left;
-	       }
-
-	       .error {
-	           color: red;
-	           font-size: 0.9em;
-	           margin-top: -10px;
-	           margin-bottom: 10px;
-	           display: none; /* Initially hidden */
-	       }
-
-	       @media (max-width: 768px) {
-	           .container {
-	               flex-direction: column;
-	               align-items: center;
-	           }
-
-	           .left-section, .right-section {
-	               width: 100%;
-	               margin: 10px 0;
-	           }
-	       }
-
-	       @keyframes fadeIn {
-	           from { opacity: 0; }
-	           to { opacity: 1; }
-	       }
-		   .ribbon {
-		       position: relative;
-		       background: darkblue; /* Ribbon color */
-		       color: white; /* Text color */
-		       padding: 10px 20px; /* Padding around text */
-		       text-align: center;
-		       font-weight: bold;
-		       border-radius: 5px; /* Rounded corners */
-		   }
-
-		   .ribbon:before,
-		   .ribbon:after {
-		       content: "";
-		       position: absolute;
-		       bottom: 100%; /* Position above the ribbon */
-		       left: 0;
-		       border-left: 10px solid transparent; /* Left triangle */
-		       border-right: 10px solid transparent; /* Right triangle */
-		   }
-
-		   .ribbon:before {
-		       border-bottom: 10px solid darkblue; /* Color of the left triangle */
-		   }
-
-		   .ribbon:after {
-		       border-bottom: 10px solid darkblue; /* Color of the right triangle */
-		       right: 0;
-		       left: auto; /* Remove left positioning */
-		   }
-
-	   </style>
+        /* Ensure the speedometer is displayed properly */
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="left-section">
-            <div class="header">
-                <img src="IMAGES/thinture.jpg" alt="THINTURE Logo" class="img">
-                <p>Welcome to the Thinture Fleet Monitoring System. Our advanced platform allows you to track, monitor, and manage your vehicles efficiently. Please log in to access your personalized dashboard.</p>
-            </div>
-            <div class="content">
-				
-            
-                <p class="title">Fleet Management System</p>
-                <p class="description">Automate your business with cutting-edge IoT tools for efficient logistics.</p>
-                <p class="description">Track your fleet in real-time with comprehensive analytics and reporting.</p>
-                <p class="description">Optimize routes and reduce operational costs effectively.</p>
-            </div>
-        </div>
-        <div class="right-section">
-            <div class="login-container">
-                
-                <h2>Welcome to Thinture Technologies Pvt. Ltd!</h2>
-				
-				<div class="ribbon">
-				    <span>Login</span>
-				</div>
 
-				<form >
-				    <label for="usertype">User Type</label>
-				    <select id="usertype" name="usertype" required>
-				        
-						<option value="SUPERADMIN">SuperAdmin</option>
-						<option value="ADMIN">Admin</option>
-						<option value="DEALER">Dealer</option>
-						<option value="USER">User</option>
-				        <option value="CLIENT">Client</option>
-				    </select>
-				    <div id="usertype-error" class="error"></div>
+<div id="map"></div>
+<!-- Speedometer Container -->
+<div id="speedometer-container">
+    <canvas id="speedometer" width="180" height="180"></canvas> <!-- Canvas element for Gauge.js -->
+</div>
 
-				    <label for="username">Username</label>
-				    <input type="text" id="username" name="username" >
-				    <div id="username-error" class="error"></div>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gauge.js/dist/gauge.min.js"></script>
+<script>
+    // Initialize the map
+    var map = L.map('map').setView([51.505, -0.09], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
-				    <label for="password">Password</label>
-				    <input type="password" id="password" name="password" >
-				    <div id="password-error" class="error"></div>
+    // Car icon marker setup
+    var carIcon = L.icon({
+        iconUrl: 'https://img.icons8.com/ios-filled/50/000000/car--v1.png', // Use any car icon you want
+        iconSize: [40, 40],
+        iconAnchor: [20, 20], // Point to place icon at the correct location
+    });
 
-				    <button type="submit">Log In</button>
-				    <a href="#" class="forgot-password">Forgot Password?</a>
-				</form>
+    // Add the car marker to the map at an initial position
+    var carMarker = L.marker([51.505, -0.09], { icon: carIcon }).addTo(map);
 
-            </div>
-            <div class="additional-info">
-                <h4>About Us</h4>
-                <p>
-                    <strong>Our Mission:</strong><br>
-                    "Thinture is a team of creative minds, aiming for a brighter future. We design world-class vehicle control systems and strive to reduce accidents and fatalities."
-                </p>
-                <p>
-                    <strong>Our Vision:</strong><br>
-                    "To be the world leader in Road Speed Limitation technology."
-                </p>
-            </div>
-        </div>
-    </div>
-	<script>
-		
-		function validateForm() {
-				              // Hide all error messages initially
-				              document.querySelectorAll('.error').forEach(error => error.style.display = 'none');
+    // Speedometer setup using Gauge.js
+    var opts = {
+        angle: 0.15, // The span of the gauge (adjust for visual appearance)
+        lineWidth: 0.44, // Thickness of the gauge arc
+        radiusScale: 1, // Relative radius
+        pointer: {
+            length: 0.6, // Relative to gauge radius
+            strokeWidth: 0.035, // Thickness of the pointer
+            color: '#000000' // Pointer color
+        },
+        limitMax: false,     // If false, max value increases automatically if value > maxValue
+        limitMin: false,     // If true, the min value of the gauge will be fixed
+        colorStart: '#6FADCF',   // Colors for the gauge arc
+        colorStop: '#8FC0DA',    // just experiment with them
+        strokeColor: '#E0E0E0',  // Stroke color
+        generateGradient: true,
+        highDpiSupport: true,     // High resolution support
+    };
 
-				              // Reset all input borders to default
-				              document.querySelectorAll('input, select').forEach(input => {
-				                  input.style.borderColor = ''; // Reset border color
-				              });
+    // Select the canvas element for the speedometer
+    var target = document.getElementById('speedometer');
 
-				              let isValid = true;
+    // Create the gauge object
+    var gauge = new Gauge(target).setOptions(opts);
+    gauge.maxValue = 180; // Set maximum speed (e.g., 180 km/h)
+    gauge.setMinValue(0);  // Set minimum speed (0 km/h)
+    gauge.animationSpeed = 32; // Animation speed
+    gauge.set(50); // Set the initial/default value to 50
 
-				              // Validate user type
-				              const usertype = document.getElementById('usertype');
-				              if (usertype.value === '') {
-				                  document.getElementById('usertype-error').style.display = 'block';
-				                  usertype.style.borderColor = 'red'; // Set border color to red
-				                  isValid = false;
-				              }
+    // Function to simulate car movement
+    var lat = 51.505;
+    var lng = -0.09;
+    
+    function moveCar(newLat, newLng, speed) {
+        // Move the car marker
+        carMarker.setLatLng([newLat, newLng]);
+        
+        // Update the speedometer
+        gauge.set(speed);
+        
+        // Keep the map centered on the moving car
+        map.panTo([newLat, newLng]);
+    }
 
-				              // Validate username
-				              const username = document.getElementById('username');
-				              if (username.value.trim() === '') {
-				                  document.getElementById('username-error').style.display = 'block';
-				                  username.style.borderColor = 'red'; // Set border color to red
-				                  isValid = false;
-				              }
+    // Simulate the car movement and speed updates
+    setInterval(function() {
+        var randomSpeed = Math.floor(Math.random() * 180); // Simulate a speed between 0 and 180
+        lat += (Math.random() - 0.5) * 0.001; // Simulate slight movement in latitude
+        lng += (Math.random() - 0.5) * 0.001; // Simulate slight movement in longitude
+        
+        moveCar(lat, lng, randomSpeed); // Move car and update speedometer
+    }, 2000); // Update every 2 seconds
 
-				              // Validate password
-				              const password = document.getElementById('password');
-				              if (password.value.trim() === '') {
-				                  document.getElementById('password-error').style.display = 'block';
-				                  password.style.borderColor = 'red'; // Set border color to red
-				                  isValid = false;
-				              }
-
-				              return isValid; // Prevent form submission if invalid
-				          }
-						  
-						  
-						  
-						  
-						  
-		
-	       function logLoginAttempt() {
-	           var usertype = document.getElementById("usertype").value;
-	           var username = document.getElementById("username").value;
-	           console.log("Login attempt for user: " + username + " with user type: " + usertype);
-	       }
-		   
-		   
-		   
-	   </script>
+</script>
 </body>
 </html>

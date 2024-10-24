@@ -7,17 +7,71 @@
     <link rel="stylesheet" href="styles.css"> <!-- Add your CSS file here -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 	<style>
-		.panel{
-			
-			width:50%;
-			height:50%;
+		body{
+			background-color: aliceblue;
 		}
+		.panel{
+			position: relative;
+			top:130px;
+			width:52%;
+		
+			left:20%;
+			background-color:white;
+			
+			border: 5px solid gray;
+			box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+			
+		}
+		#map{
+			height: 350px;
+			top:190px;
+			width:900px;
+			left:20%;
+		}
+		input{
+			padding: 12px;
+				    border: 2px solid #ddd;
+				    border-radius: 6px;
+				    font-size: 14px;
+				    box-sizing: border-box;
+					width: 15%;
+					height:2px;
+		}
+		.button{
+			
+			color:white;
+			background-color: darkblue;
+		}
+		h2{
+			text-align: center;
+						    font-size: 3em; /* Adjust size as needed */
+							font-weight: 400;
+						    color:darkblue; /* Text color */
+						    text-shadow: 
+							1px 1px 2px rgba(0, 0, 0, 0.4), /* First shadow for initial depth */
+							        3px 3px 5px rgba(0, 0, 0, 0.8), /* Slightly darker shadow for increased depth */
+							        6px 6px 8px rgba(0, 0, 0, 0.1); /* Darker shadow for stronger 3D effect */
+							
+		}
+		#back-button {
+		            position: absolute;
+		            top: 120px;
+		            left: 10px;
+		            background-color: darkred;
+		            color: white;
+		        }
 	</style>
 </head>
 <body>
+	<button class="button" id="back-button">
+	       <i class="fas fa-arrow-left"></i> Back
+	   </button>
     <!-- Replay Panel -->
     <div id="replay-panel" class="panel">
+		<h2>History</h2>
         <div>
             <label for="device-id">Device ID:</label>
             <input type="text" id="device-id" value="">
@@ -27,11 +81,14 @@
             <input type="datetime-local" id="from-date">
             <label for="to-date">To:</label>
             <input type="datetime-local" id="to-date">
-            <button id="show-replay">Show</button>
+			<button class="button" id="show-replay">
+			    <i class="fas fa-play"></i> Show
+			</button>
+
         </div>
         <div>
             <label>
-                <input type="checkbox" id="show-trail"> Trail
+                <input  type="checkbox" id="show-trail"> Trail
             </label>
             <select id="replay-speed">
                 <option value="normal">Normal</option>
@@ -40,7 +97,7 @@
             </select>
         </div>
         <div>
-            <button id="play-replay" disabled>Play</button>
+            <button id="play-replay" disabled>Play</buttonclass="button">
             <input type="range" id="replay-slider" min="0" max="100" value="0" style="width: 70%;">
             <span id="replay-time">00:00:00</span>
         </div>
@@ -234,6 +291,12 @@
 	                document.getElementById('device-id').value = deviceId;
 	            }
 	        });
+			
+			
+			// Function to go back to the previous page
+			      document.getElementById('back-button').addEventListener('click', function() {
+			          window.history.back();
+			      });
 	    </script>
 
 </body>

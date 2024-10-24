@@ -4,11 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Fleet Thinture Map</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.0/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	
 	
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 	<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
@@ -19,25 +21,51 @@
 		<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
 		    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@6.1.2/dist/stomp.min.js"></script>
 		    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+			<script src="https://cdn.jsdelivr.net/npm/gauge.js/dist/gauge.min.js"></script>
+
 		<style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
+			#speedometer-container {
+			           position: absolute;
+			           top: 20px;
+			           left: 20px;
+			           width: 200px;
+			           height: 200px;
+			           z-index: 1000; /* Ensure it is above the map */
+			           background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+			           border-radius: 10px;
+			           display: flex;
+			           align-items: center;
+			           justify-content: center;
+			           padding: 10px;
+			       }
+
+			       /* Styling for speed display */
+			       #speed-value {
+			           font-size: 20px;
+			           font-weight: bold;
+			           color: #333;
+			           text-align: center;
+			       }
+			body {
+					    font-family: Arial, sans-serif;
+					    background-image: url('THINTURE_IMAGE/background4.jpg');
+					    background-size: cover;
+					    background-repeat: no-repeat;
+					    margin: 0;
+					    padding: 0;
+					}
         .header {
 			position: absolute;
-            background-color: lightslategray;
+            background-color: gray;
             color: white;
-            padding: 5px;
+            padding: 8px;
             text-align: center;
             display: flex;
             justify-content: space-between;
             align-items: center;
 			width:40%;
-			top:190px;
-			right:20%;
+			top:165px;
+			right:2%;
         }
         .header h1 {
             margin: 0;
@@ -45,11 +73,12 @@
         
         
         #map {
-			top:200px;
-            width: 100%;
-            height: calc(100vh - 120px); /* Adjust height to fit screen */
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+			top:150px;
+			height: 500px;
+			          width: 100%;
+			          position: sticky;
+			          z-index: 1; /* Ensure map is behind the tab */
+			      
         }
 		
 			
@@ -103,10 +132,12 @@
 			       }
 				.status-buttons {
 				    display: flex;
-				    justify-content: center; /* Center the buttons horizontally */
-				    gap: 15px; /* Space between buttons */
+					position: absolute;
+				   
+				    gap: 10px; /* Space between buttons */
 				    flex-wrap: wrap; /* Wrap buttons on smaller screens */
-				    margin: 20px 0; /* Margin around buttons */
+				    margin: 50px 0; /* Margin around buttons */
+					right:75%;
 				}
 
 				.status-button {
@@ -183,57 +214,148 @@
 							   			   }
 							   			          
 
-										   #sideTab {
-										       width: 100%; /* Full width of the screen */
-										       height: 50%; /* Adjust height as needed */
-										       background: #f8f9fa;
-										       padding: 10px;
-										       position: fixed;
-										       bottom: 0; /* Align to bottom */
-										       left: 0;
-										       z-index: 1000;
-										       display: flex; /* Use Flexbox for layout */
-										       justify-content: space-between; /* Space sections apart */
-										       box-shadow: 0 -2px 5px rgba(0,0,0,0.3); /* Optional: add shadow for better visibility */
-										       transition: height 0.3s; /* Smooth transition for height */
-										       display: none; /* Initially hidden */
-											   font-size: 14px;
-										   }
+										  
+										   /* Style for the side tab */
+										         #sideTab {
+										             height: 0; /* Initially hidden */
+										             width: 100%;
+										             position: fixed;
+										             bottom: 0;
+										             left: 0;
+										             background-color: #2b2b2b; /* Sleek dark background */
+										             color: #fff;
+										             overflow-y: hidden;
+										             transition: height 0.5s ease-in-out;
+										             box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.5);
+										             z-index: 1000; /* Ensure the tab is above the map */
+										         }
 
-										   .section {
-										       width: 50%; /* Each section takes up half the space */
-										       padding: 10px;
-										       box-sizing: border-box;
-										       overflow: auto; /* Ensure overflow is handled */
-										   }
+										         /* Flex container to divide content left and right */
+										         .tab-content {
+										             display: flex;
+										             width: 100%;
+										             height: 100%;
+										             padding: 20px;
+										         }
 
-										   #live-video-section {
-										       background: #e9ecef; /* Optional: Different background color for live video section */
-										   }
+										         /* Style for each section */
+										         .section {
+										             width: 40%;
+										             padding: 20px;
+										             box-sizing: border-box;
+										             border-right: 1px solid rgba(255, 255, 255, 0.2);
+										         }
+												 .historysection {
+												 										             width: 40%;
+												 										             padding: -10px;
+												 										             box-sizing: border-box;
+												 										             border-right: 1px solid rgba(255, 255, 255, 0.2);
+												 										         }
+										         /* Remove border for the last section */
+										         .section:last-child {
+										             border-right: none;
+										         }
+												 .historysection h4 {
+												 									             font-size: 20px;
+												 									             margin-bottom: 10px;
+												 									             border-bottom: 2px solid #4CAF50;
+												 									             padding-bottom: 5px;
+												 									         }
+										         /* Section headers */
+										         .section h4 {
+										             font-size: 20px;
+										             margin-bottom: 10px;
+										             border-bottom: 2px solid #4CAF50;
+										             padding-bottom: 5px;
+										         }
 
-										   #history-section {
-										       background: #f1f1f1; /* Optional: Different background color for history section */
-										   }
+										         /* Form elements styling */
+										         label, select, input {
+										             display: block;
+										             width: 50%;
+										             margin-bottom: 10px;
+										             padding: 5px;
+										             border-radius: 5px;
+										             border: none;
+										             font-size: 14px;
+										         }
 
-										   .closebtn {
-										       font-size: 36px;
-										       color: #000;
-										       text-decoration: none;
-										       cursor: pointer;
-										       position: absolute;
-										       top: 10px; /* Adjust as needed */
-										       right: 20px; /* Adjust as needed */
-										   }
+										         select, input {
+										             background-color: #fff;
+										             color: #333;
+										         }
 
-										   .closebtn:hover {
-										       color: red;
-										   }
+										         label {
+										             color: #ccc;
+										             font-size: 10px;
+										         }
 
-							
+										         /* Button styling */
+										         .btn {
+										             background-color: #4CAF50;
+										             color: white;
+										             padding: 8px 10px;
+										             font-size: 10px;
+										             cursor: pointer;
+										             border: none;
+										             border-radius: 5px;
+										             width: 40%;
+										             text-align: center;
+										             transition: background-color 0.3s ease-in-out;
+										         }
 
+										         .btn:hover {
+										             background-color: #45a049;
+										         }
+
+										         /* Icon styling for buttons */
+										         .btn i {
+										             margin-right: 5px;
+										         }
+
+										         /* Close button for the side tab */
+										         #sideTab a {
+										             color: white;
+										             font-size: 25px;
+										             position: absolute;
+										             top: 10px;
+										             right: 20px;
+										             cursor: pointer;
+										         }
+
+										         /* Button to open the side tab */
+										         .open-tab-btn {
+										             background-color: #4CAF50;
+										             color: white;
+										             padding: 10px 20px;
+										             border: none;
+										             cursor: pointer;
+										             font-size: 16px;
+										             position: absolute;
+										             bottom: 20px;
+										             right: 20px;
+										             z-index: 3;
+										             border-radius: 5px;
+										             transition: background-color 0.3s ease-in-out;
+										         }
+
+										         .open-tab-btn:hover {
+										             background-color: #45a049;
+										         }
+
+										         /* Responsive adjustments for mobile view */
+										         @media (max-width: 600px) {
+										             .tab-content {
+										                 flex-direction: column;
+										             }
+
+										             .section {
+										                 width: 100%;
+										             }
+										         }
 									
 
-									 .live-button {
+								 .live-button {
 										background-color: #d9534f; /* Dark background color for buttons */
 																				     color: white; /* Text color */
 																				     border: none; /* Remove default button border */
@@ -259,21 +381,23 @@
 									    position: relative; /* Position relative for positioning the notification count */
 									  }
 
-									  #alert-button {
+									.header  #alert-button {
+										
 									    background-color:#d9534f ; /* Remove default button background */
 										color:white;
-										padding: 4px 20px;
-										font-size: 10px;
+										padding: 7px 20px;
+										font-size: 12px;
 									    border: none; /* Remove default button border */
 									    cursor: pointer; /* Pointer cursor on hover */
 									    display: flex; /* Flexbox for layout inside button */
 									    align-items: center; /* Center items vertically */
-										
-										top:7px;
+										right:100px;
+										top:3px;
+										width:100px;
 									  }
 
 									  #notification-icon {
-									    font-size: 20px; /* Font size of the notification icon */
+									    font-size: 10px; /* Font size of the notification icon */
 									    color: white; /* Default color of the icon */
 									    border: 2px solid transparent; /* Default border */
 									    border-radius: 50%; /* Round border */
@@ -284,7 +408,7 @@
 									  .notification-count {
 									    position: absolute; /* Absolute positioning */
 									    top: -5px; /* Position count above icon */
-									    right: 5px; /* Position count to the right of icon */
+									    right: 25px; /* Position count to the right of icon */
 									    background-color: red; /* Background color of the badge */
 									    color: white; /* Text color of the badge */
 									    border-radius: 50%; /* Round badge */
@@ -302,15 +426,18 @@
 										   }
 
 										   .panic-button {
+											position: absolute;
 										     background-color: #333; /* Dark background color for buttons */
 										     color: white; /* Text color */
 										     border: none; /* Remove default button border */
-										     padding: 9px 20px; /* Padding inside buttons */
+										     padding: 12px 20px; /* Padding inside buttons */
 										     border-radius: 5px; /* Rounded corners */
-										     font-size: 10px; /* Font size for text */
+										     font-size: 12px; /* Font size for text */
 										     display: flex; /* Flexbox for layout inside button */
 										     align-items: center; /* Center items vertically */
 										     cursor: pointer; /* Pointer cursor on hover */
+											right:210px;
+											top:11px;
 											 
 										   }
 
@@ -358,16 +485,22 @@
 										           z-index: 1000; /* Ensure it appears above other elements */
 										       }
 										       #search-input {
-										           padding: 5px;
+												position: absolute;
+												top:15px;
+										           padding: 7px;
 										           margin-right: 5px;
+												   width:30%;
 										       }
 										       #search-button {
-										           padding: 5px 10px;
+												position: absolute;
+										           padding: 10px 10px;
 										           background-color: #4CAF50;
 										           color: white;
 										           border: none;
 										           border-radius: 5px;
 										           cursor: pointer;
+												   right:400px;
+												   top:12px;
 										       }
 										   
 										   				   
@@ -377,7 +510,7 @@
 	
 	<div th:insert="navigation :: navbar"></div>
    
-   
+	
     <!-- Status Buttons -->
    
 	<div class="status-buttons">
@@ -388,13 +521,12 @@
 	    <button class="status-button inactive">0<br>Inactive</button>
 		
 	</div>
+	
 	<div class="header">
 	    <!-- Existing buttons and content -->
 	    <input type="text" id="search-input" placeholder="Enter Device ID">
 	    <button id="search-button" onclick="searchVehicleById()">Search</button>
-		<button type="menu" class="live-button" id="open">
-		               <i class="fas fa-video"></i> <strong> View Stream</strong>
-		           </button>
+		
 		           <div class="button-container">
 		               <button class="panic-button">
 		                   <i class="fas fa-briefcase"></i> <strong>Immediate Response</strong>
@@ -411,45 +543,41 @@
 
 
     <!-- Side Tab for Video -->
-    <div id="sideTab">
-        <a href="javascript:void(0)" class="closebtn" id="closeSideTab">&times;</a>
-        <!-- Live Video Section -->
-        <div id="live-video-section">
-            <button id="closeLiveVideo" class="close-video-btn">&times;</button>
-            <h4><strong>Live Stream</strong></h4>
-            <label for="camera-select-live">Select Camera:</label>
-            <select id="camera-select-live">
-                <option value="front">Front</option>
-                <option value="rear">Rear</option>
-            </select>
-            <button type="button" id="btnLiveStream">
-                <i class="fas fa-video"></i> Open Live Stream
-            </button>
-            <iframe id="video-stream" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
-        <!-- History Section -->
-        <div id="history-section">
-            <h4><strong>History</strong></h4>
-            <label for="camera-select-history">Select Camera:</label>
-            <select id="camera-select-history">
-                <option value="front">Front</option>
-                <option value="rear">Rear</option>
-            </select>
-            <div style="margin-top: 10px;">
-                <label for="from-date">From:</label>
-                <input type="datetime-local" id="from-date">
-                <label for="to-date" style="margin-left: 10px;">To:</label>
-                <input type="datetime-local" id="to-date">
-            </div>
-            <button type="button" id="btnSubmitHistory" style="margin-top: 10px;">Submit</button>
-            <!-- History Video Section -->
-            <div id="history-video-section" style="display:none;">
-                <button id="closeHistoryVideo" class="close-video-btn">&times;</button>
-                <iframe id="history-video" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
-        </div>
-    </div>
+	<div id="sideTab">
+	    <a href="javascript:void(0)" id="closeSideTab">&times;</a>
+	    
+	    <div class="tab-content">
+	        <!-- Live Video Section -->
+	        <div id="live-video-section" class="section">
+	            <h4><strong>Live Stream</strong></h4>
+	            <label for="camera-select-live">Select Camera:</label>
+	            <select id="camera-select-live">
+	                <option value="front">Front</option>
+	                <option value="rear">Rear</option>
+	            </select>
+	            <button type="button" class="btn" id="btnLiveStream">
+	                <i class="fas fa-video"></i> Open Live Stream
+	            </button>
+	            <iframe id="video-stream" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+	        </div>
 
+	        <!-- History Section -->
+	        <div id="history-section" class="historysection">
+	            <h4><strong>History</strong></h4>
+	            <label for="camera-select-history">Select Camera:</label>
+	            <select id="camera-select-history">
+	                <option value="front">Front</option>
+	                <option value="rear">Rear</option>
+	            </select>
+	            <label for="from-date">From:</label>
+	            <input type="datetime-local" id="from-date">
+	            <label for="to-date">To:</label>
+	            <input type="datetime-local" id="to-date">
+	            <button type="button" class="btnh" id="btnSubmitHistory">Submit</button>
+				<iframe id="video-stream" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+	        </div>
+	    </div>
+	</div>
     <!-- Map Section -->
     <div class="content">
         <div id="map"></div>
@@ -875,15 +1003,7 @@
 
 			// Define the openReplayPage function
 			
-			function openSideTab() {
-			      // Show the side tab by setting the width (assuming it's hidden with 0 width)
-			      document.getElementById('sideTab').style.width = '250px';  // Adjust width as per your requirement
-
-			      // Optionally, you can also add functionality to hide the tab when the close button is clicked
-			      document.getElementById('closeSideTab').onclick = function() {
-			          document.getElementById('sideTab').style.width = '0';  // Hide the side tab
-			      };
-			  }	
+			
 						
 		    if (markerDict[deviceId]) {
 		        markerDict[deviceId].setLatLng([vehicle.latitude, vehicle.longitude])
@@ -1007,6 +1127,31 @@
 	}
 	</script>
 	<script>
+		function openSideTab() {
+		       document.getElementById('sideTab').style.height = '350px';  // Adjust height as per your requirement
+
+		       document.getElementById('closeSideTab').onclick = function() {
+		           document.getElementById('sideTab').style.height = '0';  // Hide the side tab
+		       };
+		   }
+
+		   // Function to load YouTube video into the iframe
+		   document.getElementById('btnLiveStream').addEventListener('click', function() {
+		       var iframe = document.getElementById('video-stream');
+		       iframe.src = "https://www.youtube.com/embed/ScMzIvxBSi4";  // Sample YouTube video
+		   });
+		   document.getElementById('btnSubmitHistory').addEventListener('click', function() {
+		   		       var iframe = document.getElementById('video-stream');
+		   		       iframe.src = "https://www.youtube.com/embed/ScMzIvxBSi4";  // Sample YouTube video
+		   		   });
+		   // Initialize the map (Leaflet.js)
+		   var map = L.map('map').setView([51.505, -0.09], 13);  // Default coordinates, adjust as necessary
+
+		   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+		   }).addTo(map);
+	</script>
+	<script>
 		function navigateToReplay(deviceId) {
 		    if (deviceId) {
 		        window.location.href = `/replay?deviceId=${deviceId}`;
@@ -1014,6 +1159,45 @@
 		        alert('No Device ID found');
 		    }
 		}
+		
+		
+		
+		
+		var opts = {
+		        angle: 0, // The span of the gauge
+		        lineWidth: 0.3, // The gauge's thickness
+		        radiusScale: 1, // Relative radius
+		        pointer: {
+		            length: 0.6, // Relative to gauge radius
+		            strokeWidth: 0.05, // Thickness
+		            color: '#000000' // Pointer color
+		        },
+		        limitMax: false,     // If false, max value increases automatically if value > maxValue
+		        limitMin: false,     // If true, the min value of the gauge will be fixed
+		        colorStart: '#6FADCF',   // Colors
+		        colorStop: '#8FC0DA',    // just experiment with them
+		        strokeColor: '#E0E0E0',  // to see which ones work best for you
+		        generateGradient: true,
+		        highDpiSupport: true,     // High resolution support
+		    };
+
+		    var target = document.getElementById('speedometer'); // Canvas element where speedometer is rendered
+		    var gauge = new Gauge(target).setOptions(opts); // Create gauge object
+		    gauge.maxValue = 180; // Set max speed value (e.g., 180 km/h)
+		    gauge.setMinValue(0);  // Set min value (0 km/h)
+		    gauge.animationSpeed = 32; // Set animation speed
+		    gauge.set(0); // Initial value of the gauge
+
+		    // Function to simulate dynamic speed updates
+		    function updateSpeed(newSpeed) {
+		        gauge.set(newSpeed); // Update the speed on the gauge
+		    }
+
+		    // Example: Simulating speed updates every 2 seconds
+		    setInterval(function() {
+		        var randomSpeed = Math.floor(Math.random() * 180); // Generate random speed between 0 and 180
+		        updateSpeed(randomSpeed);
+		    }, 2000);
 	</script>
 </html>
 </body>
