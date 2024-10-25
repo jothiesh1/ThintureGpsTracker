@@ -41,7 +41,7 @@ public interface VehicleHistoryRepository extends JpaRepository<VehicleHistory, 
             @Param("startDate") Timestamp startDate,
             @Param("endDate") Timestamp endDate);
 
-    VehicleHistory findTopByVehicle_DeviceIDOrderByTimestampDesc(String deviceID);
+
     
     @Query("SELECT vh FROM VehicleHistory vh WHERE vh.vehicle.deviceID = :vehicleId AND YEAR(vh.timestamp) = :year")
     List<VehicleHistory> findByVehicleIdAndYear(
@@ -71,7 +71,16 @@ public interface VehicleHistoryRepository extends JpaRepository<VehicleHistory, 
 
     @Query("SELECT vh FROM VehicleHistory vh WHERE vh.vehicle.deviceID = :deviceID ORDER BY vh.timestamp DESC")
     VehicleHistory findLatestByDeviceID(@Param("deviceID") String deviceID);
-}
+  
+
+     //   //@Query("SELECT vh FROM VehicleHistory vh WHERE vh.vehicle.deviceID = :deviceID ORDER BY vh.timestamp DESC")
+      //  VehicleHistory findTopByVehicle_DeviceIDOrderByTimestampDesc(@Param("deviceID") String deviceID);
+        
+
+        // Find the latest vehicle history entry based on deviceID
+        VehicleHistory findTopByVehicle_DeviceIDOrderByTimestampDesc(String deviceID);
+    }
+
 
 	
 // this command for panic button 17/10/2024

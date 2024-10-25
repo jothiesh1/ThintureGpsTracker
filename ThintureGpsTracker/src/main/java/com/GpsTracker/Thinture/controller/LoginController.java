@@ -157,23 +157,23 @@ public class LoginController {
                 loginAttempts.remove(username);  // Reset login attempts on successful login
                 lastLoginTime.put(username, LocalDateTime.now()); // Record last login time
 
-                // Redirect based on role
+             // Redirect based on role
                 switch (usertype.toUpperCase()) {
                     case "SUPERADMIN":
-                        logger.info("Redirecting SuperAdmin to /dashboard");
-                        return new ModelAndView("redirect:/dashboard");
                     case "ADMIN":
-                        logger.info("Redirecting Admin to /admin/dashboard");
+                        logger.info("Redirecting to /dashboard");
                         return new ModelAndView("redirect:/dashboard");
                     case "DEALER":
-                        logger.info("Redirecting Dealer to /dashboard_dealer");
+                        logger.info("Redirecting to /dashboard_dealer");
                         return new ModelAndView("redirect:/dashboard_dealer");
                     case "USER":
-                        logger.info("Redirecting User to /map");
+                        logger.info("Redirecting to /map");
                         return new ModelAndView("redirect:/map");
                     default:
                         logger.warn("Usertype not found, redirecting to /login");
                         return new ModelAndView("redirect:/login");
+                
+           
                 }
             } else {
                 logger.error("Invalid password for username: {}", username);
@@ -185,13 +185,12 @@ public class LoginController {
             return new ModelAndView("login", "error", "Invalid username or password.");
         }
     }
-
     @GetMapping("/default")
     public String defaultAfterLogin(HttpServletRequest request) {
         if (request.isUserInRole("ROLE_SUPERADMIN")) {
-            return "redirect:/dashboard";
+            return "redirect:/dashboard";  // Correct path for the dashboard
         } else if (request.isUserInRole("ROLE_ADMIN")) {
-            return "redirect:/admin/dashboard";
+            return "redirect:/dashboard";  // Corrected the path by adding a forward slash
         } else if (request.isUserInRole("ROLE_DEALER")) {
             return "redirect:/dashboard_dealer";
         } else if (request.isUserInRole("ROLE_USER")) {
@@ -200,5 +199,5 @@ public class LoginController {
             return "redirect:/login";  // If no role matches
         }
     }
-
+    
 }

@@ -1067,7 +1067,7 @@
 	    console.log(`Searching for vehicle with Device ID: ${deviceId}`);
 
 	    // Fetch vehicle details from the backend API
-	    fetch(`/api/vehicles/details/${deviceId}`)
+	    fetch(`/api/vehicle/details/${deviceId}`)
 	        .then(response => {
 	            if (response.ok) {
 	                return response.json();

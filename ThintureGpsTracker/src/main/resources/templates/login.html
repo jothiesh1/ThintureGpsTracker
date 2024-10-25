@@ -13,7 +13,7 @@
 	           display: flex;
 	           align-items: center;
 	           justify-content: center;
-	           background-image: url('THINTURE_IMAGE/fleet.jpg');
+	           background-image: url('/THINTURE_IMAGE/fleet.jpg');
 	           background-size: cover;
 	           background-position: center;
 	         
@@ -23,23 +23,25 @@
 	           display: flex;
 	           justify-content: space-between;
 	           padding: 10px;
-	           max-width: 1200px;
+	           max-width: 900px;
 	           margin: auto;
+			   height:500px;
 	           border-radius: 15px;
 	           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.9);
 	           backdrop-filter: blur(10px);
 	       }
 
-	       .left-section, .right-section {
-	           background-color: white;
-	           padding: 30px;
-	           border-radius: 15px;
-	           box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-	           flex: 1;
-	           margin: 5px;
-	           position: relative;
-	           color: #2c3e50; /* Darker text for better contrast */
-	       }
+		   .left-section, .right-section {
+		       background: linear-gradient(135deg,#ffffff,#e2e2e2);
+		       padding: 30px;
+		       border-radius: 15px;
+		       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+		       flex: 1;
+		       margin: 5px;
+		       position: relative;
+		       color: #2c3e50; /* Darker text for better contrast */
+		   }
+
 
 	       .header img {
 	           height: 50px;
@@ -73,15 +75,16 @@
 
 	       .login-container {
 	           text-align: center;
-	           padding: 30px;
+	           padding: 10px;
+			   top:70px;
 	           border-radius: 10px;
 	           z-index: 1;
-			   background-color: lightgray;
+			   background: linear-gradient(135deg,#ffffff,gray);
 	           position: relative;
-	           width: 30%;
-	           height: 50%;
+	           width: 20%;
+	           height: 70%;
 	           min-width: 280px;
-	           box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+	           box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
 	           right: -12%;
 			   font-size: 18px;
 	       }
@@ -129,14 +132,14 @@
 	           text-align: center;
 	           font-size: 1.5em; /* Adjust size as needed */
 	           font-weight: 650;
-	           color:green; /* Text color */
+	           color:lightseagreen; /* Text color */
 	           text-shadow: 
 	               1px 1px 2px rgba(0, 0, 0, 0.8), /* First shadow for initial depth */
 	               3px 3px 5px rgba(0, 0, 0, 0.8), /* Slightly darker shadow for increased depth */
 	               6px 6px 8px rgba(0, 0, 0, 0.1); /* Darker shadow for stronger 3D effect */
 	       }
 
-	       h3 {
+	       p {
 	           text-align: center;
 	           font-size: 1em; /* Adjust size as needed */
 	           font-weight: 200;
@@ -238,21 +241,18 @@
             <div class="content">
 				<img src="/THINTURE_IMAGE/live_tracking3-1-1.gif" alt="Logistic" class="main-image"/>
             
-                <p class="title">Fleet Management System</p>
-                <p class="description">Automate your business with cutting-edge IoT tools for efficient logistics.</p>
-                <p class="description">Track your fleet in real-time with comprehensive analytics and reporting.</p>
-                <p class="description">Optimize routes and reduce operational costs effectively.</p>
+               
             </div>
         </div>
         <div class="right-section">
             <div class="login-container">
                 
-                <h2>Welcome to Thinture Technologies Pvt. Ltd!</h2>
+                <h2>Think Future!</h2>
 				
 				
 
 				<form th:action="@{/login}" method="post" onsubmit="return validateForm()">
-				    <label for="usertype">User Type</label>
+				    <label for="usertype"></label>
 				    <select id="usertype" name="usertype" required>
 				        
 						<option value="SUPERADMIN">SuperAdmin</option>
@@ -276,17 +276,7 @@
 				</form>
 
             </div>
-            <div class="additional-info">
-                <h4>About Us</h4>
-                <p>
-                    <strong>Our Mission:</strong><br>
-                    "Thinture is a team of creative minds, aiming for a brighter future. We design world-class vehicle control systems and strive to reduce accidents and fatalities."
-                </p>
-                <p>
-                    <strong>Our Vision:</strong><br>
-                    "To be the world leader in Road Speed Limitation technology."
-                </p>
-            </div>
+            
         </div>
     </div>
 	<script>

@@ -135,20 +135,7 @@ public class VehicleHistoryService {
 
    
 
-    // Additional method to fetch the latest location for a device (optional)
-    public VehicleHistory getLatestLocation(String deviceID) {
-        logger.info("Fetching latest location for deviceID: {}", deviceID);
-        try {
-            VehicleHistory latestLocation = vehicleHistoryRepository.findTopByVehicle_DeviceIDOrderByTimestampDesc(deviceID);
-            if (latestLocation == null) {
-                logger.warn("No location data found for deviceID: {}", deviceID);
-            }
-            return latestLocation;
-        } catch (Exception e) {
-            logger.error("Error fetching latest location for deviceID: {} - {}", deviceID, e.getMessage(), e);
-            return null;
-        }
-    }
+   
 
     // Optional method for fetching history for multiple vehicles
     public List<VehicleHistory> getMultipleVehiclesHistory(List<String> deviceIDs, Timestamp startDate, Timestamp endDate) {
@@ -166,29 +153,7 @@ public class VehicleHistoryService {
             return Collections.emptyList();
         }
     }
-    // Other methods..
-/*
- // Fetch vehicle history with optional filters
-    public List<VehicleHistory> getFilteredVehicleHistory(String vehicleId, Integer month, Integer year) {
-        logger.info("Fetching filtered vehicle history for vehicleId: {}, month: {}, year: {}", vehicleId, month, year);
-
-        try {
-            // Check which filters are applied
-            if (vehicleId != null && month != null && year != null) {
-                return vehicleHistoryRepository.findByVehicleIdAndMonthAndYear(vehicleId, month, year);
-            } else if (vehicleId != null && year != null) {
-                return vehicleHistoryRepository.findByVehicleIdAndYear(vehicleId, year);
-            } else if (vehicleId != null) {
-                return vehicleHistoryRepository.findByVehicleId(vehicleId);
-            } else {
-                return vehicleHistoryRepository.findAll();
-            }
-        } catch (Exception e) {
-            logger.error("Error fetching filtered vehicle history: {}", e.getMessage(), e);
-            return Collections.emptyList();
-        }
-    }
-    */
+    
     
     //new code violetion and vehicle report 
         
@@ -322,5 +287,47 @@ public class VehicleHistoryService {
         dto.setPanic(vehicleHistory.getPanic());
         return dto;
     }
+    
+ // Other methods..
+    /*
+     // Fetch vehicle history with optional filters
+        public List<VehicleHistory> getFilteredVehicleHistory(String vehicleId, Integer month, Integer year) {
+            logger.info("Fetching filtered vehicle history for vehicleId: {}, month: {}, year: {}", vehicleId, month, year);
+
+            try {
+                // Check which filters are applied
+                if (vehicleId != null && month != null && year != null) {
+                    return vehicleHistoryRepository.findByVehicleIdAndMonthAndYear(vehicleId, month, year);
+                } else if (vehicleId != null && year != null) {
+                    return vehicleHistoryRepository.findByVehicleIdAndYear(vehicleId, year);
+                } else if (vehicleId != null) {
+                    return vehicleHistoryRepository.findByVehicleId(vehicleId);
+                } else {
+                    return vehicleHistoryRepository.findAll();
+                }
+            } catch (Exception e) {
+                logger.error("Error fetching filtered vehicle history: {}", e.getMessage(), e);
+                return Collections.emptyList();
+            }
+        }
+        */
+
+    // Method to fetch the latest vehicle history by deviceID
+    public VehicleHistory getLatestLocation(String deviceID) {
+        logger.info("Fetching latest vehicle details for deviceID: {}", deviceID);
+
+        VehicleHistory vehicleHistory = vehicleHistoryRepository.findTopByVehicle_DeviceIDOrderByTimestampDesc(deviceID);
+        
+        if (vehicleHistory != null) {
+            logger.info("Found vehicle history for deviceID: {}", vehicleHistory.getVehicle().getDeviceID());
+        } else {
+            logger.warn("No vehicle history found for deviceID: {}", deviceID);
+        }
+
+        return vehicleHistory;
+    }
+
+
+
 }
 	

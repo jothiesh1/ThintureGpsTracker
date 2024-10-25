@@ -30,6 +30,26 @@ public class VehicleHistoryController {
     @Autowired
     private VehicleHistoryService vehicleHistoryService;
 
+    // Endpoint to get vehicle details based on deviceID
+
+ // Get vehicle details based on deviceID
+    @GetMapping("/details/{deviceID}")
+    public ResponseEntity<VehicleHistory> getVehicleDetails(@PathVariable("deviceID") String deviceID) {
+        logger.info("Fetching vehicle details for Device ID: {}", deviceID);
+
+        VehicleHistory vehicleDetails = vehicleHistoryService.getLatestLocation(deviceID);
+
+        if (vehicleDetails != null) {
+            logger.info("Vehicle found: {}", vehicleDetails);
+            return ResponseEntity.ok(vehicleDetails);
+        } else {
+            logger.warn("No vehicle details found for Device ID: {}", deviceID);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Send 404 if not found
+        }
+    
+}
+
+       
     @GetMapping("/history")
     public ResponseEntity<List<VehicleHistory>> getVehicleHistory(
         @RequestParam("deviceID") String deviceID,
@@ -137,7 +157,12 @@ public class VehicleHistoryController {
         vehicleHistoryService.saveVehicleHistory(historyData);
         return new ResponseEntity<>("Data saved successfully", HttpStatus.OK);
     
-}}
+}
+    
+
+
+
+}
 /*
 }
 
