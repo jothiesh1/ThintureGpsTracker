@@ -27,7 +27,15 @@ public class User {
     private String email;
     private String userType;
     private String address;
-    private String phone;
+    public SuperAdmin getSuperAdmin() {
+		return superAdmin;
+	}
+
+	public void setSuperAdmin(SuperAdmin superAdmin) {
+		this.superAdmin = superAdmin;
+	}
+
+	private String phone;
     private String country;
     // Getters and Setters
     @ManyToOne // This annotation establishes the many-to-one relationship

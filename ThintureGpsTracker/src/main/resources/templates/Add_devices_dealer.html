@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Serial Number and Dealer Autocomplete</title>
+	
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <style>
+        /* Basic Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Container and Tab Styling */
+		.tab-container {
+		    display: flex;
+		    border-bottom: 2px solid #ddd;
+		    margin-bottom: 150px;
+		    width: 50%;
+		    position: relative; /* Enables `right` property */
+		    right: -20%;
+		}
+
+
+        .tab-link {
+			position: relative;
+			top:130px;
+			width:50%;
+            flex: 1;
+            padding: 15px;
+            cursor: pointer;
+            text-align: center;
+            background: #f1f1f1;
+            border: none;
+            font-size: 16px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .tab-link:hover, .tab-link.active {
+            background: #0078D4;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background-color: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        input[type="text"] {
+			position: relative;
+            width: 10%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        button {
+            padding: 10px 120px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #0078D4;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #005fa3;
+        }
+
+        /* Autocomplete Style */
+        .autocomplete-suggestions {
+            position: absolute;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 1000;
+            width: calc(100% - 22px);
+            border-radius: 4px;
+        }
+
+        .autocomplete-suggestion {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .autocomplete-suggestion:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Display Section Styling */
+        .serial-section {
+            margin-top: 15px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .serial-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .serial-item:last-child {
+            border-bottom: none;
+        }
+
+        .count-display {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+	<div th:insert="navigation :: navbar"></div>
+    <!-- Tab Navigation -->
+    <div class="tab-container">
+        <button class="tab-link active" onclick="openTab('single')">Single</button>
+        <button class="tab-link" onclick="openTab('dual')">Dual</button>
+    </div>
+
+    <!-- Single Serial Number Section -->
+    <div id="single" class="tab-content active">
+        <h3>Single Serial Number</h3>
+        <input type="text" id="dealerNameSingle" placeholder="Enter dealer name" oninput="autocomplete(this)">
+        <div id="suggestionsSingle" class="autocomplete-suggestions"></div>
+        <input type="text" id="singleSerial" placeholder="Enter serial number">
+        <button onclick="addSerial('single')">Add Serial</button>
+        <div id="singleDisplay" class="serial-section"></div>
+    </div>
+
+    <!-- Dual Serial Number Range Section -->
+    <div id="dual" class="tab-content">
+        <h3>Dual Serial Number Range</h3>
+        <input type="text" id="dealerNameDual" placeholder="Enter dealer name" oninput="autocomplete(this)">
+        <div id="suggestionsDual" class="autocomplete-suggestions"></div>
+        <input type="text" id="startSerial" placeholder="Enter start number">
+        <input type="text" id="endSerial" placeholder="Enter end number">
+        <input type="text" id="removedSerial" placeholder="Enter removed number">
+        <button onclick="addSerial('dual')">Add Serials</button>
+        <div id="dualDisplay" class="serial-section"></div>
+        <div id="dualCount" class="count-display"></div>
+    </div>
+
+    <!-- JavaScript for Tab Functionality -->
+    <script>
+        const dealers = ["Dealer One", "Dealer Two", "Dealer Three", "Dealer Four", "Dealer Five"];
+
+        function openTab(tabName) {
+            let contents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < contents.length; i++) {
+                contents[i].style.display = 'none';
+                contents[i].classList.remove('active');
+            }
+
+            let tabs = document.getElementsByClassName('tab-link');
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+
+            document.getElementById(tabName).style.display = 'block';
+            document.getElementById(tabName).classList.add('active');
+            document.querySelector(`[onclick="openTab('${tabName}')"]`).classList.add('active');
+        }
+
+        function addSerial(type) {
+            let displaySection = document.getElementById(type + 'Display');
+            displaySection.innerHTML = '';
+
+            if (type === 'single') {
+                let serial = document.getElementById('singleSerial').value;
+                displaySection.innerHTML = `<div class="serial-item">${serial}</div>`;
+                document.getElementById('singleSerial').value = '';
+
+            } else if (type === 'dual') {
+                let startSerial = parseInt(document.getElementById('startSerial').value);
+                let endSerial = parseInt(document.getElementById('endSerial').value);
+                let removedSerial = parseInt(document.getElementById('removedSerial').value);
+                let serialCount = 0;
+
+                if (isNaN(startSerial) || isNaN(endSerial) || startSerial > endSerial) {
+                    displaySection.innerHTML = `<div class="serial-item" style="color: red;">Invalid range</div>`;
+                    return;
+                }
+
+                for (let i = startSerial; i <= endSerial; i++) {
+                    if (i !== removedSerial) { 
+                        displaySection.innerHTML += `<div class="serial-item">${i}</div>`;
+                        serialCount++;
+                    }
+                }
+
+                document.getElementById('startSerial').value = '';
+                document.getElementById('endSerial').value = '';
+                document.getElementById('removedSerial').value = '';
+                document.getElementById('dualCount').innerText = `Total Serial Numbers: ${serialCount}`;
+            }
+        }
+
+        function autocomplete(input) {
+            const query = input.value.toLowerCase();
+            const suggestionsBox = input.id === "dealerNameSingle" ? "suggestionsSingle" : "suggestionsDual";
+            const suggestionsContainer = document.getElementById(suggestionsBox);
+            suggestionsContainer.innerHTML = '';
+
+            if (query.length === 0) {
+                suggestionsContainer.style.display = 'none';
+                return;
+            }
+
+            const filteredDealers = dealers.filter(dealer => dealer.toLowerCase().includes(query));
+            filteredDealers.forEach(dealer => {
+                const suggestionItem = document.createElement("div");
+                suggestionItem.className = "autocomplete-suggestion";
+                suggestionItem.textContent = dealer;
+                suggestionItem.onclick = () => {
+                    input.value = dealer;
+                    suggestionsContainer.innerHTML = '';
+                };
+                suggestionsContainer.appendChild(suggestionItem);
+            });
+
+            suggestionsContainer.style.display = filteredDealers.length ? 'block' : 'none';
+        }
+
+        openTab('single');
+    </script>
+
+</body>
+</html>

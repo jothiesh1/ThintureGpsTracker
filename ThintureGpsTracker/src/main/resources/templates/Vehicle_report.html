@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-	
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
 
     <title>THINTURE</title>
 	<style>
@@ -47,104 +47,7 @@
 								            overflow: hidden;
 			}
 
-			.navbar {
-			    background: linear-gradient(135deg, white, white,#151B54,#151B54,#151B54,#151B54); /* Gradient from light to dark blue */
-			    width: 100%;
-			    position: fixed;
-			    height: 110px;
-				
-			    top: 0;
-			    z-index: 1000;
-				box-shadow: 
-				        0 2px 5px rgba(0, 0, 0, 0.3),  /* Soft shadow */
-				        0 6px 15px rgba(0, 0, 169, 0.5); /* Deeper shadow for 3D effect, more focused at the bottom */
-			   
-			}
-
-
-					       .navbar-container {
-					           display: flex;
-					           align-items: center;
-					           justify-content: space-between;
-					           padding: 10px 20px;
-					           margin-right: 60px;
-					       }
-
-					       .navbar h1 {
-					           margin: 0;
-					           font-size: 20px;
-					       }
-
-					       .navbar ul {
-					           list-style-type: none;
-					           padding: 0;
-					           margin: 0;
-					           display: flex;
-							   font-weight: bold;
-							  
-					       }
-
-					       .navbar ul li {
-					           position: relative;
-					           margin: 0 10px;
-							   font-size: 14PX;
-							   
-					       }
-
-					       .navbar ul li a {
-					           color:white;
-							   text-decoration: NONE; 
-					           padding: 10px;
-					           display: block;
-							   font-style: normal;
-							   
-							  
-					       }
-
-					       .navbar ul li a:hover {
-					           background-color: #34495e;
-					           border-radius: 5px;
-							   text-decoration: underline; 
-					       }
-
-					       .navbar ul li .dropdown-content {
-					           display: none;
-					           position: absolute;
-					           top: 100%;
-					           left: 0;
-					           background-color: #ffffff;
-					           color: #000000;
-					           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-					           border-radius: 5px;
-					           min-width: 160px;
-					           z-index: 1000;
-					       }
-
-					       .navbar ul li:hover .dropdown-content {
-					           display: block;
-					       }
-
-					       .navbar ul li .dropdown-content a {
-					           color: #000000;
-					           padding: 10px;
-					           display: block;
-					           text-decoration: none;
-					       }
-
-					       .navbar ul li .dropdown-content a:hover {
-					           background-color: #f0f0f0;
-					       }
-
-					       .content {
-					           padding: 20px;
-					           margin-top: 120px; /* Adjust according to navbar height */
-					       }
-
-					       .logo img {
-					           height: 90px;
-					           width: 210px;
-					           margin-right: 10px;
-					       }
+		
 						   .container {
 							background-color: rgba(240, 248, 255, 0.3); /* 70% transparent aliceblue */
 									    width: 70%;
@@ -301,71 +204,7 @@
 	    </style>
 </head>
 <body>
-	<div class="navbar">
-		      <div class="navbar-container">
-		          <a href="#" class="logo">
-		              <img src="THINTURE_IMAGE/thinturee.jpg" alt="Fleet Tracking Logo">
-		          </a>
-		          <ul>
-		              <li>
-		                  <a href="#" class="dropdown-toggle"><strong>SUPERADMIN</strong></a>
-		                  <div class="dropdown-content">
-		                      <a href="Add_admin.html">Add Admin</a>
-		                      <a href="Add_dealer.html">Add Dealer </a>
-							<a href="Add_Driver.html">Add Driver</a>
-		                      <a href="add_client.html">Add client</a>
-		                      <a href="add_user.html"> Add user</a>
-							
-		                  </div>
-		              </li>
-		              <li>
-		                  <a href="#" class="dropdown-toggle"><strong>TRACKING</strong></a>
-		                  <div class="dropdown-content">
-		                      <a href="demo.html">Live Tracking</a>
-		                      <a href="#history">History</a>
-		                      <a href="#reports">Reports</a>
-		                  </div>
-		              </li>
-		              <li>
-		                  <a href="#" class="dropdown-toggle"><strong>REPORTS</strong></a>
-		                  <div class="dropdown-content">
-		                      <a href="#annual">Admin Reports</a>
-		                      <a href="#annual">Dealer Reports</a>
-		                      <a href="#">Clients Reports</a>
-		                      <a href="Driver_report.html">Driver Reports</a>
-		                      <a href="Vehicle_report.html">Vehicle Reports</a>
-		                      <a href="#monthly">Monthly Reports</a>
-		                  </div>
-		              </li>
-		              <li>
-		                  <a href="#" class="dropdown-toggle"><strong>INFORMATIONS</strong></a>
-		                  <div class="dropdown-content">
-							<a href="Admin_details.html">Admin</a>
-							<a href="Dealer_details.html">Dealer</a>
-							<a href="Client_deatils.html">Client</a>
-							<a href="User_details.html">User</a>
-		                      <a href="Driver_details.html">Driver</a>
-		                      <a href="#settings">Settings</a>
-		                  </div>
-		              </li>
-		              <li>
-		                  <a href="#" class="dropdown-toggle"><strong>HELP & SUPPORTS</strong></a>
-		                  <div class="dropdown-content">
-		                      <a href="#faq">FAQ</a>
-		                      <a href="#contact">Contact Us</a>
-		                      <a href="#guides">Guides</a>
-		                  </div>
-		              </li>
-		              <li>
-		                  <a href="#" class="dropdown-toggle"><strong>PROFILE</strong></a>
-		                  <div class="dropdown-content">
-		                      <a href="#view-profile">View Profile</a>
-		                      <a href="#logout">Logout</a>
-		                  </div>
-		              </li>
-		          </ul>
-		      </div>
-		  </div>
+	<div th:insert="navigation :: navbar"></div>
 			  <div class="container main-content">
 			      <h2><strong>Vehicle Management Report</strong></h2>
 

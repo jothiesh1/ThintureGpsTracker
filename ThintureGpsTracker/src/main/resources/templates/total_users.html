@@ -1,453 +1,269 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Thinture Fleet Dashboard</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+	 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	</head>
+    <title>THINTURE</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-image: url('THINTURE_IMAGE/background4.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
             margin: 0;
             padding: 0;
-            font-size: 14px;
-        }
-        .container {
-            padding: 20px;
-        }
-        .container-header {
-            padding: 20px;
-            font-size: 10px;
-            background-color: gray;
-            margin-left: 10px;
-        }
-        .navbar {
-            background-color: lightgray;
-            color: white;
-            padding: 10px 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 120%;
-            max-width: 900px; /* Adjust as needed */
-            margin: 0 auto;
-            height: 55px;
-            margin-top: -30px;
-            margin-left: 210px;
-        }
-        .navbar-brand {
-            display: flex;
-            align-items: center;
-        }
-        .navbar-brand img {
-            height: 30px;
-            margin-right: 20px;
-        }
-        .navbar-menu, .navbar-end {
-            display: flex;
-            align-items: center;
-        }
-        .navbar-menu a, .navbar-end a {
-            color: white;
-            text-decoration: none;
-            margin-left: 15px;
-        }
-        .navbar-menu a:hover, .navbar-end a:hover {
-            text-decoration: underline;
-        }
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: white;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
-        }
-        .dropdown-content a {
-            color: black;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            width: 200px;
-        }
-        .dropdown-content a:hover {
-            background-color: #f1f1f1;
-        }
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-        .navbar-logo {
-            width: 160px;
-            height: 60px;
-        }
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: white;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        .dashboard-header h3 {
-            margin: 0;
-        }
-        .dashboard-header .actions {
-            display: flex;
-            gap: 10px;
-        }
-        .dashboard-header .actions button {
-            padding: 5px 10px;
-            border: none;
-            background-color: #4B9CD3;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .dashboard-header .actions button:hover {
-            background-color: #357ABD;
-        }
-        .tabs {
-            display: flex;
-            cursor: pointer;
-            margin-bottom: 20px;
-        }
-        .tabs div {
-            padding: 10px 20px;
-            background-color: darkblue;
-            color: white;
-            border-radius: 5px 5px 0 0;
-            margin-right: 5px;
-            flex: 1;
-            text-align: center;
-            border: none;
-            outline: none;
-        }
-        .tabs div.active {
-            background-color: white;
-            color: #4b9cd3;
-            border-bottom: 2px solid white;
-        }
-        .tab-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 0 0 5px 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            display: none;
-        }
-        .card-user {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .form-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        .tab-content button {
-            border: 2px solid gray;
-            background-color: darkblue;
-            padding: 10px 20px;
-            margin-top: 20px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .tab-content button:hover {
-            background-color: blue;
-        }
-        .form-column {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            flex: 1;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            font-weight: bold;
-        }
-        .form-group input {
-            padding: 1px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            width: 60%;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #4B9CD3;
-            color: white;
-        }
-        .modal-content {
-            padding: 20px;
-        }
-        h3 {
-            text-align: center;
-        }
-        .form-row {
-            display: flex;
-            justify-content: space-between;
-        }
-        .form-column {
-            width: 48%;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .button-container {
-            text-align: center;
-        }
-        .close-btn {
-            background-color: #f44336;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .close-btn:hover {
-            background-color: #d32f2f;
         }
 		
-		.search-container {
-				    position: relative;
-				    width: 100%;
-				    max-width: 300px; /* Adjust as needed */
-				    margin-left: 50px; /* Center the search container */
-					
-				}
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border: 1px solid gray;
+            border-radius: 15px;
+            position: relative;
+            top: 150px;
+        }
 
-				.search-container input {
-				    width: 100%;
-				    padding: 10px 40px 10px 10px; /* Padding for the icon */
-				    border: 1px solid #ccc;
-				    border-radius: 4px;
-				}
+        h2 {
+			text-align: center;
+								    font-size: 2em; /* Adjust size as needed */
+									font-weight: 400;
+								    color:black; /* Text color */
+								    text-shadow: 
+									1px 1px 2px rgba(0, 0, 0, 0.4), /* First shadow for initial depth */
+									        3px 3px 5px rgba(0, 0, 0, 0.3), /* Slightly darker shadow for increased depth */
+									        6px 6px 8px rgba(0, 0, 0, 0.2); /* Darker shadow for stronger 3D effect */
+			        }
 
-				.search-icon {
-				    position: absolute;
-				    right: 10px;
-				    top: 50%;
-				    transform: translateY(-50%);
-				    color: #4B9CD3; /* Adjust color as needed */
-				}
+        .search-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .search {
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid black;
+            border-radius: 5px;
+            width: 150px;
+        }
+
+        .search-button {
+            padding: 8px 12px;
+            background-color: darkblue;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        table {
+            width: 90%;
+            border-collapse: collapse;
+            margin: 20px auto;
+            font-size: 12px;
+            text-align: left;
+            background-color: white;
+            border-radius: 5px;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: darkblue;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .action-btn, .delete-btn, .edit-btn {
+            padding: 8px 12px;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .action-btn {
+            background-color: darkblue;
+        }
+
+        .delete-btn {
+            background-color:darkblue;
+        }
+
+        .edit-btn {
+            background-color:darkblue;
+        }
+
+        #viewContainer {
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            display: none;
+            width: 50%;
+            margin: 180px auto;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            color: white;
+            background-color: darkblue;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
     </style>
-	 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-	    <script>
-	        function refreshPage() {
-	            window.location.reload();
-	        }
+</head>
+<body>
+	<div th:insert="navigation :: navbar"></div>
+    <div class="container">
+        <h2><strong>USER DETAILS</strong></h2>
 
-	        function exportToExcel() {
-	            var table = document.querySelector('table');
-	            var ws = XLSX.utils.table_to_sheet(table);
-	            var wb = XLSX.utils.book_new();
-	            XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-	            XLSX.writeFile(wb, 'table-data.xlsx');
-	        }
+        <div class="search-container">
+            <input type="text" class="search" id="search" placeholder="Search for vehicles...">
+            <button type="button" class="search-button" onclick="searchTable()">Search</button>
+        </div>
 
-	        function openAddPage(section) {
-	            document.getElementById(section).style.display = 'block';
-	            openTab(section);
-	        }
+        <div id="tableContainer">
+            <table id="dataTable">
+                <tr>
+					<th>DEVICE ID</th>
+                    <th>NAME</th>
+                    <th>ADDRESS</th>
+                    <th>MAIL</th>
+                    <th>PHONE</th>
+					<th>VEHICLE NO.</th>
+                    <th>COUNTRY</th>
+                    <th>LOGIN-STATUS</th>
+                    <th>EDIT</th>
+                    <th>DELETE</th>
+                </tr>
+                <tr>
+					<td>TH/15A/0001</td>
+                    <td>Jestin George</td>
+                    <td>Thinture</td>
+                  
+                    <td>jestingeorge1994@gmail.com</td>
+                    <td>8943451597</td>
+					<td>KL.58.N.6082</td>
+                    <td>India</td>
+					<td>
+						<button id="toggleButton" onclick="toggleButton(this)">
+						            <i class="fas fa-check" style="color: green;"></i>
+						        </button>
+					   </td>
+                    <td><button class="edit-btn" onclick="editRow(this)">Edit</button></td>
+                    <td><button class="delete-btn" onclick="deleteRow(this)">Delete</button></td>
+                </tr>
+				<tr>
+					<td>TH/15A/0002</td>
+					                    <td>Jestin George</td>
+					                    <td>Thinture</td>
+					                  
+					                    <td>jestingeorge1994@gmail.com</td>
+					                    <td>8943451597</td>
+										<td>KL.58.N.6082</td>
+					                    <td>India</td>
+									<td>
+										<button id="toggleButton" onclick="toggleButton(this)">
+										            <i class="fas fa-check" style="color: green;"></i>
+										        </button>
+									       
+									   </td>
+				                    <td><button class="edit-btn" onclick="editRow(this)">Edit</button></td>
+				                    <td><button class="delete-btn" onclick="deleteRow(this)">Delete</button></td>
+				                </tr>
+            </table>
+        </div>
+    </div>
 
-	        function closeAddSection() {
-	            document.getElementById('addUser').style.display = 'none';
-	        }
+    <div id="viewContainer">
+        <button class="back-btn" onclick="goBack()">Back to Table</button>
+        <h3>Details</h3>
+        <p id="viewDetails"></p>
+    </div>
 
-	        function openTab(tabName) {
-	            var i, tabcontent, tablinks;
-	            tabcontent = document.getElementsByClassName("tab-content");
-	            for (i = 0; i < tabcontent.length; i++) {
-	                tabcontent[i].style.display = "none";
-	            }
-	            tablinks = document.querySelectorAll('.tabs div');
-	            for (i = 0; i < tablinks.length; i++) {
-	                tablinks[i].classList.remove("active");
-	            }
-	            var activeTab = document.getElementById(tabName);
-	            if (activeTab) {
-	                activeTab.style.display = "block";
-	                var tabElement = Array.from(tablinks).find(link => link.dataset.tab === tabName);
-	                if (tabElement) {
-	                    tabElement.classList.add("active");
-	                }
-	            }
-	        }
+    <script>
+        // Simulate login status
+        var loggedIn = false; // Change this to true when the user logs in
 
-	        document.addEventListener('DOMContentLoaded', function() {
-	            document.querySelectorAll('.tabs div').forEach(tab => {
-	                tab.addEventListener('click', function() {
-	                    openTab(this.dataset.tab);
-	                });
-	            });
-	        });
-	    </script>
-	</head>
-	<body>
-	    <div class="container-header">
-	        <br>
-	        <div class="header">
-	            <img src="THINTURE_IMAGE/logo2.jpg" alt="THINTURE Logo" class="navbar-logo">
-	        </div>
-	    </div>
-	    <div class="navbar">
-	        <a href="/dashboard" class="active"><i class="fas fa-home"></i> Dashboard</a>
-	        <a href="/map"><i class="fas fa-map"></i> Map</a>
-	        <div class="dropdown">
-	            <a href="#"><i class="fas fa-th-large"></i> View</a>
-	            <div class="dropdown-content">
-	                <a href="/total_users">Users</a>
-	                <a href="/total_vehicles">Vehicle</a>
-	                <a href="/tracking_details">Tracking Details</a>
-	                <a href="#">Calendar</a>
-	            </div>
-	        </div>
-	        <div class="dropdown">
-	            <a href="#"><i class="fas fa-th-large"></i> Utility</a>
-	            <div class="dropdown-content">
-	                <a href="#">Support & Feedback</a>
-	                <a href="#">Announcement</a>
-	                <a href="#">Send Notification</a>
-	            </div>
-	        </div>
-	        <div class="dropdown">
-	            <a href="#"><i class="fas fa-th-large"></i> Report</a>
-	            <div class="dropdown-content">
-	                <a href="#">Admin</a>
-	                <a href="#">Dealer</a>
-	                <a href="#">Users</a>
-	            </div>
-	        </div>
-	        <div class="dropdown">
-	            <a href="#"><i class="fas fa-th-large"></i> Accounts</a>
-	            <div class="dropdown-content">
-	                <a href="#">Renewal</a>
-	            </div>
-	        </div>
-	        <div class="dropdown">
-	            <a href="#"><i class="fas fa-th-large"></i> Profile</a>
-	            <div class="dropdown-content">
-	                <a href="/profile">Profile</a>
-	                <a href="/login">Logout</a>
-	            </div>
-	        </div>
-	    </div>
-	    <div id="nav-placeholder"></div>
-	    <br>
-	    <br>
-	    <div class="dashboard-header">
-	        <h3>Users Details</h3>
-	        <div class="actions">
-	            <button onclick="openAddPage('addUser')">Add User</button>
-	            <button onclick="exportToExcel()">Download Excel</button>
-	            <button onclick="refreshPage()">Refresh</button>
-	        </div>
-	    </div>
-	    <div class="search-container">
-	        <input type="text" id="search" name="search" placeholder="Search">
-	        <i class="fas fa-search search-icon"></i>
-	    </div>
-	    <br>
-	    <br>
-	    <div id="addUser" class="tab-content card-user" style="display:none;">
-	        <h3>USER</h3>
-	        <form th:action="@{/users}" method="post">
-	            <button class="close-btn" type="button" onclick="closeAddSection()">Close</button>
-	            <div class="form-row">
-	                <div class="form-column">
-	                    <div class="form-group">
-	                        <label for="username">Name</label>
-	                        <input type="text" id="username" name="username" required>
-	                    </div>
-	                    <div class="form-group">
-	                        <label for="email">Email</label>
-	                        <input type="email" id="email" name="email" required>
-	                    </div>
-	                    <div class="form-group">
-	                        <label for="address">Address</label>
-	                        <input type="text" id="address" name="address" required>
-	                    </div>
-	                    <div class="form-group">
-	                        <label for="phone">Phone</label>
-	                        <input type="text" id="phone" name="phone" required>
-	                    </div>
-	                </div>
-	                <div class="form-column">
-	                    <div class="form-group">
-	                        <label for="country">Country</label>
-	                        <input type="text" id="country" name="country" required>
-	                    </div>
-	                    <div class="form-group">
-	                        <label for="password">Password</label>
-	                        <input type="password" id="password" name="password" required>
-	                    </div>
-	                    <div class="form-group">
-	                        <label for="confirmPassword">Confirm Password</label>
-	                        <input type="password" id="confirmPassword" name="confirmPassword" required>
-	                        <br><br>
-	                        <div class="button-container">
-	                            <button type="submit" style="color:white;">ADD</button>
-	                        </div>
-	                    </div>
-	                </div>
-	            </div>
-	        </form>
-	    </div>
-	    <div class="table-container">
-	        <div class="modal-content">
-	            <table>
-	                <thead>
-	                    <tr>
-	                        <th>ID</th>
-	                        <th>NAME</th>
-	                        <th>LOGIN</th>
-	                        <th>VEHICLES</th>
-	                        <th>COMPANY</th>
-	                        <th>MOBILE</th>
-	                        <th>EMAIL</th>
-	                        <th>COUNTRY</th>
-	                        <th>STATUS</th>
-	                    </tr>
-	                </thead>
-	                <tbody>
-	                    <tr th:each="user : ${users}">
-	                        <td th:text="${user.id}"></td>
-	                        <td th:text="${user.username}"></td>
-	                        <td th:text="${user.username}"></td>
-	                        <td th:text="'gff12345'"></td>
-	                        <td th:text="'12345'"></td>
-	                        <td th:text="${user.phone}"></td>
-	                        <td th:text="${user.country}"></td>
-	                        <td th:text="${user.email}"></td>
-	                        <td th:text="'Active'"></td>
-	                    </tr>
-	                    <!-- Add more rows as needed -->
-	                </tbody>
-	            </table>
-	        </div>
-	    </div>
-		<!-->-->
-	</body>
-	</html>
+        // Enable or disable buttons based on login status
+        function setButtonState() {
+            const actionButtons = document.querySelectorAll('.action-btn');
+            actionButtons.forEach(button => {
+                button.disabled = !loggedIn;
+            });
+        }
+
+        // Call setButtonState on page load
+        window.onload = function() {
+            setButtonState();
+        };
+
+        function viewDetails(button) {
+            const row = button.closest('tr');
+            const name = row.cells[0].innerText;
+            const address = row.cells[1].innerText;
+            const license = row.cells[2].innerText;
+            const mail = row.cells[3].innerText;
+            const phone = row.cells[4].innerText;
+            const country = row.cells[5].innerText;
+
+            const details = `
+                <strong>Name:</strong> ${name}<br>
+                <strong>Address:</strong> ${address}<br>
+                <strong>License Number:</strong> ${license}<br>
+                <strong>Email:</strong> ${mail}<br>
+                <strong>Phone:</strong> ${phone}<br>
+                <strong>Country:</strong> ${country}
+            `;
+
+            document.getElementById('tableContainer').style.display = 'none';
+            document.getElementById('viewContainer').style.display = 'block';
+            document.getElementById('viewDetails').innerHTML = details;
+        }
+
+        function goBack() {
+            document.getElementById('tableContainer').style.display = 'block';
+            document.getElementById('viewContainer').style.display = 'none';
+        }
+
+        function deleteRow(button) {
+            if (confirm('Are you sure you want to delete this row?')) {
+                const row = button.closest('tr');
+                row.remove();
+            }
+        }
+		function toggleButton(btn) {
+		    const icon = btn.querySelector('i');
+		    if (icon.classList.contains('fa-check')) {
+		        // Change to Disable state
+		        icon.classList.remove('fa-check');
+		        icon.classList.add('fa-times');
+		        icon.style.color = 'red';
+		    } else {
+		        // Change to Enable state
+		        icon.classList.remove('fa-times');
+		        icon.classList.add('fa-check');
+		        icon.style.color = 'green';
+		    }
+		}
+
+
+
+    </script>
+
+</body>
+</html>

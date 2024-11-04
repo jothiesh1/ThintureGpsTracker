@@ -1,6 +1,10 @@
 package com.GpsTracker.Thinture.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -38,6 +42,16 @@ public class Dealer {
     private String country;
     private String password;
     private boolean status;
+
+    @ElementCollection
+    private List<String> serialNumbers = new ArrayList<>();
+
+   
+
+    public void addSerial(String serial) {
+        this.serialNumbers.add(serial);
+    }
+
 	public boolean isStatus() {
 		return status;
 	}

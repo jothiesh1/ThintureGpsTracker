@@ -116,4 +116,54 @@ public class DealerService {
         dealerRepository.deleteById(id);
         logger.info("Dealer deleted with ID: {}", id);
     }
+    /**
+     * Adds a single serial number to a dealer's list of serials.
+     * 
+     * @param dealerName   The name of the dealer.
+     * @param serialNumber The serial number to add.
+     */
+    public void addSingleSerial(String dealerName, String serialNumber) {
+        // Find the dealer by company name
+        Dealer dealer = dealerRepository.findByCompanyName(dealerName);
+        if (dealer == null) {
+            throw new IllegalArgumentException("Dealer not found with company name: " + dealerName);
+        }
+
+        // Add the serial number to the dealer's list of serial numbers
+        dealer.addSerial(serialNumber);
+        dealerRepository.save(dealer);
+
+        System.out.println("Added single serial " + serialNumber + " to dealer " + dealerName);
+    }
+
+    /**
+     * Adds a range of serial numbers to a dealer's list of serials, excluding a specific serial number.
+     * 
+     * @param dealerName   The name of the dealer.
+     * @param startSerial  The starting serial number of the range.
+     * @param endSerial    The ending serial number of the range.
+     * @param removedSerial The serial number to exclude.
+     */
+    public void addDualSerials(String dealerName, int startSerial, int endSerial, int removedSerial) {
+        // Find the dealer by company name
+        Dealer dealer = dealerRepository.findByCompanyName(dealerName);
+        if (dealer == null) {
+            throw new IllegalArgumentException("Dealer not found with company name: " + dealerName);
+        }
+
+        // Add serial numbers to the dealer, skipping the removed serial
+        for (int i = startSerial; i <= endSerial; i++) {
+            if (i != removedSerial) {
+                dealer.addSerial(String.valueOf(i));
+            }
+        }
+
+        dealerRepository.save(dealer);
+        System.out.println("Added serials from " + startSerial + " to " + endSerial + " (excluding " + removedSerial + ") to dealer " + dealerName);
+    }
+
+    
+    
 }
+
+

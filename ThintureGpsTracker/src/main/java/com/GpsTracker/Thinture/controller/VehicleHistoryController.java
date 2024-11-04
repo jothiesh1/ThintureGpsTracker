@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -70,11 +71,7 @@ public class VehicleHistoryController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
-
     
-    
-
     @GetMapping("/history/{deviceID}")
     public ResponseEntity<List<VehicleHistory>> getVehicleHistory(
             @PathVariable("deviceID") String deviceID,
@@ -94,14 +91,17 @@ public class VehicleHistoryController {
             List<VehicleHistory> historyData = vehicleHistoryService.getVehicleHistory(deviceID, startTimestamp, endTimestamp);
             if (historyData.isEmpty()) {
                 logger.warn("No data found for deviceID: {}", deviceID);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Use .build() instead of passing null
             }
 
             logger.info("Returning {} records for deviceID: {}", historyData.size(), deviceID);
             return ResponseEntity.ok(historyData);
+        } catch (DateTimeParseException e) {
+            logger.error("Invalid date format: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Consider sending a detailed message
         } catch (Exception e) {
             logger.error("Error fetching vehicle history: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 

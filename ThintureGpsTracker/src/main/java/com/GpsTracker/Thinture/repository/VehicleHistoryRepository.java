@@ -29,7 +29,8 @@ public interface VehicleHistoryRepository extends JpaRepository<VehicleHistory, 
 	List<VehicleHistory> findHistoryByDeviceIDAndDateRange(
 	    @Param("deviceID") String deviceID,
 	    @Param("startDate") Timestamp startDate,
-	    @Param("endDate") Timestamp endDate);
+	    @Param("endDate") Timestamp endDate
+	);
 
 
     @Query("SELECT vh FROM VehicleHistory vh WHERE vh.vehicle.deviceID = :deviceID ORDER BY vh.timestamp ASC")
@@ -79,6 +80,7 @@ public interface VehicleHistoryRepository extends JpaRepository<VehicleHistory, 
 
         // Find the latest vehicle history entry based on deviceID
         VehicleHistory findTopByVehicle_DeviceIDOrderByTimestampDesc(String deviceID);
+        
     }
 
 

@@ -10,6 +10,8 @@ import com.GpsTracker.Thinture.model.Vehicle;
 import com.GpsTracker.Thinture.repository.VehicleHistoryRepository;
 import com.GpsTracker.Thinture.repository.VehicleRepository;
 
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -117,7 +119,7 @@ public class VehicleHistoryService {
     }
 
   
-
+    @Transactional
         public List<VehicleHistory> getVehicleHistory(String deviceID, Timestamp startDate, Timestamp endDate) throws Exception {
             logger.info("Fetching vehicle history for deviceID: {} from {} to {}", deviceID, startDate, endDate);
             try {
@@ -169,7 +171,7 @@ public class VehicleHistoryService {
         
         return history;
     }
-
+    @Transactional
     public List<VehicleHistory> findHistoryByDeviceIDAndDateRange(String deviceID, Timestamp startDate, Timestamp endDate) {
         logger.info("Fetching vehicle history for deviceID: {}, startDate: {}, endDate: {}", deviceID, startDate, endDate);
         List<VehicleHistory> history = vehicleHistoryRepository.findHistoryByDeviceIDAndDateRange(deviceID, startDate, endDate);
@@ -203,6 +205,7 @@ public class VehicleHistoryService {
      * @param year The year for filtering the history.
      * @return List of VehicleHistory records that match the criteria.
      */
+    @Transactional
     public List<VehicleHistory> findByDeviceIDMonthYear(String deviceID, int month, int year) {
         logger.info("Attempting to fetch vehicle history for deviceID: {}, month: {}, year: {}", deviceID, month, year);
 
@@ -311,6 +314,7 @@ public class VehicleHistoryService {
             }
         }
         */
+    
 
     // Method to fetch the latest vehicle history by deviceID
     public VehicleHistory getLatestLocation(String deviceID) {

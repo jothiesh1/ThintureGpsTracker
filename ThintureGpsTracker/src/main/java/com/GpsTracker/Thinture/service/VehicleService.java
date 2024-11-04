@@ -1,21 +1,16 @@
 package com.GpsTracker.Thinture.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.GpsTracker.Thinture.model.GpsData;
 import com.GpsTracker.Thinture.model.Vehicle;
-import com.GpsTracker.Thinture.model.VehicleHistory;
 import com.GpsTracker.Thinture.model.VehicleLastLocation;
-import com.GpsTracker.Thinture.repository.VehicleHistoryRepository;
+
 import com.GpsTracker.Thinture.repository.VehicleLastLocationRepository;
 import com.GpsTracker.Thinture.repository.VehicleRepository;
-
-import jakarta.persistence.EntityNotFoundException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
-import java.time.LocalDate;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -27,8 +22,6 @@ import java.util.Optional;
  * 
  */
 
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class VehicleService {
