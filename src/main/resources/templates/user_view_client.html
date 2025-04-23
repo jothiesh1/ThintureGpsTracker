@@ -1,327 +1,210 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>View Drivers - Thinture GPS</title>
-  <link rel="icon" href="/THINTURE_IMAGE/favicon.jpg"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-  <link rel="stylesheet" type="text/css" th:href="@{/css/styled.css}">
+
+  <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+  <link rel="stylesheet" type="text/css" th:href="@{/css/viewallstyle.css}">
+
+  <title>Thinture GPS</title>
+  <link rel="icon" type="image/x-icon" href="THINTURE_IMAGE/favicon.jpg">
+
   <style>
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: linear-gradient(rgba(10, 25, 47, 0.95), rgba(15, 32, 65, 0.95)),
-                  url('/THINTURE_IMAGE/add_new.jpg') no-repeat center center/cover;
-      filter: blur(2px);
-      z-index: -1;
-    }
-    .card {
-      background-color: rgba(0, 0, 0, 0.3);
-      margin: 150px auto 30px auto;
-      width: 90%;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    }
-    h2 { color: white; text-align: center; }
-    .edit { background: #0f2041; color: white; margin: 2px; }
-    th, td { border: 1px solid #ccc; padding: 10px; }
-    th { background-color: darkblue; color: azure; }
-    .highlight { background-color: yellow; color: black; }
+
+
+ 
   </style>
 </head>
 <body>
-  <header th:replace="navigation_client :: navigation_client"></header>
+	<!--<<<<< git conflict >>>>>-->
+  <div th:insert="navigation_client :: navbar_client"></div>
   <div class="card">
-    <h2>Drivers Management</h2>
+  <h2>Users  Management</h2>
+  <!-- 🔍 Search Bar -->
+      <div class="mb-3">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search clients..." />
+      </div>
+	  <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
+	    <span id="totalRecords" class="text-white fw-semibold">Total Users: 0</span>
+	    <button class="btn btn-success btn-sm" onclick="exportToExcel()">
+	      <i class="fas fa-file-excel me-1"></i> Export to Excel
+	    </button>
+	  </div>
 
-    <!-- Filters -->
-    <div class="row mb-3 gx-2 gy-2">
-      <div class="col-12 col-md-5">
-        <input type="text" id="searchInput" class="form-control" placeholder="Search all fields..." oninput="handleSearch()"/>
-      </div>
-      <div class="col-6 col-md-3">
-        <select id="countryFilter" class="form-select" onchange="handleSearch()">
-          <option value="">All Countries</option>
-        </select>
-      </div>
-      <div class="col-6 col-md-4 text-end">
-        <button class="btn btn-success me-2" onclick="exportToExcel()">Export Excel</button>
-        <button class="btn btn-danger" onclick="exportToPDF()">Export PDF</button>
-      </div>
-    </div>
-
-    <!-- Table -->
-    <div class="table-responsive">
-      <table class="table table-dark table-bordered table-hover">
+    <div class="table-wrapper">
+      <table id="userTable" class="table table-bordered table-hover table-dark">
         <thead>
           <tr>
-            <th>Full Name</th>
-            <th>DOB</th>
-            <th>Age</th>
-            <th>Contact</th>
+            <th>ID</th>
+            <th>Company Name</th>
             <th>Email</th>
             <th>Address</th>
-            <th>License No</th>
-            <th>License Type</th>
-            <th>DDP</th>
-            <th>Expiry</th>
-            <th>Vehicle</th>
-            <th>RFID</th>
+            <th>Phone</th>
             <th>Country</th>
-            <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody id="driverTableBody"></tbody>
+        <tbody>
+          <!-- User data will be loaded here -->
+        </tbody>
       </table>
-    </div>
+	  <div id="pagination" class="text-center mt-3"></div>
 
-    <div class="d-flex justify-content-center gap-3 mt-3">
-      <button class="btn btn-light" id="prevPage">Previous</button>
-      <span id="pageInfo" class="text-white align-self-center"></span>
-      <button class="btn btn-light" id="nextPage">Next</button>
     </div>
-  </div>
+  </h2>
 
   <script>
-    const pageSize = 15;
+    const API_URL = "/api/users/user";
+    const ROWS_PER_PAGE = 10;
     let currentPage = 1;
-    let driversData = [];
-    let filteredDrivers = [];
+    let usersData = [];
+    let filteredData = [];
 
-    function calculateAge(dob) {
-      const birthDate = new Date(dob);
-      const today = new Date();
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const m = today.getMonth() - birthDate.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
-      return age;
-    }
+    async function loadUsers() {
+      try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error("Failed to fetch user data");
 
-    function highlight(text, keyword) {
-      if (!keyword) return text;
-      const re = new RegExp(`(${keyword})`, 'gi');
-      return text.replace(re, '<span class="highlight">$1</span>');
-    }
-
-    function renderTablePage(page) {
-      const tableBody = document.getElementById('driverTableBody');
-      tableBody.innerHTML = '';
-      const start = (page - 1) * pageSize;
-      const end = Math.min(start + pageSize, filteredDrivers.length);
-      const pageDrivers = filteredDrivers.slice(start, end);
-      const query = document.getElementById('searchInput').value.trim().toLowerCase();
-
-      if (pageDrivers.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="15" class="text-center">No drivers found.</td></tr>';
-        return;
+        usersData = await response.json();
+        filteredData = [...usersData]; // clone the original data for filtering
+        renderTable();
+      } catch (err) {
+        alert("Error loading users: " + err.message);
+        console.error(err);
       }
-
-      pageDrivers.forEach(driver => {
-        const isActive = driver.status;
-        const statusBadge = isActive
-          ? '<span class="badge bg-success">Active</span>'
-          : '<span class="badge bg-danger">Locked</span>';
-        const toggleLabel = isActive ? "Lock" : "Unlock";
-
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${highlight(driver.fullName, query)}</td>
-          <td>${highlight(driver.dob, query)}</td>
-          <td>${calculateAge(driver.dob)}</td>
-          <td>${highlight(driver.contact, query)}</td>
-          <td>${highlight(driver.email, query)}</td>
-          <td>${highlight(driver.address, query)}</td>
-          <td>${highlight(driver.license, query)}</td>
-          <td>${highlight(driver.licenseType, query)}</td>
-          <td>${highlight(driver.ddp, query)}</td>
-          <td>${highlight(driver.ddpExpiry, query)}</td>
-          <td>${highlight(driver.vehicle, query)}</td>
-          <td>${highlight(driver.rfid, query)}</td>
-          <td>${highlight(driver.country, query)}</td>
-          <td>${statusBadge}</td>
-          <td>
-            <button class="edit btn btn-sm" onclick="editDriver(${driver.id})">Edit</button>
-            <button class="edit btn btn-sm" onclick="deleteDriver(${driver.id})">Delete</button>
-            <button class="edit btn btn-sm" onclick="toggleDriverStatus(${driver.id})">${toggleLabel}</button>
-          </td>
-        `;
-        tableBody.appendChild(row);
-      });
-
-      document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${Math.ceil(filteredDrivers.length / pageSize)}`;
-      document.getElementById('prevPage').disabled = currentPage === 1;
-      document.getElementById('nextPage').disabled = end >= filteredDrivers.length;
     }
 
-    function handleSearch() {
-      const query = document.getElementById('searchInput').value.toLowerCase();
-      const selectedCountry = document.getElementById('countryFilter').value;
-      filteredDrivers = driversData.filter(driver => {
-        const matchCountry = !selectedCountry || driver.country === selectedCountry;
-        const matchQuery = Object.values(driver).some(val => String(val).toLowerCase().includes(query));
-        return matchQuery && matchCountry;
-      });
-      currentPage = 1;
-      renderTablePage(currentPage);
-    }
+	function renderTable() {
+	  const tbody = document.querySelector("#userTable tbody");
+	  const totalSpan = document.getElementById("totalRecords"); // ✅ count reference
+	  tbody.innerHTML = "";
 
-	function toggleDriverStatus(id) {
-	  fetch(`/api/drivers/${id}/toggle-status`, { method: 'PUT' })
-	    .then(res => {
-	      if (!res.ok) throw new Error("Toggle failed");
-	      return res.text();
-	    })
-	    .then(status => {
-	      Swal.fire({
-	        icon: 'success',
-	        title: 'Status Changed',
-	        text: `Driver is now ${status}`,
-	        timer: 1500,
-	        showConfirmButton: false
-	      });
+	  // ✅ Update total count
+	  totalSpan.innerText = `Total Users: ${filteredData.length}`;
 
-	      // ✅ Soft reload just that driver status without refetching everything
-	      const driver = driversData.find(d => d.id === id);
-	      if (driver) {
-	        driver.status = status.toLowerCase() === 'active';
-	      }
-	      renderTablePage(currentPage); // ✅ re-render table
-	    })
-	    .catch(() => {
-	      Swal.fire('Error', 'Failed to toggle status', 'error');
-	    });
+	  const startIndex = (currentPage - 1) * ROWS_PER_PAGE;
+	  const endIndex = startIndex + ROWS_PER_PAGE;
+	  const paginatedUsers = filteredData.slice(startIndex, endIndex);
+
+	  paginatedUsers.forEach(user => {
+	    const row = document.createElement("tr");
+	    row.innerHTML = `
+	      <td>${user.id}</td>
+	      <td>${user.name}</td>
+	      <td>${user.email}</td>
+	      <td>${user.address}</td>
+	      <td>${user.phone}</td>
+	      <td>${user.country}</td>
+	      <td>
+	        <button class="btn btn-sm btn-primary me-1" onclick="editUser(${user.id})"><i class="fas fa-edit"></i></button>
+	        <button class="btn btn-sm btn-danger me-1" onclick="deleteUser(${user.id})"><i class="fas fa-trash"></i></button>
+	        <button class="btn btn-sm btn-warning" onclick="toggleStatus(this)"><i class="fas fa-user-lock"></i> Toggle</button>
+	      </td>
+	    `;
+	    tbody.appendChild(row);
+	  });
+
+	  renderPagination();
 	}
 
+    function renderPagination() {
+      const paginationContainer = document.getElementById("pagination");
+      paginationContainer.innerHTML = "";
 
-    function editDriver(id) {
-      const driver = driversData.find(d => d.id === id);
-      if (!driver) return;
+      const totalPages = Math.ceil(filteredData.length / ROWS_PER_PAGE);
 
-      Swal.fire({
-        title: 'Edit Driver',
-        html: `
-          <input id="fullName" class="swal2-input" placeholder="Full Name" value="${driver.fullName}">
-          <input id="contact" class="swal2-input" placeholder="Contact" value="${driver.contact}">
-          <input id="email" class="swal2-input" placeholder="Email" value="${driver.email}">
-          <input id="license" class="swal2-input" placeholder="License" value="${driver.license}">
-          <input id="licenseType" class="swal2-input" placeholder="License Type" value="${driver.licenseType}">
-          <input id="vehicle" class="swal2-input" placeholder="Vehicle" value="${driver.vehicle}">
-          <input id="rfid" class="swal2-input" placeholder="RFID" value="${driver.rfid}">
-        `,
-        showCancelButton: true,
-        confirmButtonText: 'Update',
-        preConfirm: () => ({
-          fullName: document.getElementById('fullName').value,
-          contact: document.getElementById('contact').value,
-          email: document.getElementById('email').value,
-          license: document.getElementById('license').value,
-          licenseType: document.getElementById('licenseType').value,
-          vehicle: document.getElementById('vehicle').value,
-          rfid: document.getElementById('rfid').value
-        })
-      }).then(result => {
-        if (result.isConfirmed) {
-          fetch(`/api/drivers/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(result.value)
-          }).then(res => {
-            if (!res.ok) throw new Error('Update failed');
-            Swal.fire('Updated', 'Driver updated successfully', 'success');
-            document.dispatchEvent(new Event('DOMContentLoaded'));
-          }).catch(() => {
-            Swal.fire('Error', 'Failed to update driver', 'error');
-          });
+      const prevBtn = document.createElement("button");
+      prevBtn.innerText = "Previous";
+      prevBtn.className = "btn btn-sm btn-light";
+      prevBtn.disabled = currentPage === 1;
+      prevBtn.onclick = () => {
+        if (currentPage > 1) {
+          currentPage--;
+          renderTable();
         }
-      });
+      };
+      paginationContainer.appendChild(prevBtn);
+
+      const pageInfo = document.createElement("span");
+      pageInfo.className = "mx-3 text-light align-self-center";
+      pageInfo.innerText = `Page ${currentPage} of ${totalPages}`;
+      paginationContainer.appendChild(pageInfo);
+
+      const nextBtn = document.createElement("button");
+      nextBtn.innerText = "Next";
+      nextBtn.className = "btn btn-sm btn-light";
+      nextBtn.disabled = currentPage === totalPages;
+      nextBtn.onclick = () => {
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderTable();
+        }
+      };
+      paginationContainer.appendChild(nextBtn);
     }
 
-    function deleteDriver(id) {
+    function editUser(id) {
+      alert("Edit User: " + id);
+    }
+
+    function deleteUser(id) {
       Swal.fire({
         title: 'Are you sure?',
-        text: 'This driver will be permanently deleted!',
+        text: "You won't be able to revert this!",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-      }).then(result => {
+        confirmButtonText: 'Yes, delete it!',
+      }).then((result) => {
         if (result.isConfirmed) {
-          fetch(`/api/drivers/${id}`, { method: 'DELETE' })
-            .then(() => {
-              Swal.fire('Deleted!', 'Driver has been deleted.', 'success');
-              document.dispatchEvent(new Event('DOMContentLoaded'));
-            })
-            .catch(() => Swal.fire('Error', 'Failed to delete driver.', 'error'));
+          Swal.fire('Deleted!', 'User has been deleted.', 'success');
         }
       });
     }
 
-    function exportToExcel() {
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.json_to_sheet(filteredDrivers);
-      XLSX.utils.book_append_sheet(wb, ws, "Drivers");
-      XLSX.writeFile(wb, "drivers.xlsx");
-    }
-
-    function exportToPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const columns = Object.keys(filteredDrivers[0] || {}).filter(k => k !== "id");
-      const rows = filteredDrivers.map(d => columns.map(col => d[col]));
-      doc.text("Drivers Report", 14, 10);
-      doc.autoTable({ startY: 20, head: [columns], body: rows });
-      doc.save("drivers.pdf");
-    }
-
-    function populateCountryFilter() {
-      const countries = [...new Set(driversData.map(d => d.country))];
-      const select = document.getElementById('countryFilter');
-      countries.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c;
-        opt.textContent = c;
-        select.appendChild(opt);
-      });
-    }
-
-    document.getElementById('prevPage').onclick = () => {
-      if (currentPage > 1) {
-        currentPage--;
-        renderTablePage(currentPage);
+    function toggleStatus(button) {
+      const isBlocked = button.classList.contains("btn-dark");
+      if (isBlocked) {
+        button.classList.remove("btn-dark");
+        button.classList.add("btn-warning");
+        button.innerHTML = '<i class="fas fa-user-lock"></i> Toggle';
+      } else {
+        button.classList.remove("btn-warning");
+        button.classList.add("btn-dark");
+        button.innerHTML = '<i class="fas fa-user-check"></i> Unblock';
       }
-    };
+    }
 
-    document.getElementById('nextPage').onclick = () => {
-      if (currentPage * pageSize < filteredDrivers.length) {
-        currentPage++;
-        renderTablePage(currentPage);
+    // 🔍 Live Search
+    document.addEventListener("input", function (e) {
+      if (e.target.id === "searchInput") {
+        const searchText = e.target.value.toLowerCase();
+
+        filteredData = usersData.filter(user =>
+          Object.values(user).some(value =>
+            String(value).toLowerCase().includes(searchText)
+          )
+        );
+
+        currentPage = 1;
+        renderTable();
       }
-    };
-
-    document.addEventListener('DOMContentLoaded', () => {
-      fetch('/api/drivers')
-        .then(res => res.json())
-        .then(data => {
-          driversData = data;
-          filteredDrivers = [...driversData];
-          populateCountryFilter();
-          renderTablePage(currentPage);
-        })
-        .catch(() => Swal.fire('Load Failed', 'Could not load driver details.', 'error'));
     });
+	function exportToExcel() {
+	  const worksheet = XLSX.utils.json_to_sheet(filteredData);
+	  const workbook = XLSX.utils.book_new();
+	  XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+	  XLSX.writeFile(workbook, "Users_List.xlsx");
+	}
+
+    window.onload = loadUsers;
   </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

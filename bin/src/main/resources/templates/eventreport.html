@@ -19,39 +19,37 @@
 
 	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
 	<style>
-		body {
-			    font-family: Arial, sans-serif;
-			    margin: 0;
-			    padding: 0;
-			    position: relative;
-			}
+		body::before {
+					    content: "";
+					    position: fixed;
+					    top: 0;
+					    left: 0;
+					    width: 100%;
+					    height: 100%;
 
-			body::before {
-			    content: "";
-			    position: fixed;
-			    top: 0;
-			    left: 0;
-			    width: 100%;
-			    height: 100%;
-			    background: url('THINTURE_IMAGE/mainbg.jpg') no-repeat center center/cover;
-			    filter: blur(10px);
-			    z-index: -1; /* Ensures the background remains behind the content */
-			}
+					    background: linear-gradient(
+					        rgba(10, 25, 47, 0.95),
+					        rgba(15, 32, 65, 0.95)
+					      ),
+					      url('/THINTURE_IMAGE/add_new.jpg') no-repeat center center/cover;
 
-		/* Mobile screen responsiveness */
-		@media only screen and (max-width: 768px) {
-		    body {
-		        background-attachment: fixed; /* Fixes background on small screens */
-		        min-height: 100vh; /* Ensures full height */
-		        font-size: 14px; /* Adjust font size for better readability */
-				background-size: cover;
-		    }
-		}
-		
+					    filter: blur(2px);
+					    z-index: -1;
+					}
+					@media only screen and (max-width: 768px) {
+					    body {
+					        background-attachment: fixed;
+					        min-height: 100vh;
+					        font-size: 14px;
+					        background-color: #0a192f; /* fallback for small screens if image fails */
+					        background-size: cover;
+					        color: #f0f0f0;
+					    }
+					}
 				
 		.card {
 		  position: absolute;
-		  top: 190px;
+		  top: 200px;
 		  max-width: 90%; /* Adjust width dynamically */
 		  left: 45px;
 		  width: 100%;
@@ -145,41 +143,89 @@
 						    scroll-behavior: smooth;
 						}
 						#pagination {
-						    display: flex;
-						    justify-content: center;
-						    align-items: center;
-						    gap: 10px; /* Spacing between buttons */
-						    flex-wrap: wrap; /* Ensure buttons wrap on small screens */
 						    position: fixed;
-						    bottom: 190px; /* Stick to the bottom */
-						    left: 0;
-						    width: 100%;
-						    background: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
-						    padding: 10px;
-						    z-index: 1000; /* Ensure it stays on top */
+						    bottom: 20px;
+						    left: 50%;
+						    transform: translateX(-50%);
+						    display: flex;
+						    align-items: center;
+						    justify-content: center;
+						    gap: 8px;
+							
+						    border-radius: 8px;
+						    padding: 6px 10px;
+						   
+						    max-width: 95%;
+						    overflow-x: auto;
+						    z-index: 1000;
 						}
 
 						#pagination button {
-						    font-size: 14px; /* Adjust button font size */
-						    padding: 6px 12px; /* Adjust padding */
+							box-shadow: 0 6px 15px rgba(255, 255, 255, 0.4);
+														 background: linear-gradient(
+														     135deg,
+														    
+														     rgba(15, 32, 65, 1.6),
+														     rgba(15, 32, 65, 1.6),
+														     rgba(15, 32, 65, 1.6)
+														 );
+						    color: #fff;
+						    border: none;
+						    padding: 6px 12px;
+						    border-radius: 6px;
+						    font-size: 14px;
+						    cursor: pointer;
+						    flex-shrink: 0;
+						    transition: background-color 0.2s ease-in-out;
 						}
 
-						/* Mobile Optimization */
-						@media (max-width: 768px) {
+						#pagination button:hover {
+						    background-color: #0056b3;
+						}
+
+						#currentPage {
+						    color: #fff;
+						    font-weight: 600;
+						    font-size: 14px;
+						    flex-shrink: 0;
+						}
+
+						@media (max-width: 600px) {
 						    #pagination {
-						        bottom: 210px; /* Stick to the very bottom on mobile */
-						        gap: 5px; /* Reduce spacing for smaller screens */
-						        padding: 8px; /* Reduce padding for mobile */
+						        bottom: 10px;
+						        padding: 4px 8px;
 						    }
 
 						    #pagination button {
-						        font-size: 12px; /* Reduce font size for mobile */
-						        padding: 4px 8px; /* Smaller padding */
+						        font-size: 12px;
+						        padding: 4px 8px;
 						    }
 
 						    #currentPage {
-						        font-size: 12px; /* Adjust font size for readability */
+						        font-size: 12px;
 						    }
+						}
+
+						.btn {
+							box-shadow: 0 6px 15px rgba(255, 255, 255, 0.4);
+							background: linear-gradient(
+							    135deg,
+							    rgba(15, 32, 65, 0.9), /* fixed alpha value */
+							    rgba(15, 32, 65, 0.9),
+							    rgba(15, 32, 65, 0.9)
+							);
+							color: white;
+							border: none;
+							padding: 10px 20px;
+							border-radius: 8px;
+							cursor: pointer;
+							transition: all 0.3s ease-in-out;
+						}
+
+						.btn:hover {
+							color: white;
+							box-shadow: 0 8px 20px rgba(255, 255, 255, 0.6);
+							transform: translateY(-2px);
 						}
 
 
@@ -240,16 +286,16 @@
 			</div>
 			<!-- Buttons -->
 			<div class="col-md-1">
-				<button class="btn btn-primary w-100" onclick="searchReports()">Search</button>
+				<button class="btn  w-100" onclick="searchReports()">Search</button>
 			</div>
 			<div class="col-md-2">
-			    <button class="btn btn-success w-100" onclick="downloadPDF()">
+			    <button class="btn  w-100" onclick="downloadPDF()">
 			        <i class="fas fa-file-pdf"></i> Download PDF
 			    </button>
 			</div>
 
 			<div class="col-md-2">
-			    <button class="btn btn-success w-100" onclick="downloadExcel()">
+			    <button class="btn  w-100" onclick="downloadExcel()">
 			        <i class="fas fa-file-excel"></i> Download Excel
 			    </button>
 			</div>

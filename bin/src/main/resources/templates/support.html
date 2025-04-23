@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+	<title>Thinture GPS</title>
+	    <link rel="icon" type="image/x-icon" href="THINTURE_IMAGE/favicon.jpg">
+		
+		<style>
+			body::before {
+								    content: "";
+								    position: fixed;
+								    top: 0;
+								    left: 0;
+								    width: 100%;
+								    height: 100%;
+
+								    background: linear-gradient(
+								        rgba(10, 25, 47, 0.95),
+								        rgba(15, 32, 65, 0.95)
+								      ),
+								      url('/THINTURE_IMAGE/add_new.jpg') no-repeat center center/cover;
+
+								    filter: blur(2px);
+								    z-index: -1;
+								}
+								@media only screen and (max-width: 768px) {
+								    body {
+								        background-attachment: fixed;
+								        min-height: 100vh;
+								        font-size: 14px;
+								        background-color: #0a192f; /* fallback for small screens if image fails */
+								        background-size: cover;
+								        color: #f0f0f0;
+								    }
+								}
+								.card {
+									top:130px;
+								  background: rgba(10, 25, 47, 0.95);
+								  color: white;
+								  margin: 120px auto 50px;
+								  padding: 20px;
+								  border-radius: 16px;
+								  width: 90%;
+								  max-width: 1200px;
+								  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+								}
+
+								.table {
+								  color: white;
+								}
+.table th{
+	 background: rgba(10, 25, 47, 0.95);
+	 border-color: white;
+}
+.table td{
+	background-color: #f8f9fa !important;
+	          color: #212529;
+	          text-align: center;
+}
+			h2{
+				position:relative;
+				text-align: center;
+				top: 1px;
+			}
+			.nodata {
+			  color: #ff4d4d !important; /* bright red with priority */
+			  font-weight: bold;
+			  text-align: center;
+			  font-size: 16px;
+			}
+.form-control{
+	width: 30%;
+}
+#pagination {
+	position: absolute;
+  align-items: center;
+  left: 70%;
+}
+.editable{
+	display: none;
+}
+		</style>
+		
+		
+		
+		
+		
+		
+		
+</head>
+<body class="bg-light">
+	<header th:replace="~{navigation_user :: navbar_user}"></header>
+  <div class="card mt-5">
+    <h2>Submitted Complaints</h2>
+	<div class="mb-3 d-flex justify-content-between align-items-center">
+	  <input type="text" class="form-control" id="searchInput" placeholder="Search by name, vehicle, or complaint type...">
+	  
+	</div>
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>User Name</th>
+            <th>Email</th>
+            <th>Dealer/Client</th>
+            <th>Vehicle No</th>
+            <th>Complaint ID</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Date/Time</th>
+			<th>Status</th>
+			<th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="complaintTableBody">
+          <!-- Filled via JavaScript -->
+        </tbody>
+      </table>
+	  <div id="pagination" class="d-flex gap-2"></div>
+    </div>
+  </div>
+
+  <script>
+    const tbody = document.getElementById("complaintTableBody");
+    const searchInput = document.getElementById("searchInput");
+    const pagination = document.getElementById("pagination");
+    const pageSize = 7;
+    let currentPage = 1;
+    let complaints = [];
+
+    function fetchComplaintsFromBackend() {
+      fetch("/api/support/all")
+        .then(res => res.json())
+        .then(data => {
+          complaints = data.map(c => ({
+            userName: c.userName || "N/A",
+            email: c.userEmail || "N/A",
+            dealerName: c.dealerClientName || "N/A",
+            vehicleNo: c.vehicleNumber || "-",
+            imei: c.imeiNumber || "-",
+            complaintType: c.issueType,
+            description: c.message,
+            priority: c.priority,
+            dateTime: c.submittedAt.replace("T", " ").substring(0, 16),
+            status: c.status,
+            id: c.id
+          }));
+          filterAndRender();
+        })
+        .catch(err => {
+          console.error("Error fetching complaints:", err);
+          tbody.innerHTML = `<tr><td colspan="11" class="nodata">❌ Failed to load complaints</td></tr>`;
+        });
+    }
+
+    function renderTable(data) {
+      const start = (currentPage - 1) * pageSize;
+      const paginatedData = data.slice(start, start + pageSize);
+      tbody.innerHTML = "";
+
+      if (paginatedData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="11" class="nodata"><i class="fas fa-exclamation-circle"></i> No complaints found.</td></tr>`;
+        pagination.innerHTML = "";
+        return;
+      }
+
+      paginatedData.forEach((c, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${c.userName}</td>
+          <td>${c.email}</td>
+          <td>${c.dealerName}</td>
+          <td>${c.vehicleNo}</td>
+          <td>${c.imei}</td>
+          <td>${c.complaintType}</td>
+          <td>${c.description}</td>
+          <td>${c.priority}</td>
+          <td>${c.dateTime}</td>
+          <td>${c.status || 'Open'}</td>
+          <td>
+            <button class="btn btn-sm btn-danger" onclick="deleteComplaint(${c.id})"><i class="fas fa-trash-alt"></i></button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      renderPagination(data.length);
+    }
+
+    function renderPagination(totalItems) {
+      const totalPages = Math.ceil(totalItems / pageSize);
+      pagination.innerHTML = "";
+      if (totalPages <= 1) return;
+
+      const prevBtn = document.createElement("button");
+      prevBtn.textContent = "« Previous";
+      prevBtn.className = "btn btn-sm btn-outline-light";
+      prevBtn.disabled = currentPage === 1;
+      prevBtn.onclick = () => { if (currentPage > 1) { currentPage--; filterAndRender(); }};
+      pagination.appendChild(prevBtn);
+
+      const pageInfo = document.createElement("span");
+      pageInfo.className = "px-3 text-white fw-semibold align-self-center";
+      pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+      pagination.appendChild(pageInfo);
+
+      const nextBtn = document.createElement("button");
+      nextBtn.textContent = "Next »";
+      nextBtn.className = "btn btn-sm btn-outline-light";
+      nextBtn.disabled = currentPage === totalPages;
+      nextBtn.onclick = () => { if (currentPage < totalPages) { currentPage++; filterAndRender(); }};
+      pagination.appendChild(nextBtn);
+    }
+
+    function filterAndRender() {
+      const query = searchInput.value.toLowerCase();
+      const filtered = complaints.filter(c =>
+        c.userName.toLowerCase().includes(query) ||
+        c.vehicleNo.toLowerCase().includes(query) ||
+        c.complaintType.toLowerCase().includes(query)
+      );
+      renderTable(filtered);
+    }
+
+    function deleteComplaint(id) {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "This will delete the complaint permanently!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // You can call DELETE endpoint here, for now just simulate
+          complaints = complaints.filter(c => c.id !== id);
+          filterAndRender();
+          Swal.fire('Deleted!', 'The complaint has been removed.', 'success');
+        }
+      });
+    }
+
+    // Event Listener
+    searchInput.addEventListener("input", () => {
+      currentPage = 1;
+      filterAndRender();
+    });
+
+    // Load from backend
+    fetchComplaintsFromBackend();
+  </script>
+
+
+
+</body>
+</html>

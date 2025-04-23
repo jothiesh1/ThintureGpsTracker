@@ -1,334 +1,406 @@
-/* General Navbar Styles */
+/* Base Navbar Styling - Common for All Screens */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Base Navbar Styling - Common for All Screens */
 .navbar {
-    background: linear-gradient(135deg, white, rgba(15, 15, 15, 0), rgba(26, 26, 46, 0.8), rgba(22, 33, 62, 0.8), rgba(15, 52, 96, 0.8));
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 1.5), 
+        rgba(255, 255, 255, 1.5),
+        rgba(15, 32, 65, 1.9),
+        rgba(15, 32, 65, 1.6),
+        rgba(15, 32, 65, 1.6),
+        rgba(15, 32, 65, 1.6),
+        rgba(15, 32, 65, 1.6)
+    ),
+    url('https://images.unsplash.com/photo-1601597111158-4b34cc4d1cb0?auto=format&fit=crop&w=1470&q=80');
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
     width: 100%;
     position: fixed;
     top: 0;
-    left: 0;
+    height: 150px;
+
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 1000;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 6px 15px rgba(0, 0, 169, 0.5);
-    padding: 15px 20px;
-}
 
-/* Navbar Logo */
-.navbar .logo img {
-    height: 50px;
-    width: auto;
-}
-@media screen and (max-width: 1024px) {
-          .navbar {
-              height: 75px;
-              padding: 10px 20px;
-          }
-
-          .navbar-toggler {
-              display: block;
-              border: 2px solid white;
-              padding: 5px 10px;
-              border-radius: 5px;
-              cursor: pointer;
-          }
-
-          .navbar-nav {
-              flex-direction: column;
-              width: 100%;
-              background: rgba(0, 31, 63, 0.95);
-              position: absolute;
-              top: 100%;
-              left: 0;
-              display: none;
-              padding: 10px 0;
-              border-radius: 5px;
-              z-index: 999;
-          }
-
-          .navbar-nav.active {
-              display: flex;
-          }
-
-          .navbar-nav .nav-item {
-              text-align: center;
-              width: 100%;
-          }
-
-          .dropdown-menu {
-              position: relative;
-              width: 100%;
-              background: rgba(0, 0, 0, 0.9);
-              text-align: center;
-          }
-      }
-/* Navbar Navigation */
-.navbar-nav {
-    display: flex;
-    align-items: center;
-    list-style: none;
-}
-
-/* Navbar Items */
-.navbar-nav .nav-item {
-    margin: 0 15px;
-}
-
-/* Navbar Links */
-.navbar-nav .nav-item a {
-    color: white;
-    text-decoration: none;
-    padding: 10px;
-    display: block;
-    transition: color 0.3s;
-}
-
-.navbar-nav .nav-item a:hover {
-    color: lightseagreen;
-}
-
-/* Dropdown Menu */
-.dropdown-content {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: rgba(20, 20, 20, 0.95);
-    width: 200px;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     z-index: 1050;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+    padding: 25px 40px;
+
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.3s ease-in-out;
 }
 
-/* Show dropdown on hover */
-.nav-item:hover .dropdown-content {
-    display: block;
-}
+/* Override Background Color by Screen Size */
 
-/* Mobile Responsive Fix */
-.navbar-toggler {
-    display: none;
-    background: none;
-    border: none;
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-}
-
-/* MOBILE RESPONSIVE FIX */
-@media screen and (max-width: 1024px) {
+/* 1. MOBILE (up to 576px) */
+@media (max-width: 576px) {
     .navbar {
-        flex-direction: row;
+		background: linear-gradient(
+		       135deg,
+		       rgba(255, 255, 255, 1.5), 
+		       rgba(255, 255, 255, 1.5),
+		      
+		      
+		       rgba(15, 32, 65, 1.6)
+		   );
+        height: 90px;
+        padding: 8px 15px;
+    }
+}
+
+/* 2. TABLETS (576px - 991px) */
+@media (min-width: 576px) and (max-width: 991px) {
+    .navbar {
+		background: linear-gradient(
+				       135deg,
+				       rgba(255, 255, 255, 1.9), 
+				       rgba(255, 255, 255, 1.9),
+					   rgba(255, 255, 255, 1.9),
+					   rgba(15, 32, 65, 1.9),
+					   rgba(15, 32, 65, 1.9),
+					   rgba(15, 32, 65, 1.9),
+				       rgba(15, 32, 65, 1.9),
+				       rgba(15, 32, 65, 1.6),
+				       rgba(15, 32, 65, 1.6),
+				       rgba(15, 32, 65, 1.6),
+				       rgba(15, 32, 65, 1.6)
+				   );
+    }
+}
+
+/* 3. LAPTOPS (992px - 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .navbar {
+		background: linear-gradient(
+		       135deg,
+		       rgba(255, 255, 255, 1.9), 
+		       rgba(255, 255, 255, 1.9),
+			   rgba(255, 255, 255, 1.9),
+			   rgba(15, 32, 65, 1.9),
+			   rgba(15, 32, 65, 1.9),
+			   rgba(15, 32, 65, 1.9),
+			   rgba(15, 32, 65, 1.9),
+			   rgba(15, 32, 65, 1.9),
+			   rgba(15, 32, 65, 1.9),
+		       rgba(15, 32, 65, 1.9),
+		       rgba(15, 32, 65, 1.6),
+		       rgba(15, 32, 65, 1.6),
+		       rgba(15, 32, 65, 1.6),
+		       rgba(15, 32, 65, 1.6)
+		   );
+       
+    }
+}
+
+/* 4. LARGE MONITORS (1200px and above) */
+@media (min-width: 1200px) {
+    .navbar {
+		background: linear-gradient(
+		       135deg,
+		       rgba(255, 255, 255, 1.5), 
+		       rgba(255, 255, 255, 1.5),
+		       rgba(15, 32, 65, 1.9),
+		       rgba(15, 32, 65, 1.6),
+		       rgba(15, 32, 65, 1.6),
+		       rgba(15, 32, 65, 1.6),
+		       rgba(15, 32, 65, 1.6)
+		   );
+        height: 100px;
+        padding: 10px 80px;
+    }
+}
+
+
+
+
+/* Logo */
+.navbar-brand {
+	position: absolute;
+    height: 60px;
+    width: auto;
+	left:20px;
+}
+/* Align Navbar Links to the Right */
+.navbar-nav {
+    margin-left: auto;
+	color: white;
+}
+
+
+.dropdown-item{
+	color:white;
+}
+/* Dropdown Menu */
+.dropdown-menu {
+    position: absolute;
+	color:white;
+	font-size: 12px;
+    z-index: 1100;
+    background-color: rgba(15, 32, 65, 0.9);
+}
+
+/* Navbar Toggler */
+.navbar-toggler {
+    border: none;
+    background: transparent;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
+.navbar-toggler-icon {
+    background-color: white;
+    border-radius: 4px;
+    padding: 5px;
+}
+
+/* ----- SCREEN SIZE SPECIFIC STYLING ----- */
+
+/* 1. MOBILE (up to 576px) */
+/* MOBILE (up to 576px) */
+@media (max-width: 576px) {
+    .navbar {
+        height: 88px;
+        padding: 8px 15px;
+        display: flex;
+		color: white;
+        align-items: center;
         justify-content: space-between;
-        padding: 10px;
     }
 
-    /* Show menu toggle button */
+    .navbar-brand {
+        height: 50px;
+        width: auto;
+        left: 10px;
+    }
+
     .navbar-toggler {
-        display: block;
+        right: 10px;
+        top: 15px;
     }
 
-    /* Hide menu initially */
-    .navbar-nav {
-        display: none;
-        flex-direction: column;
-        width: 100%;
-        background: rgba(15, 15, 15, 0.95);
+    .navbar-toggler-icon {
+        background-color: white;
+        border-radius: 4px;
+        padding: 4px;
+    }
+
+    /* Ensure menu appears properly */
+    .navbar-collapse {
+        background: rgba(0, 0, 0, 0.9);
         position: absolute;
         top: 60px;
         left: 0;
-        z-index: 999;
+        width: 100%;
+        text-align: center;
         padding: 10px 0;
-        border-radius: 5px;
     }
 
-    /* Show menu when active */
-    .navbar-nav.active {
+    /* Make sure navbar items stack properly */
+    .navbar-nav {
         display: flex;
-    }
-	/* Initially hide the menu on mobile */
-	@media screen and (max-width: 1024px) {
-	    .navbar-nav {
-	        display: none;
-	        flex-direction: column;
-	        width: 100%;
-	        background: rgba(15, 15, 15, 0.95);
-	        position: absolute;
-	        top: 60px;
-	        left: 0;
-	        z-index: 999;
-	        padding: 10px 0;
-	        border-radius: 5px;
-	    }
-
-	    /* Show menu when active */
-	    .navbar-nav.active {
-	        display: flex;
-	    }
-
-	    /* Toggle button styling */
-	    .navbar-toggler {
-	        display: block;
-	        background: none;
-	        border: none;
-	        font-size: 24px;
-	        cursor: pointer;
-	        color: white;
-	        position: absolute;
-	        top: 20px;
-	        right: 20px;
-	        z-index: 1001;
-	    }
-
-	    .navbar-toggler.open {
-	        color: lightseagreen;
-	    }
-	}
-
-    /* Adjust dropdown for mobile */
-    .dropdown-content {
-        position: relative;
-        box-shadow: none;
-        font-size: 14px;
+        flex-direction: column;
+        align-items: center;
         width: 100%;
     }
 
-    .dropdown-content a {
-        padding: 12px;
-        display: block;
+    .navbar-nav .nav-link {
+        font-size: 14px;
+        padding: 10px;
+		color: white;
+		text-transform: uppercase;
+        width: 100%;
         text-align: center;
     }
 
-    /* Submenus on mobile */
-    .submenu {
-        position: relative;
+    /* Improve dropdown appearance */
+    .dropdown-menu {
         width: 100%;
-    }
-
-    /* Ensure the logo remains visible */
-    .logo img {
-        height: 50px;
-        width: auto;
+		font-size: 16px;
+        background-color: rgba(0, 0, 0, 0.9);
+        text-align: center;
+		
     }
 }
-.navbar {
-           background: linear-gradient(135deg, #001f3f, #003366); /* Deep blue gradient */
-           width: 100%;
-           position: fixed;
-           height: 90px;
-           top: 0;
-           display: flex;
-           justify-content: space-between;
-           align-items: center;
-           z-index: 900;
-           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-           padding: 10px 40px;
-       }
 
-       .navbar-nav {
-           display: flex;
-           align-items: center;
-           gap: 15px;
-       }
 
-       /* Logo */
-       .logo img {
-           height: 60px;
-           width: 150px;
-       }
+/* 2. TABLETS (576px - 991px) */
+@media (min-width: 576px) and (max-width: 991px) {
+    .navbar {
+        height: 80px;
+        padding: 12px 30px;
+		color: white;
+    }
 
-       /* Navbar Links */
-       .navbar-nav .nav-item {
-           position: relative;
-       }
+    .navbar-brand {
+        height: 55px;
+    }
 
-       .navbar-nav .nav-link {
-           font-size: 18px;
-           font-weight: bold;
-           text-transform: uppercase;
-           color: white !important;
-           padding: 12px 20px;
-           border-radius: 8px;
-           border: 2px solid transparent;
-           transition: all 0.3s ease-in-out;
-       }
+	.navbar-nav .nav-link {
+	        font-size:9px;
+			color: white;
+	        padding: 8px;
+			right: 0px;
+			text-transform: uppercase;
+	    }
+}
 
-       /* Hover Effect */
-       .navbar-nav .nav-link:hover {
-           color: lightseagreen !important;
-           border-color: lightseagreen;
-           background: rgba(255, 255, 255, 0.1);
-       }
+/* 3. LAPTOPS (992px - 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .navbar {
+        height: 90px;
+        padding: 15px 50px;
+    }
+	.navbar-nav {
+			position: absolute;
+		   right: 10px;
+			font-size: 4px;
+		}
+    .navbar-brand {
+        height: 60px;
+		left:5px;
+    }
 
-       /* Dropdown Menu */
-       .dropdown-menu {
-           background: rgba(0, 0, 0, 0.9) !important;
-           border-radius: 8px;
-           min-width: 200px;
-           padding: 10px;
-           display: none;
-           position: absolute;
-           z-index: 999;
-       }
+    .navbar-nav .nav-link {
+        font-size:9px;
+		color: white;
+        padding: 4px;
+		right: 0px;
+		text-transform: uppercase;
+    }
+}
 
-       .dropdown-menu .dropdown-item {
-           color: white !important;
-           font-size: 14px;
-           padding: 10px 15px;
-           transition: all 0.3s ease-in-out;
-           border-radius: 5px;
-       }
+/* 4. LARGE MONITORS (1200px and above) */
+@media (min-width: 1200px) {
+    .navbar {
+        height: 100px;
+        padding: 10px 80px;
+		
+        display: flex;
+        justify-content: space-between; /* Pushes items apart */
+        align-items: center; /* Centers items vertically */
+    }
+	.navbar-nav {
+		position: absolute;
+	   right: 10px;
+		font-size: 10px;
+	}
+    .navbar-brand {
+        height: 80px;
+		width:140px;
+    }
 
-       .dropdown-menu .dropdown-item:hover {
-           background: lightseagreen;
-           color: white !important;
-       }
+	
 
-       /* Show dropdown on hover */
-       .nav-item:hover .dropdown-menu {
-           display: block;
-       }
+	.navbar-nav .nav-link {
+	        font-size:11px;
+			color: white;
+	        padding: 1px;
+			right: 0px;
+			text-transform: uppercase;
+	    }
+}
+.logout-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.3s ease;
+  cursor: pointer; /* 👈 This makes the hand appear on hover */
+}
 
-       /* Mobile View */
-       @media screen and (max-width: 1024px) {
-           .navbar {
-               height: 75px;
-               padding: 10px 20px;
-           }
+.logout-item:hover {
+  color: red;
+}
 
-           .navbar-toggler {
-               display: block;
-               border: 2px solid white;
-               padding: 5px 10px;
-               border-radius: 5px;
-               cursor: pointer;
-           }
+.logout-item i {
+  transition: transform 0.3s ease;
+}
 
-           .navbar-nav {
-               flex-direction: column;
-               width: 100%;
-               background: rgba(0, 31, 63, 0.95);
-               position: absolute;
-               top: 100%;
-               left: 0;
-               display: none;
-               padding: 10px 0;
-               border-radius: 5px;
-               z-index: 999;
-           }
+.logout-item:hover i {
+  transform: scale(1.1) rotate(-10deg);
+}
+.fa-spin {
+    animation-duration: 1s !important;
+}
 
-           .navbar-nav.active {
-               display: flex;
-           }
+.navigation-buttons {
+	     display: flex;
+	     justify-content: space-between;
+	     padding: 10px;
+	     position: relative;
+	     top: 130px;
+	   
+	     z-index: 1000;
+	   }
 
-           .navbar-nav .nav-item {
-               text-align: center;
-               width: 100%;
-           }
+	   #backward-button, #forward-button {
+	     padding: 10px 20px;
+	     border: none;
+	     color: white;
+	     font-weight: bold;
+	     border-radius: 6px;
+	     cursor: pointer;
+	   }
 
-           .dropdown-menu {
-               position: relative;
-               width: 100%;
-               background: rgba(0, 0, 0, 0.9);
-               text-align: center;
-           }
-       }
+	   #backward-button {
+		width: 5%;
+		font-size: 12px;;
+	     margin-left: 10px;
+		  box-shadow: 0 6px 15px rgba(255, 255, 255, 0.4);
+		 background: linear-gradient(
+		     135deg,
+		    
+		     rgba(15, 32, 65, 1.6),
+		     rgba(15, 32, 65, 1.6),
+		     rgba(15, 32, 65, 1.6)
+		 );
+	   }
+
+	   #forward-button {
+	     margin-right: 10px;
+		 width:7%;
+		 		font-size: 11px;;
+		box-shadow: 0 6px 15px rgba(255, 255, 255, 0.4);
+		 background: linear-gradient(
+		 	     135deg,
+		 	    
+		 	     rgba(15, 32, 65, 1.6),
+		 	     rgba(15, 32, 65, 1.6),
+		 	     rgba(15, 32, 65, 1.6)
+		 	 );
+	   }
+	   @media (min-width: 900px) and (max-width: 1440px) {
+	     #forward-button {
+	       width: 8%;
+	      
+	       font-size: 12px;
+	     }
+	   }
+
+	   @media (max-width: 768px) {
+	     .navigation-buttons {
+	       display: none;
+	     }
+	   }

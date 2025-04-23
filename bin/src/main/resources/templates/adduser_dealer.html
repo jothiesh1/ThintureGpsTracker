@@ -7,152 +7,16 @@
 		    <link rel="icon" type="image/x-icon" href="/THINTURE_IMAGE/favicon.jpg">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+		
+		
+		
+	<link rel="stylesheet" type="text/css" th:href="@{/css/styled.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/addstyle.css}">
+	
+	
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
-<style>
-	body {
-			    font-family: Arial, sans-serif;
-			    background-image: url('/THINTURE_IMAGE/add_new.jpg');
-			    background-size: cover; /* Ensures the image covers the entire screen */
-			   
-			    background-repeat: no-repeat;
-			    margin: 0;
-			    padding: 0;
-			}
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-			.card {
-								position: absolute;
-								top:-110px;
-															               width: 30%;
-															               max-width: 900px;
-															               margin: 250px auto;
-															   			right:40%;
-															               padding: 30px;
-															               background-color: rgba(0, 0, 0, 0.5); 
-															               border: 1px solid #ddd;
-															               border-radius: 10px;
-															               box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-															   			
-															           }
-									           h2 {
-									               text-align: center;
-									               margin-bottom: 20px;
-									               color: #fff;
-									               font-size: 24px;
-									           }
-
-									           .form-group {
-									               margin-bottom: 15px;
-									           }
-
-									           .form-group label {
-									               display: block;
-									               font-size: 14px;
-									               margin-bottom: 5px;
-									               color: #ddd;
-									           }
-
-									           .form-group input {
-									               width: 100%;
-									               padding: 10px;
-									               border: 1px solid #ccc;
-									               border-radius: 5px;
-									               font-size: 14px;
-									               box-sizing: border-box;
-									               background: #fff;
-									               box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-									           }
-
-									           .form-group input::placeholder {
-									               color: #aaa;
-									               font-size: 12px;
-									           }
-
-									           .form-group input:focus {
-									               border-color: #007bff;
-									               outline: none;
-									           }
-
-									           .error-message {
-									               color: red;
-									               font-size: 12px;
-									               display: none;
-									           }
-
-									           .form-group input[type="submit"] {
-									               width: 100%;
-									               background-color: #007bff;
-									               color: #fff;
-									               font-size: 16px;
-									               cursor: pointer;
-									               border: none;
-									               margin-top: 10px;
-									               transition: background-color 0.3s ease;
-									           }
-
-									           .form-group input[type="submit"]:hover {
-									               background-color: #0056b3;
-									           }
-
-									           @media (max-width: 768px) {
-									               .container {
-									                   max-width: 90%;
-									                   padding: 15px;
-									               }
-
-									               h2 {
-									                   font-size: 20px;
-									               }
-
-									               .form-group input {
-									                   padding: 8px;
-									                   font-size: 13px;
-									               }
-
-									               .form-group input[type="submit"] {
-									                   font-size: 14px;
-									               }
-									           }
-
-									           @media (max-width: 480px) {
-									               h2 {
-									                   font-size: 18px;
-									               }
-
-									               .form-group input {
-									                   padding: 7px;
-									                   font-size: 12px;
-									               }
-
-									               .form-group input[type="submit"] {
-									                   font-size: 13px;
-									               }
-									           }
-
-		        .back-btn {
-		            display: inline-block;
-		            padding: 12px 20px;
-		            color: white;
-		            background-color: darkblue;
-		            border: none;
-		            border-radius: 6px;
-		            cursor: pointer;
-		            text-decoration: none;
-		            font-size: 14px;
-		            margin-bottom: 20px;
-		            transition: background-color 0.3s ease;
-		        }
-
-		        .back-btn:hover {
-		            background-color: #0056b3;
-		        }
-
-		        .error-message {
-		            color: red;
-		            display: none;
-		        }
-</style>
 
 
 </head>
@@ -208,107 +72,129 @@
 	</div>
 
 	<script>
-	    document.addEventListener('DOMContentLoaded', function() {
-	        const form = document.getElementById('addUserForm'); // Use the form id here
+	    document.addEventListener('DOMContentLoaded', function () {
+	        const form = document.getElementById('addUserForm');
 
-	        form.addEventListener('submit', function(event) {
-	            event.preventDefault(); // Prevent form from submitting traditionally
+	        form.addEventListener('submit', async function (event) {
+	            event.preventDefault();
 
-	            // Get form data
-	            const userrData = {
-	                companyName: document.getElementById('companyName').value,
-	                address: document.getElementById('address').value,
-	                email: document.getElementById('email').value,
-	                phone: document.getElementById('phone').value,
-	                country: document.getElementById('country').value,
-	                password: document.getElementById('password').value
+	            const userData = {
+	                companyName: document.getElementById('companyName').value.trim(),
+	                address: document.getElementById('address').value.trim(),
+	                email: document.getElementById('email').value.trim(),
+	                phone: document.getElementById('phone').value.trim(),
+	                country: document.getElementById('country').value.trim(),
+	                password: document.getElementById('password').value.trim()
 	            };
 
-	            const confirmPassword = document.getElementById('c_password').value;
+	            const confirmPassword = document.getElementById('c_password').value.trim();
 
-	            let isValid = true; // Flag to check if form is valid
-
-	            // Clear any previous errors
+	            // Reset error visuals
 	            document.querySelectorAll('input').forEach(input => input.classList.remove('error'));
+	            let isValid = true;
 
-	            // Validate form fields
-	            if (userrData.companyName.trim() === '') {
-	                document.getElementById('companyName').classList.add('error');
+	            // Validation
+	            const markError = (id) => {
+	                document.getElementById(id).classList.add('error');
 	                isValid = false;
-	            }
+	            };
 
-	            if (userrData.address.trim() === '') {
-	                document.getElementById('address').classList.add('error');
-	                isValid = false;
-	            }
-
-	            if (!/^\S+@\S+\.\S+$/.test(userrData.email)) {
-	                document.getElementById('email').classList.add('error');
-	                isValid = false;
-	            }
-
-	            if (userrData.phone.trim() === '') {
-	                document.getElementById('phone').classList.add('error');
-	                isValid = false;
-	            }
-
-	            if (userrData.country.trim() === '') {
-	                document.getElementById('country').classList.add('error');
-	                isValid = false;
-	            }
-
-	            if (userrData.password !== confirmPassword || userrData.password.trim() === '') {
-	                document.getElementById('password').classList.add('error');
-	                document.getElementById('c_password').classList.add('error');
-	                alert("Passwords do not match!");
-	                isValid = false;
-	            }
-
-	            // If form is invalid, stop submission
-	            if (!isValid) {
+	            if (!userData.companyName) markError('companyName');
+	            if (!userData.address) markError('address');
+	            if (!/^\S+@\S+\.\S+$/.test(userData.email)) markError('email');
+	            if (!userData.phone) markError('phone');
+	            if (!userData.country) markError('country');
+	            if (!userData.password || userData.password !== confirmPassword) {
+	                markError('password');
+	                markError('c_password');
+	                Swal.fire({
+	                    icon: 'error',
+	                    title: 'Password Mismatch',
+	                    text: 'Password and Confirm Password do not match!'
+	                });
 	                return;
 	            }
 
-	            // If valid, send the data to the backend
-	            fetch('/users/add', { // Ensure this is the correct endpoint
-	                method: 'POST',
-	                headers: {
-	                    'Content-Type': 'application/json'
-	                },
-	                body: JSON.stringify(userrData)
-	            })
-	            .then(response => {
+	            if (!isValid) {
+	                Swal.fire({
+	                    icon: 'error',
+	                    title: 'Validation Error',
+	                    text: 'Please fill out all fields correctly.'
+	                });
+	                return;
+	            }
+
+	            // Show confirmation
+	            const result = await Swal.fire({
+	                title: 'Add User?',
+	                text: 'Are you sure you want to add this user?',
+	                icon: 'question',
+	                showCancelButton: true,
+	                confirmButtonColor: '#3085d6',
+	                cancelButtonColor: '#d33',
+	                confirmButtonText: 'Yes, Add',
+	                cancelButtonText: 'Cancel'
+	            });
+
+	            if (!result.isConfirmed) return;
+
+	            // Submit data
+	            try {
+	                const response = await fetch('/users/add', {
+	                    method: 'POST',
+	                    headers: { 'Content-Type': 'application/json' },
+	                    body: JSON.stringify(userData)
+	                });
+
 	                if (response.ok) {
-	                    alert('User added successfully!');
-	                    window.location.href = "/dashboard"; // Redirects to the dashboard
+	                    await Swal.fire({
+	                        icon: 'success',
+	                        title: 'Success!',
+	                        text: 'User added successfully.',
+	                        timer: 2000,
+	                        showConfirmButton: false
+	                    });
+	                    window.location.href = "/dashboard_dealer";
 	                } else {
-	                    return response.text().then(text => { throw new Error(text) });
+	                    const errorText = await response.text();
+	                    Swal.fire({
+	                        icon: 'error',
+	                        title: 'Failed!',
+	                        text: errorText || 'Something went wrong. Please try again.'
+	                    });
 	                }
-	            })
-	            .catch(error => alert('Error: ' + error.message));
+	            } catch (error) {
+	                Swal.fire({
+	                    icon: 'error',
+	                    title: 'Error!',
+	                    text: error.message || 'Unexpected error occurred.'
+	                });
+	            }
 	        });
 
-	        // Remove red alert when typing
+	        // Remove error class on input change
 	        document.querySelectorAll('input').forEach(input => {
-	            input.addEventListener('input', function() {
-	                input.classList.remove('error');
+	            input.addEventListener('input', function () {
+	                this.classList.remove('error');
 	            });
 	        });
 	    });
 
-	    // Add CSS class for red border when there is an error
+	    // Add red border styling
 	    const style = document.createElement('style');
 	    style.innerHTML = `
 	        input.error {
-	            border: 2px solid red;
+	            border: 2px solid red !important;
 	        }
 	    `;
 	    document.head.appendChild(style);
 	</script>
+
 	<script>
 		document.getElementById('back-button').addEventListener('click', function () {
 				    window.history.back(); // Navigates to the previous page in browser history
 				});
 	</script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
