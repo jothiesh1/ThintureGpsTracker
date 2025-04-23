@@ -1,0 +1,2500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thinture GPS</title>
+    <link rel="icon" type="image/x-icon" href="THINTURE_IMAGE/favicon.jpg">
+
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <!-- WebSocket Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+		
+
+				#map {
+						margin-top: 20px;
+						height: calc(100vh - 150px);
+						position: sticky;
+						top:80px;
+					}
+
+				/* Icon and Animation Styles */
+			
+
+				
+				/* Sidebar Styles */
+				#sidebar {
+				    position: fixed;
+				    right: -400px;
+				    top: 0;
+				    width: 380px;
+				    height: 100vh;
+				    background: rgba(255, 255, 255, 0.9);
+				    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+				    transition: right 0.3s ease;
+				    z-index: 1000;
+				    padding: 20px;
+				    backdrop-filter: blur(8px);
+				    border-left: 1px solid rgba(0, 0, 0, 0.1);
+				}
+
+				#sidebar.active {
+				    right: 0;
+				}
+
+				#toggleButton {
+				    position: fixed;
+				    top: 150px;
+				    right: 20px;
+				    z-index: 1001;
+				    background: linear-gradient(135deg, #00c3ff, #0077ff);
+				    color: white;
+				    border: none;
+				    border-radius: 45px;
+				    padding: 10px 14px;
+				    font-size: 18px;
+				    cursor: pointer;
+				    transition: all 0.3s ease;
+				    box-shadow: 0 5px 15px rgba(0, 195, 255, 0.3);
+				}
+
+				#toggleButton:hover {
+				    background: linear-gradient(135deg, #00ff6a, #00c3ff);
+				}
+
+				#toggleButton.active {
+				    right: 370px;
+				}
+
+				/* Sidebar positioning and transitions */
+				#sidebar {
+				    position: fixed;
+				    right: -450px; /* Hidden by default */
+				    top: 150px;
+				    width: 380px;
+				    height: 70vh;
+					background: rgba(0, 0, 0, 0.4);
+				    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+				    transition: right 0.3s ease;
+				    z-index: 1000;
+				    padding: 5px;
+				    backdrop-filter: blur(10px);
+				    border-left: 1px solid rgba(0, 0, 0, 0.1);
+				}
+
+				#sidebar.active {
+				    right: 0;
+				}
+
+				/* Sidebar header styles */
+				#sidebar h2 {
+				    color:darkblue;
+				    font-size: 27px;
+				    margin-bottom: 20px;
+				    padding-bottom: 10px;
+				    border-bottom: 2px solid #3498db;
+				}
+
+				/* Search bar styles */
+				#searchBar {
+				    width: calc(50% - 14px);
+				    padding: 8px;
+				    border: 1px solid #e0e0e0;
+				    border-radius: 8px;
+				    margin-bottom: 20px;
+				    font-size: 10px;
+				    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+				}
+
+				#searchBar:focus {
+				    outline: none;
+				    border-color: #3498db;
+				    box-shadow: 0 2px 10px rgba(52, 152, 219, 0.2);
+				}
+
+				/* Mobile responsiveness */
+				@media (max-width: 768px) {
+				    #sidebar {
+				        width: 100%;
+				        right: -100%;
+				    }
+				    
+				    #toggleButton.active {
+				        right: 20px;
+				    }
+				}
+
+				.table-container {
+				    max-height: 65vh;
+				    overflow-y: auto;
+				    border-radius: 10px;
+				}
+
+				/* Table */
+				.table {
+				    width: 100%;
+				    background: rgba(255, 255, 255, 0.9);
+				    border-radius: 12px;
+				    overflow: hidden;
+				    border-collapse: collapse;
+				    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+				}
+
+				.table th {
+				   background-color:darkslateblue;
+				    color: white;
+				    padding: 2px;
+				    text-align: center;
+				    font-size: 12px;
+				}
+
+				.table td {
+				    padding: 2px;
+				    font-size: 10px;
+				    color: #222;
+				    text-align: center;
+				    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+				}
+
+				/* Table Row Hover Effect */
+				.table tbody tr:hover {
+				    background: rgba(255, 255, 255, 0.1);
+				    transition: 0.3s ease-in-out;
+				}
+
+				#map {
+							margin-top: 10px;
+							height: calc(120vh - 150px);
+							position: relative;
+						}
+						
+
+        /* Marker Animation */
+        .highlight-marker { animation: bounce 0.5s ease-in-out 2; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+		
+		
+		
+
+		/* Live indicator with ripple effect */
+		.live-indicator {
+		    display: inline-block;
+		    position: relative;
+		    color: green;
+		    font-weight: bold;
+		}
+
+		/* Water ripple animation */
+		.live-indicator .ripple {
+		    position: absolute;
+		    width: 12px;
+		    height: 12px;
+		    border-radius: 50%;
+		    background-color: rgba(0, 255, 0, 0.4);
+		    animation: rippleEffect 1.5s infinite;
+		}
+
+		.live-indicator .ripple:nth-child(2) {
+		    animation-delay: 0.5s;
+		}
+		.live-indicator .ripple:nth-child(3) {
+		    animation-delay: 1s;
+		}
+
+		@keyframes rippleEffect {
+		    0% {
+		        transform: scale(0.5);
+		        opacity: 1;
+		    }
+		    100% {
+		        transform: scale(2.5);
+		        opacity: 0;
+		    }
+		}
+
+		#vehicle-details-popup {
+		    position: absolute;
+		    background: white;
+		    color: black;
+		    font-size: 14px;
+		    padding: 15px;
+		    border-radius: 8px;
+		    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+		    border: 1px solid #ddd;
+		    display: none;
+		    z-index: 1000;
+		    width: 280px;
+		}
+
+		.popup-header {
+		    display: flex;
+		    justify-content: space-between;
+		    font-weight: bold;
+		    color: darkblue;
+		    border-bottom: 1px solid #ddd;
+		    padding-bottom: 5px;
+		    margin-bottom: 10px;
+		}
+
+		.close-btn {
+		    cursor: pointer;
+		    font-size: 18px;
+		    color: red;
+		    font-weight: bold;
+		}
+
+		.popup-content {
+		    line-height: 1.5;
+		}
+		/* Map Switcher Container */
+		/* Map Switcher Container */
+		#mapSwitcher {
+		    position: fixed;
+		    top: 280px; /* Adjust based on your navbar height */
+		    left: 20px;
+		    z-index: 1000;
+		    background: rgba(0, 0, 0, 0.8);
+		    padding: 10px;
+		    border-radius: 10px;
+		    display: flex;
+		    flex-direction: column;
+		    gap: 5px;
+		}
+
+		/* Map Switching Buttons */
+		.map-button {
+		    display: flex;
+		    align-items: center;
+		    gap: 8px;
+		    background:transparent;
+		    color: white;
+		    border: none;
+		    padding: 10px 15px;
+		    border-radius: 8px;
+		    cursor: pointer;
+		    font-size: 14px;
+		    transition: all 0.3s ease;
+		    width:50px;
+		    text-align: left;
+		    font-weight: bold;
+		   
+		}
+
+		.map-button i {
+		    font-size: 18px;
+		}
+
+		/* Hover and Active States */
+		.map-button:hover {
+		    background:gray;
+		}
+
+		.map-button.active {
+		    background: #16a085; /* Highlight active map */
+		}
+
+		/* Responsive for smaller screens */
+		@media (max-width: 768px) {
+		    #mapSwitcher {
+		        top: 310px;
+		        left: 10px;
+				background: rgba(255, 255, 255, 0.2);
+		    }
+
+		    .map-button {
+		        font-size: 10px;
+		        width: 80px;
+		        padding: 8px 10px;
+		    }
+		}
+
+
+	
+		/* Status Badge */
+		.status-badge {
+		    display: inline-block;
+		    padding: 4px 10px;
+		    border-radius: 8px;
+		    font-weight: bold;
+		}
+
+		.status-badge.live {
+		   
+		    color:#27ae60;
+		}
+
+		.status-badge.offline {
+		    
+		    color: #e74c3c;
+		}
+
+		
+
+		/* Popup Buttons */
+		.popup-buttons {
+		    display: flex;
+		    gap: 10px;
+		    margin-top: 10px;
+		}
+
+		.popup-btn {
+		    flex: 1;
+		    border: none;
+		    padding: 8px;
+		    font-size: 14px;
+		    cursor: pointer;
+		    border-radius: 6px;
+		    transition: all 0.3s ease;
+		    color: white;
+		}
+
+		.popup-btn.replay {
+		    background: #3498db;
+		}
+
+		.popup-btn.details {
+		    background: #2ecc71;
+		}
+
+		.popup-btn:hover {
+		    opacity: 0.8;
+		}
+	
+
+		.popup-header {
+		    display: flex;
+		    align-items: center;
+		    justify-content: space-between;
+		    font-size: 14px;
+		    font-weight: bold;
+		    border-bottom: 1px solid #e0e0e0;
+		    padding-bottom: 6px;
+		}
+
+		.close-btn {
+		    font-size: 18px;
+		    color: #d32f2f;
+		    cursor: pointer;
+		}
+
+		.popup-content p {
+		    margin: 6px 0;
+		    font-size: 13px;
+		}
+
+		
+
+
+		/* Popup Overlay */
+		.popup-overlay {
+		    position: fixed;
+		    top: 0;
+		    left: 0;
+		    width: 100%;
+		    height: 100%;
+		    background: rgba(0, 0, 0, 0.5);
+		    z-index: 999;
+		    display: none;
+		}
+
+		/* Popup Container */
+		.popup-container {
+		    position: fixed;
+		    top: 50%;
+		    left: 50%;
+		    transform: translate(-50%, -50%);
+		    background: linear-gradient(135deg,lightgrey,white);
+		    border-radius: 12px;
+		    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+		    width: 320px;
+		    max-width: 90%;
+		    padding: 15px;
+		    z-index: 1000;
+		    display: none;
+		}
+
+		/* Popup Header */
+		.popup-header {
+		    display: flex;
+		    justify-content: space-between;
+		    font-size: 16px;
+		    font-weight: bold;
+		    color: #2c3e50;
+		    padding-bottom: 5px;
+		    border-bottom: 2px solid #3498db;
+		}
+
+		/* Close Button */
+		.close-btn {
+		    cursor: pointer;
+		    font-size: 18px;
+		    color: red;
+		    font-weight: bold;
+		    transition: all 0.3s ease;
+		}
+
+		.close-btn:hover {
+		    color: darkred;
+		    transform: scale(1.2);
+		}
+
+		/* Popup Table */
+		.popup-table {
+		    width: 100%;
+		    margin-top: 10px;
+		    border-collapse: collapse;
+		}
+
+		.popup-table td {
+		    padding: 5px;
+		    font-size: 14px;
+		    border-bottom: 1px solid #ddd;
+		}
+
+		/* Popup Animation */
+		@keyframes fadeIn {
+		    from { opacity: 0; transform: scale(0.9); }
+		    to { opacity: 1; transform: scale(1); }
+		}
+
+		.popup-container.show {
+		    display: block;
+		    animation: fadeIn 0.3s ease-out;
+		}
+
+		
+
+		.popup-header {
+		    padding: 10px;
+		    font-weight: bold;
+		    text-align: center;
+		    font-size: 14px;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    gap: 8px;
+		}
+
+		.live-update {
+		    background: white;
+		    color: green;
+		}
+
+		.last-known {
+		    background:white;
+		    color:red;
+		}
+
+		.header-title {
+		    font-size: 14px;
+		    font-weight: bold;
+		}
+
+		.popup-content {
+		    padding: 10px;
+		    font-size: 13px;
+		    color: #333;
+		}
+
+		.popup-content p {
+		    margin: 8px 0;
+		    display: flex;
+		    justify-content: space-between;
+		}
+
+		.popup-content p strong {
+		    color: #2c3e50;
+		}
+
+		.popup-actions {
+		    display: flex;
+		    justify-content: space-between;
+		    padding: 10px;
+		    background: #f7f7f7;
+		    border-top: 1px solid #ddd;
+		}
+
+		.details-btn, .playback-btn {
+		    padding: 6px 10px;
+		    font-size: 12px;
+		    border: none;
+		    border-radius: 5px;
+		    cursor: pointer;
+		    transition: 0.2s ease-in-out;
+		}
+
+		.details-btn {
+		    background: #3498db;
+		    color: white;
+		}
+
+		.playback-btn {
+		    background: #f39c12;
+		    color: white;
+		}
+
+		.details-btn:hover {
+		    background: #2980b9;
+		}
+
+		.playback-btn:hover {
+		    background: #e67e22;
+		}
+
+		/* Default Status Style */
+		.status {
+		    padding: 4px 8px;
+		    border-radius: 5px;
+		    font-weight: bold;
+		    text-transform: uppercase;
+		    display: inline-block;
+		    font-size: 11px;
+		}
+
+		/* Running (Green) */
+		.status-running {
+		    background-color: white;
+		    color: green;
+		}
+
+		/* Idle (Orange) */
+		.status-idle {
+			background-color: white;
+		      color:orange;
+		}
+
+		/* Parked (Blue) */
+		.status-parked {
+			background-color: white;
+		    color:orange;
+		}
+
+		/* Connection Lost (Red) */
+		.status-connection-lost {
+			background-color: white;
+		    color: red;
+		}
+
+		/* Unknown (Gray) */
+		.status-unknown {
+			background-color: white;
+					    color: red;
+		}
+
+		/* Hover Effects */
+		
+
+		.live-indicator {
+		    display: flex;
+		    align-items: center;
+		    gap: 5px;
+		    font-size: 14px;
+		    font-weight: bold;
+		    color: green;
+		    position: relative;
+		}
+
+		.live-ripple {
+		    width: 12px;
+		    height: 12px;
+		    background-color: green;
+		    border-radius: 50%;
+		    position: relative;
+		}
+
+		.live-ripple::before,
+		.live-ripple::after {
+		    content: '';
+		    position: absolute;
+		    top: 50%;
+		    left: 50%;
+		    width: 100%;
+		    height: 100%;
+		    border-radius: 50%;
+		    transform: translate(-50%, -50%);
+		    background: rgba(0, 255, 0, 0.5);
+		    animation: ripple-animation 1.5s infinite ease-out;
+		}
+
+		.live-ripple::after {
+		    animation-delay: 0.75s; /* Creates the second ripple effect */
+		}
+
+		@keyframes ripple-animation {
+		    0% {
+		        width: 12px;
+		        height: 12px;
+		        opacity: 0.7;
+		    }
+		    100% {
+		        width: 30px;
+		        height: 30px;
+		        opacity: 0;
+		    }
+		}
+
+		.speed {
+		    font-weight: bold;
+		    padding: 2px 6px;
+		    border-radius: 5px;
+		}
+
+		.speed-slow {
+		    color: green;
+		}
+
+		.speed-medium {
+		    color: orange;
+		}
+
+		.speed-fast {
+		    color: red;
+		    animation: blink 1s infinite alternate; /* Blink effect for overspeeding */
+		}
+
+		.speed-unknown {
+		    color: gray;
+		}
+		.ignition-status {
+		    font-weight: bold;
+		    padding: 3px 8px;
+		    border-radius: 5px;
+		}
+
+		.ignition-status.on {
+		    color: green;
+		}
+
+		.ignition-status.off {
+		    color: red;
+		}
+
+		.ignition-status.unknown {
+		    color: gray;
+		}
+
+		/* Blinking effect for high speed */
+		@keyframes blink {
+		    0% { opacity: 1; }
+		    100% { opacity: 0.5; }
+		}
+		.clickable-icon {
+		    cursor: pointer;
+		    fill: darkblue; /* Fill the icon with dark blue */
+		    stroke: white;  /* Outline color */
+		    transition: transform 0.2s ease-in-out, fill 0.2s ease-in-out;
+		}
+
+		.clickable-icon:active {
+		    transform: scale(0.8);
+		    transition: transform 0.1s ease-in-out;
+		    fill: #ff5733; /* Change color on click */
+		}
+
+		/* Ripple Effect */
+		.ripple {
+		    position: absolute;
+		    border-radius: 50%; /* Perfect circle */
+		    background: rgba(255, 87, 51, 0.5);
+		    transform: scale(0);
+		    animation: ripple-animation 0.6s linear;
+		    pointer-events: none; /* Prevent interference */
+		}
+
+		
+
+
+		 
+		
+
+		/* Status Summary - Fix Alignment */
+		/* Fix Status Summary Position */
+		.status-summary {
+		    display: none; /* Start hidden */
+		    transition: opacity 0.3s ease-in-out;
+		}
+
+		.status-summary {
+		    position: fixed;
+		    top: 150px;  /* Adjust as per toggle button */
+		    left: 520px; /* Same as toggle button */
+		    width: auto;
+		    height: auto;
+		    background: rgba(255, 255, 255, 0.8); /* Semi-transparent */
+		    padding: 10px 15px;
+		    border-radius: 10px;
+		    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+		    z-index: 1100; /* Ensure it's above the map */
+		    display: flex;
+		    flex-wrap: wrap;
+		    justify-content: center;
+		    align-items: center;
+		    gap: 10px;
+		}
+
+		/* Status Items */
+		.status-summary p {
+		    font-size: 10px;
+		    font-weight: bold;
+		    padding: 5px 10px;
+		    text-align: center;
+		    border-radius: 5px;
+		    background: rgba(255, 255, 255, 0.5);
+		    margin: 0;
+		}
+		/* 📌 Fix Status Summary Position for Laptop Screens */
+		@media screen and (min-width: 1024px) {
+		    .status-summary {
+		        position: fixed;
+		        top: 120px; /* Adjust for better placement */
+		        left: 100px; /* Move it to the left */
+		        width: 250px; /* Set a fixed width */
+		        height: auto;
+		        background: rgba(255, 255, 255, 0.8); /* Semi-transparent */
+		        padding: 10px 15px;
+		        border-radius: 10px;
+		        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+		        z-index: 1100; /* Ensure it's above the map */
+		        display: flex;
+		        flex-direction: column;
+		        align-items: flex-start;
+		        gap: 10px;
+		    }
+		}
+
+		
+
+		/* 📌 Make It Fully Responsive */
+		@media screen and (max-width: 1024px) {
+		    .status-summary {
+		        width: 100%;
+		        left: 0; /* Full width for smaller screens */
+		        text-align: center;
+		        flex-direction: row;
+		        justify-content: space-around;
+		        padding: 10px;
+		    }
+		}
+
+		@media (max-width: 768px) {
+		    .status-summary {
+		        top: auto;   /* Remove fixed top */
+		        bottom: 20px; /* Place at bottom */
+		        left: 10px;
+		        right: 10px;
+		        width: 95%;  /* Expand width */
+		        flex-direction: row; /* Keep horizontal layout */
+		        justify-content: space-around; /* Space evenly */
+		        background: rgba(255, 255, 255, 0.8); /* Make it more visible */
+		    }
+		}
+
+		/* Status Icons */
+		.status-summary span {
+		    font-size: 18px;
+		    font-weight: bold;
+		}
+
+	
+		/* Status Count Colors */
+		#totalCount { color: black; font-weight: bold; }  /* Total */
+		#runningCount { color: #2ecc71; font-weight: bold; }  /* Green */
+		#idleCount { color: #f39c12; font-weight: bold; }  /* Orange */
+		#parkedCount { color: #3498db; font-weight: bold; }  /* Blue */
+		#lostCount { color: #e74c3c; font-weight: bold; }  /* Red */
+
+
+		/* Responsive Fix */
+		
+		.switch {
+		    position: relative;
+		    display: inline-block;
+		    width: 34px;
+		    height: 20px;
+		}
+
+		.switch input {
+		    opacity: 0;
+		    width: 0;
+		    height: 0;
+		}
+
+		.slider {
+		    position: absolute;
+		    cursor: pointer;
+		    top: 0;
+		    left: 0;
+		    right: 0;
+		    bottom: 0;
+		    background-color: #ccc;
+		    transition: .4s;
+		    border-radius: 20px;
+		}
+
+		.slider:before {
+		    position: absolute;
+		    content: "";
+		    height: 14px;
+		    width: 14px;
+		    left: 3px;
+		    bottom: 3px;
+		    background-color: white;
+		    transition: .4s;
+		    border-radius: 50%;
+		}
+
+		input:checked + .slider {
+		    background-color: #4CAF50;
+		}
+
+		input:checked + .slider:before {
+		    transform: translateX(14px);
+		}
+
+		.device-popup {
+		    position: fixed;
+		    top: 50%;
+		    left: 50%;
+		    transform: translate(-50%, -50%);
+		    background: rgba(255, 255, 255, 0.95);
+		    padding: 15px;
+		    border-radius: 10px;
+		    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+		    display: none;
+		    width: 350px;
+		    z-index: 1000;
+		}
+
+		.popup-header {
+		    display: flex;
+		    justify-content: space-between;
+		    font-weight: bold;
+		    font-size: 16px;
+		    color: darkblue;
+		    border-bottom: 2px solid #3498db;
+		    padding-bottom: 5px;
+		}
+
+		.close-btn {
+		    cursor: pointer;
+		    font-size: 18px;
+		    color: red;
+		}
+
+		.device-list {
+		    list-style: none;
+		    padding: 0;
+		    max-height: 200px;
+		    overflow-y: auto;
+		}
+
+		.device-list li {
+		    padding: 8px;
+		    border-bottom: 1px solid #ddd;
+		    font-size: 14px;
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		}
+
+		.pagination-controls {
+		    display: flex;
+		    justify-content: center;
+		    align-items: center;
+		    margin-top: 10px;
+		}
+
+		.pagination-controls button {
+		    background: #3498db;
+		    color: white;
+		    border: none;
+		    padding: 5px 10px;
+		    margin: 5px;
+		    cursor: pointer;
+		    border-radius: 5px;
+		    transition: all 0.3s;
+		}
+
+		.pagination-controls button:disabled {
+		    background:white;
+			color:white;
+		    cursor: not-allowed;
+		}
+
+		.pagination-controls .active {
+		    background: #2980b9;
+		    font-weight: bold;
+		}
+		/* Speed Alert Popup */
+		.speed-alert-popup {
+		    position: fixed;
+		     top: 355px;
+		    right: 608px;
+		    background: rgba(255, 0, 0, 0.9);
+		    color: white;
+		    padding: 15px;
+		    border-radius: 8px;
+		    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+		    z-index: 1000;
+		    display: none;
+		    animation: blink 1s infinite alternate;
+		}
+
+		/* Blinking Effect */
+		@keyframes blink {
+		    0% { opacity: 1; }
+		    100% { opacity: 0.5; }
+		}
+
+		
+		/* Settings Sidebar */
+		#settingsSidebar {
+		    position: fixed;
+		    right: -350px; /* Default hidden for desktop */
+		    top: 120px;
+		    width: 320px;
+		    height: auto;
+		    background: rgba(0, 0, 0, 0.9);
+		    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+		    transition: right 0.3s ease-in-out, bottom 0.3s ease-in-out;
+		    z-index: 1100;
+		    padding: 15px;
+			color: white;
+		    backdrop-filter: blur(10px);
+		    border-left: 1px solid rgba(0, 0, 0, 0.1);
+		    border-radius: 10px 0 0 10px;
+		    display: none; /* Hide initially */
+		}
+
+		/* Mobile Responsive */
+		@media (max-width: 768px) {
+		    #settingsSidebar {
+		        right: auto;
+		        left: 50%;
+		        bottom: -100%; /* Default hidden */
+		        width: 95%;
+		        transform: translateX(-50%);
+		        height: auto;
+		        border-radius: 10px 10px 0 0;
+		    }
+		    #settingsSidebar.active {
+		        bottom: 0; /* Slide up on mobile */
+		    }
+		}
+
+
+
+		/* Settings Header */
+		.settings-header {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		    font-size: 20px;
+		    font-weight: bold;
+		    padding-bottom: 10px;
+		    border-bottom: 2px solid #3498db;
+		}
+
+		.close-settings-btn {
+		    background: none;
+		    border: none;
+		    font-size: 20px;
+		    cursor: pointer;
+		    color: red;
+		}
+
+		/* Toggle Switch Styles */
+		.toggle-container {
+		    display: flex;
+		    align-items: center;
+		    gap: 10px;
+		    font-size: 16px;
+		    margin-top: 10px;
+		}
+
+		.toggle-switch {
+		    position: relative;
+		    width: 50px;
+		    height: 25px;
+		}
+
+		.toggle-switch input {
+		    opacity: 0;
+		    width: 0;
+		    height: 0;
+		}
+
+		.slider {
+		    position: absolute;
+		    top: 0;
+		    left: 0;
+		    right: 0;
+		    bottom: 0;
+		    background-color: #ccc;
+		    border-radius: 25px;
+		    transition: 0.3s;
+		}
+
+		.slider:before {
+		    content: "";
+		    position: absolute;
+		    height: 18px;
+		    width: 18px;
+		    left: 4px;
+		    bottom: 3.5px;
+		    background-color: white;
+		    border-radius: 50%;
+		    transition: 0.3s;
+		}
+
+		input:checked + .slider {
+		    background-color: #4caf50;
+		}
+
+		input:checked + .slider:before {
+		    transform: translateX(24px);
+		}
+		/* Modern Settings Button */
+		.settings-btn {
+		    background-color: transparent;
+		    color: white;
+		    border: none;
+		    padding: 12px 20px;
+		    font-size: 16px;
+		    font-weight: bold;
+		    border-radius: 10px;
+		    cursor: pointer;
+		    transition: all 0.3s ease-in-out;
+		    display: flex;
+		    align-items: center;
+		    gap: 8px;
+		    
+		    outline: none;
+		    position: relative;
+		    overflow: hidden;
+		}
+
+		
+		/* Active Click Effect */
+		.settings-btn:active {
+		    transform: scale(0.98);
+		}
+
+		/* Icon Animation */
+		
+		.settings-btn::after::before {
+				    content: "⚙"; /* Gear Icon */
+				    position: absolute;
+				    left: 12px;
+				    font-size: 18px;
+				    opacity: 0;
+				    transform: rotate(-90deg);
+				    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+				}
+		/* Show Icon on Hover */
+		.settings-btn:hover::before {
+		    opacity: 1;
+		    transform: rotate(0deg);
+		}
+		
+		@media (max-width: 768px) {
+		    #sidebar {
+		        width: 100%;
+		        right: -100%; /* Fully slide out */
+		        top: 0;
+		        height: 100vh;
+		        z-index: 2000;
+		        border-radius: 0;
+		    }
+
+		    #sidebar.active {
+		        right: 0; /* Slide in full screen */
+		    }
+			.leaflet-control-zoom {
+			    display: none !important;
+			}
+
+		    #toggleButton {
+		        top: 10px;
+		        right: 15%;
+		        padding: 8px 12px;
+		        font-size: 16px;
+		    }
+		}
+		.table-responsive {
+		    overflow-x: auto;
+		}
+		@media (max-width: 768px) {
+		    .status-summary {
+		        position: fixed;
+		        bottom: 0;
+		        left: 0;
+		        width: 100%;
+		        flex-wrap: wrap;
+		        justify-content: space-evenly;
+		        background: rgba(255, 255, 255, 0.95);
+		        padding: 10px 0;
+		    }
+		}
+
+		@media (max-width: 768px) {
+		    #settingsSidebar {
+		        right: auto;
+		        left: 0;
+		        bottom: -100%;
+		        width: 100%;
+		        border-radius: 10px 10px 0 0;
+		        transition: bottom 0.3s ease-in-out;
+		    }
+
+		    #settingsSidebar.active {
+		        bottom: 0;
+		    }
+		}
+
+/*popup style */
+		
+.mobile-header {
+    display: none;
+    background: #0077ff;
+    color: white;
+    padding: 12px;
+    text-align: center;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .mobile-header {
+        display: block;
+    }
+}
+   
+    </style>
+</head>
+<body>
+	<header th:insert="navigation :: navbar"></header>
+	<header class="mobile-header">Thinture GPS</header>
+
+<header><button id="toggleButton">☰</button></header>
+
+<!-- Map Container -->
+<div id="map"></div>
+
+<div class="status-summary">
+    <p><strong>Total Vehicles:</strong> 
+        <span id="totalCount" onclick="fetchDevicesByStatus('total')">0</span>
+    </p>
+    <p><strong>Running:</strong> 
+        <span id="runningCount" onclick="fetchDevicesByStatus('running')">0</span>
+    </p>
+    <p><strong>Idle:</strong> 
+        <span id="idleCount" onclick="fetchDevicesByStatus('idle')">0</span>
+    </p>
+    <p><strong>Parked:</strong> 
+        <span id="parkedCount" onclick="fetchDevicesByStatus('parked')">0</span>
+    </p>
+    <p><strong>Offline:</strong> 
+        <span id="lostCount" onclick="fetchDevicesByStatus('lost')">0</span>
+    </p>
+</div>
+<div id="speedAlertPopup" class="speed-alert-popup">
+    <span class="close-btn" onclick="closeSpeedAlert()">×</span>
+    <h4>🚨 Overspeed Alert</h4>
+    <p><strong>Vehicle No:</strong> <span id="alertDeviceID"></span></p>
+    <p><strong>Speed:</strong> <span id="alertSpeed"></span> km/h</p>
+</div>
+<label class="toggle-container">
+    <span>Enable Speed Alert</span>
+    <div class="toggle-switch">
+        <input type="checkbox" id="speedAlertToggle">
+        <span class="slider"></span>
+    </div>
+</label>
+
+<!-- Device Details Popup -->
+<div id="deviceDetailsPopup" class="device-popup">
+    <div class="popup-header">
+        <strong id="popup-title">Device Details</strong>
+        <span class="close-btn" onclick="closeDevicePopup()">×</span>
+    </div>
+    <div class="popupcontent">
+        <ul id="deviceList"></ul>
+    </div>
+	<div id="paginationControls" class="pagination-controls"></div>
+</div>
+
+
+<!-- Map Switcher Buttons -->
+<div id="mapSwitcher">
+	<button class="map-button active" data-map="osm" onclick="switchLiveMap('osm')">
+	        <i class="fas fa-map"></i> 
+	    </button>
+    <!--<button class="map-button" data-map="googleSatellite" onclick="switchLiveMap('googleSatellite')">Satellite</button> -->
+	<button class="map-button" data-map="googleRoadMap" onclick="switchLiveMap('googleRoadMap')">
+	       <i class="fas fa-road"></i> 
+	   </button>
+   <!-- <button class="map-button" data-map="googleHybrid" onclick="switchLiveMap('googleHybrid')">Hybrid</button> --> 
+   <button class="settings-btn" onclick="openSettingsSidebar()">    ⚙</button>
+   <!--
+   <button id="centerLocationBtn" class="map-button" onclick="centerToUserLocation()">
+       <i class="fas fa-crosshairs"></i>
+   </button>
+  
+  
+   <button id="darkModeToggleBtn" class="map-button" onclick="toggleDarkMode()">
+       <i class="fas fa-moon"></i>
+   </button>
+   -->
+   <button id="fullScreenBtn" class="map-button" onclick="toggleFullScreen()">
+       <i class="fas fa-expand"></i>
+   </button>
+
+</div>
+
+<!-- Status Summary -->
+<!-- Settings Sidebar -->
+<div id="settingsSidebar">
+    <div class="settings-header">
+        <h3>Settings</h3>
+        <button class="close-settings-btn" onclick="closeSettingsSidebar()">✖</button>
+    </div>
+    <div class="settings-content">
+        <label class="toggle-container">
+            <span>Enable Speed Alert</span>
+            <div class="toggle-switch">
+                <input type="checkbox" id="speedAlertToggle" >
+                <span class="slider"></span>
+            </div>
+        </label>
+        <br>
+        <label class="toggle-container">
+            <span>Enable Notifications</span>
+            <div class="toggle-switch">
+                <input type="checkbox" id="notificationToggle" checked>
+                <span class="slider"></span>
+            </div>
+        </label>
+        <br>
+       
+    </div>
+</div>
+
+
+
+
+<!-- Sidebar -->
+<div id="sidebar">
+    <h2>Tracker Details</h2>
+
+    <!-- Settings Button -->
+	
+
+
+    <!-- Settings Section (Initially Hidden) -->
+    
+
+    <!-- Search Bar -->
+    <input type="text" id="searchBar" placeholder="Search by Device ID" class="form-control mb-2">
+
+    <!-- Table -->
+	<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+				<th>Speed alert</th>
+                <th>Status</th>
+                <th>Vehicle No</th>
+                <th>Last Upload</th>
+                <th>Select Device</th>
+            </tr>
+        </thead>
+        <tbody id="trackerTableBody"></tbody>
+    </table>
+
+    <!-- Pagination Controls -->
+    <div id="paginationControls" class="pagination-controls"></div>
+</div>
+</div>
+<!-- Popup Overlay -->
+<div id="popupOverlay" class="popup-overlay" onclick="closePopup()"></div>
+
+<!-- Vehicle Details Modal -->
+<div id="vehicleDetailsModal" class="popup-container">
+    <div class="popup-header">
+        <strong>Vehicle Details</strong>
+        <span class="close-btn" onclick="closePopup()">×</span>
+    </div>
+    <div class="popup-content">
+        <table id="vehicleDetailsTable" class="popup-table">
+			
+
+            <tr><td><strong>Vehicle No:</strong></td><td id="popup-deviceID">Loading...</td></tr>
+			<tr><td><strong>Total KM:</strong></td><td id="popup-totalDistance">Loading...</td></tr>
+            <tr><td><strong>Owner:</strong></td><td id="popup-ownerName">Loading...</td></tr>
+            <tr><td><strong>Model:</strong></td><td id="popup-model">Loading...</td></tr>
+			<tr><td><strong>SIM Number:</strong></td><td id="popup-simNumber">Loading...</td></tr>
+
+            <tr><td><strong>Speed:</strong></td><td id="popup-speed">Loading...</td></tr>
+            <tr><td><strong>Ignition:</strong></td><td id="popup-ignition">Loading...</td></tr>
+            <tr><td><strong>Location:</strong></td><td id="popup-location">Loading...</td></tr>
+            <tr><td><strong>Last Update:</strong></td><td id="popup-timestamp">Loading...</td></tr>
+        </table>
+    </div>
+</div>
+
+<script>
+	class VehicleTracker {
+	    constructor(mapElementId) {
+	        // Ensure map is initialized
+	        const mapElement = document.getElementById(mapElementId);
+	        if (!mapElement) {
+	            console.error("❌ Map element not found! Make sure the ID is correct.");
+	            return;
+	        }
+
+			this.map = L.map(mapElementId, {
+			    zoomControl: false  // ← disables the + / – buttons
+			}).setView([13.07757, 77.55928], 10);
+
+	        if (!this.map) {
+	            console.error("❌ Map failed to initialize.");
+	            return;
+	        }
+
+	        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	            attribution: ''
+	        }).addTo(this.map);
+
+	        this.markers = {};
+
+	        // Ensure map is ready before calling update
+	        setTimeout(() => this.fetchAndUpdateVehicleData(), 1000);
+	        this.initWebSocket();
+	    }
+	
+
+
+		fetchAndUpdateVehicleData() {
+			fetch('/api/vehicle/last/latests-locations/all')
+			    .then(response => response.json())
+			    .then(data => {
+			        data.forEach(vehicle => {
+			            vehicle.isLive = false; // Default to false
+
+			            // If the data is recent (e.g., within 1 minute), mark it as live
+			            const lastUpdated = new Date(vehicle.timestamp);
+			            const now = new Date();
+			            const diffMinutes = (now - lastUpdated) / (1000 * 60);
+
+			            if (diffMinutes <= 1) {
+			                vehicle.isLive = true;
+			            }
+
+			            window.vehicleTracker.createOrUpdateMarker(vehicle, vehicle.isLive);
+			        });
+			    })
+			    .catch(error => console.error('🚨 Error fetching vehicle data:', error));
+}
+
+
+        updateMapMarkers(vehicles) {
+            vehicles.forEach(vehicle => this.createOrUpdateMarker(vehicle));
+        }
+		
+		createOrUpdateMarker(vehicle, isLive) {
+		    if (!this.map) {
+		        console.error("❌ Map object is NULL. Cannot create marker.");
+		        return;
+		    }
+
+		    function formatTimestamp(timestamp) {
+		        if (!timestamp) return "N/A";
+
+		        let dateObj = new Date(timestamp);
+
+		        return dateObj.toLocaleString(undefined, {  
+		            year: 'numeric',
+		            month: '2-digit',
+		            day: '2-digit',
+		            hour: '2-digit',
+		            minute: '2-digit',
+		            second: '2-digit',
+		            hour12: false  
+		        });
+		    }
+
+		    const deviceId = vehicle.deviceId || vehicle.deviceID || "Unknown";
+		    const latitude = parseFloat(vehicle.latitude);
+		    const longitude = parseFloat(vehicle.longitude);
+		    const timestamp = vehicle.timestamp ? new Date(vehicle.timestamp) : null;
+		    const course = parseFloat(vehicle.course) || 0; 
+
+		    if (isNaN(latitude) || isNaN(longitude)) {
+		        console.error(`❌ Invalid coordinates for ${deviceId}: (${latitude}, ${longitude})`);
+		        return;
+		    }
+
+		    const speed = vehicle.speed || 0;
+		    const ignitionStatus = vehicle.ignition 
+		        ? vehicle.ignition.toUpperCase() === "IGON" 
+		            ? "ON" 
+		            : vehicle.ignition.toUpperCase() === "IGOFF" 
+		                ? "OFF" 
+		                : "Unknown"
+		        : "Unknown";
+		    const vehicleStatus = vehicle.vehicleStatus || "Unknown";
+
+		    let formattedDateTime = formatTimestamp(vehicle.timestamp);
+
+		    // ✅ Determine LIVE status based on time
+		    const currentTime = new Date();
+		    let timeDifferenceSeconds = (currentTime - timestamp) / 1000; 
+		    let isLiveNow = timeDifferenceSeconds <= 5; 
+
+		    let liveIndicator = isLiveNow
+		        ? `<span class="live-indicator"><span class="live-ripple"></span>  LIVE</span>`
+		        : `<span class="status-badge last-known">🔴 Last Received: ${formattedDateTime}</span>`;
+
+		    // ✅ Get Rotating Vehicle Icon (Updated Immediately)
+		    const vehicleIcon = this.getVehicleIcon(course, vehicle.ignition, vehicleStatus);
+
+		    // ✅ Generate Popup Content
+		    const popupContent = `
+		        <div class="vehicle-popup">
+		            ${liveIndicator}
+		            <p><b>Vehicle No:</b> ${deviceId}</p>
+		            <p><b>📍 Latitude:</b> ${latitude.toFixed(5)}</p>
+		            <p><b>📍 Longitude:</b> ${longitude.toFixed(5)}</p>
+		            <p><b>🚀 Speed:</b> <span class="speed ${this.getSpeedClass(speed)}">${speed} km/h</span></p>
+		            <p><b>🔑 Ignition:</b> 
+		                <span class="ignition-status ${ignitionStatus.toLowerCase()}">${ignitionStatus}</span>
+		            </p>
+		            <p><b>✅ Status:</b> <span class="status ${this.getStatusClass(vehicleStatus)}">${vehicleStatus}</span></p>
+		            <div class="popup-actions">
+		                <button class="details-btn" onclick="fetchVehicleDetails('${deviceId}')">📋 Details</button>
+		                <button class="playback-btn" onclick="navigateToReplay('${deviceId}')">⏮ Playback</button>
+		            </div>
+		        </div>
+		    `;
+
+		    // ✅ Directly move marker without animation
+		    if (this.markers[deviceId]) {
+		        let marker = this.markers[deviceId];
+		        marker.setLatLng([latitude, longitude]); // Directly update position
+		        marker.setIcon(vehicleIcon).bindPopup(popupContent);
+		    } else {
+		        this.markers[deviceId] = L.marker([latitude, longitude], { icon: vehicleIcon })
+		            .bindPopup(popupContent)
+		            .addTo(this.map);
+		    }
+		}
+
+
+
+		// Helper function for speed color classes
+		getSpeedClass(speed) {
+		    if (speed < 2) return "speed-low";
+		    if (speed < 30) return "speed-medium";
+		    return "speed-high";
+		}
+
+		// Helper function for vehicle status classes
+		getStatusClass(status) {
+		    switch (status.toLowerCase()) {
+		        case "online": return "status-online";
+		        case "offline": return "status-offline";
+		        case "idle": return "status-idle";
+		        case "moving": return "status-moving";
+		        default: return "status-unknown";
+		    }
+		}
+
+
+
+
+		getVehicleIcon(course, ignition, vehicleStatus) {
+		    const basePath = '/THINTURE_IMAGE/car';
+		    let color = 'green'; // Default color
+
+		    // ✅ Change color based on vehicle status
+		    switch (vehicleStatus.toUpperCase()) {
+		        case 'PARKED': case 'IDLE': color = 'orange'; break;
+		        case 'RUNNING': color = 'green'; break;
+		        case 'OFFLINE': case 'CONNECTION LOST': color = 'red'; break;
+		    }
+
+		    console.log(`🚗 Vehicle Status: ${vehicleStatus}, Color Set To: ${color}`);
+
+		    const imagePath = `${basePath}/${color}/car0.png`;
+
+		    return L.divIcon({
+		        html: `<img src="${imagePath}" 
+		                    style="transform: rotate(${course}deg); width: 35px; height: 35px;">`,  // ✅ Instantly Rotates
+		        className: 'custom-icon',
+		        iconSize: [35, 35],
+		        iconAnchor: [17, 17],  // Center the icon
+		        popupAnchor: [0, -15]
+		    });
+		}
+
+
+
+
+
+		
+
+
+		      
+
+
+
+/*
+		getPopupContent(vehicle, isLiveNow, lastUpdated) {
+		    const lastUpdatedTime = lastUpdated ? lastUpdated.toLocaleString() : "N/A";
+
+		    const statusIndicator = isLiveNow
+		        ? `<span class="status-badge live">🟢 LIVE</span>`
+		        : `<span class="status-badge offline">🔴 Last Update</span>`;
+
+		    const ignitionIcon = vehicle.ignition === "IGon" 
+		        ? `<i class="fas fa-key ignition-on"></i> <span class="ignition-text">On</span>` 
+		        : `<i class="fas fa-power-off ignition-off"></i> <span class="ignition-text">Off</span>`;
+
+		    const speedIcon = vehicle.speed > 0 
+		        ? `<i class="fas fa-tachometer-alt speed-icon"></i> ${vehicle.speed} km/h`
+		        : `<i class="fas fa-car-side parked-icon"></i> Parked`;
+
+		    const address = vehicle.address || "Fetching address...";
+
+		    return `
+		        <div class="popup-container">
+		            <div class="popup-header">
+		                <span class="popup-title">Vehicle Details</span>
+		                <span class="close-btn" onclick="closePopup()">×</span>
+		            </div>
+		            <div class="popup-content">
+		                ${statusIndicator}
+		                <div class="popup-item">
+		                    <i class="fas fa-car"></i> <strong>Device ID:</strong> ${vehicle.deviceId}
+		                </div>
+		                <div class="popup-item">
+		                    ${ignitionIcon}
+		                </div>
+		                <div class="popup-item">
+		                    ${speedIcon}
+		                </div>
+		                <div class="popup-item">
+		                    <i class="fas fa-map-marker-alt"></i> <strong>Address:</strong> ${address}
+		                </div>
+		                ${!isLiveNow ? `<div class="popup-item"><i class="fas fa-clock"></i> <strong>Last Updated:</strong> ${lastUpdatedTime}</div>` : ''}
+		                <div class="popup-buttons">
+		                    <button class="popup-btn replay" onclick="navigateToReplay('${encodeURIComponent(vehicle.deviceId)}')">
+		                        <i class="fas fa-history"></i> Playback
+		                    </button>
+							<button style="padding: 5px 10px; background-color: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer;"
+																		    onclick="fetchVehicleDetails(this.getAttribute('data-deviceid'))"
+																		    data-deviceid="${deviceId}">
+																		    Details
+																		</button>
+		                </div>
+		            </div>
+		        </div>
+		    `;
+		}
+
+
+*/
+
+updateSidebarTable(vehicles) {
+    const tableBody = document.getElementById("trackerTableBody");
+    tableBody.innerHTML = vehicles.map(v => {
+        if (!v.timestamp) return `<tr><td colspan="5">N/A</td></tr>`; // Handle missing timestamps
+
+        // Convert timestamp to UAE Time Zone (Asia/Dubai)
+        const dateObj = new Date(v.timestamp).toLocaleString('en-US', { 
+            timeZone: 'Asia/Dubai', // ✅ Force UAE Time
+            year: 'numeric', 
+            month: '2-digit', 
+            day: '2-digit', 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit',
+            hour12: false  // 24-hour format
+        });
+
+        // Extract date and time components manually
+        const [month, day, year, hour, minute, second] = dateObj.match(/\d+/g).map(num => num.padStart(2, '0')); 
+
+        // Format as 'YYYY-MM-DD HH:mm:ss'
+        const formattedDate = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+
+        // ✅ Retrieve alert status for the vehicle from localStorage
+        let isChecked = localStorage.getItem(`alert_${v.deviceId}`) === "enabled" ? "checked" : "";
+
+        return `
+            <tr>
+				<td>
+				                    <label class="switch">
+				                        <input type="checkbox" id="alert_${v.deviceId}" ${isChecked} onchange="toggleVehicleAlert('${v.deviceId}')">
+				                        <span class="slider"></span>
+				                    </label>
+				                </td>
+                <td>${v.vehicleStatus}</td>
+                <td>${v.deviceID || v.deviceId}</td>  <!-- Ensure compatibility -->
+                <td>${formattedDate}</td> <!-- Formatted UAE Time -->
+				<td>
+				    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
+				         fill="none" stroke="#ff5733" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+				         class="clickable-icon"
+				         onclick="zoomEffect(event, '${v.deviceId}', ${v.latitude}, ${v.longitude})">
+				        <!-- Map Pin -->
+				        <path d="M12 2C8.13 2 5 5.13 5 9c0 5 7 11 7 11s7-6 7-11c0-3.87-3.13-7-7-7z"></path>
+				        <circle cx="12" cy="9" r="3"></circle>
+				    </svg>
+				</td>
+            </tr>`;
+    }).join('');
+}
+
+
+
+
+
+zoomToVehicle(deviceId, latitude, longitude) {
+    if (!this.map) {
+        console.error("❌ Map not initialized.");
+        return;
+    }
+
+    if (!latitude || !longitude) {
+        console.error(`❌ Missing coordinates for device ${deviceId}`);
+        return;
+    }
+
+    const maxZoom = this.map.getMaxZoom() || 20;
+    this.map.setView([latitude, longitude], maxZoom);
+
+    // Hide other markers
+    Object.entries(this.markers).forEach(([id, marker]) => {
+        if (id !== deviceId && marker._icon) {
+            marker._icon.style.display = "none"; // Hide
+        }
+    });
+
+    const marker = this.markers[deviceId];
+    if (marker) {
+        marker.openPopup();
+        const icon = marker._icon;
+        if (icon) {
+            icon.classList.add("highlight-marker");
+
+            setTimeout(() => {
+                icon.classList.remove("highlight-marker");
+
+                // Show all markers again after highlight
+                Object.values(this.markers).forEach(m => {
+                    if (m._icon) m._icon.style.display = "";
+                });
+            }, 8000);
+        }
+    }
+}
+
+
+
+
+		
+
+		initWebSocket() {
+		    setTimeout(() => {
+		        const socket = new SockJS('/gs-guide-websocket');
+		        const stompClient = Stomp.over(socket);
+
+		        stompClient.connect({}, () => {
+		            console.log('✅ WebSocket connected.');
+		            stompClient.subscribe('/topic/location-updates', (message) => {
+		                try {
+		                    const vehicleData = JSON.parse(message.body);
+		                    if (!vehicleData) {
+		                        console.warn("⚠ WebSocket received empty message.");
+		                        return;
+		                    }
+		                    this.createOrUpdateMarker(vehicleData, true);
+		                } catch (error) {
+		                    console.error('🚨 WebSocket message error:', error);
+		                }
+		            });
+		        }, (error) => {
+		            console.error('❌ WebSocket connection error:', error);
+		            setTimeout(() => this.initWebSocket(), 5000);
+		        });
+		    }, 2000);
+		}
+
+			}
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        window.vehicleTracker = new VehicleTracker('map');
+        document.getElementById("toggleButton").addEventListener("click", () => {});
+    });
+
+    function navigateToReplay(deviceId) {
+        window.location.href = `/replay?deviceId=${deviceId}`;
+    }
+	
+	
+	class MyWebSocketHandler {
+	    reconnectInterval = 5000; // Corrected: Move inside class
+
+	    constructor() {
+	        this.initWebSocket();
+	    }
+		}
+		
+		
+		// Function to fetch and update vehicle data every 5 seconds
+		function autoRefreshData() {
+		    fetch('/api/vehicle/last/latests-locations/all')
+		        .then(response => response.json())
+		        .then(data => {
+		            const currentTime = new Date();
+
+		            // Status Counters
+		            let totalCount = data.length;
+		            let runningCount = 0, idleCount = 0, parkedCount = 0, lostCount = 0;
+
+		            data.forEach(vehicle => {
+		                if (vehicle.timestamp) {
+		                    const lastUpdated = new Date(vehicle.timestamp);
+		                    const diffMinutes = (currentTime - lastUpdated) / (1000 * 60);
+
+		                    if (vehicle.vehicleStatus === "PARKED" && diffMinutes > 45 ||
+		                        vehicle.vehicleStatus !== "PARKED" && diffMinutes > 1 ||
+		                        vehicle.vehicleStatus === "IDLE" && diffMinutes > 5) {
+		                        vehicle.vehicleStatus = "Offline"; // ✅ Mark as lost if outdated
+		                    }
+		                } else {
+		                    vehicle.vehicleStatus = "Offline";
+		                }
+
+		                // Count based on status
+		                switch (vehicle.vehicleStatus) {
+		                    case "RUNNING": runningCount++; break;
+		                    case "IDLE": idleCount++; break;
+		                    case "PARKED": parkedCount++; break;
+		                    case "Offline": 
+		                    case "Lost":
+		                        lostCount++; break;
+		                }
+		            });
+
+		            // ✅ Update UI counts
+		            document.getElementById("totalCount").textContent = totalCount;
+		            document.getElementById("runningCount").textContent = runningCount;
+		            document.getElementById("idleCount").textContent = idleCount;
+		            document.getElementById("parkedCount").textContent = parkedCount;
+		            document.getElementById("lostCount").textContent = lostCount; // ✅ Update lost count
+
+		            // ✅ Debugging log
+		            console.log(`🚀 Total: ${totalCount}, Running: ${runningCount}, Idle: ${idleCount}, Parked: ${parkedCount}, o: ${lostCount}`);
+
+		            // Update map markers
+		            window.vehicleTracker.updateMapMarkers(data);
+		            // Update sidebar table
+		            window.vehicleTracker.updateSidebarTable(data);
+		        })
+		        .catch(err => console.error('🚨 Error fetching vehicle data:', err));
+		}
+
+		// ✅ Run the function every 8 seconds
+		document.addEventListener('DOMContentLoaded', () => {
+		    autoRefreshData();
+		    setInterval(autoRefreshData, 8000);
+		});
+
+
+</script>
+
+<script>
+	function navigateToReplay(deviceId) {
+	    if (!deviceId) {
+	        alert("Device ID is required to navigate to the replay page.");
+	        return;
+	    }
+	    window.location.href = `/playback?deviceId=${encodeURIComponent(deviceId)}`;
+	}
+
+</script>
+
+
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+	    fetch("/api/details")
+	        .then(response => response.json())
+	        .then(data => {
+	            console.log("✅ Received Data:", data);
+
+	            if (!data || data.length === 0) {
+	                console.error("❌ No vehicles found");
+	                document.getElementById("vehiclesTable").innerHTML = "<tr><td colspan='8'>No Data Available</td></tr>";
+	                return;
+	            }
+
+	            let tableContent = "";
+	            data.forEach(vehicle => {
+	                tableContent += `
+	                    <tr>
+	                        <td>${vehicle.deviceID || "N/A"}</td>
+	                        <td>${vehicle.vehicleNumber || "N/A"}</td>
+	                        <td>${vehicle.imei || "N/A"}</td>
+	                        <td>${vehicle.engineNumber || "N/A"}</td>
+	                        <td>${vehicle.model || "N/A"}</td>
+	                        <td>${vehicle.ownerName || "N/A"}</td>
+	                        <td>${vehicle.vehicleType || "N/A"}</td>
+	                        <td>
+	                            <button onclick="showVehicleDetails('${vehicle.deviceID}', event)">Details</button>
+	                        </td>
+	                    </tr>`;
+	            });
+
+	            document.getElementById("vehiclesTable").innerHTML = tableContent;
+	        })
+	        .catch(error => console.error("🚨 Error fetching vehicle list:", error));
+	});
+
+	// ✅ Function to fetch and display vehicle details in a popup
+	async function showVehicleDetails(deviceID, event) {
+	    if (!deviceID) {
+	        console.error("❌ Device ID is missing!");
+	        alert("❌ No Device ID found!");
+	        return;
+	    }
+
+	    console.log("🚀 Fetching details for Device ID:", deviceID);
+
+	    try {
+	        const response = await fetch(`/api/details/${deviceID}`);
+	        if (!response.ok) {
+	            throw new Error("❌ Server returned error " + response.status);
+	        }
+
+	        const vehicle = await response.json();
+	        console.log("📡 Vehicle Details Received:", vehicle);
+
+	        if (!vehicle || Object.keys(vehicle).length === 0) {
+	            alert("❌ No data found for this vehicle!");
+	            return;
+	        }
+
+	        // Check if popup exists, create if not
+	        let detailsPopup = document.getElementById("vehicle-details-popup");
+	        if (!detailsPopup) {
+	            detailsPopup = document.createElement("div");
+	            detailsPopup.id = "vehicle-details-popup";
+	            document.body.appendChild(detailsPopup);
+	        }
+
+	        // Populate popup with vehicle details
+	        detailsPopup.innerHTML = `
+	            <div class="popup-header">
+	                <strong>Vehicle Details</strong>
+	                <span class="close-btn" onclick="closeVehiclePopup()">×</span>
+	            </div>
+	            <div class="popup-content">
+	                <strong>Owner:</strong> ${vehicle.ownerName || "N/A"} <br>
+	                <strong>Vehicle Number:</strong> ${vehicle.vehicleNumber || "N/A"} <br>
+	                <strong>Total Distance:</strong> ${vehicle.totalDistance || "N/A"} km <br>
+	                <strong>Device ID:</strong> ${vehicle.deviceID || "N/A"} <br>
+	                <strong>Driver RFID:</strong> ${vehicle.driverRFID || "N/A"} <br>
+	                <strong>GSM Strength:</strong> ${vehicle.gsmStrength || "N/A"} <br>
+	                <strong>IMEI:</strong> ${vehicle.imei || "N/A"} <br>
+	                <strong>Vehicle Model:</strong> ${vehicle.model || "N/A"} <br>
+	            </div>
+	        `;
+
+	        // Show popup near clicked button
+	        detailsPopup.style.display = "block";
+	        const button = event.target;
+	        const rect = button.getBoundingClientRect();
+	        detailsPopup.style.top = `${rect.top + window.scrollY + 40}px`;
+	        detailsPopup.style.left = `${rect.left + window.scrollX}px`;
+
+	        // Add event listener to close when clicking outside
+	        setTimeout(() => {
+	            document.addEventListener("click", outsideClickListener);
+	        }, 100);
+
+	    } catch (error) {
+	        console.error("🚨 Error fetching vehicle details:", error);
+	        alert("⚠️ Error fetching data. Check console for details.");
+	    }
+	}
+
+	// Function to close the popup
+	function closeVehiclePopup() {
+	    let detailsPopup = document.getElementById("vehicle-details-popup");
+	    if (detailsPopup) {
+	        detailsPopup.style.display = "none";
+	    }
+	}
+
+	// Click outside listener to close popup
+	function outsideClickListener(event) {
+	    let detailsPopup = document.getElementById("vehicle-details-popup");
+	    if (detailsPopup && !detailsPopup.contains(event.target)) {
+	        closeVehiclePopup();
+	        document.removeEventListener("click", outsideClickListener);
+	    }
+	}
+
+	// Function to close the popup
+	function closeVehiclePopup() {
+	    const popup = document.getElementById("vehicle-details-popup");
+	    if (popup) {
+	        popup.style.display = "none";
+	        document.removeEventListener("click", outsideClickListener); // Remove event listener
+	    }
+	}
+
+	// Function to detect outside click
+	function outsideClickListener(event) {
+	    const popup = document.getElementById("vehicle-details-popup");
+	    if (popup && event.target !== popup && !popup.contains(event.target)) {
+	        closeVehiclePopup();
+	    }
+	}
+
+
+	
+	document.getElementById("searchBar").addEventListener("input", function() {
+	    const searchValue = this.value.toLowerCase();
+	    const rows = document.querySelectorAll("#trackerTableBody tr");
+
+	    rows.forEach(row => {
+	        const deviceId = row.cells[1]?.textContent.toLowerCase() || ""; // Assuming device ID is in the 2nd column (index 1)
+	        if (deviceId.includes(searchValue)) {
+	            row.style.display = "";
+	        } else {
+	            row.style.display = "none";
+	        }
+	    });
+	});
+	function playSpeedAlert(deviceId, speed) {
+	    const globalAlertEnabled = localStorage.getItem("speedAlertEnabled") === "true";
+	    const vehicleAlertEnabled = localStorage.getItem(`alert_${deviceId}`) === "enabled";
+
+	    if (!globalAlertEnabled || !vehicleAlertEnabled) {
+	        console.log(`🔇 Speed alert skipped for ${deviceId} (Global: ${globalAlertEnabled}, Vehicle: ${vehicleAlertEnabled})`);
+	        return;
+	    }
+
+		let alertSound = new Audio('/THINTURE_IMAGE/alertsspeed.mp3'); 
+
+		function playSpeedAlert(deviceId, speed) {
+		    const globalAlertEnabled = localStorage.getItem("speedAlertEnabled") === "true";
+		    const vehicleAlertEnabled = localStorage.getItem(`alert_${deviceId}`) === "enabled";
+
+		    if (!globalAlertEnabled || !vehicleAlertEnabled) {
+		        console.log(`🔇 Speed alert skipped for ${deviceId} (Global: ${globalAlertEnabled}, Vehicle: ${vehicleAlertEnabled})`);
+		        return;
+		    }
+
+		    alertSound.currentTime = 0; // Reset sound
+		    alertSound.play().then(() => {
+		        console.log("🔊 Speed alert sound playing.");
+
+		        // Stop sound after 5 seconds
+		        setTimeout(() => {
+		            alertSound.pause();
+		            alertSound.currentTime = 0;
+		            console.log("🔇 Speed alert sound stopped.");
+		        }, 5000);
+
+		    }).catch(error => {
+		        console.error("🚨 Audio play failed. User interaction may be required:", error);
+
+		        let playButton = document.createElement("button");
+		        playButton.innerText = "🔊 Enable Speed Alert Sound";
+		        playButton.style.position = "fixed";
+		        playButton.style.bottom = "20px";
+		        playButton.style.right = "20px";
+		        playButton.style.zIndex = "1000";
+		        playButton.style.padding = "10px 15px";
+		        playButton.style.background = "#ff0000";
+		        playButton.style.color = "#fff";
+		        playButton.style.border = "none";
+		        playButton.style.borderRadius = "5px";
+		        playButton.style.cursor = "pointer";
+
+		        document.body.appendChild(playButton);
+
+		        playButton.addEventListener("click", () => {
+		            alertSound.play();
+		            setTimeout(() => {
+		                alertSound.pause();
+		                alertSound.currentTime = 0;
+		            }, 5000);
+		            playButton.remove();
+		        });
+		    });
+
+		    showSpeedAlert(deviceId, speed);
+		}
+
+	
+	
+	
+	function autoRefreshSidebar() {
+			    fetch('/api/vehicle/last/latests-locations/all')
+			        .then(response => response.json())
+			        .then(data => {
+			            updateSidebarTable(data);
+			        })
+			        .catch(error => console.error('Error fetching vehicle data:', error));
+			
+
+			// Set interval to refresh sidebar table every 30 seconds
+			setInterval(autoRefreshSidebar, 30000);
+
+			// Run it once on page load
+			document.addEventListener('DOMContentLoaded', autoRefreshSidebar);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+</script>
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+	    let currentLayer;
+	    let mapLayers = {
+	        "osm": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	            attribution: '&copy; OpenStreetMap contributors'
+	        }),
+	        "googleSatellite": L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+	            attribution: '&copy; Google Satellite'
+	        }),
+	        "googleRoadMap": L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+	            attribution: '&copy; Google '
+	        }),
+	        "googleHybrid": L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+	            attribution: '&copy; Google Hybrid'
+	        })
+	    };
+
+	    function switchLiveMap(mapType) {
+	        if (currentLayer) {
+	            window.vehicleTracker.map.removeLayer(currentLayer);
+	        }
+	        currentLayer = mapLayers[mapType];
+	        currentLayer.addTo(window.vehicleTracker.map);
+
+	        // Update active button styling
+	        document.querySelectorAll(".map-button").forEach(btn => btn.classList.remove("active"));
+	        document.querySelector(`.map-button[data-map="${mapType}"]`).classList.add("active");
+	    }
+
+	    // Initialize map with OSM by default
+	    currentLayer = mapLayers["osm"];
+	    currentLayer.addTo(window.vehicleTracker.map);
+
+	    // Assign switching function globally
+	    window.switchLiveMap = switchLiveMap;
+	});
+
+	
+	document.addEventListener('DOMContentLoaded', () => {
+	    const sidebar = document.getElementById("sidebar");
+	    const toggleButton = document.getElementById("toggleButton");
+
+	    toggleButton.addEventListener("click", function() {
+	        sidebar.classList.toggle("active");
+	        toggleButton.classList.toggle("active");
+	    });
+	});
+
+	// ✅ Fetch Vehicle Details & Show Popup
+	function fetchVehicleDetails(deviceID) {
+	    if (!deviceID) {
+	        console.error("❌ Device ID is missing!");
+	        alert("❌ No Device ID found!");
+	        return;
+	    }
+
+	    console.log("🚀 Fetching details for Device ID:", deviceID);
+
+	    fetch(`/api/details/${deviceID}`)
+	        .then(response => {
+	            console.log("📡 Response Status:", response.status);
+	            if (!response.ok) {
+	                throw new Error("❌ Server returned error " + response.status);
+	            }
+	            return response.json();
+	        })
+	        .then(vehicle => {
+	            console.log("📡 Vehicle Details Received:", vehicle);
+
+	            if (!vehicle || Object.keys(vehicle).length === 0) {
+	                alert("❌ No data found for this vehicle!");
+	                return;
+	            }
+
+	            // ✅ Populate Popup Data
+	            document.getElementById("popup-deviceID").textContent = vehicle.simNumber || "N/A";
+	            document.getElementById("popup-ownerName").textContent = vehicle.ownerName || "N/A";
+	            document.getElementById("popup-model").textContent = vehicle.model || "N/A";
+				
+	            document.getElementById("popup-speed").textContent = vehicle.speed ? vehicle.speed + " km/h" : "N/A";
+	            document.getElementById("popup-ignition").textContent = vehicle.ignition === "IGon" ? "ON" : "OFF";
+	            document.getElementById("popup-location").textContent = vehicle.address || "Unknown";
+	            document.getElementById("popup-timestamp").textContent = new Date(vehicle.timestamp).toLocaleString();
+
+	            // ✅ Show Popup
+	            document.getElementById("popupOverlay").style.display = "block";
+	            document.getElementById("vehicleDetailsModal").classList.add("show");
+	            console.log("✅ Popup Opened!");
+	        })
+	        .catch(error => {
+	            console.error("🚨 Error fetching vehicle details:", error);
+	            alert("⚠️ Error fetching data. Check console for details.");
+	        });
+	}
+
+	// ✅ Function to Close Popup
+	function closePopup() {
+	    document.getElementById("popupOverlay").style.display = "none";
+	    document.getElementById("vehicleDetailsModal").classList.remove("show");
+	}
+
+	document.addEventListener("DOMContentLoaded", function () {
+	    const toggleButton = document.getElementById("toggleButton");
+	    const statusSummary = document.querySelector(".status-summary");
+
+	    // Initially hide the status summary
+	    statusSummary.style.display = "none";
+
+	    toggleButton.addEventListener("click", function () {
+	        // Toggle visibility of status summary
+	        if (statusSummary.style.display === "none") {
+	            statusSummary.style.display = "flex"; // Show
+	        } else {
+	            statusSummary.style.display = "none"; // Hide
+	        }
+	    });
+	});
+	let currentPage = 1;
+	const itemsPerPage = 10;
+
+	async function fetchDevicesByStatus(status, page = 1) {
+	    const popup = document.getElementById("deviceDetailsPopup");
+	    const title = document.getElementById("popup-title");
+	    const deviceList = document.getElementById("deviceList");
+
+	    title.textContent = `${status.toUpperCase()} Devices`;
+	    deviceList.innerHTML = "<li>Loading...</li>";
+
+	    try {
+	        console.log("Fetching data from /api/vehicle/last/latests-locations/all...");
+	        const response = await fetch("/api/vehicle/last/latests-locations/all");
+	        console.log("API Response Status:", response.status);
+	        if (!response.ok) throw new Error(`Server Error: ${response.status}`);
+
+	        const devices = await response.json();
+	        console.log("API Data Received:", devices);
+	        deviceList.innerHTML = "";
+
+	        if (!Array.isArray(devices)) {
+	            throw new Error("Invalid API response format. Expected an array.");
+	        }
+
+	        const currentTime = new Date();
+	        let filteredDevices = devices.map(device => {
+	            if (device.timestamp) {
+	                const lastUpdated = new Date(device.timestamp);
+	                const diffMinutes = (currentTime - lastUpdated) / (1000 * 60);
+	                if ((device.vehicleStatus === "PARKED" && diffMinutes > 45) ||
+	                    (device.vehicleStatus !== "PARKED" && diffMinutes > 1) ||
+	                    (device.vehicleStatus === "IDLE" && diffMinutes > 5)) {
+	                    device.vehicleStatus = "Offline";
+	                }
+	            } else {
+	                device.vehicleStatus = "Offline";
+	            }
+	            return device;
+	        });
+
+	        switch (status) {
+	            case "running":
+	                filteredDevices = filteredDevices.filter(d => d.vehicleStatus === "RUNNING");
+	                break;
+	            case "idle":
+	                filteredDevices = filteredDevices.filter(d => d.vehicleStatus === "IDLE");
+	                break;
+	            case "parked":
+	                filteredDevices = filteredDevices.filter(d => d.vehicleStatus === "PARKED");
+	                break;
+	            case "lost":
+	                filteredDevices = filteredDevices.filter(d => d.vehicleStatus === "Offline");
+	                console.log("🚨  Offline Devices:", filteredDevices);
+	                break;
+	            default:
+	                break;
+	        }
+
+	        console.log(`Devices matching status '${status}':`, filteredDevices);
+	        const totalPages = Math.ceil(filteredDevices.length / itemsPerPage);
+	        currentPage = Math.max(1, Math.min(page, totalPages));
+	        const paginatedDevices = filteredDevices.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+	        if (paginatedDevices.length > 0) {
+	            paginatedDevices.forEach(device => {
+	                const li = document.createElement("li");
+	                li.innerHTML = `<strong>${device.deviceId || device.deviceID || "N/A"}</strong> - ${device.vehicleStatus}`;
+	                deviceList.appendChild(li);
+	            });
+	        } else {
+	            deviceList.innerHTML = "<li>No devices available</li>";
+	        }
+
+	        const paginationControls = document.getElementById("paginationControls");
+	        paginationControls.innerHTML = `
+	            <button onclick="fetchDevicesByStatus('${status}', ${currentPage - 1})" ${currentPage === 1 ? "disabled" : ""}>⬅ Previous</button>
+	            <span>Page ${currentPage} of ${totalPages}</span>
+	            <button onclick="fetchDevicesByStatus('${status}', ${currentPage + 1})" ${currentPage === totalPages ? "disabled" : ""}>Next ➡</button>
+	        `;
+
+	        popup.style.display = "block";
+	    } catch (error) {
+	        console.error("🚨 Error fetching device data:", error);
+	        deviceList.innerHTML = `<li>Error: ${error.message}</li>`;
+	    }
+	}
+
+	function closeDevicePopup() {
+	    const popup = document.getElementById("deviceDetailsPopup");
+	    if (popup) {
+	        popup.style.display = "none";
+	    }
+	}
+	// Function to show speed alert popup
+	
+
+	// Function to close the alert manually
+	function closeSpeedAlert() {
+	    document.getElementById("speedAlertPopup").style.display = "none";
+	}
+
+	// Function to determine speed class based on speed range
+	
+	
+	function openSettingsSidebar() {
+	    let sidebar = document.getElementById("settingsSidebar");
+
+	    // Show sidebar when button is clicked
+	    sidebar.style.display = "block"; 
+
+	    if (window.innerWidth < 768) {
+	        // Mobile: Slide up
+	        sidebar.style.bottom = "0";
+	    } else {
+	        // Desktop: Slide in from right
+	        sidebar.style.right = "0";
+	    }
+
+	    sidebar.classList.add("active");
+	}
+
+	function closeSettingsSidebar() {
+	    let sidebar = document.getElementById("settingsSidebar");
+
+	    if (window.innerWidth < 768) {
+	        // Mobile: Slide down and hide
+	        sidebar.style.bottom = "-100%";
+	    } else {
+	        // Desktop: Slide out and hide
+	        sidebar.style.right = "-350px";
+	    }
+
+	    sidebar.classList.remove("active");
+
+	    // Hide completely after animation ends
+	    setTimeout(() => {
+	        sidebar.style.display = "none"; 
+	    }, 300); // Match transition duration
+	}
+	function centerToUserLocation() {
+	    if (navigator.geolocation) {
+	        navigator.geolocation.getCurrentPosition(position => {
+	            window.vehicleTracker.map.setView([position.coords.latitude, position.coords.longitude], 15);
+	        }, error => {
+	            alert("Unable to retrieve location. Please enable GPS.");
+	        });
+	    } else {
+	        alert("Geolocation is not supported by this browser.");
+	    }
+	}
+
+	function toggleDarkMode() {
+	    document.body.classList.toggle("dark-mode");
+
+	    let isDark = document.body.classList.contains("dark-mode");
+	    localStorage.setItem("darkMode", isDark ? "enabled" : "disabled");
+
+	    // Update map layers
+	    let darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png');
+	    let lightLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+
+	    if (isDark) {
+	        window.vehicleTracker.map.removeLayer(lightLayer);
+	        darkLayer.addTo(window.vehicleTracker.map);
+	    } else {
+	        window.vehicleTracker.map.removeLayer(darkLayer);
+	        lightLayer.addTo(window.vehicleTracker.map);
+	    }
+	}
+	function toggleFullScreen() {
+	    let mapContainer = document.getElementById('map');
+	    if (!document.fullscreenElement) {
+	        mapContainer.requestFullscreen().catch(err => {
+	            console.error(`Error attempting full-screen mode: ${err.message}`);
+	        });
+	    } else {
+	        document.exitFullscreen();
+	    }
+	}
+
+
+</script>
+<script>
+    function zoomEffect(event, deviceId, latitude, longitude) {
+        // Click effect (ripple animation)
+        let ripple = document.createElement("div");
+        ripple.classList.add("ripple");
+
+        let rect = event.target.getBoundingClientRect();
+        ripple.style.width = ripple.style.height = "50px";
+        ripple.style.left = `${event.clientX - rect.left - 25}px`;
+        ripple.style.top = `${event.clientY - rect.top - 25}px`;
+
+        event.target.parentElement.appendChild(ripple);
+
+        setTimeout(() => {
+            ripple.remove();
+        }, 600);
+
+        // Call your zoom function
+        window.vehicleTracker.zoomToVehicle(deviceId, latitude, longitude);
+    }
+	document.addEventListener("DOMContentLoaded", function () {
+	    const speedAlertToggle = document.getElementById("speedAlertToggle");
+
+	    // Load setting from localStorage
+	    const speedAlertEnabled = localStorage.getItem("speedAlertEnabled") === "true";
+	    speedAlertToggle.checked = speedAlertEnabled;
+
+	    speedAlertToggle.addEventListener("change", function () {
+	        localStorage.setItem("speedAlertEnabled", speedAlertToggle.checked);
+	        console.log(`🚀 Global Speed Alert: ${speedAlertToggle.checked ? "ENABLED" : "DISABLED"}`);
+	    });
+	});
+
+	// ✅ Function to Toggle Individual Vehicle Alerts
+	function toggleVehicleAlert(deviceId) {
+	    let alertCheckbox = document.getElementById(`alert_${deviceId}`);
+	    let isEnabled = alertCheckbox.checked;
+
+	    localStorage.setItem(`alert_${deviceId}`, isEnabled ? "enabled" : "disabled");
+
+	    console.log(`🚗 Speed Alert for ${deviceId} is now ${isEnabled ? "ENABLED" : "DISABLED"}`);
+	}
+
+	// ✅ Restore Toggle States on Page Load
+	document.addEventListener("DOMContentLoaded", function () {
+	    document.querySelectorAll("[id^=alert_]").forEach(input => {
+	        const deviceId = input.id.replace("alert_", "");
+	        input.checked = localStorage.getItem(`alert_${deviceId}`) === "enabled";
+	    });
+	});
+
+	function toggleVehicleAlert(deviceId) {
+	    let alertCheckbox = document.getElementById(`alert_${deviceId}`);
+	    let isEnabled = alertCheckbox.checked;
+
+	    localStorage.setItem(`alert_${deviceId}`, isEnabled ? "enabled" : "disabled");
+
+	    console.log(`🚗 Speed Alert for ${deviceId} is now ${isEnabled ? "ENABLED" : "DISABLED"}`);
+	}
+
+	// ✅ Ensure vehicle alert states are restored on page load
+	document.addEventListener("DOMContentLoaded", function () {
+	    document.querySelectorAll("[id^=alert_]").forEach(input => {
+	        const deviceId = input.id.replace("alert_", "");
+	        input.checked = localStorage.getItem(`alert_${deviceId}`) === "enabled";
+	    });
+	});
+	// ✅ Manage Global Speed Alert Enable/Disable
+	document.addEventListener("DOMContentLoaded", function () {
+	    const speedAlertToggle = document.getElementById("speedAlertToggle");
+
+	    // Load setting from localStorage
+	    const speedAlertEnabled = localStorage.getItem("speedAlertEnabled") === "true";
+	    speedAlertToggle.checked = speedAlertEnabled;
+
+	    speedAlertToggle.addEventListener("change", function () {
+	        localStorage.setItem("speedAlertEnabled", speedAlertToggle.checked);
+	        console.log(`🚀 Global Speed Alert: ${speedAlertToggle.checked ? "ENABLED" : "DISABLED"}`);
+	    });
+	});
+
+	function playSpeedAlert(deviceId, speed) {
+	    const globalAlertEnabled = localStorage.getItem("speedAlertEnabled") === "true";
+	    const vehicleAlertEnabled = localStorage.getItem(`alert_${deviceId}`) === "enabled";
+
+	    if (!globalAlertEnabled || !vehicleAlertEnabled) {
+	        console.log(`🔇 Speed alert skipped for ${deviceId} (Global: ${globalAlertEnabled}, Vehicle: ${vehicleAlertEnabled})`);
+	        return;
+	    }
+
+	    const alertSound = new Audio('/THINTURE_IMAGE/alertsspeed.mp3');
+	    alertSound.play();
+
+	    showSpeedAlert(deviceId, speed);
+	}
+}
+	
+	
+</script>
+<script>
+	// ✅ Make this global (outside of any function or DOMContentLoaded)
+	function zoomEffect(event, deviceId, latitude, longitude) {
+	    const lat = parseFloat(latitude);
+	    const lng = parseFloat(longitude);
+
+	    if (isNaN(lat) || isNaN(lng)) {
+	        console.error(`❌ Invalid coordinates for ${deviceId}: ${lat}, ${lng}`);
+	        return;
+	    }
+
+	    console.log(`📍 Zooming to ${deviceId} at (${lat}, ${lng})`);
+	    window.vehicleTracker.zoomToVehicle(deviceId, lat, lng);
+	}
+</script>
+
+</body>
+</html>

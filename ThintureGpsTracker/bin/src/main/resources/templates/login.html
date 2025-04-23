@@ -1,0 +1,497 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+	<title>Thinture GPS</title>
+	    <link rel="icon" type="image/x-icon" href="/THINTURE_IMAGE/favicon.jpg">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<style>
+		        * {
+		            margin: 0;
+		            padding: 0;
+		            box-sizing: border-box;
+		            font-family: 'Poppins', sans-serif;
+		        }
+
+		        body {
+		            height: 100vh;
+		            display: flex;
+		            align-items: center;
+		            justify-content: center;
+					background: url('/THINTURE_IMAGE/mainbg.jpg') no-repeat center center/cover;
+															  
+
+		            backdrop-filter: blur(10px);
+		        }
+
+		        .container {
+		            display: flex;
+		            align-items: center;
+		            justify-content: space-between;
+		            gap: 20px;
+		            width: 90%;
+		            max-width: 900px;
+		            background: rgba(255, 255, 255, 0.3);
+		            
+		            padding: 40px;
+		            border-radius: 15px;
+		            box-shadow: 0 10px 30px rgba(0, 0, 0, 1);
+		            transition: all 0.3s ease-in-out;
+		        }
+
+		        .features-container {
+		            width: 50%;
+		            color: white;
+		            padding: 20px;
+		        }
+
+		        .features-container h3 {
+		            font-size: 2.8rem;
+		            margin-bottom: 15px;
+		        }
+
+		        .features-container ul li {
+		            font-size: 1.2rem;
+		            margin: 8px 0;
+		            list-style: none;
+		        }
+
+		        .login-container {
+		            width: 50%;
+					
+		            text-align: center;
+		            background: rgba(255, 255, 255, 3);
+		            padding: 50px;
+					font-size: 12px;
+		            border-radius: 15px;
+		            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+		        }
+
+		        .login-container img {
+		            width: 140px;
+					height: 60px;
+		            margin-bottom: 15px;
+		        }
+
+		        h2 {
+		            font-size: 1.8rem;
+		            margin-bottom: 20px;
+		            color: #fff;
+		        }
+select{
+	 border: 1px solid black; /* Black border by default */
+	    border-radius: 5px; /* Rounded corners */
+	    padding: 10px;
+	    outline: none;
+	    transition: border 0.3s ease-in-out;
+	}
+		        select, input {
+		            width: 100%;
+		            padding: 12px;
+		            margin: 10px 0;
+		            border: none;
+		            border-radius: 8px;
+		            font-size: 18px;
+		            color: black;
+		           
+		            transition: 0.3s;
+		        }
+
+		        button {
+		            width: 100%;
+		            padding: 12px;
+		            background: linear-gradient(45deg, #4facfe, #00f2fe);
+		            border: none;
+		            border-radius: 8px;
+		            color: #fff;
+		            font-size: 1.2rem;
+		            cursor: pointer;
+		            transition: 0.3s;
+		        }
+
+		        button:hover {
+		            transform: scale(1.05);
+		            background: linear-gradient(45deg, #00f2fe, #4facfe);
+		        }
+
+		        .forgot-password {
+		            display: block;
+		            margin-top: 10px;
+		            color: darkblue;
+		            text-decoration: none;
+		            font-size: 0.9rem;
+		            opacity: 0.8;
+		        }
+
+		        .forgot-password:hover {
+		            opacity: 1;
+		        }
+
+		        @media screen and (max-width: 768px) {
+		            .container {
+		                flex-direction: column;
+		                align-items: center;
+		            }
+
+		            .login-container, .features-container {
+		                width: 100%;
+		            }
+		        }
+				.error-message{
+					   		color:red;
+					   	   }
+						   
+						   
+						   .password-container {
+						       position: relative;
+						       display: flex;
+						       align-items: center;
+						       width: 100%;
+						   }
+
+						   .password-container input {
+						       width: 100%;
+						       padding: 10px 40px 10px 10px; /* Adjust padding for icon space */
+						       font-size: 16px;
+						       border: 1px solid #ccc;
+						       border-radius: 5px;
+						       outline: none;
+						   }
+
+						   .password-container i {
+						       position: absolute;
+						       right: 10px;
+						       cursor: pointer;
+						       font-size: 18px;
+						       color: #888;
+						       transition: color 0.3s;
+						   }
+
+						   .password-container i:hover {
+						       color: #333; /* Darker color on hover */
+						   }
+						   @media screen and (max-width: 1024px) {
+						       .container {
+						           flex-direction: column;
+						           width: 95%;
+						           padding: 30px;
+						       }
+
+						       .features-container, .login-container {
+						           width: 100%;
+						           text-align: center;
+						       }
+
+						       .features-container h3 {
+						           font-size: 2rem;
+						       }
+
+						       .features-container ul li {
+						           font-size: 1rem;
+						       }
+
+						       .login-container {
+						           padding: 40px;
+						       }
+
+						       input, select, button {
+						           font-size: 16px;
+						       }
+						   }
+
+						   @media screen and (max-width: 768px) {
+						       .container {
+						           flex-direction: column;
+						           padding: 25px;
+						           width: 100%;
+						       }
+
+						       .features-container {
+						           text-align: center;
+						           padding: 15px;
+						       }
+
+						       .features-container h3 {
+						           font-size: 1.6rem;
+						       }
+
+						       .features-container ul {
+						           padding: 0;
+						       }
+
+						       .features-container ul li {
+						           font-size: 0.9rem;
+						           margin: 5px 0;
+						       }
+
+						       .login-container {
+						           padding: 35px;
+						       }
+
+						       .login-container img {
+						           width: 120px;
+						           height: 50px;
+						       }
+
+						       input, select, button {
+						           font-size: 14px;
+						           padding: 10px;
+						       }
+						   }
+
+						   @media screen and (max-width: 480px) {
+						       .container {
+						           padding: 20px;
+						           width: 100%;
+						       }
+
+						       .features-container {
+						           padding: 10px;
+						       }
+
+						       .features-container h3 {
+						           font-size: 1.4rem;
+						       }
+
+						       .features-container ul li {
+						           font-size: 0.8rem;
+						       }
+
+						       .login-container {
+						           padding: 30px;
+						       }
+
+						       .login-container img {
+						           width: 100px;
+						           height: 40px;
+						       }
+
+						       input, select, button {
+						           font-size: 12px;
+						           padding: 8px;
+						       }
+
+						       .forgot-password {
+						           font-size: 0.8rem;
+						       }
+						   }
+
+		    </style>
+</head>
+<body>
+    <div class="container">
+        
+		<div class="features-container">
+		            <h3>Fleet Management Advantages:</h3>
+		            <ul>
+		                <li>✔ Real-time GPS tracking</li>
+		                <li>✔ Route optimization for fuel efficiency</li>
+		                <li>✔ Automated maintenance alerts</li>
+		                <li>✔ Driver performance monitoring</li>
+		                <li>✔ Seamless integration with existing systems</li>
+		                <li>✔ Enhanced security and theft prevention</li>
+		            </ul>
+		        </div>
+
+       
+        
+            <div class="login-container">
+                
+				<a>
+					<img src="/THINTURE_IMAGE/thinlogo.png?v=3" alt="Fleet Tracking Logo" class="logo">
+
+
+										</a>
+				
+
+				<form th:action="@{/login}" method="post" onsubmit="storeUserCredentials(); return validateForm();">
+				    <label for="usertype"></label>
+				    <select id="usertype" name="usertype" class="select" required>
+				        
+						<option value="SUPERADMIN">SuperAdmin</option>
+						<option value="ADMIN">Admin</option>
+						<option value="DEALER">Dealer</option>
+						<option value="USER">User</option>
+				        <option value="CLIENT">Client</option>
+				    </select>
+				    <div id="usertype-error" class="error"></div>
+
+				    
+				    <input type="text" id="username" name="username" placeholder="Username" >
+				    <div id="username-error" class="error"></div>
+
+				  
+					<div class="password-container">
+					    <input type="password" id="password" name="password" placeholder="Password">
+					    <i id="togglePassword" class="fas fa-eye"></i>
+					</div>
+					<div id="password-error" class="error"></div>
+
+
+				    <button type="submit">Log In</button>
+				    <a href="#" class="forgot-password">Forgot Password?</a>
+				</form>
+
+            </div>
+            
+      
+    </div>
+	<script>
+		
+		function validateForm() {
+				              // Hide all error messages initially
+				              document.querySelectorAll('.error').forEach(error => error.style.display = 'none');
+
+				              // Reset all input borders to default
+				              document.querySelectorAll('input, select').forEach(input => {
+				                  input.style.borderColor = ''; // Reset border color
+				              });
+
+				              let isValid = true;
+
+				              // Validate user type
+				              const usertype = document.getElementById('usertype');
+				              if (usertype.value === '') {
+				                  document.getElementById('usertype-error').style.display = 'block';
+				                  usertype.style.borderColor = 'red'; // Set border color to red
+				                  isValid = false;
+				              }
+
+				              // Validate username
+				              const username = document.getElementById('username');
+				              if (username.value.trim() === '') {
+				                  document.getElementById('username-error').style.display = 'block';
+				                  username.style.borderColor = 'red'; // Set border color to red
+				                  isValid = false;
+				              }
+
+				              // Validate password
+				              const password = document.getElementById('password');
+				              if (password.value.trim() === '') {
+				                  document.getElementById('password-error').style.display = 'block';
+				                  password.style.borderColor = 'red'; // Set border color to red
+				                  isValid = false;
+				              }
+
+				              return isValid; // Prevent form submission if invalid
+				          }
+						  
+						  
+						  
+						  
+						  
+						  function logLoginAttempt() {
+						      var usertype = document.getElementById("usertype").value;
+						      var username = document.getElementById("username").value;
+						      console.log("Login attempt for user: " + username + " with user type: " + usertype);
+						  }
+
+						  function storeUsername() {
+						      const username = document.getElementById("username").value; // Get the entered username
+						      if (username) {
+						          localStorage.setItem("username", username); // Store the username in localStorage
+						          console.log("Stored username: " + username); // Debug log
+						      } else {
+						          console.log("Username not entered.");
+						      }
+						  }
+
+						  function storeUserType() {
+						      const usertype = document.getElementById("usertype").value; // Get the selected usertype
+						      if (usertype) {
+						          localStorage.setItem("usertype", usertype); // Save the usertype in localStorage
+						          console.log("Stored usertype: " + usertype); // Debug log
+						      } else {
+						          console.log("Usertype not selected.");
+						      }
+						  }
+
+
+						  function validateForm() {
+						      let isValid = true;
+
+						      // Reset errors and borders
+						      document.querySelectorAll('.error').forEach(error => error.textContent = '');
+						      document.querySelectorAll('input, select').forEach(input => input.style.border = '1px solid #ccc');
+
+						      // Get input elements
+						      const usertype = document.getElementById('usertype');
+						      const username = document.getElementById('username');
+						      const password = document.getElementById('password');
+
+						      // User Type Validation
+						      if (usertype.value === '') {
+						          document.getElementById('usertype-error').textContent = "Please select a user type.";
+						          usertype.style.border = '2px solid red';
+						          isValid = false;
+						      }
+
+						      // Username Validation
+						      if (username.value.trim() === '') {
+						          document.getElementById('username-error').textContent = "";
+						          username.style.border = '2px solid red';
+						          isValid = false;
+						      }
+
+						      // Password Validation
+						      if (password.value.trim() === '') {
+						          document.getElementById('password-error').textContent = "";
+						          password.style.border = '2px solid red';
+						          isValid = false;
+						      }
+
+						      return isValid; // Prevent form submission if invalid
+						  }
+
+						  document.getElementById("togglePassword").addEventListener("click", function () {
+						      let passwordInput = document.getElementById("password");
+						      let icon = this;
+
+						      if (passwordInput.type === "password") {
+						          passwordInput.type = "text";
+						          icon.classList.replace("fa-eye", "fa-eye-slash");
+						      } else {
+						          passwordInput.type = "password";
+						          icon.classList.replace("fa-eye-slash", "fa-eye");
+						      }
+						  });
+						  document.addEventListener("DOMContentLoaded", () => {
+						      const savedUsername = localStorage.getItem("username");
+						      const savedUserType = localStorage.getItem("usertype");
+
+						      if (savedUsername) document.getElementById("username").value = savedUsername;
+						      if (savedUserType) document.getElementById("usertype").value = savedUserType;
+						  });
+
+						  // Save credentials on form submit
+						  function storeUserCredentials() {
+						      const username = document.getElementById("username").value;
+						      const usertype = document.getElementById("usertype").value;
+
+						      if (username && usertype) {
+						          localStorage.setItem("username", username);
+						          localStorage.setItem("usertype", usertype);
+						      }
+						  }
+
+
+
+		   
+	   </script>
+	   <script>
+	       function storeUserCredentials() {
+	           const username = document.getElementById("username").value;
+	           const usertype = document.getElementById("usertype").value;
+
+	           if (username && usertype) {
+	               localStorage.setItem("username", username);
+	               localStorage.setItem("usertype", usertype);
+	           }
+	       }
+	   </script>
+</body>
+</html>

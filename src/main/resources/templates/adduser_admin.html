@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Thinture GPS</title>
+		    <link rel="icon" type="image/x-icon" href="/THINTURE_IMAGE/favicon.jpg">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+	
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/addstyle.css}">
+	
+	
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+</head>
+<body>
+	 <div th:insert="navigation_admin :: navbar_admin"></div>
+	<button class="button" id="back-button">
+	       <i class="fas fa-arrow-left"></i> Back
+	   </button>
+	<div class="card">
+	    <h2>ADD USER</h2>
+	   
+	    <form id="addUserForm"> <!-- Added id to form for easier targeting -->
+	        <div class="form-group">
+	            <label for="companyName">Company Name</label>
+	            <input type="text" id="companyName" name="companyName">
+				<span class="error-message" id="companyName-error"></span>
+	        </div>
+	        <div class="form-group">
+	            <label for="address">Address</label>
+	            <input type="text" id="address" name="address" >
+				<span class="error-message" id="address-error"></span>
+	        </div>
+	        <div class="form-group">
+	            <label for="email">Email</label>
+	            <input type="email" id="email" name="email" >
+				<span class="error-message" id="email-error"></span>
+	        </div>
+	        <div class="form-group">
+	            <label for="phone">Phone</label>
+	            <input type="text" id="phone" name="phone" >
+				<span class="error-message" id="phone-error"></span>
+	        </div>
+	        <div class="form-group">
+	            <label for="country">Country</label>
+	            <input type="text" id="country" name="country" >
+				<span class="error-message" id="country-error"></span>
+	        </div>
+			<div class="form-group position-relative">
+			    <label for="password">Password</label>
+			    <input type="password" id="password" name="password" class="form-control pe-5">
+			    <i class="fas fa-eye toggle-password" toggle="#password"></i>
+			    <span class="error-message" id="password-error"></span>
+			</div>
+
+			<div class="form-group position-relative">
+			    <label for="c_password">Confirm Password</label>
+			    <input type="password" id="c_password" name="c_password" class="form-control pe-5">
+			    <i class="fas fa-eye toggle-password" toggle="#c_password"></i>
+			    <span class="error-message" id="c_password-error"></span>
+			</div>
+
+
+	        <div class="form-group">
+	            <input type="submit" value="Add User">
+	        </div>
+	    </form>
+	</div>
+
+	<script>
+	    document.addEventListener('DOMContentLoaded', function() {
+	        const form = document.getElementById('addUserForm');
+
+	        form.addEventListener('submit', async function(event) {
+	            event.preventDefault();
+
+	            // Clear previous errors visually
+	            document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+	            document.querySelectorAll('input').forEach(el => el.classList.remove('error'));
+
+	            const userData = {
+	                companyName: document.getElementById('companyName').value.trim(),
+	                address: document.getElementById('address').value.trim(),
+	                email: document.getElementById('email').value.trim(),
+	                phone: document.getElementById('phone').value.trim(),
+	                country: document.getElementById('country').value.trim(),
+	                password: document.getElementById('password').value.trim()
+	            };
+
+	            const confirmPassword = document.getElementById('c_password').value.trim();
+
+	            // Password match check
+	            if (userData.password !== confirmPassword) {
+	                Swal.fire({
+	                    icon: 'error',
+	                    title: 'Oops!',
+	                    text: 'Passwords do not match!'
+	                });
+	                document.getElementById('password').classList.add('error');
+	                document.getElementById('c_password').classList.add('error');
+	                return;
+	            }
+
+	            // Confirm before submit
+	            const confirmResult = await Swal.fire({
+	                title: 'Are you sure?',
+	                text: "Do you want to add this user?",
+	                icon: 'question',
+	                showCancelButton: true,
+	                confirmButtonColor: '#3085d6',
+	                cancelButtonColor: '#d33',
+	                confirmButtonText: 'Yes, Add!'
+	            });
+
+	            if (!confirmResult.isConfirmed) {
+	                return;
+	            }
+
+	            try {
+	                const response = await fetch('/users/add', {
+	                    method: 'POST',
+	                    headers: { 'Content-Type': 'application/json' },
+	                    body: JSON.stringify(userData)
+	                });
+
+	                if (response.ok) {
+	                    await Swal.fire({
+	                        icon: 'success',
+	                        title: 'Success!',
+	                        text: 'User added successfully.',
+	                        timer: 2000,
+	                        showConfirmButton: false
+	                    });
+	                    window.location.href = "/adduser_admin";
+	                } else {
+	                    const errorText = await response.text();
+	                    Swal.fire({
+	                        icon: 'error',
+	                        title: 'Failed!',
+	                        text: errorText
+	                    });
+	                }
+	            } catch (error) {
+	                Swal.fire({
+	                    icon: 'error',
+	                    title: 'Error!',
+	                    text: error.message || 'Something went wrong. Please try again.'
+	                });
+	            }
+	        });
+
+	        document.getElementById('back-button').addEventListener('click', function () {
+	            window.history.back();
+	        });
+	    });
+
+	    // Add CSS class for red border when there is an error
+	    const style = document.createElement('style');
+	    style.innerHTML = `
+	        input.error {
+	            border: 2px solid red !important;
+	        }
+	    `;
+	    document.head.appendChild(style);
+	</script>
+
+	<script>
+		document.getElementById('back-button').addEventListener('click', function () {
+				    window.history.back(); // Navigates to the previous page in browser history
+				});
+	</script>
+	
+	<script>
+	    document.querySelectorAll('.toggle-password').forEach(icon => {
+	        icon.addEventListener('click', function () {
+	            const input = document.querySelector(this.getAttribute('toggle'));
+	            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+	            input.setAttribute('type', type);
+	            this.classList.toggle('fa-eye');
+	            this.classList.toggle('fa-eye-slash');
+	        });
+	    });
+	</script>
+
+</body>
+</html>

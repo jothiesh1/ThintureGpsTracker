@@ -1,0 +1,406 @@
+/* Base Navbar Styling - Common for All Screens */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Base Navbar Styling - Common for All Screens */
+.navbar {
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 1.5), 
+        rgba(255, 255, 255, 1.5),
+        rgba(15, 32, 65, 1.9),
+        rgba(15, 32, 65, 1.6),
+        rgba(15, 32, 65, 1.6),
+        rgba(15, 32, 65, 1.6),
+        rgba(15, 32, 65, 1.6)
+    ),
+    url('https://images.unsplash.com/photo-1601597111158-4b34cc4d1cb0?auto=format&fit=crop&w=1470&q=80');
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    width: 100%;
+    position: fixed;
+    top: 0;
+    height: 150px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    z-index: 1050;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+    padding: 25px 40px;
+
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.3s ease-in-out;
+}
+
+/* Override Background Color by Screen Size */
+
+/* 1. MOBILE (up to 576px) */
+@media (max-width: 576px) {
+    .navbar {
+		background: linear-gradient(
+		       135deg,
+		       rgba(255, 255, 255, 1.5), 
+		       rgba(255, 255, 255, 1.5),
+		      
+		      
+		       rgba(15, 32, 65, 1.6)
+		   );
+        height: 90px;
+        padding: 8px 15px;
+    }
+}
+
+/* 2. TABLETS (576px - 991px) */
+@media (min-width: 576px) and (max-width: 991px) {
+    .navbar {
+		background: linear-gradient(
+				       135deg,
+				       rgba(255, 255, 255, 1.9), 
+				       rgba(255, 255, 255, 1.9),
+					   rgba(255, 255, 255, 1.9),
+					   rgba(15, 32, 65, 1.9),
+					   rgba(15, 32, 65, 1.9),
+					   rgba(15, 32, 65, 1.9),
+				       rgba(15, 32, 65, 1.9),
+				       rgba(15, 32, 65, 1.6),
+				       rgba(15, 32, 65, 1.6),
+				       rgba(15, 32, 65, 1.6),
+				       rgba(15, 32, 65, 1.6)
+				   );
+    }
+}
+
+/* 3. LAPTOPS (992px - 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .navbar {
+		background: linear-gradient(
+		       135deg,
+		       rgba(255, 255, 255, 1.9), 
+		       rgba(255, 255, 255, 1.9),
+			   rgba(255, 255, 255, 1.9),
+			   rgba(15, 32, 65, 1.9),
+			   rgba(15, 32, 65, 1.9),
+			   rgba(15, 32, 65, 1.9),
+			   rgba(15, 32, 65, 1.9),
+			   rgba(15, 32, 65, 1.9),
+			   rgba(15, 32, 65, 1.9),
+		       rgba(15, 32, 65, 1.9),
+		       rgba(15, 32, 65, 1.6),
+		       rgba(15, 32, 65, 1.6),
+		       rgba(15, 32, 65, 1.6),
+		       rgba(15, 32, 65, 1.6)
+		   );
+       
+    }
+}
+
+/* 4. LARGE MONITORS (1200px and above) */
+@media (min-width: 1200px) {
+    .navbar {
+		background: linear-gradient(
+		       135deg,
+		       rgba(255, 255, 255, 1.5), 
+		       rgba(255, 255, 255, 1.5),
+		       rgba(15, 32, 65, 1.9),
+		       rgba(15, 32, 65, 1.6),
+		       rgba(15, 32, 65, 1.6),
+		       rgba(15, 32, 65, 1.6),
+		       rgba(15, 32, 65, 1.6)
+		   );
+        height: 100px;
+        padding: 10px 80px;
+    }
+}
+
+
+
+
+/* Logo */
+.navbar-brand {
+	position: absolute;
+    height: 60px;
+    width: auto;
+	left:20px;
+}
+/* Align Navbar Links to the Right */
+.navbar-nav {
+    margin-left: auto;
+	color: white;
+}
+
+
+.dropdown-item{
+	color:white;
+}
+/* Dropdown Menu */
+.dropdown-menu {
+    position: absolute;
+	color:white;
+	font-size: 12px;
+    z-index: 1100;
+    background-color: rgba(15, 32, 65, 0.9);
+}
+
+/* Navbar Toggler */
+.navbar-toggler {
+    border: none;
+    background: transparent;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
+.navbar-toggler-icon {
+    background-color: white;
+    border-radius: 4px;
+    padding: 5px;
+}
+
+/* ----- SCREEN SIZE SPECIFIC STYLING ----- */
+
+/* 1. MOBILE (up to 576px) */
+/* MOBILE (up to 576px) */
+@media (max-width: 576px) {
+    .navbar {
+        height: 88px;
+        padding: 8px 15px;
+        display: flex;
+		color: white;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .navbar-brand {
+        height: 50px;
+        width: auto;
+        left: 10px;
+    }
+
+    .navbar-toggler {
+        right: 10px;
+        top: 15px;
+    }
+
+    .navbar-toggler-icon {
+        background-color: white;
+        border-radius: 4px;
+        padding: 4px;
+    }
+
+    /* Ensure menu appears properly */
+    .navbar-collapse {
+        background: rgba(0, 0, 0, 0.9);
+        position: absolute;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        padding: 10px 0;
+    }
+
+    /* Make sure navbar items stack properly */
+    .navbar-nav {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .navbar-nav .nav-link {
+        font-size: 14px;
+        padding: 10px;
+		color: white;
+		text-transform: uppercase;
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Improve dropdown appearance */
+    .dropdown-menu {
+        width: 100%;
+		font-size: 16px;
+        background-color: rgba(0, 0, 0, 0.9);
+        text-align: center;
+		
+    }
+}
+
+
+/* 2. TABLETS (576px - 991px) */
+@media (min-width: 576px) and (max-width: 991px) {
+    .navbar {
+        height: 80px;
+        padding: 12px 30px;
+		color: white;
+    }
+
+    .navbar-brand {
+        height: 55px;
+    }
+
+	.navbar-nav .nav-link {
+	        font-size:9px;
+			color: white;
+	        padding: 8px;
+			right: 0px;
+			text-transform: uppercase;
+	    }
+}
+
+/* 3. LAPTOPS (992px - 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .navbar {
+        height: 90px;
+        padding: 15px 50px;
+    }
+	.navbar-nav {
+			position: absolute;
+		   right: 10px;
+			font-size: 4px;
+		}
+    .navbar-brand {
+        height: 60px;
+		left:5px;
+    }
+
+    .navbar-nav .nav-link {
+        font-size:9px;
+		color: white;
+        padding: 4px;
+		right: 0px;
+		text-transform: uppercase;
+    }
+}
+
+/* 4. LARGE MONITORS (1200px and above) */
+@media (min-width: 1200px) {
+    .navbar {
+        height: 100px;
+        padding: 10px 80px;
+		
+        display: flex;
+        justify-content: space-between; /* Pushes items apart */
+        align-items: center; /* Centers items vertically */
+    }
+	.navbar-nav {
+		position: absolute;
+	   right: 10px;
+		font-size: 10px;
+	}
+    .navbar-brand {
+        height: 80px;
+		width:140px;
+    }
+
+	
+
+	.navbar-nav .nav-link {
+	        font-size:11px;
+			color: white;
+	        padding: 1px;
+			right: 0px;
+			text-transform: uppercase;
+	    }
+}
+.logout-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.3s ease;
+  cursor: pointer; /* 👈 This makes the hand appear on hover */
+}
+
+.logout-item:hover {
+  color: red;
+}
+
+.logout-item i {
+  transition: transform 0.3s ease;
+}
+
+.logout-item:hover i {
+  transform: scale(1.1) rotate(-10deg);
+}
+.fa-spin {
+    animation-duration: 1s !important;
+}
+
+.navigation-buttons {
+	     display: flex;
+	     justify-content: space-between;
+	     padding: 10px;
+	     position: relative;
+	     top: 130px;
+	   
+	     z-index: 1000;
+	   }
+
+	   #backward-button, #forward-button {
+	     padding: 10px 20px;
+	     border: none;
+	     color: white;
+	     font-weight: bold;
+	     border-radius: 6px;
+	     cursor: pointer;
+	   }
+
+	   #backward-button {
+		width: 5%;
+		font-size: 12px;;
+	     margin-left: 10px;
+		  box-shadow: 0 6px 15px rgba(255, 255, 255, 0.4);
+		 background: linear-gradient(
+		     135deg,
+		    
+		     rgba(15, 32, 65, 1.6),
+		     rgba(15, 32, 65, 1.6),
+		     rgba(15, 32, 65, 1.6)
+		 );
+	   }
+
+	   #forward-button {
+	     margin-right: 10px;
+		 width:7%;
+		 		font-size: 11px;;
+		box-shadow: 0 6px 15px rgba(255, 255, 255, 0.4);
+		 background: linear-gradient(
+		 	     135deg,
+		 	    
+		 	     rgba(15, 32, 65, 1.6),
+		 	     rgba(15, 32, 65, 1.6),
+		 	     rgba(15, 32, 65, 1.6)
+		 	 );
+	   }
+	   @media (min-width: 900px) and (max-width: 1440px) {
+	     #forward-button {
+	       width: 8%;
+	      
+	       font-size: 12px;
+	     }
+	   }
+
+	   @media (max-width: 768px) {
+	     .navigation-buttons {
+	       display: none;
+	     }
+	   }

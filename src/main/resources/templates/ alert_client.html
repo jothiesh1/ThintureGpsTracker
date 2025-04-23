@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Thinture GPS - Dealer Notifications</title>
+  <link rel="icon" type="image/x-icon" href="THINTURE_IMAGE/favicon.jpg" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+
+  <style>
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(rgba(10, 25, 47, 0.95), rgba(15, 32, 65, 0.95)),
+        url('/THINTURE_IMAGE/add_new.jpg') no-repeat center center/cover;
+      filter: blur(2px);
+      z-index: -1;
+    }
+
+    @media only screen and (max-width: 768px) {
+      body {
+        background-attachment: fixed;
+        min-height: 100vh;
+        font-size: 14px;
+        background-color: #0a192f;
+        background-size: cover;
+        color: #f0f0f0;
+      }
+    }
+
+    .card {
+      position: absolute;
+      background-color: rgba(10, 25, 47, 0.8);
+      color: white;
+      top: 210px;
+      width: 50%;
+      left: 25%;
+    }
+
+    .notification-box {
+      margin-bottom: 15px;
+      border-radius: 8px;
+    }
+
+    .btnread {
+      background-color: rgba(10, 25, 47, 0.8);
+      color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    h3 {
+      text-align: center;
+    }
+
+    .alert {
+      width: 90%;
+      margin: 10px auto;
+    }
+  </style>
+</head>
+<body>
+
+  <header th:insert="navigation_client :: navbar_client"></header>
+
+  <div class="card p-4">
+    <h3>🔔 Escalated Alerts for Dealer</h3>
+    <div id="notificationArea" class="mt-4"></div>
+  </div>
+
+  <script>
+    async function loadUnreadAlerts() {
+      const container = document.getElementById("notificationArea");
+      container.innerHTML = "";
+
+      try {
+        const response = await fetch("/api/support/alerts/unread/DEALER");
+        const alerts = await response.json();
+
+        if (!alerts.length) {
+          container.innerHTML = `<div class="alert alert-success text-center">🎉 No escalated alerts!</div>`;
+          return;
+        }
+
+        alerts.forEach(alert => {
+          const div = document.createElement("div");
+          div.className = "alert alert-warning d-flex justify-content-between align-items-center notification-box";
+          div.innerHTML = `
+            <span>📌 ${alert.subject || "New Complaint"} - ${alert.complaintDescription || ""}</span>
+            <button class="btnread btn-sm" onclick="markAlertAsRead(${alert.id}, this)">Mark as Read</button>
+          `;
+          container.appendChild(div);
+        });
+      } catch (err) {
+        console.error("❌ Failed to fetch alerts:", err);
+        container.innerHTML = `<div class="alert alert-danger text-center">❌ Error loading alerts.</div>`;
+      }
+    }
+
+    async function markAlertAsRead(id, button) {
+      try {
+        const res = await fetch(`/api/support/alerts/mark-read/${id}`, { method: "PUT" });
+
+        if (res.ok) {
+          button.closest(".alert").remove();
+          Swal.fire("✔️", "Alert marked as read", "success");
+        } else {
+          Swal.fire("⚠️", "Failed to mark as read", "error");
+        }
+      } catch (err) {
+        console.error("❌ Error marking alert:", err);
+        Swal.fire("❌", "Something went wrong", "error");
+      }
+    }
+
+    window.onload = loadUnreadAlerts;
+  </script>
+
+</body>
+</html>

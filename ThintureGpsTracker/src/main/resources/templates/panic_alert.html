@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fleet Trip Manager</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+    }
+    #map {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: 75%;
+    }
+    .panel {
+      width: 25%;
+      height: 100%;
+      float: left;
+      background: #f8f8f8;
+      padding: 20px;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      overflow-y: auto;
+    }
+    .panel h2 {
+      margin-top: 0;
+    }
+    input, button, select {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+    }
+    .status {
+      margin-top: 20px;
+      background: #fff;
+      padding: 10px;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    small {
+      display: block;
+      margin-bottom: 10px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+<div class="panel">
+  <h2>Trip Manager</h2>
+
+  <label>Start Location (lat,lng)</label>
+  <input id="start" placeholder="e.g. 13.0671,77.5481" />
+  <small id="startAddress"></small>
+
+  <label>Stop Location (lat,lng)</label>
+  <input id="stop" placeholder="e.g. 13.0674,77.5604" />
+  <small id="stopAddress"></small>
+
+  <label>End Location (lat,lng)</label>
+  <input id="end" placeholder="e.g. 13.0346,77.5775" />
+  <small id="endAddress"></small>
+
+  <select id="clickType">
+    <option value="">-- Click on map to select point --</option>
+    <option value="start">Set Start Location</option>
+    <option value="stop">Set Stop Location</option>
+    <option value="end">Set End Location</option>
+  </select>
+
+  <button onclick="createTrip()">Add Trip</button>
+  <button onclick="startTrip()">Start Trip</button>
+  <button onclick="endTrip()">End Trip</button>
+
+  <div class="status" id="tripStatus">Trip not started</div>
+</div>
+
+<div id="map"></div>
+
+<!-- Leaflet & Routing Machine JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
+
+<script>
+  const map = L.map('map').setView([13.0671, 77.5481], 13);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  const warehouse = L.latLng(13.0500, 77.5600);
+  L.marker(warehouse).addTo(map).bindPopup("🏢 Warehouse");
+
+  let routingControl;
+  let vehicleMarker = null;
+  let tripInterval = null;
+  let routeCoords = [];
+  let clickType = "";
+
+  const carIcon = L.icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/1995/1995470.png',
+    iconSize: [40, 40],
+    iconAnchor: [20, 20]
+  });
+
+  document.getElementById("clickType").addEventListener("change", function () {
+    clickType = this.value;
+  });
+
+  map.on("click", function (e) {
+    const latlng = e.latlng;
+    const latlngStr = `${latlng.lat.toFixed(6)},${latlng.lng.toFixed(6)}`;
+
+    if (!clickType) {
+      alert("Please select which location to set.");
+      return;
+    }
+
+    if (clickType === "start") {
+      document.getElementById("start").value = latlngStr;
+      reverseGeocode(latlng, "startAddress");
+    } else if (clickType === "stop") {
+      document.getElementById("stop").value = latlngStr;
+      reverseGeocode(latlng, "stopAddress");
+    } else if (clickType === "end") {
+      document.getElementById("end").value = latlngStr;
+      reverseGeocode(latlng, "endAddress");
+    }
+
+    document.getElementById("clickType").value = "";
+    clickType = "";
+  });
+
+  function reverseGeocode(latlng, outputId) {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latlng.lat}&lon=${latlng.lng}`;
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        const address = data.display_name || "Unknown location";
+        document.getElementById(outputId).innerText = `📍 ${address}`;
+      })
+      .catch(err => {
+        console.error("Geocoding error:", err);
+      });
+  }
+
+  function parseLatLng(str) {
+    const parts = str.split(',').map(p => parseFloat(p.trim()));
+    return (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) ? L.latLng(parts[0], parts[1]) : null;
+  }
+
+  function createTrip() {
+    const start = parseLatLng(document.getElementById('start').value);
+    const stop = parseLatLng(document.getElementById('stop').value);
+    const end = parseLatLng(document.getElementById('end').value);
+
+    if (!start || !stop || !end) {
+      alert("Please enter valid coordinates.");
+      return;
+    }
+
+    if (routingControl) map.removeControl(routingControl);
+    if (vehicleMarker) map.removeLayer(vehicleMarker);
+    if (tripInterval) clearInterval(tripInterval);
+    document.getElementById('tripStatus').innerHTML = "Trip created.<br>";
+
+    routingControl = L.Routing.control({
+      waypoints: [start, stop, end],
+      createMarker: () => null,
+      routeWhileDragging: false,
+      addWaypoints: false
+    }).addTo(map);
+  }
+
+  function startTrip() {
+    if (!routingControl) {
+      alert("Create a trip first.");
+      return;
+    }
+
+    routingControl.on('routesfound', function (e) {
+      routeCoords = e.routes[0].coordinates;
+
+      const startLatLng = parseLatLng(document.getElementById('start').value);
+      const stopLatLng = parseLatLng(document.getElementById('stop').value);
+      const endLatLng = parseLatLng(document.getElementById('end').value);
+
+      let alerted = {
+        start: false,
+        stop: false,
+        end: false,
+        warehouse: false
+      };
+
+      if (vehicleMarker) map.removeLayer(vehicleMarker);
+      vehicleMarker = L.marker(routeCoords[0], { icon: carIcon }).addTo(map).bindPopup("🚗 Vehicle");
+
+      let i = 0;
+      tripInterval = setInterval(() => {
+        i++;
+        if (i >= routeCoords.length) {
+          endTrip();
+          return;
+        }
+        const pos = routeCoords[i];
+        vehicleMarker.setLatLng(pos);
+
+        checkProximity(pos, startLatLng, "start", alerted);
+        checkProximity(pos, stopLatLng, "stop", alerted);
+        checkProximity(pos, endLatLng, "end", alerted);
+        checkProximity(pos, warehouse, "warehouse", alerted);
+      }, 100);
+    });
+
+    routingControl.route();
+    updateTripStatus("Trip started...");
+  }
+
+  function endTrip() {
+    if (tripInterval) clearInterval(tripInterval);
+    if (vehicleMarker) map.removeLayer(vehicleMarker);
+    updateTripStatus("🔚 Trip ended.");
+  }
+
+  function checkProximity(currentPos, targetPos, label, alerted) {
+    const distance = currentPos.distanceTo(targetPos);
+    const threshold = 50;
+
+    if (!alerted[label] && distance < threshold) {
+      const now = new Date();
+      const time = now.toLocaleTimeString();
+      const labelMap = {
+        start: "🟢 Reached START point",
+        stop: "🟡 Reached STOP point",
+        end: "🔴 Reached END point",
+        warehouse: "🏢 Near WAREHOUSE"
+      };
+
+      const message = `${labelMap[label]} at <b>${time}</b>`;
+      updateTripStatus(message);
+      alerted[label] = true;
+    }
+  }
+
+  function updateTripStatus(message) {
+    const box = document.getElementById('tripStatus');
+    box.innerHTML += `<div>${message}</div>`;
+  }
+</script>
+
+</body>
+</html>
