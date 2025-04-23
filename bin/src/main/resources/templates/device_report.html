@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
-    <title>Thinture GPS</title>
-    <link rel="icon" type="image/x-icon" href="/THINTURE_IMAGE/favicon.jpg">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-	  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+
+	<link rel="stylesheet" type="text/css" th:href="@{/css/styled.css}">
+	<title>Thinture GPS</title>
+	    <link rel="icon" type="image/x-icon" href="THINTURE_IMAGE/favicon.jpg">
+
     <style>
         /* General Styles */
 		body {
@@ -20,27 +23,36 @@
 							}
 
 							body::before {
-							    content: "";
-							    position: fixed;
-							    top: 0;
-							    left: 0;
-							    width: 100%;
-							    height: 100%;
-							    background: url('THINTURE_IMAGE/mainbg.jpg') no-repeat center center/cover;
-							    filter: blur(10px);
-							    z-index: -1; /* Ensures the background remains behind the content */
-							}
-							@media only screen and (max-width: 768px) {
-									    body {
-									        background-attachment: fixed; /* Fixes background on small screens */
-									        min-height: 100vh; /* Ensures full height */
-									        font-size: 14px; /* Adjust font size for better readability */
-											background-size: cover;
-									    }
-									}
+										    content: "";
+										    position: fixed;
+										    top: 0;
+										    left: 0;
+										    width: 100%;
+										    height: 100%;
+
+										    background: linear-gradient(
+										        rgba(10, 25, 47, 0.95),
+										        rgba(15, 32, 65, 0.95)
+										      ),
+										      url('/THINTURE_IMAGE/add_new.jpg') no-repeat center center/cover;
+
+										    filter: blur(2px);
+										    z-index: -1;
+										}
+										@media only screen and (max-width: 768px) {
+										    body {
+										        background-attachment: fixed;
+										        min-height: 100vh;
+										        font-size: 14px;
+										        background-color: #0a192f; /* fallback for small screens if image fails */
+										        background-size: cover;
+										        color: #f0f0f0;
+										    }
+										}
 
         h2 {
             color: white;
+			text-align: center;
             margin-top: 40px;
         }
 
@@ -62,7 +74,7 @@
 .card{
 	background-color: rgba(0, 0, 0, 0.3);
 	position: absolute;
-	top:150px;
+	top:190px;
 	left:5%;
 	width:90%;
 }
@@ -122,7 +134,7 @@
         }
 
         th {
-            background-color: #007bff;
+            background-color:rgba(15, 32, 65, 3.1);
             color: white;
         }
 
@@ -138,11 +150,25 @@
         }
 
         .btn-edit {
-            background-color: #ffc107;
+			box-shadow: 0 6px 15px rgba(255, 255, 255, 0.1);
+				 background: linear-gradient(
+				     135deg,
+				    
+				     rgba(15, 32, 65, 1.6),
+				     rgba(15, 32, 65, 1.6),
+				     rgba(15, 32, 65, 1.6)
+				 );
         }
 
         .btn-delete {
-            background-color: #dc3545;
+			box-shadow: 0 6px 15px rgba(255, 255, 255, 0.1);
+				 background: linear-gradient(
+				     135deg,
+				    
+				     rgba(15, 32, 65, 1.6),
+				     rgba(15, 32, 65, 1.6),
+				     rgba(15, 32, 65, 1.6)
+				 );
         }
 
         .btn-view {
@@ -164,7 +190,14 @@
             font-size: 14px;
             cursor: pointer;
             border: none;
-            background-color: #007bff;
+			box-shadow: 0 6px 15px rgba(255, 255, 255, 0.4);
+				 background: linear-gradient(
+				     135deg,
+				    
+				     rgba(15, 32, 65, 1.6),
+				     rgba(15, 32, 65, 1.6),
+				     rgba(15, 32, 65, 1.6)
+				 );
             color: white;
             border-radius: 5px;
         }
@@ -289,7 +322,6 @@
 		        .catch(error => console.error("Error fetching vehicle data:", error));
 		}
 
-
 		function populateTable() {
 		    const tableBody = document.querySelector("#tracker-table tbody");
 		    tableBody.innerHTML = "";
@@ -303,11 +335,11 @@
 
 		        const row = document.createElement("tr");
 		        row.innerHTML = `
-		            <td>${vehicle.deviceID}</td>
+		            <td id="deviceID-${index}">${vehicle.deviceID}</td>
 		            <td id="owner-${index}">${vehicle.ownerName}</td>
-		            <td id="imei-${index}">${vehicle.imei}</td>
-		            <td id="simNumber-${index}">${vehicle.simNumber || "N/A"}</td> <!-- ✅ Ensure SIM number is displayed -->
-		            <td id="vehicleNumber-${index}">${vehicle.vehicleNumber}</td>
+		            <td id="imei-${index}">${vehicle.imei}</td> <!-- Corrected -->
+		            <td id="simNumber-${index}">${vehicle.simNumber ? vehicle.simNumber : "N/A"}</td> <!-- Corrected -->
+		            <td id="vehicleNumber-${index}">${vehicle.vehicleNumber}</td> <!-- Corrected -->
 		            <td id="engineNumber-${index}">${vehicle.engineNumber}</td>
 		            <td id="vehicleType-${index}">${vehicle.vehicleType}</td>
 		            <td id="model-${index}">${vehicle.model}</td>
@@ -321,6 +353,8 @@
 
 		    updatePagination();
 		}
+
+
 
 
 		function updatePagination() {
@@ -483,29 +517,37 @@
 
 		    document.getElementById("editDeviceID").value = vehicle.deviceID;
 		    document.getElementById("editOwnerName").value = vehicle.ownerName;
-		    document.getElementById("editIMEI").value = vehicle.imei;
-		    document.getElementById("editSimNumber").value = vehicle.simNumber || ""; // ✅ Ensure SIM Number is populated
-		    document.getElementById("editVehicleNumber").value = vehicle.vehicleNumber;
+		    document.getElementById("editIMEI").value = vehicle.imei; // ✅ Fix: Correctly mapping IMEI
+		    document.getElementById("editSimNumber").value = vehicle.simNumber || ""; // ✅ Fix: Correctly mapping SIM Number
+		    document.getElementById("editVehicleNumber").value = vehicle.vehicleNumber; // ✅ Fix: Correctly mapping Vehicle Number
 		    document.getElementById("editEngineNumber").value = vehicle.engineNumber;
 		    document.getElementById("editVehicleType").value = vehicle.vehicleType;
 		    document.getElementById("editModel").value = vehicle.model;
+
+		    console.log("IMEI in Modal:", document.getElementById("editIMEI").value);
+		    console.log("Sim Number in Modal:", document.getElementById("editSimNumber").value);
+		    console.log("Vehicle Number in Modal:", document.getElementById("editVehicleNumber").value);
 
 		    var editModal = new bootstrap.Modal(document.getElementById("editModal"));
 		    editModal.show();
 		}
 
 
+
+
 		function saveChanges() {
 		    const updatedVehicle = {
 		        deviceID: document.getElementById("editDeviceID").value,
 		        ownerName: document.getElementById("editOwnerName").value,
-		        imei: document.getElementById("editIMEI").value,
-				simNumber: document.getElementById("editSimNumber").value,
-		        vehicleNumber: document.getElementById("editVehicleNumber").value,
+		        imei: document.getElementById("editIMEI").value,  // ✅ Fix: Correctly updating IMEI
+		        simNumber: document.getElementById("editSimNumber").value,  // ✅ Fix: Correctly updating SIM Number
+		        vehicleNumber: document.getElementById("editVehicleNumber").value, // ✅ Fix: Correctly updating Vehicle Number
 		        engineNumber: document.getElementById("editEngineNumber").value,
 		        vehicleType: document.getElementById("editVehicleType").value,
 		        model: document.getElementById("editModel").value
 		    };
+
+		    console.log("Updated Data Sent to API:", updatedVehicle); // Debugging
 
 		    fetch(`/api/update/${updatedVehicle.deviceID}`, {
 		        method: "PUT",
@@ -519,12 +561,19 @@
 		            text: "Vehicle details updated successfully.",
 		            icon: "success"
 		        }).then(() => {
-		            document.getElementById("editModal").querySelector(".btn-close").click(); // Close the modal
-		            fetchAndPopulateTrackerTable(); // Refresh table
+		            document.getElementById("editModal").querySelector(".btn-close").click(); // Close modal
+		            fetchAndPopulateTrackerTable(); // Refresh table to reflect changes
 		        });
 		    })
-		    .catch(error => console.error("Error updating vehicle:", error));
+		    .catch(error => {
+		        console.error("Error updating vehicle:", error);
+		        Swal.fire("Error!", "Failed to update vehicle details.", "error");
+		    });
 		}
+
+
+
+
 
 	    </script>
 		<script>
@@ -582,5 +631,6 @@
 		    // Call this function after populating the table
 		    fetchAndPopulateTrackerTable().then(makeTableEditable);
 		</script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

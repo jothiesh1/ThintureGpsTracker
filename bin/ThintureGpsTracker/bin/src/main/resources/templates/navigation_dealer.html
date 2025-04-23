@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <title>Enhanced Navbar</title>
+    <style>
+        /* Navbar Styling */
+       .navbar {
+            background: linear-gradient(135deg, #001f3f, #003366); /* Deep blue gradient */
+            width: 100%;
+            position: fixed;
+            height: 90px;
+            top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 900;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            padding: 10px 40px;
+        }
+
+        .navbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+ 
+        /* Logo */
+        .logo img {
+            height: 60px;
+            width: 150px;
+        }
+
+        /* Navbar Links */
+        .navbar-nav .nav-item {
+            position: relative;
+        }
+
+        .navbar-nav .nav-link {
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: white !important;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Hover Effect */
+        .navbar-nav .nav-link:hover {
+            color: lightseagreen !important;
+            border-color: lightseagreen;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Dropdown Menu */
+        .dropdown-menu {
+            background: rgba(0, 0, 0, 0.9) !important;
+            border-radius: 8px;
+            min-width: 200px;
+            padding: 10px;
+            display: none;
+            position: absolute;
+            z-index: 999;
+        }
+
+        .dropdown-menu .dropdown-item {
+            color: white !important;
+            font-size: 14px;
+            padding: 10px 15px;
+            transition: all 0.3s ease-in-out;
+            border-radius: 5px;
+        }
+
+        .dropdown-menu .dropdown-item:hover {
+            background: lightseagreen;
+            color: white !important;
+        }
+
+        /* Show dropdown on hover */
+        .nav-item:hover .dropdown-menu {
+            display: block;
+        }
+
+        /* Mobile View */
+        @media screen and (max-width: 1024px) {
+            .navbar {
+                height: 75px;
+                padding: 10px 20px;
+            }
+
+            .navbar-toggler {
+                display: block;
+                border: 2px solid white;
+                padding: 5px 10px;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+
+            .navbar-nav {
+                flex-direction: column;
+                width: 100%;
+                background: rgba(0, 31, 63, 0.95);
+                position: absolute;
+                top: 100%;
+                left: 0;
+                display: none;
+                padding: 10px 0;
+                border-radius: 5px;
+                z-index: 999;
+            }
+
+            .navbar-nav.active {
+                display: flex;
+            }
+
+            .navbar-nav .nav-item {
+                text-align: center;
+                width: 100%;
+            }
+
+            .dropdown-menu {
+                position: relative;
+                width: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                text-align: center;
+            }
+        }
+
+    </style>
+</head>
+<body>
+	<div th:fragment="navbar_dealer">
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a href="#" class="logo">
+                <img src="/THINTURE_IMAGE/thinlogo.png" alt="Fleet Tracking Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard_dealer"><strong>HOME</strong></a>
+                    </li>
+                    
+                    <li class="nav-item dropdown dealer-only">
+                        <a class="nav-link dropdown-toggle" href="#" id="managerDropdown" data-bs-toggle="dropdown">
+                            <strong>MANAGER</strong>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/addclient_dealer">Add Client</a></li>
+                            <li><a class="dropdown-item" href="/adduser_dealer">Add User</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="trackingDropdown" data-bs-toggle="dropdown">
+                            <strong>TRACKING</strong>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/mapDealer">Live Map</a></li>
+                            <li><a class="dropdown-item" href="/playback_dealer">Playback Track</a></li>
+                            <li><a class="dropdown-item" href="/dealer_eventreport">Report</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="configDropdown" data-bs-toggle="dropdown">
+                            <strong>CONFIGURATION</strong>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/installDealerController">Install</a></li>
+                            <li><a class="dropdown-item" href="#renewal">Renewal</a></li>
+                            <li><a class="dropdown-item" href="/dealer_device_report">Search</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" data-bs-toggle="dropdown">
+                            <strong>REPORT</strong>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/event_dealer">Event</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" data-bs-toggle="dropdown">
+                            <strong id="profileid">PROFILE</strong>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="">Profile</a></li>
+                            <li><a class="dropdown-item" onclick="logout()">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const username = localStorage.getItem("username");
+            const usertype = localStorage.getItem("usertype");
+            const profileElement = document.getElementById("profileid");
+            const dealerMenu = document.querySelector(".dealer-only");
+
+            if (username && profileElement) {
+                profileElement.textContent = username;
+            }
+
+            if (usertype === "CLIENT") {
+                dealerMenu.style.display = "none";
+            } else if (usertype === "DEALER") {
+                dealerMenu.style.display = "flex";
+            }
+        });
+
+        function logout() {
+            if (confirm("Are you sure you want to log out?")) {
+                localStorage.clear();
+                window.location.replace("/login");
+            }
+        }
+    </script>
+</body>
+</html>

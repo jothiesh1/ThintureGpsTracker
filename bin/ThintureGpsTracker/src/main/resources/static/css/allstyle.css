@@ -1,0 +1,137 @@
+
+	body::before {
+					    content: "";
+					    position: fixed;
+					    top: 0;
+					    left: 0;
+					    width: 100%;
+					    height: 100%;
+
+					    background: linear-gradient(
+					        rgba(10, 25, 47, 0.95),
+					        rgba(15, 32, 65, 0.95)
+					      ),
+					      url('/THINTURE_IMAGE/add_new.jpg') no-repeat center center/cover;
+
+					    filter: blur(2px);
+					    z-index: -1;
+					}
+					@media only screen and (max-width: 768px) {
+					    body {
+					        background-attachment: fixed;
+					        min-height: 100vh;
+					        font-size: 14px;
+					        background-color: #0a192f; /* fallback for small screens if image fails */
+					        background-size: cover;
+					        color: #f0f0f0;
+					    }
+					}		
+
+	.card {
+	    position: relative;
+		background: linear-gradient(
+							        rgba(0, 0, 0, 0.1),
+							        rgba(0, 0, 0, 0.1)
+							      );
+	    padding: 10px;
+	    margin: 0 auto;
+	    max-width: 1200px; /* Center the content on larger screens */
+	    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+	    text-align: center;
+		top:150px;
+	}
+
+	.main-heading {
+	    text-align: center;
+	    font-size: 36px;
+	    font-weight: bold;
+	    color: #ffffff;
+	    margin-bottom: 20px;
+	    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+	}
+
+	.report-grid {
+	    display: grid;
+	    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	    gap: 20px;
+	    justify-items: center;
+	    align-items: center;
+	    padding: 10px;
+	}
+
+	.report-card {
+	    background: rgba(0, 0, 0, 0.8);
+	    border-radius: 8px;
+	    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.9);
+	    padding: 15px;
+	    text-align: center;
+	    cursor: pointer;
+	    transition: transform 0.2s;
+	    max-width: 150px; /* Limit the card width */
+	}
+
+	.report-card:hover {
+	    transform: scale(1.05);
+	}
+
+	.report-card img {
+	    max-width: 100%; /* Ensure the image is responsive */
+	    height: auto;    /* Maintain aspect ratio */
+	    margin-bottom: 10px;
+	}
+
+	.report-card span {
+	    font-weight: bold;
+	    display: block;
+	    margin-top: 10px;
+	    color: white;
+	    font-size: 14px;
+	}
+
+	/* Responsive Adjustments */
+	@media screen and (max-width: 1024px) {
+	    .main-heading {
+	        font-size: 28px;
+	    }
+
+	    .report-card span {
+	        font-size: 12px;
+	    }
+	}
+
+	@media screen and (max-width: 768px) {
+	    .main-heading {
+	        font-size: 24px;
+	    }
+
+	    .report-card {
+	        padding: 10px;
+	    }
+
+	    .report-card img {
+	        max-width: 80px;
+	    }
+
+	    .report-card span {
+	        font-size: 12px;
+	    }
+	}
+
+	@media screen and (max-width: 480px) {
+	    .main-heading {
+	        font-size: 20px;
+	    }
+
+	    .report-card {
+	        max-width: 100px;
+	        padding: 8px;
+	    }
+
+	    .report-card img {
+	        max-width: 60px;
+	    }
+
+	    .report-card span {
+	        font-size: 10px;
+	    }
+	}

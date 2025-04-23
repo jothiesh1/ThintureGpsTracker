@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thinture GPS Dashboard</title>
+  <link rel="icon" type="image/x-icon" href="THINTURE_IMAGE/favicon.jpg">
+
+  <!-- CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js/dist/Chart.min.css">
+
+  
+  <link rel="stylesheet" type="text/css" th:href="@{/css/styled.css}">
+  
+  
+  
+  <!-- JS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Custom Styles -->
+  <style>
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 150%;
+      background: linear-gradient(rgba(10, 25, 47, 0.95), rgba(15, 32, 65, 0.95)),
+                  url('/THINTURE_IMAGE/add_new.jpg') no-repeat center center/cover;
+      filter: blur(2px);
+      z-index: -1;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      padding-bottom: 120px;
+    }
+    .card-custom {
+		position: relative;
+		top:50px;
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid #ccc;
+      border-radius: 1rem;
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+    .card-title {
+      color: #ffffff;
+    }
+    .footer {
+      background-color: rgba(15, 32, 65, 1);
+      font-size: 12px;
+      position: fixed;
+      bottom: 0; width: 100%;
+      text-align: center;
+      padding: 10px;
+    }
+    @media only screen and (max-width: 768px) {
+      canvas {
+        max-width: 100% !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div th:insert="navigation_admin :: navbar_admin"></div>
+
+  <div class="container mt-5">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card-custom">
+          <h5 class="card-title">Users Distribution</h5>
+          <canvas id="userTypeChart"></canvas>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card-custom">
+          <h5 class="card-title">Vehicle Type Count</h5>
+          <canvas id="vehicleTypePieChart"></canvas>
+        </div>
+      </div>
+
+	  <div class="col-md-4">
+	    <div class="card-custom">
+	      <h5 class="card-title">Driver Performance Report</h5>
+	      <canvas id="driverPerformanceChart"></canvas>
+	    </div>
+	  </div>
+	  <div class="col-md-4">
+	    <div class="card-custom">
+	      <h5 class="card-title">Violation Report</h5>
+	      <canvas id="violationChart"></canvas>
+	    </div>
+	  </div>
+	  	  <div class="col-md-4">
+	    <div class="card-custom">
+	      <h5 class="card-title">Complaint Status</h5>
+	      <canvas id="complaintStatusChart"></canvas>
+	    </div>
+	  </div>
+	  <div class="col-md-4">
+	    <div class="card-custom">
+	      <h5 class="card-title">Vehicle Status</h5>
+	      <canvas id="vehicleStatusChart"></canvas>
+	    </div>
+	  </div>
+
+	  <div class="col-md-6">
+	  	    <div class="card-custom">
+	  	      <h5 class="card-title">Top 5 Vehicles by Usage (KM)</h5>
+	  	      <canvas id="topVehiclesChart"></canvas>
+	  	    </div>
+	  	  </div>
+		  
+		  
+		  <div class="col-md-6">
+		    <div class="card-custom">
+		      <h5 class="card-title">Device Expiry Status</h5>
+		      <div class="row g-2 mb-3">
+		        <div class="col-md-4">
+		          <label for="expiryYearFilter">Year</label>
+		          <select id="expiryYearFilter" class="form-select">
+		            <option value="All">All</option>
+		            <option value="2024">2024</option>
+		            <option value="2025">2025</option>
+		          </select>
+		        </div>
+		        <div class="col-md-4">
+		          <label for="expiryMonthFilter">Month</label>
+		          <select id="expiryMonthFilter" class="form-select">
+		            <option value="All">All</option>
+		            <option value="Jan">Jan</option>
+		            <option value="Feb">Feb</option>
+		            <option value="Mar">Mar</option>
+		            <option value="Apr">Apr</option>
+		            <option value="May">May</option>
+		            <option value="Jun">Jun</option>
+		            <option value="Jul">Jul</option>
+		            <option value="Aug">Aug</option>
+		            <option value="Sep">Sep</option>
+		            <option value="Oct">Oct</option>
+		            <option value="Nov">Nov</option>
+		            <option value="Dec">Dec</option>
+		          </select>
+		        </div>
+		        <div class="col-md-4">
+		          <label for="statusFilter">Status</label>
+		          <select id="statusFilter" class="form-select">
+		            <option value="All">All</option>
+		            <option value="Expiring This Month">Expiring This Month</option>
+		            <option value="Next Month">Next Month</option>
+		            <option value="Expired">Expired</option>
+		            <option value="Active">Active</option>
+		          </select>
+		        </div>
+		      </div>
+		      <canvas id="deviceExpiryChart" height="100"></canvas>
+		    </div>
+		  </div>
+
+
+	  <div class="card-custom mt-4">
+	    <h5 class="card-title">Vehicle Driven KM</h5>
+
+	    <div class="row mb-3">
+	      <div class="col-md-4">
+	        <label for="vehicleSelect">Select Vehicle</label>
+	        <select id="vehicleSelect" class="form-select">
+	          <option value="">-- Select Vehicle --</option>
+	          <!-- JS will populate options -->
+	        </select>
+	      </div>
+		 
+
+	      <div class="col-md-4">
+	        <label for="durationSelect">Filter By</label>
+	        <select id="durationSelect" class="form-select">
+	          <option value="day">Daily</option>
+	          <option value="week">Weekly</option>
+	          <option value="month" selected>Monthly</option>
+	        </select>
+	      </div>
+	      <div class="col-md-4 d-flex align-items-end">
+	        <button class="btn btn-primary w-100" onclick="loadKmChart()">🔄 Load Report</button>
+	      </div>
+	    </div>
+
+	    <canvas id="vehicleKmLineChart" height="100"></canvas>
+	  </div>
+
+    </div>
+
+	
+	
+	
+    <div class="card-custom mt-4">
+      <h5 class="card-title">Monthly Installation & Renewal Report</h5>
+      <div class="row g-2 mb-3">
+        <div class="col-md-3">
+          <label for="yearFilter">Year</label>
+          <select id="yearFilter" class="form-select">
+            <option value="All">All</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="monthFilter">Month</label>
+          <select id="monthFilter" class="form-select">
+            <option value="All">All</option>
+            <option value="Jan">Jan</option>
+            <option value="Feb">Feb</option>
+            <option value="Mar">Mar</option>
+            <option value="Apr">Apr</option>
+            <option value="May">May</option>
+            <option value="Jun">Jun</option>
+            <option value="Jul">Jul</option>
+            <option value="Aug">Aug</option>
+            <option value="Sep">Sep</option>
+            <option value="Oct">Oct</option>
+            <option value="Nov">Nov</option>
+            <option value="Dec">Dec</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="dataTypeFilter">Data Type</label>
+          <select id="dataTypeFilter" class="form-select">
+            <option value="All">All</option>
+            <option value="Installations">Installations</option>
+            <option value="Renewals">Renewals</option>
+          </select>
+        </div>
+      </div>
+      <canvas id="monthlyReportChart" height="100"></canvas>
+    </div>
+
+
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <p class="mb-1">© 2025 Thinture Technologies Pvt. Ltd. All rights reserved.</p>
+      <p class="mb-1">Version v0.1</p>
+      <p class="mb-0">
+        <a href="mailto:info@thinture.com" class="text-info">info@thinture.com</a>
+      </p>
+    </div>
+  </footer>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', async function () {
+		    const ctx = document.getElementById('userTypeChart').getContext('2d');
+
+		    try {
+		        const response = await fetch('/api/dashboard-summary/counts');
+		        const data = await response.json();
+
+		        const userTypeChart = new Chart(ctx, {
+		            type: 'doughnut',
+		            data: {
+		                labels: ['Dealer', 'Client', 'User'],
+		                datasets: [{
+		                    data: [
+		                        data.Dealer || 0,
+		                        data.Client || 0,
+		                        data.User || 0
+		                    ],
+		                    backgroundColor: ['#2196F3', '#FFC107', '#F44336'],
+		                    hoverBackgroundColor: ['#42A5F5', '#FFCA28', '#E57373'],
+		                    borderColor: '#ffffff',
+		                    borderWidth: 2
+		                }]
+		            },
+		            options: {
+		                cutout: '70%',
+		                plugins: {
+		                    tooltip: {
+		                        callbacks: {
+		                            label: function(context) {
+		                                const label = context.label || '';
+		                                const value = context.raw || 0;
+		                                return `${label}: ${value}`;
+		                            }
+		                        }
+		                    },
+		                    legend: {
+		                        display: true,
+		                        position: 'bottom'
+		                    },
+		                    datalabels: {
+		                        color: '#000',
+		                        font: {
+		                            weight: 'bold',
+		                            size: 16
+		                        },
+		                        formatter: function(value) {
+		                            return value;
+		                        }
+		                    }
+		                },
+		                onClick: function(evt) {
+		                    const activePoints = userTypeChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+		                    if (activePoints.length) {
+		                        const clickedLabel = userTypeChart.data.labels[activePoints[0].index];
+								if (clickedLabel === 'Dealer') {
+								    window.location.href = '/dealer_view';
+								} else if (clickedLabel === 'Client') {
+								    window.location.href = 'clients.html';
+								} else if (clickedLabel === 'User') {
+								    window.location.href = 'users.html';
+								}
+
+		                    }
+		                }
+		            },
+		            plugins: [ChartDataLabels]
+		        });
+
+		    } catch (error) {
+		        console.error('Error fetching user type data:', error);
+		        Swal.fire('Error!', 'Failed to load user distribution. Please try again later.', 'error');
+		    }
+		});
+
+		
+		
+		
+		
+		
+		
+		
+		
+		document.addEventListener('DOMContentLoaded', async function () {
+		    try {
+		        // Fetch vehicle status data
+		        const response = await fetch('/api/vehicle-status');
+		        const data = await response.json();
+
+		        // Assuming your API returns a structure like:
+		        // {
+		        //     running: 40, 
+		        //     idle: 30, 
+		        //     parked: 20, 
+		        //     offline: 10, 
+		        //     total: 100
+		        // }
+
+		        // Update total vehicles
+		        document.getElementById('dashboardTotalVehicles').textContent = data.total;
+
+		        // Update progress bars
+		        const total = data.total;
+
+		        // Calculate percentages for each status
+		        const runningPercentage = (data.running / total) * 100;
+		        const idlePercentage = (data.idle / total) * 100;
+		        const parkedPercentage = (data.parked / total) * 100;
+		        const offlinePercentage = (data.offline / total) * 100;
+
+		        // Set the width and label of each progress bar
+		        document.getElementById('runningBar').style.width = `${runningPercentage}%`;
+		        document.getElementById('runningBar').textContent = `Running (${data.running})`;
+
+		        document.getElementById('idleBar').style.width = `${idlePercentage}%`;
+		        document.getElementById('idleBar').textContent = `Idle (${data.idle})`;
+
+		        document.getElementById('parkedBar').style.width = `${parkedPercentage}%`;
+		        document.getElementById('parkedBar').textContent = `Parked (${data.parked})`;
+
+		        document.getElementById('offlineBar').style.width = `${offlinePercentage}%`;
+		        document.getElementById('offlineBar').textContent = `Offline (${data.offline})`;
+
+		    } catch (error) {
+		        console.error('Error fetching vehicle status data:', error);
+		        Swal.fire('Error!', 'Failed to load vehicle status data. Please try again later.', 'error');
+		    }
+		});
+
+
+		
+		
+		
+		
+		
+
+	
+	
+	
+	
+	
+	
+	
+	
+	//vehicle pie chart
+	
+	document.addEventListener('DOMContentLoaded', async function () {
+	          const vehicleCtx = document.getElementById('vehicleStatusPieChart').getContext('2d');
+
+	          // Default static data
+	          const defaultData = {
+	              running: 15,
+	              idle: 10,
+	              parked: 8,
+	              offline: 5
+	          };
+
+	          // Initialize Ring (Doughnut) Chart
+	          const vehicleStatusRingChart = new Chart(vehicleCtx, {
+	              type: 'doughnut', // Use doughnut for ring chart
+	              data: {
+	                  labels: ['Running', 'Idle', 'Parked', 'Offline'],
+	                  datasets: [{
+	                      data: [defaultData.running, defaultData.idle, defaultData.parked, defaultData.offline],
+	                      backgroundColor: ['#4CAF50', '#FFC107', '#2196F3', '#F44336'],
+	                      borderColor: '#ffffff',
+	                      borderWidth: 2
+	                  }]
+	              },
+	              options: {
+	                  responsive: true,
+	                  cutout: '70%', // Creates a ring chart (controls the inner cutout size)
+	                  plugins: {
+	                      legend: {
+	                          display: true,
+	                          position: 'bottom',
+	                          labels: {
+	                              color: '#fff' // makes legend visible on dark background
+	                          }
+	                      },
+	                      tooltip: {
+	                          callbacks: {
+	                              label: function(context) {
+	                                  return `${context.label}: ${context.raw}`;
+	                              }
+	                          }
+	                      },
+	                      datalabels: {
+	                          color: '#fff',  // White color for the data label
+	                          font: {
+	                              weight: 'bold',
+	                              size: 16
+	                          },
+	                          formatter: function(value) {
+	                              return value;  // Display count inside the chart
+	                          },
+	                          align: 'center', // Center the labels inside the ring
+	                          anchor: 'center' // Anchor the label to the center
+	                      }
+	                  }
+	              }
+	          });
+
+	          // Attempt to fetch real data
+	          try {
+	              const response = await fetch('/api/vehicle-status');
+	              const data = await response.json();
+
+	              // Update the chart with the fetched data, fallback to default if no data
+	              vehicleStatusRingChart.data.datasets[0].data = [
+	                  data.running || defaultData.running,
+	                  data.idle || defaultData.idle,
+	                  data.parked || defaultData.parked,
+	                  data.offline || defaultData.offline
+	              ];
+	              vehicleStatusRingChart.update();
+
+	          } catch (error) {
+	              // If the fetch fails, use the default data
+	              console.error('Error fetching vehicle status data:', error);
+	              Swal.fire('Error!', 'Failed to load live data. Showing default.', 'warning');
+	          }
+	      });
+
+
+	</script>
+	<script>
+		const ctxType = document.getElementById('vehicleTypePieChart').getContext('2d');
+		new Chart(ctxType, {
+		  type: 'doughnut',
+		  data: {
+		    labels: ['Truck', 'Bus', 'Van'],
+		    datasets: [{
+		      data: [39, 29, 37],
+		      backgroundColor: ['#3498db', '#f1c40f', '#e74c3c'],
+		      borderWidth: 0,
+		      hoverOffset: 10
+		    }]
+		  },
+		  options: {
+		    responsive: true,
+		    cutout: '65%',
+		    plugins: {
+		      legend: { display: false },
+		      tooltip: {
+		        enabled: true,
+		        backgroundColor: '#2c3e50',
+		        titleColor: '#fff',
+		        bodyColor: '#fff',
+		        padding: 10,
+		        borderWidth: 2,
+		      }
+		    }
+		  },
+		  plugins: [{
+		    id: 'label-inside-ring',
+		    afterDatasetDraw(chart) {
+		      const { ctx, data } = chart;
+		      const meta = chart.getDatasetMeta(0);
+		      ctx.fillStyle = '#fff';
+		      ctx.font = 'bold 16px Segoe UI';
+		      ctx.textAlign = 'center';
+		      ctx.textBaseline = 'middle';
+
+		      meta.data.forEach((arc, i) => {
+		        const center = arc.tooltipPosition();
+		        ctx.fillText(data.datasets[0].data[i], center.x, center.y);
+		      });
+		    }
+		  }]
+		});
+
+
+	</script>
+
+	<script>
+	document.addEventListener('DOMContentLoaded', async function () {
+	    const ctxType = document.getElementById('vehicleTypePieChart').getContext('2d');
+
+	    // Default fallback data
+	    const defaultLabels = ['Truck', 'Bus', 'Van'];
+	    const defaultData = [10, 5, 3];
+
+	    const vehicleTypeChart = new Chart(ctxType, {
+	        type: 'doughnut',
+	        data: {
+	            labels: defaultLabels,
+	            datasets: [{
+	                data: defaultData,
+	                backgroundColor: ['#3498db', '#f1c40f', '#e74c3c'],
+	                borderWidth: 0,
+	                hoverOffset: 10
+	            }]
+	        },
+	        options: {
+	            responsive: true,
+	            cutout: '65%',
+	            plugins: {
+	                legend: {
+	                    display: true,
+	                    position: 'bottom',
+	                    labels: { color: '#ffffff' }
+	                },
+	                tooltip: {
+	                    enabled: true,
+	                    backgroundColor: '#2c3e50',
+	                    titleColor: '#fff',
+	                    bodyColor: '#fff',
+	                    padding: 10,
+	                    borderWidth: 2,
+	                }
+	            }
+	        },
+	        plugins: [{
+	            id: 'label-inside-ring',
+	            afterDatasetDraw(chart) {
+	                const { ctx, data } = chart;
+	                const meta = chart.getDatasetMeta(0);
+	                ctx.fillStyle = '#fff';
+	                ctx.font = 'bold 16px Segoe UI';
+	                ctx.textAlign = 'center';
+	                ctx.textBaseline = 'middle';
+
+	                meta.data.forEach((arc, i) => {
+	                    const center = arc.tooltipPosition();
+	                    ctx.fillText(data.datasets[0].data[i], center.x, center.y);
+	                });
+	            }
+	        }]
+	    });
+
+	    // Try to fetch real data from your backend
+	    try {
+	        const response = await fetch('/api/vehicle-types');
+	        const result = await response.json();
+
+	        const labels = result.map(item => item.type);
+	        const counts = result.map(item => item.count);
+
+	        vehicleTypeChart.data.labels = labels;
+	        vehicleTypeChart.data.datasets[0].data = counts;
+	        vehicleTypeChart.update();
+	    } catch (error) {
+	        console.error("Vehicle type pie chart fetch failed:", error);
+	        Swal.fire('Error!', 'Could not load vehicle type data. Showing default.', 'warning');
+	    }
+	});
+	</script>
+
+	
+	
+	
+	
+	
+	
+	
+	
+	<script>
+		
+		
+		
+		//driver chart
+	document.addEventListener('DOMContentLoaded', async function () {
+	    const ctx = document.getElementById('driverPerformanceChart').getContext('2d');
+
+	    // Fallback static data
+	    const defaultLabels = ['Excellent', 'Good', 'Average', 'Poor'];
+	    const defaultData = [15, 30, 10, 5];
+	    const defaultColors = ['#2ecc71', '#3498db', '#f1c40f', '#e74c3c'];
+
+	    const driverChart = new Chart(ctx, {
+	        type: 'doughnut',
+	        data: {
+	            labels: defaultLabels,
+	            datasets: [{
+	                data: defaultData,
+	                backgroundColor: defaultColors,
+	                borderWidth: 0,
+	                hoverOffset: 10
+	            }]
+	        },
+	        options: {
+	            responsive: true,
+	            cutout: '65%',
+	            plugins: {
+	                legend: {
+	                    display: true,
+	                    position: 'bottom',
+	                    labels: { color: '#ffffff' }
+	                },
+	                tooltip: {
+	                    enabled: true,
+	                    backgroundColor: '#2c3e50',
+	                    titleColor: '#fff',
+	                    bodyColor: '#fff',
+	                    padding: 10,
+	                    borderWidth: 2
+	                }
+	            }
+	        },
+	        plugins: [{
+	            id: 'label-inside-ring',
+	            afterDatasetDraw(chart) {
+	                const { ctx, data } = chart;
+	                const meta = chart.getDatasetMeta(0);
+	                ctx.fillStyle = '#fff';
+	                ctx.font = 'bold 16px Segoe UI';
+	                ctx.textAlign = 'center';
+	                ctx.textBaseline = 'middle';
+
+	                meta.data.forEach((arc, i) => {
+	                    const center = arc.tooltipPosition();
+	                    ctx.fillText(data.datasets[0].data[i], center.x, center.y);
+	                });
+	            }
+	        }]
+	    });
+
+	    // Optional: Fetch live data from backend
+	    try {
+	        const response = await fetch('/api/driver-performance');
+	        const result = await response.json(); // Ex: [{ label: 'Excellent', count: 10 }, ...]
+	        
+	        const labels = result.map(d => d.label);
+	        const values = result.map(d => d.count);
+
+	        driverChart.data.labels = labels;
+	        driverChart.data.datasets[0].data = values;
+	        driverChart.update();
+	    } catch (error) {
+	        console.warn('⚠️ Could not load live driver report data. Showing fallback.');
+	    }
+	});
+	</script>
+
+	
+	
+	
+	<script>
+		
+		
+		//violation chart
+	document.addEventListener('DOMContentLoaded', async function () {
+	    const ctx = document.getElementById('violationChart').getContext('2d');
+
+	    // Default violation categories
+	    const defaultLabels = [
+	        'Driver: Overspeed', 
+	        'Driver: Harsh Brake', 
+	        'Vehicle: Engine Idle',
+	        'Vehicle: Offline'
+	    ];
+	    const defaultData = [12, 5, 8, 4]; // Example values
+	    const defaultColors = ['#e74c3c', '#f39c12', '#3498db', '#9b59b6'];
+
+	    const violationChart = new Chart(ctx, {
+	        type: 'doughnut',
+	        data: {
+	            labels: defaultLabels,
+	            datasets: [{
+	                data: defaultData,
+	                backgroundColor: defaultColors,
+	                borderWidth: 0,
+	                hoverOffset: 10
+	            }]
+	        },
+	        options: {
+	            responsive: true,
+	            cutout: '65%',
+	            plugins: {
+	                legend: {
+	                    display: true,
+	                    position: 'bottom',
+	                    labels: { color: '#ffffff' }
+	                },
+	                tooltip: {
+	                    enabled: true,
+	                    backgroundColor: '#2c3e50',
+	                    titleColor: '#fff',
+	                    bodyColor: '#fff',
+	                    padding: 10,
+	                    borderWidth: 2
+	                }
+	            }
+	        },
+	        plugins: [{
+	            id: 'label-inside-ring',
+	            afterDatasetDraw(chart) {
+	                const { ctx, data } = chart;
+	                const meta = chart.getDatasetMeta(0);
+	                ctx.fillStyle = '#fff';
+	                ctx.font = 'bold 16px Segoe UI';
+	                ctx.textAlign = 'center';
+	                ctx.textBaseline = 'middle';
+
+	                meta.data.forEach((arc, i) => {
+	                    const center = arc.tooltipPosition();
+	                    ctx.fillText(data.datasets[0].data[i], center.x, center.y);
+	                });
+	            }
+	        }]
+	    });
+
+	    // Optional: Fetch violations from backend API
+	    try {
+	        const response = await fetch('/api/violations-summary'); // Example endpoint
+	        const result = await response.json(); // [{ label: 'Driver: Overspeed', count: 12 }, ...]
+
+	        const labels = result.map(item => item.label);
+	        const counts = result.map(item => item.count);
+
+	        violationChart.data.labels = labels;
+	        violationChart.data.datasets[0].data = counts;
+	        violationChart.update();
+	    } catch (error) {
+	        console.warn('⚠️ Violation data fetch failed, using default.');
+	    }
+	});
+	</script>
+	
+	
+	<script>
+		let kmChart;
+
+		document.addEventListener('DOMContentLoaded', async function () {
+		    // ✅ Fetch all vehicle IDs from the correct endpoint
+		    try {
+		        const res = await fetch('/api/distance/ids'); // 🔄 Updated to correct endpoint
+		        const vehicles = await res.json(); // Example: [{id: 'BGNW0001'}, ...]
+
+		        const select = document.getElementById('vehicleSelect');
+		        vehicles.forEach(v => {
+		            const opt = document.createElement('option');
+		            opt.value = v.id;
+		            opt.textContent = v.id; // You can also show something like `${v.vehicleNumber} (${v.id})` if needed
+		            select.appendChild(opt);
+		        });
+		    } catch (err) {
+		        console.warn('❌ Failed to load vehicle IDs:', err);
+		        Swal.fire('Error', 'Could not load vehicle list.', 'error');
+		    }
+
+		    // 🎯 Init chart with blank setup
+		    const ctx = document.getElementById('vehicleKmLineChart').getContext('2d');
+		    kmChart = new Chart(ctx, {
+		        type: 'line',
+		        data: {
+		            labels: [],
+		            datasets: [{
+		                label: 'KM Driven',
+		                data: [],
+		                borderColor: '#4CAF50',
+		                backgroundColor: 'rgba(76, 175, 80, 0.1)',
+		                fill: true,
+		                tension: 0.4,
+		                pointRadius: 4,
+		                pointBackgroundColor: '#4CAF50'
+		            }]
+		        },
+		        options: {
+		            responsive: true,
+		            plugins: {
+		                legend: { position: 'bottom', labels: { color: '#ffffff' } },
+		                tooltip: {
+		                    callbacks: {
+		                        label: ctx => `${ctx.dataset.label}: ${ctx.raw} KM`
+		                    }
+		                }
+		            },
+		            scales: {
+		                x: { ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+		                y: {
+		                    ticks: { color: '#fff' },
+		                    title: { display: true, text: 'Kilometers', color: '#ffffff' },
+		                    grid: { color: 'rgba(255,255,255,0.1)' }
+		                }
+		            }
+		        }
+		    });
+		});
+
+		// 🚀 Load KM data into chart
+		async function loadKmChart() {
+		    const vehicleId = document.getElementById('vehicleSelect').value;
+		    const type = document.getElementById('durationSelect').value;
+
+		    if (!vehicleId) {
+		        Swal.fire('Select Vehicle', 'Please choose a vehicle first.', 'info');
+		        return;
+		    }
+
+		    try {
+		        const res = await fetch(`/api/distance/summary?deviceId=${vehicleId}&type=${type}`);
+		        const data = await res.json(); // Expected: [{ label: '2025-04-01', km: 45 }, ...]
+
+		        const labels = data.map(d => d.label);
+		        const values = data.map(d => d.km);
+
+		        kmChart.data.labels = labels;
+		        kmChart.data.datasets[0].data = values;
+		        kmChart.update();
+		    } catch (err) {
+		        console.error(err);
+		        Swal.fire('Error', 'Failed to load distance data.', 'error');
+		    }
+		}
+	</script>
+
+	
+	
+	
+	<script>
+	document.addEventListener('DOMContentLoaded', function () {
+	    const ctx = document.getElementById('complaintStatusChart').getContext('2d');
+
+	    new Chart(ctx, {
+	        type: 'doughnut',
+	        data: {
+	            labels: ['Pending', 'In Progress', 'Resolved', 'Rejected'],
+	            datasets: [{
+	                data: [20, 15, 40, 5], // Default counts
+	                backgroundColor: ['#f39c12', '#3498db', '#2ecc71', '#e74c3c'],
+	                borderWidth: 0,
+	                hoverOffset: 10
+	            }]
+	        },
+	        options: {
+	            responsive: true,
+	            cutout: '65%',
+	            plugins: {
+	                legend: {
+	                    display: true,
+	                    position: 'bottom',
+	                    labels: { color: '#ffffff' }
+	                },
+	                tooltip: {
+	                    backgroundColor: '#2c3e50',
+	                    titleColor: '#fff',
+	                    bodyColor: '#fff',
+	                    padding: 10,
+	                    borderWidth: 2
+	                }
+	            }
+	        }
+	    });
+	});
+	</script>
+	
+	
+	
+	
+	
+	
+	<script>
+	document.addEventListener('DOMContentLoaded', function () {
+	    const ctx = document.getElementById('vehicleStatusChart').getContext('2d');
+
+	    new Chart(ctx, {
+	        type: 'doughnut',
+	        data: {
+	            labels: ['Running', 'Idle', 'Parked', 'Offline'],
+	            datasets: [{
+	                data: [35, 20, 25, 10], // Default counts
+	                backgroundColor: ['#4CAF50', '#FFC107', '#2196F3', '#F44336'],
+	                borderWidth: 0,
+	                hoverOffset: 10
+	            }]
+	        },
+	        options: {
+	            responsive: true,
+	            cutout: '65%',
+	            plugins: {
+	                legend: {
+	                    display: true,
+	                    position: 'bottom',
+	                    labels: { color: '#ffffff' }
+	                },
+	                tooltip: {
+	                    backgroundColor: '#2c3e50',
+	                    titleColor: '#fff',
+	                    bodyColor: '#fff',
+	                    padding: 10,
+	                    borderWidth: 2
+	                }
+	            }
+	        }
+	    });
+	});
+	</script>
+	<script>
+	document.addEventListener('DOMContentLoaded', async function () {
+	    const ctx = document.getElementById('topVehiclesChart').getContext('2d');
+
+	    // Default fallback data
+	    const defaultLabels = ['TN01AB1234', 'TN01CD5678', 'TN02EF9012', 'TN03GH3456', 'TN04IJ7890'];
+	    const defaultData = [1200, 1150, 980, 900, 850];
+
+	    const usageChart = new Chart(ctx, {
+	        type: 'bar',
+	        data: {
+	            labels: defaultLabels,
+	            datasets: [{
+	                label: 'KM Driven',
+	                data: defaultData,
+	                backgroundColor: '#3498db'
+	            }]
+	        },
+	        options: {
+	            responsive: true,
+	            plugins: {
+	                legend: { display: false },
+	                tooltip: {
+	                    callbacks: {
+	                        label: context => `${context.dataset.label}: ${context.raw} KM`
+	                    }
+	                }
+	            },
+	            scales: {
+	                x: {
+	                    ticks: { color: '#ffffff' },
+	                    grid: { color: 'rgba(255,255,255,0.1)' }
+	                },
+	                y: {
+	                    ticks: { color: '#ffffff' },
+	                    grid: { color: 'rgba(255,255,255,0.1)' },
+	                    title: {
+	                        display: true,
+	                        text: 'KM Driven',
+	                        color: '#ffffff'
+	                    }
+	                }
+	            }
+	        }
+	    });
+
+	    // Optional: Fetch live data
+	    try {
+	        const res = await fetch('/api/top-vehicles-by-usage'); // Example endpoint
+	        const result = await res.json(); // [{ vehicle: 'TN01AB1234', km: 1200 }, ...]
+
+	        const labels = result.map(v => v.vehicle);
+	        const data = result.map(v => v.km);
+
+	        usageChart.data.labels = labels;
+	        usageChart.data.datasets[0].data = data;
+	        usageChart.update();
+	    } catch (error) {
+	        console.warn('⚠️ Could not fetch top vehicles data. Showing default values.');
+	    }
+	});
+	</script>
+	
+	
+	
+	
+	
+	<script>
+	document.addEventListener('DOMContentLoaded', function () {
+	  const ctx = document.getElementById('deviceExpiryChart').getContext('2d');
+
+	  // Static default dataset by month (labels like 'Jan-2024', etc.)
+	  const labels = [
+	    'Jan-2024', 'Feb-2024', 'Mar-2024', 'Apr-2024', 'May-2024', 'Jun-2024',
+	    'Jul-2024', 'Aug-2024', 'Sep-2024', 'Oct-2024', 'Nov-2024', 'Dec-2024',
+	    'Jan-2025', 'Feb-2025', 'Mar-2025', 'Apr-2025'
+	  ];
+
+	  const defaultData = {
+	    'Expiring This Month': [5, 7, 6, 4, 8, 3, 5, 6, 7, 8, 4, 5, 6, 7, 6, 5],
+	    'Next Month': [3, 5, 4, 2, 6, 2, 4, 5, 6, 7, 3, 4, 5, 6, 5, 4],
+	    'Expired': [2, 3, 2, 1, 3, 1, 2, 2, 3, 3, 2, 2, 3, 2, 3, 2],
+	    'Active': [90, 85, 88, 92, 83, 94, 89, 87, 84, 82, 91, 89, 88, 85, 86, 90]
+	  };
+
+	  const colors = {
+	    'Expiring This Month': '#f39c12',
+	    'Next Month': '#3498db',
+	    'Expired': '#e74c3c',
+	    'Active': '#2ecc71'
+	  };
+
+	  // Create chart
+	  const deviceExpiryChart = new Chart(ctx, {
+	    type: 'line',
+	    data: {
+	      labels: labels,
+	      datasets: Object.keys(defaultData).map(key => ({
+	        label: key,
+	        data: defaultData[key],
+	        borderColor: colors[key],
+	        backgroundColor: colors[key] + '22',
+	        fill: true,
+	        tension: 0.3
+	      }))
+	    },
+	    options: {
+	      responsive: true,
+	      plugins: {
+	        legend: {
+	          display: true,
+	          position: 'bottom',
+	          labels: { color: '#ffffff' }
+	        },
+	        tooltip: {
+	          callbacks: {
+	            label: ctx => `${ctx.dataset.label}: ${ctx.raw}`
+	          }
+	        }
+	      },
+	      scales: {
+	        x: {
+	          ticks: { color: '#ffffff' },
+	          grid: { color: 'rgba(255,255,255,0.1)' }
+	        },
+	        y: {
+	          ticks: { color: '#ffffff' },
+	          grid: { color: 'rgba(255,255,255,0.1)' }
+	        }
+	      }
+	    }
+	  });
+
+	  function filterDeviceExpiryChart() {
+	    const selectedYear = document.getElementById('expiryYearFilter').value;
+	    const selectedMonth = document.getElementById('expiryMonthFilter').value;
+	    const selectedStatus = document.getElementById('statusFilter').value;
+
+	    const filteredLabels = [];
+	    const filteredData = {
+	      'Expiring This Month': [],
+	      'Next Month': [],
+	      'Expired': [],
+	      'Active': []
+	    };
+
+	    labels.forEach((label, index) => {
+	      const [month, year] = label.split('-');
+	      const monthMatch = selectedMonth === 'All' || month === selectedMonth;
+	      const yearMatch = selectedYear === 'All' || year === selectedYear;
+
+	      if (monthMatch && yearMatch) {
+	        filteredLabels.push(label);
+	        for (let key in filteredData) {
+	          filteredData[key].push(defaultData[key][index]);
+	        }
+	      }
+	    });
+
+	    const updatedDatasets = [];
+
+	    if (selectedStatus === 'All') {
+	      for (let key in filteredData) {
+	        updatedDatasets.push({
+	          label: key,
+	          data: filteredData[key],
+	          borderColor: colors[key],
+	          backgroundColor: colors[key] + '22',
+	          fill: true,
+	          tension: 0.3
+	        });
+	      }
+	    } else {
+	      updatedDatasets.push({
+	        label: selectedStatus,
+	        data: filteredData[selectedStatus],
+	        borderColor: colors[selectedStatus],
+	        backgroundColor: colors[selectedStatus] + '22',
+	        fill: true,
+	        tension: 0.3
+	      });
+	    }
+
+	    // Update chart
+	    deviceExpiryChart.data.labels = filteredLabels;
+	    deviceExpiryChart.data.datasets = updatedDatasets;
+	    deviceExpiryChart.update();
+	  }
+
+	  // Attach event listeners
+	  document.getElementById('expiryYearFilter').addEventListener('change', filterDeviceExpiryChart);
+	  document.getElementById('expiryMonthFilter').addEventListener('change', filterDeviceExpiryChart);
+	  document.getElementById('statusFilter').addEventListener('change', filterDeviceExpiryChart);
+	});
+	
+	
+	
+	
+	//renewal code
+	
+	document.addEventListener('DOMContentLoaded', async function () {
+			    const ctx = document.getElementById('monthlyReportChart').getContext('2d');
+
+			    const monthlyReportChart = new Chart(ctx, {
+			        type: 'line',
+			        data: {
+			            labels: [],
+			            datasets: [
+			                {
+			                    label: 'Installations',
+			                    data: [],
+			                    borderColor: '#4CAF50',
+			                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+			                    tension: 0.3
+			                },
+			                {
+			                    label: 'Renewals',
+			                    data: [],
+			                    borderColor: '#F44336',
+			                    backgroundColor: 'rgba(244, 67, 54, 0.1)',
+			                    tension: 0.3
+			                }
+			            ]
+			        },
+			        options: {
+			            responsive: true,
+			            plugins: {
+			                legend: { display: true, position: 'bottom' },
+			                tooltip: {
+			                    callbacks: {
+			                        label: ctx => `${ctx.dataset.label}: ${ctx.raw}`
+			                    }
+			                }
+			            },
+			            onClick: function (evt) {
+			                const activePoints = monthlyReportChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+			                if (activePoints.length > 0) {
+			                    const clickedIndex = activePoints[0].index;
+			                    const clickedMonth = monthlyReportChart.data.labels[clickedIndex];
+			                    window.location.href = `/monthly-report-details?month=${encodeURIComponent(clickedMonth)}`;
+			                }
+			            }
+			        }
+			    });
+
+			    // Fetch data initially and on filter change
+			    async function fetchAndUpdateChart() {
+			        const selectedYear = document.getElementById('yearFilter').value;
+			        const selectedMonth = document.getElementById('monthFilter').value;
+			        const selectedDataType = document.getElementById('dataTypeFilter').value;
+
+			        const url = `/api/dashboard-summary/monthly-report?year=${selectedYear}&month=${selectedMonth}`;
+			        try {
+			            const response = await fetch(url);
+			            const data = await response.json();
+
+			            const labels = data.map(d => d.month);
+			            const installs = data.map(d => d.installations);
+			            const renewals = data.map(d => d.renewals);
+
+			            monthlyReportChart.data.labels = labels;
+
+			            if (selectedDataType === 'Installations') {
+			                monthlyReportChart.data.datasets[0].data = installs;
+			                monthlyReportChart.data.datasets[1].data = [];
+			                monthlyReportChart.data.datasets[0].hidden = false;
+			                monthlyReportChart.data.datasets[1].hidden = true;
+			            } else if (selectedDataType === 'Renewals') {
+			                monthlyReportChart.data.datasets[0].data = [];
+			                monthlyReportChart.data.datasets[1].data = renewals;
+			                monthlyReportChart.data.datasets[0].hidden = true;
+			                monthlyReportChart.data.datasets[1].hidden = false;
+			            } else {
+			                monthlyReportChart.data.datasets[0].data = installs;
+			                monthlyReportChart.data.datasets[1].data = renewals;
+			                monthlyReportChart.data.datasets[0].hidden = false;
+			                monthlyReportChart.data.datasets[1].hidden = false;
+			            }
+
+			            monthlyReportChart.update();
+
+			        } catch (error) {
+			            console.error("❌ Failed to load chart data:", error);
+			            Swal.fire('Error!', 'Could not load chart data.', 'error');
+			        }
+			    }
+
+			    // Initial chart load
+			    fetchAndUpdateChart();
+
+			    // Trigger on filter change
+			    document.getElementById('yearFilter').addEventListener('change', fetchAndUpdateChart);
+			    document.getElementById('monthFilter').addEventListener('change', fetchAndUpdateChart);
+			    document.getElementById('dataTypeFilter').addEventListener('change', fetchAndUpdateChart);
+			});
+			
+	
+
+	
+	</script>
+
+	
+	
+	
+	
+	
+
+
+</body>
+</html>

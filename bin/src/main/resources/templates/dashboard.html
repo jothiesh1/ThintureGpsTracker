@@ -1,50 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+
+
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
-	<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-
     <title>Thinture GPS</title>
-    <link rel="icon" type="image/x-icon" href="THINTURE_IMAGE/favicon.jpg">
-    <style>
-		body {
-										    font-family: Arial, sans-serif;
-										    margin: 0;
-										    padding: 0;
-										    position: relative;
-										}
 
-										body::before {
-										    content: "";
-										    position: fixed;
-										    top: 0;
-										    left: 0;
-										    width: 100%;
-										    height: 100%;
-										    background: url('/THINTURE_IMAGE/mainbg.jpg') no-repeat center center/cover;
-										    filter: blur(10px);
-										    z-index: -1; /* Ensures the background remains behind the content */
-										}
-										@media only screen and (max-width: 768px) {
-												    body {
-												        background-attachment: fixed; /* Fixes background on small screens */
-												        min-height: 100vh; /* Ensures full height */
-												        font-size: 14px; /* Adjust font size for better readability */
-														background-size: cover;
-												    }
-												}
+    <link rel="icon" type="image/x-icon" href="THINTURE_IMAGE/favicon.jpg">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+
+    <style>
         .content {
-          position: absolute;
-			left:5px;
+            position: absolute;
+            top: 150px;
+            left: 5px;
         }
+        
         h2 {
             text-align: center;
             font-size: 2em;
@@ -52,149 +32,951 @@
             color: white;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
         }
+        
         .chart-container {
-			position: absolute;
-			top:190px;
+            position: absolute;
+            top: 190px;
             width: 20%;
-			left:15px;
+            left: 15px;
             margin: 2px auto;
             padding: 20px;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
-		.status-list{
-			color: aliceblue;
-		}
+        
+        .status-list {
+            color: aliceblue;
+        }
+        
+        .footer {
+            position: absolute;
+            background: rgba(15, 32, 65, 1.6);
+            bottom: 0px;
+            width: 100%;
+        }
+        
+        /* Additional styles for enhanced dashboard */
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #3498db;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .dashboard-container {
+            margin-top: 150px;
+            margin-left: 25%;
+            width: 72%;
+            padding-bottom: 100px;
+        }
+        
+        .status-card {
+            border-radius: 15px;
+            background: white;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+        
+        .status-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .main-chart-container {
+            border-radius: 15px;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-card {
+            border-radius: 15px;
+            background: white;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+        
+        .chart-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .chart-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .dashboard-chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+        
+        .total-count {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--primary-color);
+        }
+        
+        .count-label {
+            font-size: 1rem;
+            color: #7f8c8d;
+            margin: 0;
+        }
+        
+        .status-count-card {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .status-count-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .running-card {
+            background-color: rgba(46, 204, 113, 0.1);
+            border-left: 5px solid var(--success-color);
+        }
+        
+        .idle-card {
+            background-color: rgba(243, 156, 18, 0.1);
+            border-left: 5px solid var(--warning-color);
+        }
+        
+        .parked-card {
+            background-color: rgba(52, 152, 219, 0.1);
+            border-left: 5px solid var(--info-color);
+        }
+        
+        .offline-card {
+            background-color: rgba(231, 76, 60, 0.1);
+            border-left: 5px solid var(--danger-color);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 767.98px) {
+            .chart-card, .status-card {
+                margin-bottom: 1rem;
+            }
+            
+            .dashboard-container {
+                margin-left: 2%;
+                margin-top: 220px;
+                width: 96%;
+            }
+        }
+        
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+            max-height: 250px;
+        }
     </style>
 </head>
+
+
+
+
 <body>
+    <!-- Using your original navigation component -->
     <div th:insert="navigation :: navbar"></div>
-    
+
+	
+	
+	
+    <!-- Original content and chart container -->
     <div class="content">
-        <h2>Vehicle Status </h2>
+        <h2>Vehicle Status</h2>
     </div>
+
+    <div class="chart-container">
+        <div class="chart-box">
+            <canvas id="pieChart"></canvas>
+        </div>
+        <div class="status-list" id="statusList"></div>
+        <div id="totalVehicles" class="text-white mt-2 text-center fs-5"></div>
+    </div>
+
+    <!-- Enhanced Dashboard Content -->
+    <div class="container dashboard-container">
+        <!-- Vehicle Status Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="status-count-card running-card fade-in">
+                    <i class="fas fa-car-side fa-2x mb-3" style="color: var(--success-color);"></i>
+                    <h2 class="total-count" id="runningCount" style="color: var(--primary-color); font-size: 2.5rem;">0</h2>
+                    <p class="count-label">RUNNING</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="status-count-card idle-card fade-in" style="animation-delay: 0.1s;">
+                    <i class="fas fa-pause-circle fa-2x mb-3" style="color: var(--warning-color);"></i>
+                    <h2 class="total-count" id="idleCount" style="color: var(--primary-color); font-size: 2.5rem;">0</h2>
+                    <p class="count-label">IDLE</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="status-count-card parked-card fade-in" style="animation-delay: 0.2s;">
+                    <i class="fas fa-parking fa-2x mb-3" style="color: var(--info-color);"></i>
+                    <h2 class="total-count" id="parkedCount" style="color: var(--primary-color); font-size: 2.5rem;">0</h2>
+                    <p class="count-label">PARKED</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="status-count-card offline-card fade-in" style="animation-delay: 0.3s;">
+                    <i class="fas fa-power-off fa-2x mb-3" style="color: var(--danger-color);"></i>
+                    <h2 class="total-count" id="offlineCount" style="color: var(--primary-color); font-size: 2.5rem;">0</h2>
+                    <p class="count-label">OFFLINE</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Vehicle Status Chart -->
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <div class="main-chart-container fade-in">
+                    <h4 class="chart-title"><i class="fas fa-car me-2"></i>Vehicle Status Overview</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="dashboard-chart-container">
+                                <canvas id="mainPieChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-center">
+                            <div class="w-100">
+                                <div class="progress mb-4" style="height: 25px;">
+                                    <div class="progress-bar bg-success" id="runningBar" style="width: 25%;">Running</div>
+                                </div>
+                                <div class="progress mb-4" style="height: 25px;">
+                                    <div class="progress-bar bg-warning" id="idleBar" style="width: 25%;">Idle</div>
+                                </div>
+                                <div class="progress mb-4" style="height: 25px;">
+                                    <div class="progress-bar bg-info" id="parkedBar" style="width: 25%;">Parked</div>
+                                </div>
+                                <div class="progress mb-4" style="height: 25px;">
+                                    <div class="progress-bar bg-danger" id="offlineBar" style="width: 25%;">Offline</div>
+                                </div>
+								
+								
+                                <div class="text-center">
+                                    <h5 class="mb-0"><i class="fas fa-car-alt me-2"></i> Total Vehicles: <span id="dashboardTotalVehicles">0</span></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Organization Role Distributions -->
+        <h4 class="mb-4 text-center text-white">System User Roles & Devices Distribution</h4>
+		
+		
+        <div class="row mb-4">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="chart-card fade-in">
+                    <h5 class="chart-title"><i class="fas fa-user-shield me-2"></i>Admin Distribution</h5>
+                    <div class="dashboard-chart-container">
+                        <canvas id="adminChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="chart-card fade-in" style="animation-delay: 0.1s;">
+                    <h5 class="chart-title"><i class="fas fa-store me-2"></i>Dealer Distribution</h5>
+                    <div class="dashboard-chart-container">
+                        <canvas id="dealerChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="chart-card fade-in" style="animation-delay: 0.2s;">
+                    <h5 class="chart-title"><i class="fas fa-building me-2"></i>Client Distribution</h5>
+                    <div class="dashboard-chart-container">
+                        <canvas id="clientChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="chart-card fade-in" style="animation-delay: 0.3s;">
+                    <h5 class="chart-title"><i class="fas fa-users me-2"></i>User Distribution</h5>
+                    <div class="dashboard-chart-container">
+                        <canvas id="userChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="chart-card fade-in" style="animation-delay: 0.4s;">
+                    <h5 class="chart-title"><i class="fas fa-id-card me-2"></i>Driver Distribution</h5>
+                    <div class="dashboard-chart-container">
+                        <canvas id="driverChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="chart-card fade-in" style="animation-delay: 0.5s;">
+                    <h5 class="chart-title"><i class="fas fa-server me-2"></i>Device Distribution</h5>
+                    <div class="dashboard-chart-container">
+                        <canvas id="deviceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+		
+		
+
+        <!-- User Role Summary -->
+        <div class="row mb-5">
+            <div class="col-lg-12">
+                <div class="status-card fade-in" style="animation-delay: 0.6s;">
+                    <h4 class="chart-title mb-4"><i class="fas fa-users-cog me-2"></i>Organization Overview</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col"><i class="fas fa-user me-2"></i>Role Type</th>
+                                    <th scope="col" class="text-center"><i class="fas fa-hashtag me-2"></i>Count</th>
+                                    <th scope="col" class="text-center"><i class="fas fa-percentage me-2"></i>Percentage</th>
+                                    <th scope="col" class="text-center"><i class="fas fa-chart-bar me-2"></i>Distribution</th>
+                                </tr>
+                            </thead>
+                            <tbody id="roleSummaryTable">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Original footer -->
     
-	<div class="chart-container">
-	        <div class="chart-box">
-	            <canvas id="pieChart"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+	
+	
+	
+    <script>
+        // Register Chart.js plugin
+        Chart.register(ChartDataLabels);
+
+        // Chart color schemes
+        const chartColors = {
+            running: {
+                main: '#2ecc71',
+                background: 'rgba(46, 204, 113, 0.8)',
+                hover: 'rgba(46, 204, 113, 1)'
+            },
+            idle: {
+                main: '#f39c12',
+                background: 'rgba(243, 156, 18, 0.8)',
+                hover: 'rgba(243, 156, 18, 1)'
+            },
+            parked: {
+                main: '#3498db',
+                background: 'rgba(52, 152, 219, 0.8)',
+                hover: 'rgba(52, 152, 219, 1)'
+            },
+            offline: {
+                main: '#e74c3c',
+                background: 'rgba(231, 76, 60, 0.8)',
+                hover: 'rgba(231, 76, 60, 1)'
+            },
+            role: {
+                main: '#3498db',
+                background: 'rgba(52, 152, 219, 0.8)',
+                hover: 'rgba(52, 152, 219, 1)',
+                other: 'rgba(189, 195, 199, 0.4)',
+                otherHover: 'rgba(189, 195, 199, 0.6)'
+            }
+        };
+
+        // Global chart options
+        const globalChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                datalabels: {
+                    color: '#fff',
+                    font: {
+                        weight: 'bold',
+                        size: 12
+                    },
+                    formatter: (value, ctx) => {
+                        if (value < 5) return '';
+                        const dataset = ctx.chart.data.datasets[0];
+                        const sum = dataset.data.reduce((a, b) => a + b, 0);
+                        const percentage = Math.round((value / sum) * 100) + '%';
+                        return percentage;
+                    }
+                },
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    padding: 10,
+                    cornerRadius: 5,
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            const dataset = context.dataset;
+                            const total = dataset.data.reduce((acc, data) => acc + data, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true,
+                duration: 1000,
+                easing: 'easeOutQuart'
+            }
+        };
+
+        // Vehicle status tracking
+        let vehicleStatusData = {
+            Running: 0,
+            Idle: 0,
+            Parked: 0,
+            Offline: 0
+        };
+
+        // Chart instances
+        let pieChartInstance = null;
+        let mainPieChart = null;
+        let adminChart = null;
+        let dealerChart = null;
+        let clientChart = null;
+        let userChart = null;
+        let driverChart = null;
+        let deviceChart = null;
+
+        // Initialize the dashboard
+        async function initializeDashboard() {
+            await fetchVehicleStatusData();
+            await fetchRoleDeviceData();
+            
+            // Set refresh interval
+            setInterval(fetchVehicleStatusData, 30000);
+        }
+
+        // Fetch vehicle status data
+        async function fetchVehicleStatusData() {
+            try {
+                const response = await fetch('/api/vehicle/last/latests-locations/all');
+                const data = await response.json();
+
+                // Reset counters
+                vehicleStatusData = {
+                    Running: 0,
+                    Idle: 0,
+                    Parked: 0,
+                    Offline: 0
+                };
+
+                const currentTime = new Date();
+
+                data.forEach(vehicle => {
+                    let vehicleStatus = vehicle.vehicleStatus ? vehicle.vehicleStatus.toUpperCase() : "UNKNOWN";
+
+                    if (vehicle.timestamp) {
+                        const lastUpdated = new Date(vehicle.timestamp);
+                        const diffMinutes = (currentTime - lastUpdated) / (1000 * 60);
+
+                        if (vehicleStatus === 'RUNNING') {
+                            vehicleStatusData.Running++;
+                        } else if (vehicleStatus === 'IDLE' && diffMinutes <= 5) {
+                            vehicleStatusData.Idle++;
+                        } else if (vehicleStatus === 'PARKED' && diffMinutes <= 45) {
+                            vehicleStatusData.Parked++;
+                        } else {
+                            vehicleStatusData.Offline++;
+                        }
+                    } else {
+                        vehicleStatusData.Offline++;
+                    }
+                });
+
+                // Update both the original and enhanced dashboard
+                updateStatusList(vehicleStatusData);
+                renderChart(vehicleStatusData);
+                updateTotalVehicles(vehicleStatusData);
+                
+                // Update enhanced dashboard
+                updateVehicleStatusDisplay();
+                updateMainPieChart();
+            } catch (error) {
+                console.error('Error fetching vehicle status data:', error);
+                // Show error message to user
+                showErrorToast('Failed to fetch vehicle status data. Please try again later.');
+                // Use demo data if API fails
+                useDemoData();
+            }
+        }
+
+        // Original chart rendering functions
+        function renderChart(statusCounts) {
+            const ctx = document.getElementById('pieChart').getContext('2d');
+
+            if (pieChartInstance) {
+                pieChartInstance.destroy();
+            }
+
+            const labels = Object.keys(statusCounts);
+            const data = Object.values(statusCounts);
+            const colors = {
+                Running: '#28a745',
+                Idle: '#f39c12',
+                Parked: '#3498db',
+                'Offline': '#e74c3c'
+            };
+
+            pieChartInstance = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: labels.map(label => colors[label]),
+                        borderColor: '#ffffff',
+                        borderWidth: 2,
+                        hoverOffset: 12
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: true
+							
+                        }
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    }
+                }
+            });
+        }
+
+        function updateStatusList(statusCounts) {
+            const statusList = document.getElementById('statusList');
+            statusList.innerHTML = '';
+
+            const colors = {
+                Running: '#28a745',
+                Idle: '#f39c12',
+                Parked: '#3498db',
+                'Offline': '#e74c3c'
+            };
+
+            Object.entries(statusCounts).forEach(([status, count]) => {
+                const statusItem = document.createElement('div');
+                statusItem.className = 'status-item';
+                statusItem.innerHTML = `<span style="color: ${colors[status]};">&#9632;</span> ${status}: ${count}`;
+                statusList.appendChild(statusItem);
+            });
+        }
+
+        function updateTotalVehicles(statusCounts) {
+            const total = Object.values(statusCounts).reduce((sum, count) => sum + count, 0);
+            const totalDiv = document.getElementById('totalVehicles');
+            totalDiv.textContent = `Total Vehicles: ${total}`;
+        }
+
+        // Enhanced dashboard UI update functions
+        function updateVehicleStatusDisplay() {
+            // Update counters
+            document.getElementById('runningCount').textContent = vehicleStatusData.Running;
+            document.getElementById('idleCount').textContent = vehicleStatusData.Idle;
+            document.getElementById('parkedCount').textContent = vehicleStatusData.Parked;
+            document.getElementById('offlineCount').textContent = vehicleStatusData.Offline;
+
+            // Update total
+            const total = Object.values(vehicleStatusData).reduce((sum, count) => sum + count, 0);
+            document.getElementById('dashboardTotalVehicles').textContent = total;
+
+            // Update progress bars
+            if (total > 0) {
+                const runningPercent = (vehicleStatusData.Running / total) * 100;
+                const idlePercent = (vehicleStatusData.Idle / total) * 100;
+                const parkedPercent = (vehicleStatusData.Parked / total) * 100;
+                const offlinePercent = (vehicleStatusData.Offline / total) * 100;
+
+                document.getElementById('runningBar').style.width = `${runningPercent}%`;
+                document.getElementById('runningBar').textContent = `Running (${Math.round(runningPercent)}%)`;
+                
+                document.getElementById('idleBar').style.width = `${idlePercent}%`;
+                document.getElementById('idleBar').textContent = `Idle (${Math.round(idlePercent)}%)`;
+                
+                document.getElementById('parkedBar').style.width = `${parkedPercent}%`;
+                document.getElementById('parkedBar').textContent = `Parked (${Math.round(parkedPercent)}%)`;
+                
+                document.getElementById('offlineBar').style.width = `${offlinePercent}%`;
+                document.getElementById('offlineBar').textContent = `Offline (${Math.round(offlinePercent)}%)`;
+            }
+        }
+
+        // Create/update main pie chart for enhanced dashboard
+        function updateMainPieChart() {
+            const ctx = document.getElementById('mainPieChart').getContext('2d');
+            
+            // Prepare data
+            const labels = Object.keys(vehicleStatusData);
+            const data = Object.values(vehicleStatusData);
+            const backgroundColors = [
+                chartColors.running.background,
+                chartColors.idle.background,
+                chartColors.parked.background,
+                chartColors.offline.background
+            ];
+            const hoverColors = [
+                chartColors.running.hover,
+                chartColors.idle.hover,
+                chartColors.parked.hover,
+                chartColors.offline.hover
+            ];
+            
+            // Destroy existing chart if it exists
+            if (mainPieChart) {
+                mainPieChart.destroy();
+            }
+            
+            // Create new chart
+            mainPieChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        hoverBackgroundColor: hoverColors,
+                        borderColor: '#ffffff',
+                        borderWidth: 2,
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    ...globalChartOptions,
+                    cutout: '60%',
+                    plugins: {
+                        ...globalChartOptions.plugins,
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 15,
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Fetch role and device data
+        async function fetchRoleDeviceData() {
+            try {
+                const response = await fetch('/api/dashboard-summary/counts');
+                const data = await response.json();
+                
+                createRoleDistributionCharts(data);
+                updateRoleSummaryTable(data);
+            } catch (error) {
+                console.error('Error fetching role and device data:', error);
+                showErrorToast('Failed to fetch organization data. Please try again later.');
+                
+                // Use demo role data
+                const demoRoleData = {
+                    Admin: 5,
+                    Dealer: 12,
+                    Client: 24,
+                    User: 45,
+                    Driver: 37,
+                    Device: 77
+                };
+                createRoleDistributionCharts(demoRoleData);
+                updateRoleSummaryTable(demoRoleData);
+            }
+        }
+
+        // Create role distribution charts
+        function createRoleDistributionCharts(data) {
+            // Calculate total for percentages
+            const total = Object.values(data).reduce((sum, count) => sum + count, 0);
+            
+            // Create each role chart
+            createRoleChart('adminChart', 'Admin', data, total);
+            createRoleChart('dealerChart', 'Dealer', data, total);
+            createRoleChart('clientChart', 'Client', data, total);
+            createRoleChart('userChart', 'User', data, total);
+            createRoleChart('driverChart', 'Driver', data, total);
+            createRoleChart('deviceChart', 'Device', data, total);
+        }
+
+        // Create individual role chart
+        function createRoleChart(canvasId, roleName, data, total) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const roleValue = data[roleName] || 0;
+            const otherValue = total - roleValue;
+            
+            // Set up chart configuration
+            const chartConfig = {
+                type: 'doughnut',
+                data: {
+                    labels: [roleName, 'Others'],
+                    datasets: [{
+                        data: [roleValue, otherValue],
+                        backgroundColor: [
+                            chartColors.role.background,
+                            chartColors.role.other
+                        ],
+                        hoverBackgroundColor: [
+                            chartColors.role.hover,
+                            chartColors.role.otherHover
+                        ],
+                        borderColor: '#ffffff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    ...globalChartOptions,
+                    cutout: '70%',
+                    plugins: {
+                        ...globalChartOptions.plugins,
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            
+            // Create chart
+            new Chart(ctx, chartConfig);
+        }
+
+        // Update role summary table
+        function updateRoleSummaryTable(data) {
+            const tableBody = document.getElementById('roleSummaryTable');
+            tableBody.innerHTML = '';
+            
+            // Calculate total for percentages
+            const total = Object.values(data).reduce((sum, count) => sum + count, 0);
+            
+            // Create rows for each role
+            Object.entries(data).forEach(([role, count]) => {
+                const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><i class="fas fa-${getRoleIcon(role)} me-2"></i>${role}</td>
+                    <td class="text-center">${count}</td>
+                    <td class="text-center">${percentage}%</td>
+                    <td>
+                        <div class="progress" style="height: 15px;">
+                            <div class="progress-bar ${getRoleColorClass(role)}" 
+                                 style="width: ${percentage}%;" 
+                                 aria-valuenow="${percentage}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Get icon for each role type
+        function getRoleIcon(role) {
+            switch(role) {
+                case 'Admin': return 'user-shield';
+                case 'Dealer': return 'store';
+                case 'Client': return 'building';
+                case 'User': return 'user';
+                case 'Driver': return 'id-card';
+                case 'Device': return 'server';
+                default: return 'user-circle';
+            }
+        }
+        
+        // Get color class for each role type
+        function getRoleColorClass(role) {
+            switch(role) {
+                case 'Admin': return 'bg-primary';
+                case 'Dealer': return 'bg-success';
+                case 'Client': return 'bg-info';
+                case 'User': return 'bg-warning';
+                case 'Driver': return 'bg-secondary';
+                case 'Device': return 'bg-dark';
+                default: return 'bg-primary';
+            }
+        }
+        
+        // Show error toast notification
+        function showErrorToast(message) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: message,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
+        }
+        
+        // For demo purposes only - use sample data when API is not available
+        function useDemoData() {
+            // Sample vehicle status data
+            vehicleStatusData = {
+                Running: 25,
+                Idle: 8,
+                Parked: 12,
+                Offline: 32
+            };
+            
+            // Update both the original and enhanced dashboard
+            updateStatusList(vehicleStatusData);
+            renderChart(vehicleStatusData);
+            updateTotalVehicles(vehicleStatusData);
+            
+            // Update enhanced dashboard
+            updateVehicleStatusDisplay();
+            updateMainPieChart();
+            
+            console.log('Using demo data as API endpoint is not available');
+        }
+        
+        // Initialize dashboard when DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboard();
+            
+            // Add refresh functionality for demo
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('#refreshBtn')) {
+                    fetchVehicleStatusData();
+                    fetchRoleDeviceData();
+                    
+                    // Show refresh notification
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Dashboard Refreshed',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+                
+                if (e.target.closest('#exportBtn')) {
+                    exportDashboardData();
+                }
+            });
+        });
+        
+        // Export dashboard data as CSV
+        function exportDashboardData() {
+            // Prepare vehicle status data
+            const vehicleStatusCSV = 'Status,Count\n' + 
+                                    Object.entries(vehicleStatusData)
+                                    .map(([status, count]) => `${status},${count}`)
+                                    .join('\n');
+            
+            // Create and trigger download
+            const blob = new Blob([vehicleStatusCSV], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `vehicle_status_export_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Show success notification
+            Swal.fire({
+                icon: 'success',
+                title: 'Export Complete',
+                text: 'Dashboard data has been exported to CSV',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+    </script>
+	
+	
+	<footer class="footer text-white text-center py-3 mt-5">
+	        <div class="container">
+	            <p class="mb-1">© 2025 Thinture Technologies Pvt. Ltd. All rights reserved.</p>
+	            <p class="mb-0">
+	                <a href="mailto:info@thinture.com" class="text-info">info@thinture.com</a>
+	            </p>
 	        </div>
-	        <div class="status-list" id="statusList"></div>
-	    </div>
-    
-	<script>
-	       async function fetchData() {
-	           try {
-	               const response = await fetch('/api/vehicle/last/latests-locations/all');
-	               const data = await response.json();
-
-	               const statusCounts = {
-	                   Running: 0,
-	                   Idle: 0,
-	                   Parked: 0,
-	                   'Offline': 0
-	               };
-
-	               const currentTime = new Date();
-
-	               data.forEach(vehicle => {
-	                   let vehicleStatus = vehicle.vehicleStatus ? vehicle.vehicleStatus.toUpperCase() : "UNKNOWN";
-
-	                   if (vehicle.timestamp) {
-	                       const lastUpdated = new Date(vehicle.timestamp);
-	                       const diffMinutes = (currentTime - lastUpdated) / (1000 * 60);
-
-	                       if (vehicleStatus === 'RUNNING') {
-	                           statusCounts.Running++;
-	                       } else if (vehicleStatus === 'IDLE' && diffMinutes <= 5) {  
-	                           statusCounts.Idle++;
-	                       } else if (vehicleStatus === 'PARKED' && diffMinutes <= 45) {
-	                           statusCounts.Parked++;
-	                       } else {
-	                           statusCounts['Offline']++;
-	                       }
-	                   } else {
-	                       statusCounts['Offline']++;
-	                   }
-	               });
-
-	               renderChart(statusCounts);
-	               updateStatusList(statusCounts);
-	           } catch (error) {
-	               console.error('Error fetching data:', error);
-	           }
-	       }
-
-	       let pieChartInstance = null;
-
-		   function renderChart(statusCounts) {
-		       const ctx = document.getElementById('pieChart').getContext('2d');
-
-		       if (pieChartInstance) {
-		           pieChartInstance.destroy();
-		       }
-
-		       const labels = Object.keys(statusCounts);
-		       const data = Object.values(statusCounts);
-		       const colors = {
-		           Running: '#28a745',
-		           Idle: '#f39c12',
-		           Parked: '#3498db',
-		           'Offline': '#e74c3c'
-		       };
-
-		       pieChartInstance = new Chart(ctx, {
-		           type: 'pie',
-		           data: {
-		               labels: labels,
-		               datasets: [{
-		                   data: data,
-		                   backgroundColor: labels.map(label => colors[label]),
-		                   borderColor: '#ffffff',
-		                   borderWidth: 2,
-		                   hoverOffset: 12
-		               }]
-		           },
-		           options: {
-		               responsive: true,
-		               plugins: {
-		                   legend: {
-		                       display: false
-		                   },
-		                   tooltip: {
-		                       enabled: true
-		                   }
-		               },
-		               animation: {
-		                   animateScale: true,
-		                   animateRotate: true
-		               }
-		           }
-		       });
-		   }
-
-
-	       function updateStatusList(statusCounts) {
-	           const statusList = document.getElementById('statusList');
-	           statusList.innerHTML = '';
-
-	           const colors = {
-	               Running: '#28a745',
-	               Idle: '#f39c12',
-	               Parked: '#3498db',
-	               'Offline': '#e74c3c'
-	           };
-
-	           Object.entries(statusCounts).forEach(([status, count]) => {
-	               const statusItem = document.createElement('div');
-	               statusItem.className = 'status-item';
-	               statusItem.innerHTML = `<span style="color: ${colors[status]};">&#9632;</span> ${status}: ${count}`;
-	               statusList.appendChild(statusItem);
-	           });
-	       }
-
-	       fetchData();
-	       setInterval(fetchData, 30000);
-	   </script>
-</body>
-</html>
+	    </footer>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body></html>
