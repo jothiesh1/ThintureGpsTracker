@@ -32,13 +32,13 @@
     <style>
         #map {
             width: 100%;
-            height: 700px;
+            height: 100vh;
         }
         
         /* Improved Speedometer positioning */
         #speedometer-toggle-wrapper {
             position: absolute;
-            top: 20px;
+            top: 340px;
             right: 20px;
             z-index: 10001;
             background: rgba(255, 255, 255, 0.8);
@@ -48,21 +48,22 @@
             cursor: pointer;
         }
         
-        #speedometer-container {
-            position: absolute;
-            top: 80px;
-            right: 20px;
-            z-index: 9999;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            padding: 15px;
-            width: 250px;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-            transform: translateY(-10px);
-        }
+		#speedometer-container {
+		    position: absolute;
+		    bottom: 20px;
+		    right: 20px;
+		
+		    z-index: 9999;
+		    
+		    border-radius: 10px;
+		   
+		    padding: 15px;
+		    width: 250px;
+		    opacity: 1 !important;
+		    visibility: visible !important;
+		    transform: translateY(0) !important;
+		}
+
 
         #speedometer-container.visible {
             opacity: 1;
@@ -166,13 +167,13 @@
 </head>
 
 <body>
-    <div th:insert="~{navigation_admin :: navbar_admin}"></div>
+    <div th:insert="~{navigation :: navbar}"></div>
     
-    <!-- Improved FontAwesome icon with tooltip -->
+    <!-- Improved FontAwesome icon with tooltip 
     <div id="speedometer-toggle-wrapper" title="Toggle Speedometer">
         <i class="fa-solid fa-gauge-high" id="toggleSpeedometer"></i>
     </div>
-
+	-->
     <!-- Heatmap toggle button -->
     <button id="heatmap-toggle" title="Toggle Heatmap View">
         <i class="fas fa-fire"></i> Heatmap
@@ -180,8 +181,8 @@
 
     <!-- Improved Speedometer container -->
     <div id="speedometer-container">
-        <canvas id="speedometer" width="220" height="120"></canvas>
-        <div id="speedDisplay"><b>Speed: 0 km/h</b></div>
+        <canvas id="speedometer" width="220" height="220"></canvas>
+        <!-- <div id="speedDisplay"><b>Speed: 0 km/h</b></div>-->
     </div>
 
     <div id="map"></div>
@@ -1315,6 +1316,86 @@
                 }
             });
         }
+		
+		
+		function drawSpeedometer(speed) {
+		    if (!speedometerCtx) return;
+
+		    const canvas = speedometerCanvas;
+		    const ctx = speedometerCtx;
+
+		    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+		    const centerX = canvas.width / 2;
+		    const centerY = canvas.height / 2;
+		    const radius = canvas.width / 2 - 15;
+		    const maxSpeed = 180;
+
+		    // Background circle
+		    ctx.beginPath();
+		    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+		    ctx.fillStyle = '#f0f0f0';
+		    ctx.fill();
+
+		    // Tick marks
+		    for (let i = 0; i <= maxSpeed; i += 10) {
+		        const angle = (Math.PI * (i / maxSpeed)) * 1.5 + 0.75 * Math.PI;
+		        const x1 = centerX + (radius - 10) * Math.cos(angle);
+		        const y1 = centerY + (radius - 10) * Math.sin(angle);
+		        const x2 = centerX + radius * Math.cos(angle);
+		        const y2 = centerY + radius * Math.sin(angle);
+
+		        ctx.beginPath();
+		        ctx.moveTo(x1, y1);
+		        ctx.lineTo(x2, y2);
+		        ctx.lineWidth = (i % 20 === 0) ? 2 : 1;
+		        ctx.strokeStyle = '#333';
+		        ctx.stroke();
+
+		        // Speed numbers
+		        if (i % 20 === 0) {
+		            const labelX = centerX + (radius - 25) * Math.cos(angle);
+		            const labelY = centerY + (radius - 25) * Math.sin(angle);
+		            ctx.font = '10px Arial';
+		            ctx.fillStyle = '#000';
+		            ctx.textAlign = 'center';
+		            ctx.textBaseline = 'middle';
+		            ctx.fillText(i.toString(), labelX, labelY);
+		        }
+		    }
+
+		    // Needle
+		    const needleAngle = (Math.PI * (speed / maxSpeed)) * 1.5 + 0.75 * Math.PI;
+		    const needleX = centerX + (radius - 30) * Math.cos(needleAngle);
+		    const needleY = centerY + (radius - 30) * Math.sin(needleAngle);
+
+		    ctx.beginPath();
+		    ctx.moveTo(centerX, centerY);
+		    ctx.lineTo(needleX, needleY);
+		    ctx.lineWidth = 3;
+		    ctx.strokeStyle = '#ff0000';
+		    ctx.stroke();
+
+		    // Center hub
+		    ctx.beginPath();
+		    ctx.arc(centerX, centerY, 6, 0, 2 * Math.PI);
+		    ctx.fillStyle = '#222';
+		    ctx.fill();
+
+		    // Text
+		    ctx.font = "bold 14px Arial";
+		    ctx.fillStyle = "#000";
+		    ctx.textAlign = "center";
+		    ctx.fillText(`${Math.round(speed)} km/h`, centerX, centerY + 40);
+
+		    // Update external speed text
+		    const speedDisplay = document.getElementById("speedDisplay");
+		    if (speedDisplay) {
+		        speedDisplay.innerHTML = `<b>Speed: ${Math.round(speed)} km/h</b>`;
+		    }
+		}
+
     </script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
