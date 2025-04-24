@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPS Tracker with Live Table</title>
+    
+    <!-- Leaflet CSS and JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        #map {
+            flex: 1;
+            height: 100%;
+        }
+        #sidebar {
+            width: 350px;
+            background: #f5f5f5;
+            padding: 10px;
+            overflow-y: auto;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+        }
+        #vehicle-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        #vehicle-table th {
+            background: #4285f4;
+            color: white;
+            padding: 8px;
+            text-align: left;
+        }
+        #vehicle-table td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        #vehicle-table tr:hover {
+            background: #f1f1f1;
+            cursor: pointer;
+        }
+        .running { color: green; font-weight: bold; }
+        .parked { color: orange; font-weight: bold; }
+        .stopped { color: red; font-weight: bold; }
+        .search-box {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .selected-row {
+            background-color: #e0e0ff !important;
+        }
+        .data-age {
+            color: #666;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="map"></div>
+        <div id="sidebar">
+            <h2>GPS Tracker</h2>
+            <input type="text" id="search-box" class="search-box" placeholder="Search by Device ID...">
+            <table id="vehicle-table">
+                <thead>
+                    <tr>
+                        <th>Device ID</th>
+                        <th>Status</th>
+                        <th>Speed</th>
+                        <th>Last Update</th>
+                    </tr>
+                </thead>
+                <tbody id="vehicle-list"></tbody>
+            </table>
+            <div class="refresh-info">Auto-refreshing every 5 seconds</div>
+        </div>
+    </div>
+    
+    <script>
+        const map = L.map('map').setView([13.0827, 77.5827], 12);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+        
+        const markers = {};
+        let vehicleData = [];
+        let selectedVehicleId = null;
+
+        const icons = {
+            RUNNING: L.divIcon({ html: '🟢', className: 'vehicle-icon', iconSize: [20, 20], iconAnchor: [10, 10] }),
+            PARKED: L.divIcon({ html: '🟠', className: 'vehicle-icon', iconSize: [20, 20], iconAnchor: [10, 10] }),
+            STOPPED: L.divIcon({ html: '🔴', className: 'vehicle-icon', iconSize: [20, 20], iconAnchor: [10, 10] })
+        };
+
+        function formatTimeDifference(timestamp) {
+            if (!timestamp) return 'N/A';
+            const now = new Date();
+            const diffMs = now - new Date(timestamp);
+            if (isNaN(diffMs)) return 'N/A';
+            const diffMinutes = Math.floor(diffMs / 60000);
+            if (diffMinutes < 60) return `${diffMinutes} min ago`;
+            const diffHours = Math.floor(diffMinutes / 60);
+            if (diffHours < 24) return `${diffHours} hrs ago`;
+            return `${Math.floor(diffHours / 24)} days ago`;
+        }
+
+        function createOrUpdateMarker(vehicle) {
+            const icon = icons[vehicle.vehicleStatus] || icons.STOPPED;
+            const popupContent = `
+                <h4>${vehicle.deviceId}</h4>
+                <p>Status: <span class="${vehicle.vehicleStatus.toLowerCase()}">${vehicle.vehicleStatus}</span></p>
+                <p>Speed: ${vehicle.speed} km/h</p>
+                <p>Last Update: ${formatTimeDifference(vehicle.timestamp)}</p>
+            `;
+
+            if (markers[vehicle.deviceId]) {
+                markers[vehicle.deviceId].setLatLng([vehicle.latitude, vehicle.longitude]);
+                markers[vehicle.deviceId].setIcon(icon);
+                markers[vehicle.deviceId].getPopup().setContent(popupContent);
+            } else {
+                const marker = L.marker([vehicle.latitude, vehicle.longitude], { icon, title: vehicle.deviceId }).addTo(map);
+                marker.bindPopup(popupContent);
+                markers[vehicle.deviceId] = marker;
+            }
+        }
+
+        function updateTable() {
+            const vehicleList = document.getElementById('vehicle-list');
+            const searchTerm = document.getElementById('search-box').value.toLowerCase();
+            vehicleList.innerHTML = '';
+
+            vehicleData.filter(v => v.deviceId.toLowerCase().includes(searchTerm))
+                .forEach(vehicle => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${vehicle.deviceId}</td>
+                        <td><span class="${vehicle.vehicleStatus.toLowerCase()}">${vehicle.vehicleStatus}</span></td>
+                        <td>${vehicle.speed} km/h</td>
+                        <td>${formatTimeDifference(vehicle.timestamp)}</td>
+                    `;
+                    row.addEventListener('click', () => {
+                        selectedVehicleId = vehicle.deviceId;
+                        const marker = markers[vehicle.deviceId];
+                        if (marker) {
+                            map.setView(marker.getLatLng(), 15);
+                            marker.openPopup();
+                        }
+                    });
+                    vehicleList.appendChild(row);
+                });
+        }
+
+        function fetchVehicleData() {
+            simulateAPIData().then(data => {
+                vehicleData = data;
+                vehicleData.forEach(createOrUpdateMarker);
+                updateTable();
+            });
+        }
+
+        const excludeDummyIds = ['GPS-001', 'TEST-001', 'DUMMY-123'];
+
+        function simulateAPIData() {
+            return new Promise(resolve => {
+                const baseVehicles = [
+                    { deviceId: 'KA-01-HG-5543', latitude: 13.0227, longitude: 77.5427, vehicleStatus: 'RUNNING', speed: 34, timestamp: new Date() },
+                    { deviceId: 'KA-02-MJ-9876', latitude: 13.1227, longitude: 77.5827, vehicleStatus: 'STOPPED', speed: 0, timestamp: new Date() }
+                ];
+
+                const updatedVehicles = baseVehicles.filter(vehicle => !excludeDummyIds.includes(vehicle.deviceId));
+                resolve(updatedVehicles);
+            });
+        }
+
+        document.getElementById('search-box').addEventListener('input', updateTable);
+
+        fetchVehicleData();
+        setInterval(fetchVehicleData, 5000);
+    </script>
+</body>
+</html>

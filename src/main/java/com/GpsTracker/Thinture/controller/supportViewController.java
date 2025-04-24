@@ -50,7 +50,14 @@ public class supportViewController {
 	    }
 	  
 
+
+	  @GetMapping("/user_view_client")
+	    public String   showClient(Model model) {
+	        return "user_view_client"; // Should match the name of the HTML file in the templates folder (map2.html)
+	    }
 	  
-	  
-	  
+	  @GetMapping("/driver_view_client")
+	    public String   illShowClient(Model model) {
+	        return "driver_view_client"; // Should match the name of the HTML file in the templates folder (map2.html)
+	    }
 }

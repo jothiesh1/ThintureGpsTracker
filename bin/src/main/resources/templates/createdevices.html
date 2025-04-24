@@ -1,380 +1,23 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	
-    <title>Thinture-GPS</title>
+	<title>Thinture GPS</title>
+		    <link rel="icon" type="image/x-icon" href="THINTURE_IMAGE/favicon.jpg">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/installstyle.css}">
 	<style>
-			/* Navigation Menu Styles */
-			body {
-						    font-family: Arial, sans-serif;
-						    margin: 0;
-						    padding: 0;
-						    position: relative;
-						}
 
-						body::before {
-						    content: "";
-						    position: fixed;
-						    top: 0;
-						    left: 0;
-						    width: 100%;
-						    height: 100%;
-						    background: url('THINTURE_IMAGE/mainbg.jpg') no-repeat center center/cover;
-						    filter: blur(10px);
-						    z-index: -1; /* Ensures the background remains behind the content */
-						}
-						@media only screen and (max-width: 768px) {
-								    body {
-								        background-attachment: fixed; /* Fixes background on small screens */
-								        min-height: 100vh; /* Ensures full height */
-								        font-size: 14px; /* Adjust font size for better readability */
-										background-size: cover;
-								    }
-								}
-				.form-container {
-				            max-width: 600px;
-							position: absolute;
-							top:150px;
-							left:30%;
-				            width: 100%;
-				            padding: 20px;
-				            border: 1px solid #ccc;
-				            border-radius: 8px;
-				            background-color: #fff;
-				            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-							background-color: rgba(0, 0, 0, 0.7);
-
-				        }
-
-			        fieldset {
-			            border: none;
-			            padding: 0;
-			        }
-
-			        legend {
-			            font-size: 1.5em;
-			            margin-bottom: 10px;
-			            color: white;
-			        }
-
-			        label {
-			            display: block;
-			            margin-bottom: 8px;
-			            color: white;
-			        }
-
-			        input[type="text"], input[type="date"], input[type="tel"], select, textarea {
-			            width: 55%;
-			            padding: 8px;
-			            margin-bottom: 12px;
-			            border: 1px solid #ccc;
-			            border-radius: 4px;
-			            box-sizing: border-box;
-			        }
-					.form-group input[type="email"] {
-						width: 145px;
-						           padding: 8px;
-						           margin-bottom: 12px;
-						           border: 1px solid #ccc;
-						           border-radius: 4px;
-						           box-sizing: border-box;
-					}
-			        button {
-			            display: block;
-			            width: 100%;
-			            padding: 10px;
-			            border: none;
-			            border-radius: 4px;
-			            background-color: darkblue;
-			            color: white;
-			            font-size: 1em;
-			            cursor: pointer;
-			            box-sizing: border-box;
-			        }
-
-			        button:hover {
-			            background-color: #0056b3;
-			        }
-
-					.hidden {
-					    display: none;
-					}
-
-
-			        .error {
-			            color: red;
-			            font-size: 0.875em;
-			            margin-top: -10px;
-			            margin-bottom: 10px;
-			        }
-
-			        .submitted-data p {
-			            margin: 8px 0;
-			        }
-
-			        .form-container {
-			            width: 60%;
-			            margin: 0 auto;
-			        }
-
-			        .form-row {
-			            display: flex;
-			            justify-content: space-between;
-			            margin-bottom: 15px;
-			        }
-
-			        .form-group {
-			            width: 80%;
-			        }
-
-			        fieldset {
-			            padding: 20px;
-			            border: 1px solid #ccc;
-			            margin-bottom: 20px;
-			        }
-
-			        legend {
-			            font-weight: bold;
-			        }
-
-			        button {
-			            margin-top: 20px;
-			        }
-
-			        .review-section p {
-			            font-weight: bold;
-			        }
-
-			        #add-vehicle-section {
-			            margin-top: 20px;
-			            padding: 20px;
-			            border: 1px solid #ccc;
-			            border-radius: 8px;
-			            background-color: #fff;
-			            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-			        }
-
-			        /* Styles for the autocomplete container */
-					.suggestions {
-					            border: 1px solid #ccc;
-					            max-height: 150px;
-					            overflow-y: auto;
-					            position: absolute;
-					             background-color: white;
-								
-					            z-index: 1000;
-					            width: 25%;
-					            display: none;
-					        }
-					        .suggestion-item {
-					            padding: 8px;
-					            cursor: pointer;
-					        }
-					        .suggestion-item:hover {
-					            background-color: #f0f0f0;
-					        }
-					.input-container {
-					    position: relative;
-					    width: 100%;
-					}
-
-					.input-container input[type="text"] {
-					   /* Adjust the width to account for the button */
-					    padding-right: 120px; /* Ensure padding is added to make space for the button */
-					}
-					
-					.add-vehicle-button {
-					    position: absolute;
-					    right: -290px;
-					    top: -105px;
-					    height: 90%;
-					    width: 110px; /* Set a fixed width for the button */
-					    border: none;
-					    border-left: 1px solid #ccc; /* Border to separate the button from the input */
-					    background-color:darkblue;
-					    color: white;
-					    cursor: pointer;
-					    box-sizing: border-box;
-						font-size: 14px;
-					}
-
-					.add-vehicle-button:hover {
-					    background-color: #0056b3;
-					}
-					.add-driver{
-						
-						position: absolute;
-								    right: -290px;
-								    top: 90px;
-								    height: 90%;
-								    width: 110px; /* Set a fixed width for the button */
-								    border: none;
-								    border-left: 1px solid #ccc; /* Border to separate the button from the input */
-								    background-color: mediumaquamarine;
-								    color: white;
-								    cursor: pointer;
-								    box-sizing: border-box;
-									font-size: 14px;
-						
-					}
-			.search{
-				position: absolute;
-					    right: 940px;
-					    top: 288px;
-					    height: 43px;
-					    width: 120px; /* Set a fixed width for the button */
-					    border: none;
-					    border-left: 1px solid #ccc; /* Border to separate the button from the input */
-					    background-color: mediumaquamarine;
-					    color: white;
-					    cursor: pointer;
-					    box-sizing: border-box;
-						font-size: 14px;
-				
-			}
-			.search-bar{
-				width:20px;
-			}
-			/* Modal Styles */
-			.modal {
-			  
-			    position: fixed; /* Stay in place */
-			    z-index: 1; /* Sit on top */
-			    left: 550px;
-			    top: 0;
-			    width: 50%; /* Full width */
-			    height: 100%; /* Full height */
-			    overflow: auto; /* Enable scroll if needed */
-			    background-color: rgb(0,0,0); /* Fallback color */
-			    background-color: transparent; /* Black w/ opacity */
-			}
-
-			.modal-content {
-			    background-color: #fefefe;
-			    margin: 15% auto; /* 15% from the top and centered */
-			    padding: 20px;
-			    border: 1px solid #888;
-			    width: 80%; /* Could be more or less, depending on screen size */
-			}
-
-			.close {
-			    color: #aaa;
-			    float: right;
-			    font-size: 28px;
-			    font-weight: bold;
-			}
-
-			.close:hover,
-			.close:focus {
-			    color:red;
-			    text-decoration: none;
-			    cursor: pointer;
-			}
-
-			/* Ensure the form-row divs use flexbox for the layout */
-			.form-row {
-			    display: flex;
-			    flex-wrap: wrap; /* Wrap to next line if needed */
-			    margin-bottom: 15px; /* Spacing between rows */
-			}
-
-			/* Each form-group will take up half of the row width */
-			.form-group {
-			    flex: 1 1 50%; /* Grow to fill space and take up 50% of the width */
-			    padding: 0 10px; /* Spacing between columns */
-			    box-sizing: border-box; /* Include padding in width calculation */
-			}
-
-			/* Optional: Adjust label and input width to fit nicely */
-			.form-group label {
-			    display: block;
-			    margin-bottom: 5px;
-			}
-
-			.form-group input {
-			    width: 55%; /* Make input take full width of the form-group */
-			}
-			.add-drivers{
-				
-				position: absolute;
-							    right: 50px;
-							    top: 50px;
-							    height: 8%;
-							    width: 105px; /* Set a fixed width for the button */
-							    border: none;
-							    border-left: 1px solid #ccc; /* Border to separate the button from the input */
-							    background-color:darkblue;
-							    color: white;
-							    cursor: pointer;
-							    box-sizing: border-box;
-								font-size: 14px;
-					
-			}
-			/* Hidden class to hide elements */
-
-
-			/* Style for the add vehicle section as a modal */
-			#add-vehicle-section {
-			    padding: 20px;
-			    border: 1px solid #ddd;
-			    margin-top: 20px;
-			    background-color: #f4f4f4;
-			    position: fixed;
-			    top: 50%;
-			    left: 50%;
-			    transform: translate(-50%, -50%);
-			    width: 300px;
-			    z-index: 1000;
-			    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-			}
-
-			/* Style for the close button */
-			.close {
-			    color: #aaa;
-			    float: right;
-			    font-size: 28px;
-			    font-weight: bold;
-			}
-
-			.close:hover,
-			.close:focus {
-			    color: red;
-			    text-decoration: none;
-			    cursor: pointer;
-			}
-
-			/* Optional: Style for background overlay */
-			body.modal-open {
-			    overflow: hidden;
-			    position: relative;
-			}
-
-			body.modal-open::before {
-			    content: '';
-			    position: fixed;
-			    top: 0;
-			    left: 0;
-			    right: 0;
-			    bottom: 0;
-			    background-color: rgba(0, 0, 0, 0.4);
-			    z-index: 999;
-			}
-			.add-vechile input[type="text"], .add-vechile select {
-			    width: 180px;
-			}
-
-			.error {
-			    color: red;
-			    font-size: 12px;
-			}
+		
+			
 
 	    </style>
 </head>
@@ -391,7 +34,147 @@
 	                <div class="form-group">
 					<!-- 	<button type="button" class="add-drivers" onclick="openAddDriverModal()">+ Add Driver</button> -->
 	                </div>
-	            </div>
+					</div>
+					
+					
+					<div class="form-row">
+					    <div class="form-group">
+							<label for="user-selection">Select User:</label>
+
+							
+							<!-- Autocomplete Input -->
+							<input list="user-list" id="user-selection" name="user-selection" placeholder="Select a user" required>
+
+							<!-- Datalist Options -->
+							<datalist id="user-list"></datalist>
+
+							<!-- Hidden field to store selected user ID -->
+							<input type="hidden" id="user-id" name="user-id">
+
+						
+							    <!-- Options will be added dynamically -->
+							</datalist>
+
+
+					        <span id="user-selection-error" class="error"></span>
+					    </div>
+					</div>
+					<div id="user-preview" style="margin-top: 10px; color: white; display: none;">
+					    <strong>Selected User:</strong> <span id="preview-username">None</span><br>
+					    <strong>User ID:</strong> <span id="preview-userid">N/A</span>
+					</div>
+
+					
+					<script>
+
+						
+						document.addEventListener("DOMContentLoaded", () => {
+						    fetchUsers();
+						    setupUserSelectionListener();
+						});
+
+						function fetchUsers() {
+						    fetch('/users/api/all')
+						        .then(response => {
+						            if (!response.ok) throw new Error("Failed to fetch users.");
+						            return response.json();
+						        })
+						        .then(users => {
+						            const datalist = document.getElementById("user-list");
+						            datalist.innerHTML = ""; // Clear options
+						            userMap = {}; // Just re-assign, not re-declare
+
+						            users.forEach(user => {
+						                const option = document.createElement("option");
+						                option.value = user.name;
+						                datalist.appendChild(option);
+						                userMap[user.name] = user.id;
+						            });
+						        })
+						        .catch(error => console.error("Error loading users:", error));
+						}
+
+
+					    // Attach input change listener to validate selection
+					    function setupUserSelectionListener() {
+					        const userInput = document.getElementById("user-selection");
+
+					        userInput.addEventListener("change", function () {
+					            const selectedName = this.value;
+					            const userId = userMap[selectedName];
+
+					            if (userId) {
+					                document.getElementById("user-id").value = userId;
+					                console.log("✅ User ID set:", userId);
+					            } else {
+					                document.getElementById("user-id").value = "";
+					                console.warn("❌ Invalid user selected or typed manually.");
+					            }
+					        });
+					    }
+						document.getElementById("user-selection").addEventListener("change", function () {
+						    const selectedName = this.value;
+						    const userId = userMap[selectedName];
+						    document.getElementById("user-id").value = userId || "";
+						});
+						function setupUserSelectionListener() {
+						    const userInput = document.getElementById("user-selection");
+
+						    userInput.addEventListener("change", function () {
+						        const selectedName = this.value;
+						        const userId = userMap[selectedName];
+
+						        if (userId) {
+						            document.getElementById("user-id").value = userId;
+
+						            // ✅ Update preview
+						            document.getElementById("preview-username").textContent = selectedName;
+						            document.getElementById("preview-userid").textContent = userId;
+
+						            console.log("✅ User selected:", selectedName, "ID:", userId);
+						        } else {
+						            document.getElementById("user-id").value = "";
+						            document.getElementById("preview-username").textContent = "None";
+						            document.getElementById("preview-userid").textContent = "N/A";
+						            console.warn("❌ Invalid user selected or typed manually.");
+						        }
+						    });
+						}
+
+					document.addEventListener("DOMContentLoaded", function () {
+					    fetchUsers();
+					});
+
+					let userMap = {}; // This will map user name to ID
+
+					function fetchUsers() {
+					    fetch('/users/api/all')
+					        .then(response => {
+					            if (!response.ok) throw new Error("Failed to fetch users.");
+					            return response.json();
+					        })
+					        .then(users => {
+					            const datalist = document.getElementById("user-list");
+					            datalist.innerHTML = "";
+					            userMap = {}; // Reset map
+
+					            users.forEach(user => {
+					                const option = document.createElement("option");
+					                option.value = user.name; // What user sees
+					                datalist.appendChild(option);
+					                userMap[user.name] = user.id; // What you use behind the scenes
+					            });
+					        })
+					        .catch(error => {
+					            console.error("Error loading users:", error);
+					        });
+					}
+
+
+					</script>
+
+
+	           
 				<br>
 				<br>
 	            <div class="form-row">
@@ -467,6 +250,8 @@
 
 	// Function to save the new vehicle
 	function saveVehicle() {
+	    const userId = document.getElementById('user-id').value;
+
 	    const newVehicleData = {
 	        vehicleNumber: document.getElementById('new-vehicle-number').value,
 	        vehicleType: document.getElementById('new-vehicle-type').value,
@@ -474,11 +259,12 @@
 	        engineNumber: document.getElementById('new-engine-number').value,
 	        manufacturer: document.getElementById('new-manufacturer').value,
 	        model: document.getElementById('new-model').value,
-	        deviceID: document.getElementById('new-device-id') ? document.getElementById('new-device-id').value : null // Handle optional deviceID
+	        deviceID: document.getElementById('new-device-id') ? document.getElementById('new-device-id').value : null,
+	       userId: document.getElementById("user-id").value.trim() // ✅ Add this line
 	    };
 
-	    if (newVehicleData.vehicleNumber && newVehicleData.vehicleType && newVehicleData.ownerName) {
-	        fetch('/total_vehicles/createdevices', { // Correct the endpoint path as needed
+	    if (newVehicleData.vehicleNumber && newVehicleData.vehicleType && newVehicleData.ownerName && newVehicleData.userId) {
+	        fetch('/total_vehicles/createdevices', {
 	            method: 'POST',
 	            headers: {
 	                'Content-Type': 'application/json'
@@ -491,15 +277,15 @@
 	                hideAddVehicleSection();
 	            } else {
 	                alert('Error saving vehicle. Please try again.');
-	                console.error('Failed response:', response);
 	            }
 	        })
 	        .catch(error => {
 	            console.error('Error during save:', error);
-	            alert('An unexpected error occurred. Please check the console for details.');
+	            alert('An unexpected error occurred.');
 	        });
 	    } else {
-	        document.getElementById('add-vehicle-error').innerText = 'Please fill out all fields, excluding Device ID if it is optional.';
+	        document.getElementById('add-vehicle-error').innerText =
+	            'Please fill out all fields, including selecting a valid user.';
 	    }
 	}
 
@@ -761,7 +547,8 @@
 						            <span id="country-error" class="error"></span>
 						        </div>
 						    </div>
-							<button type="button" id="submit-button" onclick="addDevice()">Submit</button>
+							<button type="button" id="submit-button" onclick="showReview()">Review</button>
+
 							
 							
 							
@@ -770,6 +557,34 @@
 						    <button type="button" onclick="showPart1()">Back</button>
 						</fieldset>
 						</div>
+						
+						
+						<!-- Review Section -->
+						<div id="review-section" class="hidden review-container">
+						    <fieldset>
+						        <legend class="review">Review Submission</legend>
+						        <div class="review-item" id="review-owner-name"></div>
+						        <div class="review-item" id="review-vehicle-number"></div>
+						        <div class="review-item" id="review-vehicle-type"></div>
+						        <div class="review-item" id="review-engine-number"></div>
+						        <div class="review-item" id="review-installation-date"></div>
+						        <div class="review-item" id="review-gps-device-id"></div>
+						        <div class="review-item" id="review-installer-name"></div>
+						        <div class="review-item" id="review-imei"></div>
+						        <div class="review-item" id="review-sim-number"></div>
+						        <div class="review-item" id="review-dealername"></div>
+						        <div class="review-item" id="review-dealerphone"></div>
+								<div class="review-item" id="review-user-name"></div>
+								<div class="review-item" id="review-user-id"></div>
+
+						        <div class="button-row">
+						            <button type="button" onclick="showPart3()">Edit</button>
+						            <button type="button" onclick="addDevice()">Confirm</button>
+						        </div>
+						    </fieldset>
+						</div>
+
+
 		<div id="add-vehicle-section" class="hidden">
 		    <!-- Close button for the section -->
 		    <span class="close" onclick="hideAddVehicleSection()">&times;</span>
@@ -815,6 +630,7 @@
 		</div>
 	
 		<script>
+			//controlller class public class VehicleController 
 			    function showPart3() {
 			        document.getElementById('part1').classList.add('hidden');
 			        document.getElementById('part3').classList.remove('hidden');
@@ -829,24 +645,29 @@
 			    }
 
 
-	    function showReview() {
-	        document.getElementById('part3').classList.add('hidden');
-	        document.getElementById('review-section').classList.remove('hidden');
+				function showReview() {
+				    document.getElementById('part3').classList.add('hidden');
+				    document.getElementById('review-section').classList.remove('hidden');
 
-	        // Fill review section with form data
-	        document.getElementById("review-owner-name").innerText = "Owner Name: " + document.getElementById("owner-name").value;
-	        document.getElementById("review-vehicle-number").innerText = "Vehicle Number: " + document.getElementById("vehicle-number").value;
-	        document.getElementById("review-vehicle-type").innerText = "Vehicle Type: " + document.getElementById("vehicle-type").value;
-	        document.getElementById("review-engine-number").innerText = "Engine Number: " + document.getElementById("engine-number").value;
-	        document.getElementById("review-installation-date").innerText = "Installation Date: " + document.getElementById("installation-date").value;
-	        document.getElementById("review-gps-device-id").innerText = "GPS Device ID: " + document.getElementById("gps-device-id").value;
-	        document.getElementById("review-installer-name").innerText = "Technician Name: " + document.getElementById("installer-name").value;
-	        document.getElementById("review-imei").innerText = "IMEI: " + document.getElementById("imei").value;
-	        document.getElementById("review-sim-number").innerText = "SIM NO: " + document.getElementById("sim_number").value;
-	        document.getElementById("review-dealername").innerText = "Dealer Name: " + document.getElementById("dealername").value;
-	        document.getElementById("review-dealerphone").innerText = "Dealer Phone: " + document.getElementById("dealerphone").value;
-	        document.getElementById("review-comments").innerText = "Comments: " + document.getElementById("comments").value;
-	    }
+				    document.getElementById("review-owner-name").innerText = "Owner Name: " + document.getElementById("owner-name").value;
+				    document.getElementById("review-vehicle-number").innerText = "Vehicle Number: " + document.getElementById("vehiclenumber").value;
+				    document.getElementById("review-vehicle-type").innerText = "Vehicle Type: " + document.getElementById("vehicle-type").value;
+				    document.getElementById("review-engine-number").innerText = "Engine Number: " + document.getElementById("engine-number").value;
+				    document.getElementById("review-installation-date").innerText = "Installation Date: " + document.getElementById("installation-date").value;
+
+				    // These fields had wrong IDs
+				    document.getElementById("review-gps-device-id").innerText = "GPS Device ID: " + document.getElementById("serialNoInput").value;
+				    document.getElementById("review-installer-name").innerText = "Technician Name: " + document.getElementById("installer-name").value;
+				    document.getElementById("review-imei").innerText = "IMEI: " + document.getElementById("imei").value;
+				    document.getElementById("review-sim-number").innerText = "SIM NO: " + document.getElementById("sim-number").value;
+				    document.getElementById("review-dealername").innerText = "Dealer Name: " + document.getElementById("dealer-name").value;
+				    document.getElementById("review-dealerphone").innerText = "Dealer Phone: " + document.getElementById("dealer-phone").value;
+					document.getElementById("review-user-name").innerText = "User Name: " + document.getElementById("user-selection").value;
+					   document.getElementById("review-user-id").innerText = "User ID: " + document.getElementById("user-id").value;
+				    // If comments field is not present, skip this line or create a comments field in HTML
+				   
+				}
+
 
 		function editForm() {
 		    }
@@ -874,24 +695,7 @@
 	        document.getElementById('review-section').classList.add('hidden');
 	    }
 
-	    function showReview() {
-	        document.getElementById('part3').classList.add('hidden');
-	        document.getElementById('review-section').classList.remove('hidden');
-
-	        // Fill review section with form data
-	        document.getElementById("review-owner-name").innerText = "Owner Name: " + document.getElementById("new-owner-name").value;
-	        document.getElementById("review-vehicle-number").innerText = "Vehicle Number: " + document.getElementById("new-vehicle-number").value;
-	        document.getElementById("review-vehicle-type").innerText = "Vehicle Type: " + document.getElementById("new-vehicle-type").value;
-	        document.getElementById("review-engine-number").innerText = "Engine Number: " + document.getElementById("new-engine-number").value;
-	        document.getElementById("review-installation-date").innerText = "Installation Date: " + document.getElementById("installation-date").value;
-	        document.getElementById("review-gps-device-id").innerText = "GPS Device ID: " + document.getElementById("gps-device-id").value;
-	        document.getElementById("review-installer-name").innerText = "Technician Name: " + document.getElementById("installer-name").value;
-	        document.getElementById("review-imei").innerText = "IMEI: " + document.getElementById("imei").value;
-	        document.getElementById("review-sim-number").innerText = "SIM NO: " + document.getElementById("sim_number").value;
-	        document.getElementById("review-dealername").innerText = "Dealer Name: " + document.getElementById("dealername").value;
-	        document.getElementById("review-dealerphone").innerText = "Dealer Phone: " + document.getElementById("dealerphone").value;
-	        document.getElementById("review-comments").innerText = "Comments: " + document.getElementById("comments").value;
-	    }
+	  
 		</script>
 		<script>
 		    // Open the Add Driver Modal
@@ -994,7 +798,7 @@
 		                suggestionsDiv.hide();
 		            }
 		        });
-
+                 //controlller class public class VehicleController 
 		        // Fetch suggestions from the server
 		        function fetchSerialNoSuggestions(query) {
 		            $.ajax({
@@ -1085,7 +889,60 @@
 		
 		
 		<script>
+
+			function addDevice() {
+			    const userId = parseInt(document.getElementById("user-id").value.trim());
+			    
+			    const vehicleDetails = {
+			        serialNo: document.getElementById("serialNoInput").value.trim(),
+			        imei: document.getElementById("imei").value.trim(),
+			        vehicleNumber: document.getElementById("vehiclenumber").value.trim(),
+			        ownerName: document.getElementById("owner-name").value.trim(),
+			        vehicleType: document.getElementById("vehicle-type").value.trim(),
+			        engineNumber: document.getElementById("engine-number").value.trim(),
+			        manufacturer: document.getElementById("manufacturer").value.trim(),
+			        model: document.getElementById("model").value.trim(),
+			        installationDate: document.getElementById("installation-date").value.trim(),
+			        technicianName: document.getElementById("installer-name").value.trim(),
+			        simNumber: document.getElementById("sim-number").value.trim(),
+			        dealerName: document.getElementById("dealer-name").value.trim(),
+			        addressPhone: document.getElementById("dealer-phone").value.trim(),
+			        country: document.getElementById("country").value.trim(),
+
+			        // ✅ Wrap user ID into `user` object
+			        user: userId ? { id: userId } : null
+			    };
+
+			    fetch("/total_vehicles/add-vehicle-and-device", {
+			        method: "POST",
+			        headers: {
+			            "Content-Type": "application/json"
+			        },
+			        body: JSON.stringify(vehicleDetails)
+			    })
+			    .then(response => {
+			        if (response.ok) {
+			            alert("Vehicle and device added successfully!");
+			            window.location.href = "/dashboard";
+			        } else {
+			            return response.text().then(text => { throw new Error(text); });
+			        }
+			    })
+			    .catch(error => {
+			        console.error("Error:", error);
+			        alert("Failed to add vehicle/device. " + error.message);
+			    });
+			}
+
 		    function addDevice() {
+				const selectedUserName = document.getElementById("user-selection").value;
+				const userId = userMap[selectedUserName];
+
+				if (!userId) {
+				    alert("Please select a valid user from the list.");
+				    return;
+				}
+
 		        // Fetch vehicle details, including Serial Number and IMEI
 		        const vehicleDetails = {
 		            serialNo: document.getElementById("serialNoInput").value.trim(), // Serial Number
@@ -1101,7 +958,8 @@
 		            simNumber: document.getElementById("sim-number").value.trim(),
 		            dealerName: document.getElementById("dealer-name").value.trim(),
 		            addressPhone: document.getElementById("dealer-phone").value.trim(),
-		            country: document.getElementById("country").value.trim()
+		            country: document.getElementById("country").value.trim(),
+					userId: userId // ✅ Set the user ID here
 		        };
 
 		        // Validate input fields
@@ -1123,33 +981,9 @@
 		            return;
 		        }
 
-		        // Submit data via fetch
-		        fetch("http://3.109.116.92:8181/total_vehicles/add-vehicle-and-device", {
-		            method: "POST",
-		            headers: {
-		                "Content-Type": "application/json"
-		            },
-		            body: JSON.stringify(vehicleDetails)
-		        })
-		            .then(response => {
-		                if (response.ok) {
-		                    return response.text(); // Handle successful response
-		                } else {
-		                    return response.text().then(text => { throw new Error(text); });
-		                }
-		            })
-		            .then(successMessage => {
-		                alert(successMessage || "Vehicle and Device information updated successfully!");
-		                window.location.href = "/dashboard"; // Redirect to dashboard
-		            })
-		            .catch(error => {
-		                console.error("Error updating vehicle and device:", error);
-		                alert(`Failed to update vehicle and device information. ${error.message}`);
-		            });
-		    }
+
 		</script>
-
-
+		
 		
 </body>
 </html>
