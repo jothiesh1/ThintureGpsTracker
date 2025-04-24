@@ -39,17 +39,18 @@ public class UserController {
     @PostMapping("/add")
     public ResponseEntity<?> addUser(@RequestBody User user) {
         try {
-            // Get logged-in user's details
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            
-            logger.info("Adding user by: {}", userDetails.getId());
+
+            logger.info("📥 Add User Request by: {} (ID: {}, Roles: {})", 
+                        userDetails.getUsername(), userDetails.getId(), userDetails.getAuthorities());
 
             User savedUser = userService.addUser(user);
+            logger.info("✅ User added successfully with ID: {}", savedUser.getId());
             return ResponseEntity.ok(savedUser);
 
         } catch (Exception e) {
-            logger.error("Error adding user", e);
+            logger.error("❌ Error adding user: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding user");
         }
     }

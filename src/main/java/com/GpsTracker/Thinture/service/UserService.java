@@ -21,7 +21,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.GpsTracker.Thinture.service.UserTypeFilterService.UserTypeResult;
+
+import jakarta.transaction.Transactional;
+
+import com.GpsTracker.Thinture.dto.RoleHierarchyDTO;
+import com.GpsTracker.Thinture.Util.RoleHierarchyUtil;
 
 @Service
 public class UserService {
@@ -39,59 +46,47 @@ public class UserService {
     private SuperAdminRepository superAdminRepository;
     @Autowired
     private ClientRepository clientRepository;
-    
+    @Autowired private PasswordEncoder passwordEncoder;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserTypeFilterService userTypeFilterService;
 
+    @Transactional
     public User addUser(User user) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-        if (userDetails.getId() == null) {
-            throw new IllegalStateException("Logged-in user ID is null. Cannot assign ownership.");
-        }
+        String email = userDetails.getUsername();
+        UserTypeResult creator = userTypeFilterService.findUserAndTypeByEmail(email);
 
-        logger.info("🔍 Logged-in User ID: {}", userDetails.getId());
-        logger.info("🔍 Logged-in Role(s): {}", userDetails.getAuthorities());
+        logger.info("📥 Add User by: {} (Role: {})", email, creator.getRole());
 
-        if (userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
-            Admin admin = adminRepository.findById(userDetails.getId())
-                    .orElseThrow(() -> new RuntimeException("Admin not found"));
-            user.setAdmin(admin);
-            user.setAdmin_id(admin.getId());
-            logger.info("✅ Setting admin_id: {}", admin.getId());
+        RoleHierarchyDTO dto = RoleHierarchyUtil.prepareHierarchy(creator);
 
-        } else if (userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_DEALER"))) {
-            Dealer dealer = dealerRepository.findById(userDetails.getId())
-                    .orElseThrow(() -> new RuntimeException("Dealer not found"));
-            user.setDealer(dealer);
-            user.setDealer_id(dealer.getId());
-            logger.info("✅ Setting dealer_id: {}", dealer.getId());
+        // ✅ Apply hierarchy to user
+        user.setSuperadmin_id(dto.getSuperadmin_id());
+        user.setAdmin_id(dto.getAdmin_id());
+        user.setDealer_id(dto.getDealer_id());
+        user.setClient_id(dto.getClient_id());
+        user.setUser_id(dto.getUser_id());
 
-        
+        // 🔐 Encode password before saving
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        } else if (userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CLIENT"))) {
-            Client client = clientRepository.findById(userDetails.getId())
-                    .orElseThrow(() -> new RuntimeException("Client not found"));
-            user.setClient(client);
-            user.setClient_id(client.getId());
-            logger.info("✅ Setting client_id: {}", client.getId());
-        }
-
-        logger.info("📥 Final User Object Before Save:");
-        logger.info("➡ ID: {}", user.getId());
+        logger.info("📦 Final User Save Payload:");
+        logger.info("➡ Email: {}", user.getEmail());
         logger.info("➡ Username: {}", user.getUsername());
+        logger.info("➡ Superadmin ID: {}", user.getSuperadmin_id());
         logger.info("➡ Admin ID: {}", user.getAdmin_id());
         logger.info("➡ Dealer ID: {}", user.getDealer_id());
-      //  logger.info("➡ SuperAdmin ID: {}", user.getSuperadmin_id());
         logger.info("➡ Client ID: {}", user.getClient_id());
 
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+        logger.info("✅ User saved with ID: {}", saved.getId());
+
+        return saved;
     }
-
-
-    
-    
     
 
 

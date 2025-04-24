@@ -4,6 +4,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.GpsTracker.Thinture.model.Admin;
@@ -30,7 +31,8 @@ public class DealerService {
     private AdminRepository adminRepository;
     @Autowired
     private SuperAdminRepository superAdminRepository;
-
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private static final Logger logger = LoggerFactory.getLogger(DealerService.class);
 
@@ -54,38 +56,49 @@ public class DealerService {
         Long userId = loggedInUser.getId();
         String role = loggedInUser.getAuthorities().iterator().next().getAuthority();
 
-        logger.info("🛠 Adding dealer by user: {} (ID: {}, Role: {})", loggedInUser.getUsername(), userId, role);
+        logger.info("🛠 Adding dealer initiated by: {} | ID: {} | Role: {}", loggedInUser.getUsername(), userId, role);
 
-        // Assign based on role
         if (role.equals("ROLE_ADMIN")) {
             Admin admin = adminRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("❌ Admin not found (ID: " + userId + ")"));
-            dealer.setAdmin(admin);                      // Entity reference
-            dealer.setAdmin_id(admin.getId());           // ID for insert
+                .orElseThrow(() -> {
+                    logger.error("❌ Admin not found for ID: {}", userId);
+                    return new RuntimeException("Admin not found (ID: " + userId + ")");
+                });
+
+            dealer.setAdmin(admin);
+            dealer.setAdmin_id(admin.getId());
             dealer.setSuperAdmin(null);
             dealer.setSuperadmin_id(null);
-            logger.info("✅ Dealer assigned to Admin [ID: {}]", admin.getId());
+
+            logger.info("✅ Dealer linked to Admin ID: {}", admin.getId());
 
         } else if (role.equals("ROLE_SUPERADMIN")) {
             SuperAdmin superAdmin = superAdminRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("❌ SuperAdmin not found (ID: " + userId + ")"));
-            dealer.setSuperAdmin(superAdmin);            // Entity reference
-            dealer.setSuperadmin_id(superAdmin.getId()); // ID for insert
+                .orElseThrow(() -> {
+                    logger.error("❌ SuperAdmin not found for ID: {}", userId);
+                    return new RuntimeException("SuperAdmin not found (ID: " + userId + ")");
+                });
+
+            dealer.setSuperAdmin(superAdmin);
+            dealer.setSuperadmin_id(superAdmin.getId());
             dealer.setAdmin(null);
             dealer.setAdmin_id(null);
-            logger.info("✅ Dealer assigned to SuperAdmin [ID: {}]", superAdmin.getId());
+
+            logger.info("✅ Dealer linked to SuperAdmin ID: {}", superAdmin.getId());
 
         } else {
-            logger.warn("❌ Unauthorized role '{}' attempted to create dealer", role);
+            logger.warn("⚠️ Unauthorized role '{}' attempted to add dealer", role);
             throw new RuntimeException("Unauthorized role to create a dealer");
         }
 
+        dealer.setPassword(passwordEncoder.encode(dealer.getPassword()));
         Dealer savedDealer = dealerRepository.save(dealer);
-        logger.info("🆗 Dealer saved successfully with ID: {}", savedDealer.getId());
 
+        logger.info("🆗 Dealer saved with ID: {} | Name: {}", savedDealer.getId(), savedDealer.getCompanyName());
         return savedDealer;
     }
-
+    
+    
     
     
     /**

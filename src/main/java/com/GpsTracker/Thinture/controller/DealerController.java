@@ -66,13 +66,16 @@ public class DealerController {
         CustomUserDetails loggedInUser = (CustomUserDetails) authentication.getPrincipal();
 
         try {
-            dealerService.addDealer(dealer, loggedInUser);
+            logger.info("📥 Add Dealer Request by: {} (ID: {}, Roles: {})", loggedInUser.getUsername(), loggedInUser.getId(), loggedInUser.getAuthorities());
+            Dealer savedDealer = dealerService.addDealer(dealer, loggedInUser);
+            logger.info("✅ Dealer added successfully with ID: {}", savedDealer.getId());
             return ResponseEntity.ok("Dealer added successfully!");
         } catch (Exception e) {
             logger.error("❌ Error adding dealer: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding dealer.");
         }
     }
+
 
     
     

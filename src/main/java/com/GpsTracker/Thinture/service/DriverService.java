@@ -13,14 +13,31 @@ import com.GpsTracker.Thinture.repository.SuperAdminRepository;
 import com.GpsTracker.Thinture.repository.UserRepository;
 import com.GpsTracker.Thinture.security.AuthenticationFacade;
 
+import com.GpsTracker.Thinture.Util.RoleHierarchyUtil;
+import com.GpsTracker.Thinture.dto.DriverDTO;
+import com.GpsTracker.Thinture.dto.RoleHierarchyDTO;
+import com.GpsTracker.Thinture.model.Driver;
+import com.GpsTracker.Thinture.repository.*;
+import com.GpsTracker.Thinture.security.AuthenticationFacade;
+import com.GpsTracker.Thinture.service.UserTypeFilterService.UserTypeResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
+import com.GpsTracker.Thinture.service.UserTypeFilterService;
+import com.GpsTracker.Thinture.service.UserTypeFilterService.UserTypeResult;
 
 import com.GpsTracker.Thinture.dto.DriverDTO;
 
 @Service
 public class DriverService {
 
+	
+	private static final Logger logger = LoggerFactory.getLogger(DriverService.class);
+	
     @Autowired
     private DriverRepository driverRepository;
 
@@ -42,10 +59,43 @@ public class DriverService {
     @Autowired
     private UserRepository userRepository;
 
+    
+    @Autowired
+    private UserTypeFilterService userTypeFilterService;
+
     public Driver addDriverFromDTO(DriverDTO dto) {
-        Driver driver = convertToEntity(dto);
-        return driverRepository.save(driver);
+        Driver driver = convertToEntity(dto); // Apply fields from DTO
+
+        // 🔐 Get logged-in user details
+        String email = authFacade.getAuthentication().getName();
+        UserTypeFilterService.UserTypeResult creator = userTypeFilterService.findUserAndTypeByEmail(email);
+
+        logger.info("📥 Add Driver by: {} (Role: {})", email, creator.getRole());
+
+        // 📌 Set role hierarchy
+        RoleHierarchyDTO hierarchy = RoleHierarchyUtil.prepareHierarchy(creator);
+
+        driver.setSuperadmin_id(hierarchy.getSuperadmin_id());
+        driver.setAdmin_id(hierarchy.getAdmin_id());
+        driver.setDealer_id(hierarchy.getDealer_id());
+        driver.setClient_id(hierarchy.getClient_id());
+        driver.setUser_id(hierarchy.getUser_id());
+
+        // 📦 Final log before save
+        logger.info("📦 Final Driver Save Payload:");
+        logger.info("➡ Name: {}", driver.getFullName());
+        logger.info("➡ Superadmin ID: {}", driver.getSuperadmin_id());
+        logger.info("➡ Admin ID: {}", driver.getAdmin_id());
+        logger.info("➡ Dealer ID: {}", driver.getDealer_id());
+        logger.info("➡ Client ID: {}", driver.getClient_id());
+        logger.info("➡ User ID: {}", driver.getUser_id());
+
+        Driver saved = driverRepository.save(driver);
+        logger.info("✅ Driver saved with ID: {}", saved.getId());
+
+        return saved;
     }
+
 
     public List<Driver> getAllDrivers() {
         return driverRepository.findAll();

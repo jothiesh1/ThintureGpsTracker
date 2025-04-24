@@ -1,6 +1,7 @@
 package com.GpsTracker.Thinture.controller;
 
 import com.GpsTracker.Thinture.model.Driver;
+import com.GpsTracker.Thinture.security.CustomUserDetails;
 import com.GpsTracker.Thinture.dto.DriverDTO;
 import com.GpsTracker.Thinture.service.DriverService;
 
@@ -8,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -24,11 +27,34 @@ public class DriverController {
     // 🔹 Add new driver
     @PostMapping
     public ResponseEntity<Driver> addDriver(@RequestBody DriverDTO dto) {
-        logger.info("🚗 Creating new driver with data: {}", dto);
-        Driver saved = driverService.addDriverFromDTO(dto);
-        logger.info("✅ Driver created with ID: {}", saved.getId());
-        return ResponseEntity.ok(saved);
+        try {
+            // 🔐 Get authenticated user info
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (!(auth.getPrincipal() instanceof CustomUserDetails userDetails)) {
+                logger.warn("❌ Unauthorized access - invalid user principal.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            Long userId = userDetails.getId();
+            String email = userDetails.getUsername();
+            String role = userDetails.getAuthorities().iterator().next().getAuthority();
+
+            logger.info("👤 Driver add request by: {} (ID: {}, Role: {})", email, userId, role);
+            logger.info("🚗 Creating new driver with data: {}", dto);
+
+            // 💾 Save driver
+            Driver saved = driverService.addDriverFromDTO(dto);
+
+            logger.info("✅ Driver created with ID: {}", saved.getId());
+            return ResponseEntity.ok(saved);
+
+        } catch (Exception e) {
+            logger.error("❌ Error creating driver: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body(null);
+        }
     }
+
 
     // 🔹 Get all drivers
     @GetMapping

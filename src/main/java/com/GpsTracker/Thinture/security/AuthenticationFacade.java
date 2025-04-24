@@ -53,4 +53,9 @@ public class AuthenticationFacade {
 
         return userDetails;
     }
+    
+    public Authentication getAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
+    }
+
 }
