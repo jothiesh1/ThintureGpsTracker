@@ -70,8 +70,10 @@
 		
     <script>
 		class VehicleTracker {
-		    constructor(mapElementId) {
-		        this.map = L.map(mapElementId).setView([13.07757, 77.55928], 5);
+			constructor(mapElementId) {
+						this.map = L.map(mapElementId, {
+						    zoomControl: false  // ← disables the + / – buttons
+						}).setView([13.07757, 77.55928], 5);
 		        this.markers = {};
 		        this.liveDevices = new Set();
 		        this.deviceLastUpdate = {};

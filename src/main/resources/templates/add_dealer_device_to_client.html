@@ -25,57 +25,90 @@
 		  
 		  
     <style>
-		body {
-				    font-family: Arial, sans-serif;
-				    background-image: url('/THINTURE_IMAGE/add_new.jpg');
-				    background-size: cover; /* Ensures the image covers the entire screen */
-				   
-				    background-repeat: no-repeat;
-				    margin: 0;
-				    padding: 0;
-				}
+		body::before {
+				    content: "";
+				    position: fixed;
+				    top: 0;
+				    left: 0;
+				    width: 100%;
+				    height: 100%;
 
+				    background: linear-gradient(
+				        rgba(10, 25, 47, 0.95),
+				        rgba(15, 32, 65, 0.95)
+				      ),
+				      url('/THINTURE_IMAGE/add_new.jpg') no-repeat center center/cover;
+
+				    filter: blur(2px);
+				    z-index: -1;
+				}
+				@media only screen and (max-width: 768px) {
+				    body {
+				        background-attachment: fixed;
+				        min-height: 100vh;
+				        font-size: 14px;
+				        background-color: #0a192f; /* fallback for small screens if image fails */
+				        background-size: cover;
+				        color: #f0f0f0;
+				    }
+				}
 				.card {
 				    position: absolute;
-				    top: 150px;
+				    top: 190px;
 				    left: 50%;  /* Move the element to 50% from the left */
 				    transform: translateX(-50%); /* Center it exactly */
 				    background-color: rgba(0, 0, 0, 0.3);
 				    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 				    border-radius: 10px;
-				    width: 50%;
+				    width: 30%;
 				    padding: 20px 30px;
 				}
 
-			      h2 {
-			          text-align: center;
-			          font-size: 24px;
-			          margin-bottom: 20px;
-			          color: white;
-			      }
+				h2 {
+				    text-align: center;
+				    font-size: 24px;
+				    margin-bottom: 20px;
+				    color: white;
+				    border: none; /* Remove any line */
+				    padding-top: 10px;
+				}
+.SerialInput lable{
+	display: block;
+				          margin-bottom: 5px;
+						  color:white;
+}
 
-			      label,h3 {
-			          font-weight: bold;
+			     label,h3 {
+			         
 			          display: block;
 			          margin-bottom: 5px;
 					  color:white;
 			      }
 
-			      select, input[type="text"] {
-			          width: calc(100% - 22px);
-			          padding: 10px;
-			          margin: 10px 0;
-			          border: 1px solid #ddd;
-			          border-radius: 4px;
-			          font-size: 14px;
-			          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-			      }
+				  select, input[type="text"] {
+				      position: relative;
+				      width: 50%;
+				      left: 38%;
+				      padding: 10px;
+				      margin: 10px 0;
+				      border: none;
+				      outline: none;
+				      border-radius: 6px;
+				      background: white;
+				      font-size: 14px;
+				      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+				  }
 
-			      button {
+
+			      .addb {
+					position: relative;
 			          padding: 10px 20px;
+					  width: 40%;
+					  left: 40%; 
 			          font-size: 14px;
 			          color: white;
-			          background: linear-gradient(to right, #00c6ff, #0072ff);
+					  background: linear-gradient( rgba(10, 25, 47, 0.9));
+					  							  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.8);
 			          border: none;
 			          border-radius: 4px;
 			          cursor: pointer;
@@ -84,9 +117,7 @@
 			          margin-top: 10px;
 			      }
 
-			      button:hover {
-			          background: linear-gradient(to right, #0072ff, #00c6ff);
-			      }
+			     
 
 			      .tab-container {
 			          display: flex;
@@ -136,49 +167,121 @@
 			      }
 
 			      td input {
-			          width: 50%;
+			          width: 30%;
+					  border-radius: 6px;
+					  			      border: 1px solid #ccc;
 			          padding: 5px;
 			          font-size: 14px;
 			      }
+				  
+				  .autocomplete-wrapper {
+				      position: relative;
+				      width: 100%;
+				      max-width: 400px;
+				      margin: 0 auto 20px auto;
+				  }
+
+				  #SerialInput {
+				      width: 50%;
+					  left:38%;
+				      padding: 10px 12px;
+				      border-radius: 6px;
+				      border: 1px solid #ccc;
+				      font-size: 14px;
+				      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+				  }
+
+				  .autocomplete-suggestions {
+				      position: absolute;
+				      top: 100%;
+				      left: 0;
+				      right: 0;
+				      background: #fff;
+				      border: 1px solid #ddd;
+				      border-top: none;
+				      border-radius: 0 0 6px 6px;
+				      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+				      z-index: 1000;
+				      max-height: 220px;
+				      overflow-y: auto;
+				      font-size: 14px;
+				  }
+
+				  .autocomplete-suggestions div {
+				      padding: 10px 15px;
+				      cursor: pointer;
+				      border-bottom: 1px solid #eee;
+				      transition: background 0.2s ease;
+				  }
+
+				  .autocomplete-suggestions div:last-child {
+				      border-bottom: none;
+				  }
+
+				  .autocomplete-suggestions div:hover {
+				      background-color: #f7f7f7;
+				  }
+
+				  
+				  
+				  
+				  
+				  .autocomplete-suggestions {
+				      position: absolute;
+				      background: #fff;
+				      border: 1px solid #ccc;
+				      border-radius: 6px;
+				      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+				      max-height: 200px;
+				      overflow-y: auto;
+				      z-index: 1000;
+				      width: auto;
+				      min-width: 300px;
+				      font-size: 14px;
+				      margin-top: 4px;
+				  }
+
+				  .autocomplete-suggestions div {
+				      padding: 10px 14px;
+				      cursor: pointer;
+				      transition: background 0.2s ease;
+				  }
+
+				  .autocomplete-suggestions div:hover {
+				      background-color: #f2f2f2;
+				  }
+
     </style>
 </head>
 
 
 <body>
-	<header th:replace="~{navigation :: navbar}"></header>
+	<header th:replace="~{navigation_dealer :: navbar_dealer}"></header>
 
 	<div class="card">
-	    <h2>Dealer to Client Mapping</h2>
+		
+		
+	    <h2>ADD DEVICE TO CLIENT</h2>
+<br>
+<br>
+		<div class="autocomplete-wrapper">
+		<label for="ClientInput">Enter Client Name:</label>
+			    <input type="text" id="ClientInput" placeholder=" search client..." autocomplete="off">
+			    <div id="ClientSuggestions" class="autocomplete-suggestions"></div>
+		</div>
+				<div class="autocomplete-wrapper">
+				    <label for="SerialInput">Enter Serial No:</label>
+				    <input type="text" id="SerialInput" placeholder="search serial..." autocomplete="off" class="form-control">
+				    <div id="SerialSuggestions" class="autocomplete-suggestions"></div>
+				</div>
 
-	    <label for="SerialInput">Enter Serial No:</label>
-	    <input type="text" id="SerialInput" placeholder="Type to search serial..." autocomplete="off">
-	    <div id="SerialSuggestions" class="autocomplete-suggestions"></div>
 
-	    <label for="ClientInput">Enter Client Name:</label>
-	    <input type="text" id="ClientInput" placeholder="Type to search client..." autocomplete="off">
-	    <div id="ClientSuggestions" class="autocomplete-suggestions"></div>
+	    
 
-	    <button onclick="updateClientIdForVehicle()">Update Client</button>
+	    <button class="addb" onclick="updateClientIdForVehicle()">Add Device</button>
 	</div>
 
-	<style>
-	    .autocomplete-suggestions {
-	        position: absolute;
-	        background: white;
-	        border: 1px solid #ddd;
-	        max-height: 150px;
-	        overflow-y: auto;
-	        width: 50%;
-	        z-index: 1000;
-	    }
-	    .autocomplete-suggestions div {
-	        padding: 10px;
-	        cursor: pointer;
-	    }
-	    .autocomplete-suggestions div:hover {
-	        background: #f0f0f0;
-	    }
-	</style>
+
 
 
 	<script>

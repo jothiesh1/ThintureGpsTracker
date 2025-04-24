@@ -13,6 +13,12 @@
 
 	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
 	<link rel="stylesheet" type="text/css" th:href="@{/css/addstyle.css}">
+	<style>
+	    .is-invalid {
+	        border: 2px solid red !important;
+	    }
+	</style>
+
 </head>
 <body>
 	<div th:insert="navigation_admin :: navbar_admin"></div>
@@ -64,7 +70,7 @@
 				       <span class="error-message" id="c_password-error"></span>
 				   </div>
 
-		           <button type="submit" class="btn btn-primary">Add Client</button>
+		           <button type="submit" class="submit">Add Client</button>
 		       </form>
 		   </div>
 
@@ -89,42 +95,54 @@
 		                   password: document.getElementById('password').value.trim()
 		               };
 
-		               const validateField = (id, message) => {
-		                   const field = document.getElementById(id);
-		                   if (!field.value.trim()) {
-		                       document.getElementById(`${id}-error`).textContent = message;
-		                       return false;
-		                   }
-		                   return true;
-		               };
+					   const validateField = (id, message) => {
+					       const field = document.getElementById(id);
+					       const errorSpan = document.getElementById(`${id}-error`);
+					       if (!field.value.trim()) {
+					           field.classList.add('is-invalid'); // 🔴 red border
+					           errorSpan.textContent = message;
+					           return false;
+					       } else {
+					           field.classList.remove('is-invalid'); // remove red if fixed
+					           errorSpan.textContent = '';
+					       }
+					       return true;
+					   };
 
-		               let isValid = true;
-		               isValid &= validateField('companyName', 'Company name is required.');
-		               isValid &= validateField('address', 'Address is required.');
-		               isValid &= validateField('email', 'Email is required.');
-		               isValid &= validateField('phone', 'Phone number is required.');
-		               isValid &= validateField('country', 'Country is required.');
+					   let isValid = true;
 
-		               const password = document.getElementById('password').value.trim();
-		               const confirmPassword = document.getElementById('c_password').value.trim();
-		               if (password !== confirmPassword) {
-		                   document.getElementById('password-error').textContent = 'Passwords do not match.';
-		                   document.getElementById('c_password-error').textContent = 'Passwords do not match.';
-		                   isValid = false;
-		               }
+					   // Clear previous red borders
+					   document.querySelectorAll('.form-control').forEach(el => el.classList.remove('is-invalid'));
 
-		               if (!isValid) return;
+					   isValid &= validateField('companyName', 'Company name is required.');
+					   isValid &= validateField('address', 'Address is required.');
+					   isValid &= validateField('email', 'Email is required.');
+					   isValid &= validateField('phone', 'Phone number is required.');
+					   isValid &= validateField('country', 'Country is required.');
 
-		               // Show confirmation alert
-		               const result = await Swal.fire({
-		                   title: 'Are you sure?',
-		                   text: "Do you want to add this client?",
-		                   icon: 'question',
-		                   showCancelButton: true,
-		                   confirmButtonColor: '#3085d6',
-		                   cancelButtonColor: '#d33',
-		                   confirmButtonText: 'Yes, add it!'
-		               });
+					   const password = document.getElementById('password').value.trim();
+					   const confirmPassword = document.getElementById('c_password').value.trim();
+
+					   if (!password || !confirmPassword || password !== confirmPassword) {
+					       const passwordField = document.getElementById('password');
+					       const confirmPasswordField = document.getElementById('c_password');
+					       passwordField.classList.add('is-invalid');
+					       confirmPasswordField.classList.add('is-invalid');
+					       document.getElementById('password-error').textContent = 'Passwords do not match.';
+					       document.getElementById('c_password-error').textContent = 'Passwords do not match.';
+					       isValid = false;
+					   }
+
+					   if (!isValid) {
+					       Swal.fire({
+					           icon: 'error',
+					           title: 'Validation Error',
+					           text: 'Please correct the red highlighted fields.',
+					           confirmButtonColor: '#d33'
+					       });
+					       return;
+					   }
+
 
 		               if (!result.isConfirmed) {
 		                   return; // If user cancels, do nothing
@@ -164,6 +182,17 @@
 		                       title: 'Oops!',
 		                       text: 'Something went wrong. Please try again.'
 		                   });
+		               }
+		           });
+		       });
+		   </script>
+		   <script>
+		       document.querySelectorAll('.form-control').forEach(input => {
+		           input.addEventListener('input', () => {
+		               if (input.classList.contains('is-invalid')) {
+		                   input.classList.remove('is-invalid');
+		                   const errorSpan = document.getElementById(`${input.id}-error`);
+		                   if (errorSpan) errorSpan.textContent = '';
 		               }
 		           });
 		       });
