@@ -25,7 +25,7 @@
             <!-- Dealer Dropdown -->
 			<div class="form-group">
 			    <label for="clientDropdown">Assign to Client*</label>
-			    <select id="clientDropdown" name="client" required onchange="fetchSelectedClientId()">
+			    <select id="clientDropdown" name="client"  onchange="fetchSelectedClientId()">
 			        <option value="">Select Client</option>
 			    </select>
 			    <div id="selectedClientId" style="color:white; margin-top: 10px;"></div>
@@ -57,12 +57,6 @@
 	<script>
 	    let rfidSet = new Set();
 
-	    // Load clients when page loads
-	    window.onload = function () {
-	        populateClientDropdown();
-	    };
-
-	    // Fetch all clients and populate the dropdown
 	    function populateClientDropdown() {
 	        fetch("/client/all")
 	            .then(response => response.json())
@@ -78,7 +72,6 @@
 	            .catch(error => console.error("Error fetching clients:", error));
 	    }
 
-	    // Show selected client info
 	    function fetchSelectedClientId() {
 	        const dropdown = document.getElementById("clientDropdown");
 	        const selectedClientId = dropdown.value;
@@ -87,33 +80,51 @@
 	            `Selected Client: ${selectedClientName} (ID: ${selectedClientId})`;
 	    }
 
-	 
-	    // Submit form with clientId + RFIDs
 	    function validateForm() {
-	        const clientId = document.getElementById('clientDropdown').value;
+	        const clientDropdown = document.getElementById('clientDropdown');
+	        const clientId = clientDropdown.value;
+
+	        clientDropdown.classList.remove('file-error');
 
 	        if (!clientId) {
-	            alert("Please select a client.");
+	            clientDropdown.classList.add('file-error');
+	            Swal.fire({
+	                icon: "warning",
+	                title: "Missing Client",
+	                text: "Please select a client before submitting.",
+	                confirmButtonColor: "#3085d6"
+	            });
 	            return false;
 	        }
 
 	        if (rfidSet.size === 0) {
-	            alert("Please enter at least one RFID.");
+	            Swal.fire({
+	                icon: "warning",
+	                title: "Missing RFID",
+	                text: "Please enter at least one RFID.",
+	                confirmButtonColor: "#3085d6"
+	            });
 	            return false;
 	        }
 
 	        const rfidArray = Array.from(rfidSet);
 
-	        fetch(`/api/rfid/registerForClient?clientId=${clientId}`, {  // Corrected URL
+	        fetch(`/api/rfid/registerForClient?clientId=${clientId}`, {
 	            method: 'POST',
-	            headers: {
-	                'Content-Type': 'application/json'
-	            },
+	            headers: { 'Content-Type': 'application/json' },
 	            body: JSON.stringify(rfidArray)
 	        })
 	        .then(response => response.text())
 	        .then(message => {
-	            Swal.fire("Success", message, "success");
+	            Swal.fire({
+	                icon: "success",
+	                title: "Success",
+	                text: message,
+	                confirmButtonColor: "#3085d6"
+	            }).then(() => {
+	                window.location.href = "/addrfid_dealer_client";
+	            });
+
 	            document.getElementById("driver-form").reset();
 	            rfidSet.clear();
 	            displayRFIDs();
@@ -121,52 +132,51 @@
 	        })
 	        .catch(error => {
 	            console.error("Error:", error);
-	            Swal.fire("Error", "Failed to submit RFIDs", "error");
+	            Swal.fire({
+	                icon: "error",
+	                title: "Error",
+	                text: "Failed to submit RFIDs.",
+	                confirmButtonColor: "#d33"
+	            });
 	        });
 
-	        return false; // prevent form default
+	        return false;
 	    }
+
+	    function fetchRFIDs() {
+	        fetch("/api/rfid/all")
+	            .then(response => response.json())
+	            .then(rfids => {
+	                const rfidList = document.getElementById("rfidList");
+	                rfids.forEach(rfid => {
+	                    const option = document.createElement("option");
+	                    option.value = rfid;
+	                    rfidList.appendChild(option);
+	                });
+	            })
+	            .catch(error => console.error("Error fetching RFIDs:", error));
+	    }
+
+	    function addRFID() {
+	        const input = document.getElementById("rfidInput");
+	        const rfid = input.value.trim();
+	        if (rfid && !rfidSet.has(rfid)) {
+	            rfidSet.add(rfid);
+	            input.value = '';
+	            displayRFIDs();
+	        }
+	    }
+
+	    function displayRFIDs() {
+	        const display = document.getElementById("rfidDisplay");
+	        display.innerHTML = `<strong>RFIDs:</strong> ${Array.from(rfidSet).join(", ")}`;
+	    }
+
+	    window.onload = function () {
+	        populateClientDropdown();
+	        fetchRFIDs();
+	    };
 	</script>
 
-	<script>
-		// Fetch RFID list from backend and populate datalist
-		function fetchRFIDs() {
-		    fetch("/api/rfid/all")  // Your API endpoint to get all RFID strings
-		        .then(response => response.json())
-		        .then(rfids => {
-		            const rfidList = document.getElementById("rfidList");
-		            rfids.forEach(rfid => {
-		                const option = document.createElement("option");
-		                option.value = rfid;
-		                rfidList.appendChild(option);
-		            });
-		        })
-		        .catch(error => console.error("Error fetching RFIDs:", error));
-		}
-
-		// Add RFID to Set and show
-		function addRFID() {
-		    const input = document.getElementById("rfidInput");
-		    const rfid = input.value.trim();
-		    if (rfid && !rfidSet.has(rfid)) {
-		        rfidSet.add(rfid);
-		        input.value = '';
-		        displayRFIDs();
-		    }
-		}
-
-		// Display all selected RFIDs
-		function displayRFIDs() {
-		    const display = document.getElementById("rfidDisplay");
-		    display.innerHTML = `<strong>RFIDs:</strong> ${Array.from(rfidSet).join(", ")}`;
-		}
-
-		// Call this when page loads
-		window.onload = function () {
-		    populateClientDropdown();
-		    fetchRFIDs(); // ✅ Call the RFID fetching function too
-		};
-
-	</script>
 </body>
 </html>

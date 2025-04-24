@@ -12,12 +12,13 @@ import ch.qos.logback.core.model.Model;
 
 
 
+
 @Controller
 public class dealerEventController {
 
-	
-	
+	 @GetMapping("/dealer_eventreport")
+	    public String showDealerVehicleReport() {
+	        return "dealer_eventreport"; // Assuming you are using Thymeleaf templates (place in /templates)
+	    }
+
 }
-
-
-

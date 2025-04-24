@@ -24,7 +24,7 @@
             <!-- Dealer Dropdown -->
 			<div class="form-group">
 			    <label for="dealerDropdown">Assign to Dealer*</label>
-			    <select id="dealerDropdown" name="dealer" required onchange="fetchSelectedDealerId()">
+			    <select id="dealerDropdown" name="dealer"  onchange="fetchSelectedDealerId()">
 			        <option value="">Select Dealer</option>
 			    </select>
 			    <div id="selectedDealerId" style="color:white; margin-top: 10px;"></div>
@@ -149,43 +149,67 @@
 	    }
 
 	    // Final form submission logic
-	    function validateForm() {
-	        const dealerId = document.getElementById('dealerDropdown').value;
+		function validateForm() {
+		  const dealerId = document.getElementById('dealerDropdown').value;
+		  const fileInput = document.getElementById('rfidUpload');
+		  const manualInput = document.getElementById('manualRfid');
 
-	        if (!dealerId) {
-	            alert("Please select a dealer.");
-	            return false;
-	        }
+		  // Reset any previous error borders
+		  fileInput?.classList.remove('file-error');
+		  manualInput?.classList.remove('file-error');
 
-	        if (rfidSet.size === 0) {
-	            alert("Please enter at least one RFID.");
-	            return false;
-	        }
+		  if (!dealerId) {
+		    Swal.fire({
+		      icon: "warning",
+		      title: "Missing Dealer",
+		      text: "Please select a dealer.",
+		      confirmButtonColor: "#3085d6"
+		    });
+		    return false;
+		  }
 
-	        const rfidArray = Array.from(rfidSet);
+		  if (rfidSet.size === 0) {
+		    if (fileInput && !fileInput.files.length) {
+		      fileInput.classList.add('file-error');
+		    }
+		    if (manualInput && !manualInput.value.trim()) {
+		      manualInput.classList.add('file-error');
+		    }
 
-	        fetch(`/api/rfid/registerForDealer?dealerId=${dealerId}`, {
-	            method: 'POST',
-	            headers: {
-	                'Content-Type': 'application/json'
-	            },
-	            body: JSON.stringify(rfidArray)
-	        })
-	        .then(response => response.text())
-	        .then(message => {
-	            Swal.fire("Success", message, "success");
-	            document.getElementById("driver-form").reset();
-	            rfidSet.clear();
-	            displayRFIDs();
-	            document.getElementById("selectedDealerId").innerText = '';
-	        })
-	        .catch(error => {
-	            console.error("Error:", error);
-	            Swal.fire("Error", "Failed to submit RFIDs", "error");
-	        });
+		    Swal.fire({
+		      icon: "warning",
+		      title: "No RFID Provided",
+		      text: "Please enter at least one RFID manually or upload an Excel file.",
+		      confirmButtonColor: "#3085d6"
+		    });
+		    return false;
+		  }
 
-	        return false; // prevent regular form submission
-	    }
+		  const rfidArray = Array.from(rfidSet);
+
+		  fetch(`/api/rfid/registerForDealer?dealerId=${dealerId}`, {
+		    method: 'POST',
+		    headers: {
+		      'Content-Type': 'application/json'
+		    },
+		    body: JSON.stringify(rfidArray)
+		  })
+		    .then(response => response.text())
+		    .then(message => {
+		      Swal.fire("Success", message, "success");
+		      document.getElementById("driver-form").reset();
+		      rfidSet.clear();
+		      displayRFIDs();
+		      document.getElementById("selectedDealerId").innerText = '';
+		    })
+		    .catch(error => {
+		      console.error("Error:", error);
+		      Swal.fire("Error", "Failed to submit RFIDs", "error");
+		    });
+
+		  return false; // Prevent form default submission
+		}
+
 	</script>
 
 	

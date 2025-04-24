@@ -12,6 +12,13 @@
   
   <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
 <link rel="stylesheet" type="text/css" th:href="@{/css/adddriver.css}">
+<style>
+  .invalid-field {
+    border: 1px solid red;
+    background-color: #ffe6e6;
+  }
+</style>
+
 </head>
 
 
@@ -30,39 +37,39 @@
 
             <div class="form-group mb-3">
               <label for="fullName">Full Name</label>
-              <input type="text" id="fullName" class="form-control" required>
+              <input type="text" id="fullName" class="form-control">
             </div>
 
             <div class="row mb-3">
               <div class="col-md-6">
                 <label for="dob">Date of Birth</label>
-                <input type="date" id="dob" class="form-control" required>
+                <input type="date" id="dob" class="form-control">
                 <div id="ageDisplay" class="mt-1"></div>
               </div>
               <div class="col-md-6">
                 <label for="contact">Contact Number</label>
-                <input type="text" id="contact" class="form-control" required>
+                <input type="text" id="contact" class="form-control">
               </div>
             </div>
 
             <div class="form-group mb-3">
               <label for="email">Email Address</label>
-              <input type="email" id="email" class="form-control" required>
+              <input type="email" id="email" class="form-control">
             </div>
 
             <div class="form-group mb-3">
               <label for="address">Address</label>
-              <textarea id="address" rows="3" class="form-control" placeholder="Enter full address" required></textarea>
+              <textarea id="address" rows="3" class="form-control" placeholder="Enter full address"></textarea>
             </div>
 
             <div class="form-group mb-3">
               <label for="license">License Number</label>
-              <input type="text" id="license" class="form-control" required>
+              <input type="text" id="license" class="form-control">
             </div>
 
             <div class="form-group mb-3">
               <label for="licenseType">License Type</label>
-              <select id="licenseType" class="form-select" required>
+              <select id="licenseType" class="form-select">
                 <option value="">Select</option>
                 <option value="LV">Light Vehicle</option>
                 <option value="HGV">Heavy Goods Vehicle</option>
@@ -73,7 +80,7 @@
 
             <div class="form-group mb-3">
               <label for="ddp">Defensive Driving Permit Code</label>
-              <select id="ddp" class="form-select" required>
+              <select id="ddp" class="form-select" >
                 <option value="">Select</option>
                 <option value="DD01">DD01 - LV</option>
                 <option value="DD02">DD02 - HGV</option>
@@ -86,7 +93,7 @@
             <div class="row mb-3">
               <div class="col-md-6">
                 <label for="ddpExpiry">DDP Expiry Date</label>
-                <input type="date" id="ddpExpiry" class="form-control" required>
+                <input type="date" id="ddpExpiry" class="form-control" >
               </div>
               <div class="col-md-6">
                 <label for="vehicle">Assign Vehicle</label>
@@ -97,7 +104,7 @@
             <!-- Updated RFID field: now a dropdown -->
             <div class="form-group mb-3">
               <label for="rfid">Assign RFID</label>
-              <select id="rfid" class="form-select" required>
+              <select id="rfid" class="form-select" >
                 <option value="">Loading RFIDs...</option>
 				
               </select>
@@ -130,101 +137,104 @@
       currentAge = age;
       document.getElementById('ageDisplay').innerText = isNaN(age) ? '' : `Age: ${age} years`;
     });
+	document.getElementById('addDriverForm').addEventListener('submit', function (e) {
+	  e.preventDefault();
 
-    document.getElementById('addDriverForm').addEventListener('submit', function (e) {
-      e.preventDefault();
+	  const requiredFields = [
+	    'fullName', 'dob', 'contact', 'email',
+	    'address', 'license', 'licenseType',
+	    'ddp', 'ddpExpiry', 'rfid'
+	  ];
 
-      const requiredFields = [
-        'fullName', 'dob', 'contact', 'email',
-        'address', 'license', 'licenseType',
-        'ddp', 'ddpExpiry', 'rfid'
-      ];
+	  let hasError = false;
 
-      let hasError = false;
+	  requiredFields.forEach(id => {
+	    const field = document.getElementById(id);
+	    field.classList.remove('invalid-field');
+	    const value = field.value;
+	    if (
+	      (field.tagName === 'SELECT' && value === '') || 
+	      (field.tagName !== 'SELECT' && value.trim() === '')
+	    ) {
+	      field.classList.add('invalid-field');
+	      hasError = true;
+	    }
+	  });
 
-      requiredFields.forEach(id => {
-        document.getElementById(id).classList.remove('invalid-field');
-      });
+	  if (hasError) {
+	    Swal.fire({
+	      icon: 'error',
+	      title: 'Missing Fields',
+	      text: 'Please fill all required fields. Missing fields are highlighted.'
+	    });
+	    return;
+	  }
 
-      requiredFields.forEach(id => {
-        const field = document.getElementById(id);
-        if (!field.value.trim()) {
-          field.classList.add('invalid-field');
-          hasError = true;
-        }
-      });
+	  const licenseType = document.getElementById('licenseType').value;
+	  const age = currentAge;
+	  let minAge = 21;
+	  if (licenseType === 'HGV') minAge = 26;
+	  if (licenseType === 'Bus' || licenseType === 'Tanker') minAge = 30;
 
-      if (hasError) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Missing Fields',
-          text: 'Please fill all required fields. Missing fields are highlighted.'
-        });
-        return;
-      }
+	  if (age === null || age < minAge) {
+	    Swal.fire({
+	      icon: 'warning',
+	      title: 'Age Restriction',
+	      text: `Minimum age for ${licenseType} license is ${minAge} years. Current age is ${age ?? 'N/A'}.`
+	    });
+	    document.getElementById('dob').classList.add('invalid-field');
+	    return;
+	  }
 
-      const licenseType = document.getElementById('licenseType').value;
-      const age = currentAge;
-      let minAge = 21;
-      if (licenseType === 'HGV') minAge = 26;
-      if (licenseType === 'Bus' || licenseType === 'Tanker') minAge = 30;
+	  const data = {
+	    fullName: document.getElementById('fullName').value.trim(),
+	    dob: document.getElementById('dob').value,
+	    contact: document.getElementById('contact').value.trim(),
+	    email: document.getElementById('email').value.trim(),
+	    address: document.getElementById('address').value.trim(),
+	    license: document.getElementById('license').value.trim(),
+	    licenseType: licenseType,
+	    ddp: document.getElementById('ddp').value,
+	    ddpExpiry: document.getElementById('ddpExpiry').value,
+	    vehicle: document.getElementById('vehicle')?.value || "",
+	    rfid: document.getElementById('rfid').value,
+	    country: document.getElementById('country')?.value || ""
+		
+	  };
 
-      if (age === null || age < minAge) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Age Restriction',
-          text: `Minimum age for ${licenseType} license is ${minAge} years. Current age is ${age ?? 'N/A'}.`
-        });
-        document.getElementById('dob').classList.add('invalid-field');
-        return;
-      }
+	  fetch('/api/drivers', {
+	    method: 'POST',
+	    headers: { 'Content-Type': 'application/json' },
+	    body: JSON.stringify(data)
+	  })
+	    .then(response => {
+	      if (response.ok) {
+	        Swal.fire({
+	          icon: 'success',
+	          title: 'Driver Saved',
+	          text: `${data.fullName} has been added successfully.`
+	        });
+	        document.getElementById('addDriverForm').reset();
+	        document.getElementById('ageDisplay').textContent = '';
+	        currentAge = null;
+	      } else {
+	        Swal.fire({
+	          icon: 'error',
+	          title: 'Error',
+	          text: 'Something went wrong while saving the driver.'
+	        });
+	      }
+	    })
+	    .catch(error => {
+	      Swal.fire({
+	        icon: 'error',
+	        title: 'Request Failed',
+	        text: error.message
+	      });
+	    });
+	});
 
-      const data = {
-        fullName: document.getElementById('fullName').value.trim(),
-        dob: document.getElementById('dob').value,
-        contact: document.getElementById('contact').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        address: document.getElementById('address').value.trim(),
-        license: document.getElementById('license').value.trim(),
-        licenseType: licenseType,
-        ddp: document.getElementById('ddp').value,
-        ddpExpiry: document.getElementById('ddpExpiry').value,
-        vehicle: document.getElementById('vehicle')?.value || "",
-        rfid: document.getElementById('rfid').value,
-        country: document.getElementById('country')?.value || ""
-      };
-
-      fetch('/api/drivers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      })
-        .then(response => {
-          if (response.ok) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Driver Saved',
-              text: `${data.fullName} has been added successfully.`
-            });
-            document.getElementById('addDriverForm').reset();
-            document.getElementById('ageDisplay').textContent = '';
-            currentAge = null;
-          } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'Something went wrong while saving the driver.'
-            });
-          }
-        })
-        .catch(error => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Request Failed',
-            text: error.message
-          });
-        });
-    });
+       
 
     // RFID dropdown population
 	document.addEventListener('DOMContentLoaded', () => {
@@ -256,6 +266,35 @@
 	});
 
 
+  </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const requiredFields = [
+        'fullName', 'dob', 'contact', 'email',
+        'address', 'license', 'licenseType',
+        'ddp', 'ddpExpiry', 'rfid'
+      ];
+
+      requiredFields.forEach(id => {
+        const field = document.getElementById(id);
+        if (!field) return;
+
+        const removeInvalidStyle = () => {
+          if (field.classList.contains('invalid-field')) {
+            const value = field.value;
+            if (
+              (field.tagName === 'SELECT' && value !== '') ||
+              (field.tagName !== 'SELECT' && value.trim() !== '')
+            ) {
+              field.classList.remove('invalid-field');
+            }
+          }
+        };
+
+        field.addEventListener('input', removeInvalidStyle);
+        field.addEventListener('change', removeInvalidStyle);
+      });
+    });
   </script>
 
   <style>

@@ -24,7 +24,7 @@
             <!-- Dealer Dropdown -->
 			<div class="form-group">
 			    <label for="clientDropdown">Assign to Client*</label>
-			    <select id="clientDropdown" name="client" required onchange="fetchSelectedClientId()">
+			    <select id="clientDropdown" name="client" onchange="fetchSelectedClientId()">
 			        <option value="">Select Client</option>
 			    </select>
 			    <div id="selectedClientId" style="color:white; margin-top: 10px;"></div>
@@ -147,43 +147,73 @@
 	    }
 
 	    // Submit form with clientId + RFIDs
-	    function validateForm() {
-	        const clientId = document.getElementById('clientDropdown').value;
+		function validateForm() {
+		  const clientId = document.getElementById('clientDropdown').value;
+		  const fileInput = document.getElementById('rfidUpload');
+		  const manualInput = document.getElementById('manualRfid');
 
-	        if (!clientId) {
-	            alert("Please select a client.");
-	            return false;
-	        }
+		  // Remove old error borders
+		  fileInput?.classList.remove('file-error');
+		  manualInput?.classList.remove('file-error');
 
-	        if (rfidSet.size === 0) {
-	            alert("Please enter at least one RFID.");
-	            return false;
-	        }
+		  if (!clientId) {
+		    Swal.fire({
+		      icon: "warning",
+		      title: "Missing Client",
+		      text: "Please select a client.",
+		      confirmButtonColor: "#3085d6"
+		    });
+		    return false;
+		  }
 
-	        const rfidArray = Array.from(rfidSet);
+		  if (rfidSet.size === 0) {
+		    if (!fileInput.files.length) fileInput.classList.add('file-error');
+		    if (!manualInput.value.trim()) manualInput.classList.add('file-error');
 
-	        fetch(`/api/rfid/registerForClient?clientId=${clientId}`, {  // Corrected URL
-	            method: 'POST',
-	            headers: {
-	                'Content-Type': 'application/json'
-	            },
-	            body: JSON.stringify(rfidArray)
-	        })
-	        .then(response => response.text())
-	        .then(message => {
-	            Swal.fire("Success", message, "success");
-	            document.getElementById("driver-form").reset();
-	            rfidSet.clear();
-	            displayRFIDs();
-	            document.getElementById("selectedClientId").innerText = '';
-	        })
-	        .catch(error => {
-	            console.error("Error:", error);
-	            Swal.fire("Error", "Failed to submit RFIDs", "error");
-	        });
+		    Swal.fire({
+		      icon: "warning",
+		      title: "No RFID Provided",
+		      text: "Please enter at least one RFID manually or upload an Excel file.",
+		      confirmButtonColor: "#3085d6"
+		    });
+		    return false;
+		  }
 
-	        return false; // prevent form default
-	    }
+		  const rfidArray = Array.from(rfidSet);
+
+		  fetch(`/api/rfid/registerForClient?clientId=${clientId}`, {
+		    method: 'POST',
+		    headers: {
+		      'Content-Type': 'application/json'
+		    },
+		    body: JSON.stringify(rfidArray)
+		  })
+		    .then(response => response.text())
+		    .then(message => {
+		      Swal.fire({
+		        icon: "success",
+		        title: "Success",
+		        text: message,
+		        confirmButtonColor: "#3085d6"
+		      });
+		      document.getElementById("driver-form").reset();
+		      rfidSet.clear();
+		      displayRFIDs();
+		      document.getElementById("selectedClientId").innerText = '';
+		    })
+		    .catch(error => {
+		      console.error("Error:", error);
+		      Swal.fire({
+		        icon: "error",
+		        title: "Error",
+		        text: "Failed to submit RFIDs",
+		        confirmButtonColor: "#d33"
+		      });
+		    });
+
+		  return false; // Prevent default form submit
+		}
+
 	</script>
 
 	
