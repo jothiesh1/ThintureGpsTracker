@@ -1,151 +1,210 @@
 package com.GpsTracker.Thinture.controller;
 
-
-
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import com.GpsTracker.Thinture.model.Admin;
-
-import ch.qos.logback.core.model.Model;
+import org.springframework.ui.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Controller
 public class SuperAdminPageController {
 
+    private static final Logger logger = LoggerFactory.getLogger(SuperAdminPageController.class);
 
-	private static final Logger logger = LoggerFactory.getLogger(SuperAdminPageController.class);
-	/*
-	 
-	 */
-	  
-	
-	  @GetMapping("/add_admin")
+    @GetMapping("/superadmin/add-admin")
+    public String addAdminPage(Model model) {
+        logger.info("🔹 Accessed SuperAdmin - Add Admin Page");
+        return "superadmin/add_admin";
+    }
+    
+
+	  @GetMapping("/dashboard")
 	    public String showAddAdminForm(Model model) {
 	        logger.info("Displaying the Add Admin Form");
 	       
-	        return "add_admin"; // HTML form for adding an admin file name is add_admin.html
+	        return "superadmin/dashboard"; // HTML form for adding an admin file name is add_admin.html
 	    }
 
+    @GetMapping("/superadmin/add-dealer")
+    public String addDealerPage(Model model) {
+        logger.info("🔹 Accessed SuperAdmin - Add Dealer Page");
+        return "superadmin/add_dealer";
+    }
 
-	  @GetMapping("/add_client")
-	    public String showAddClientForm(Model model) {
-		  logger.info("SuperAdmin login Displaying the Add client Form");
-	        return "add_client"; // Should match the name of the HTML file in the templates folder (add_client.html)
-	    }
-	  
-	  @GetMapping("/add_dealer")
-	    public String showAddDealerForm() {
-		  logger.info(" SuperAdmin loginDisplaying the Add dealer Form");
-	        return "add_dealer"; // This should match your HTML file in templates
-	    }
-	  
-	  @GetMapping("/add_driver")
-	    public String showAddDriverForm() {
-		  logger.info("SuperAdmin login Displaying the Add driver Form");
-	        return "add_driver"; //Return the HTML form for adding add_driver.html
-	    }
-	    
-	  
-	  @GetMapping("/add_user")
-	    public String showAddUserForm(Model model) {
-	        logger.info("SuperAdmin login Displaying the Add User Form");
-	        return "add_user"; // Return the HTML form for adding add_user.html
-	    }
-	  
-	  @GetMapping("/Add_devices_dealer")
-	    public String showAddUserAdd_devices_dealer_Form(Model model) {
-		  logger.info("SuperAdmin login Displaying the Add_devices_dealer.html Form");
-	        return "Add_devices_dealer"; // Ensure this matches the HTML file in your templates folder, e.g., map.html
-	    }
-	    
-	  
-	  @GetMapping("/Add_devices_client")
-	    public String showAdd_devices_client(Model model) {
-		  logger.info("SuperAdmin login Displaying the  Add_devices_client.html Form");
-	        // Add any attributes to the model if necessary
-	        return "Add_devices_client"; // Ensure this matches the HTML file in your templates folder, e.g., map.html
-	    } 
-	  
-	  @GetMapping("/map4")
-	    public String showMapsuper(Model model) {
-		  logger.info("SuperAdmin login Displaying the  map4.html ");
-	        return "map4"; // Should match the name of the HTML file in the templates folder (map2.html)
-	    }
-	  
+    @GetMapping("/superadmin/add-client")
+    public String addClientPage(Model model) {
+        logger.info("🔹 Accessed SuperAdmin - Add Client Page");
+        return "superadmin/add_client";
+    }
 
-	    @GetMapping("/playback")
-	    public String showplayback(Model model) {
-	    	  logger.info("SuperAdmin login Displaying the playback .html ");
-	        return "playback"; // Ensure this matches the HTML file in your templates folder, e.g., map.html
-	    }
-	 
-	    
-	    @GetMapping("/replay")
-	    public String replayPage() {
-	    	  logger.info("SuperAdmin login Displaying the replay .html ");
-	        return "replay"; // This refers to replay.html in the templates directory
-	    }
-	    
-	    @GetMapping("/map2")
-	    public String showMap2(Model model) {
-	    	logger.info("SuperAdmin login Displaying the map2 .html report");
-	        return "map2"; // Should match the name of the HTML file in the templates folder (map2.html)
-	    }
-	    
-	    @GetMapping("/createdevices")
-	    public String createdevices(Model model) {
-	    	logger.info("SuperAdmin login Displaying the  createdevices.html ");
-	        return "createdevices"; // Should match the name of the HTML file in the templates folder (map2.html)
+    @GetMapping("/superadmin/add-user")
+    public String addUserPage(Model model) {
+        logger.info("🔹 Accessed SuperAdmin - Add User Page");
+        return "superadmin/add_user";
+    }
+
+    @GetMapping("/superadmin/add-driver")
+    public String addDriverPage(Model model) {
+        logger.info("🔹 Accessed SuperAdmin - Add Driver Page");
+        return "superadmin/add_driver";
+    }
+
+    @GetMapping("/superadmin/view-driver")
+    public String viewDriverPage(Model model) {
+        logger.info("🔹 Accessed SuperAdmin - View Driver Page");
+        return "superadmin/view_driver";
+    }
+
+    @GetMapping("/superadmin/add-devices-dealer")
+    public String addDevicesDealer(Model model) {
+        logger.info("🔹 Accessed SuperAdmin - Add Devices to Dealer Page");
+        return "superadmin/add_devices_dealer";
+    }
+
+    @GetMapping("/superadmin/add-devices-client")
+    public String addDevicesClient(Model model) {
+        logger.info("🔹 Accessed SuperAdmin - Add Devices to Client Page");
+        return "superadmin/add_devices_client";
+    }
+
+    @GetMapping("/superadmin/map4")
+    public String showMap4(Model model) {
+        logger.info("🔹 Accessed SuperAdmin - Map4 Page");
+        return "superadmin/map4";
+    }
+
+    @GetMapping("/superadmin/playback")
+    public String showPlayback(Model model) {
+        logger.info("🔹 Accessed SuperAdmin - Playback Page");
+        return "superadmin/playback";
+    }
+
+    @GetMapping("/superadmin/replay")
+    public String showReplay() {
+        logger.info("🔹 Accessed SuperAdmin - Replay Page");
+        return "superadmin/replay";
+    }
+
+    @GetMapping("/superadmin/map2")
+    public String showMap2(Model model) {
+        logger.info("🔹 Accessed SuperAdmin - Map2 Report");
+        return "superadmin/map2";
+    }
+
+    @GetMapping("/superadmin/createdevices")
+    public String showCreateDevices(Model model) {
+        logger.info("🔹 Accessed SuperAdmin - Create Devices Page");
+        return "superadmin/createdevices";
+    }
+
+    @GetMapping("/superadmin/event")
+    public String showEvent(Model model) {
+        logger.info("🔹 Accessed SuperAdmin - Event Report");
+        return "superadmin/event";
+    }
+
+    @GetMapping("/superadmin/eventreport")
+    public String showEventReport(Model model) {
+        logger.info("🔹 Accessed SuperAdmin - Event Report Page");
+        return "superadmin/eventreport";
+    }
+
+    @GetMapping("/superadmin/device-report")
+    public String showDeviceReport() {
+        logger.info("🔹 Accessed SuperAdmin - Device Report");
+        return "superadmin/device_report";
+    }
+    
+    
+
+    @GetMapping("/superadmin/vehicle-violation")
+    public String showVehicleViolation() {
+        logger.info("🔹 Accessed SuperAdmin - Vehicle Violation Report");
+        return "superadmin/vehicle_violation";
+    }
+
+    
+    
+    @GetMapping("/superadmin/driver-violation-report")
+    public String showDriverViolationReport() {
+        logger.info("🔹 Accessed SuperAdmin - Driver Violation Report");
+        return "superadmin/driver_violation_report";
+    }
+
+    @GetMapping("/superadmin/renewal")
+    public String showRenewal() {
+        logger.info("🔹 Accessed SuperAdmin - Renewal Page");
+        return "superadmin/renewal";
+    }
+    
+    
+    
+    
+    @GetMapping("/superadmin/OTA")
+    public String showOta(Model model) {
+        logger.info("🔹 Accessed SuperAdmin - OTA Report");
+        return "superadmin/OTA";
+    }
+    
+    
+
+    @GetMapping("/superadmin/dealer_view")
+    public String dealerView() {
+        return "superadmin/dealer_view"; 
+    }
+
+    @GetMapping("/superadmin/admin_view")
+    public String adminView() {
+        return "superadmin/admin_view"; 
+    }
+
+    @GetMapping("/superadmin/client_view")
+    public String clientView() {
+        return "superadmin/client_view"; 
+    }
+
+    @GetMapping("/superadmin/users_view")
+    public String usersView() {
+        return "superadmin/users_view"; 
+    }
+
+    @GetMapping("/superadmin/driver_view")
+    public String driverView() {
+        return "superadmin/driver_view"; 
+    }
+
+
+
+    
+    @GetMapping("/superadmin/driver-violation")
+    public String showDriverViolation() {
+        logger.info("🔹 Accessed SuperAdmin - Vehicle Violation Report");
+        return "superadmin/driver_violation_report";
+    }
+    
+
+    @GetMapping("/superadmin/alert")
+    public String showAlert() {
+        logger.info("🔹 Accessed SuperAdmin - alert   ");
+        return "superadmin/alert";
+    }
+    
+    
+    
+	  @GetMapping("/view_superadmin_complaints")
+	    public String   superAdminShowView(Model model) {
+	        return "view_superadmin_complaints"; // Should match the name of the HTML file in the templates folder (map2.html)
 	    }
 	  
-	    
-	    @GetMapping("/event")
-	    public String showEventModel(Model model) {
-	    	logger.info("SuperAdmin login Displaying the  event.html report ");
-	        return "event"; // Should match the name of the HTML file in the templates folder (map2.html)
+	
+	  @GetMapping("/add_rfidto_dealer")
+	    public String   rfidtoShowView(Model model) {
+	        return "superadmin/add_rfidto_dealer"; // Should match the name of the HTML file in the templates folder (map2.html)
 	    }
-	    
-	    @GetMapping("/eventreport")
-	    public String showEventReport(Model model) {
-	    	logger.info("SuperAdmin login Displaying the  eventreport.html report ");
-	        return "eventreport"; // Should match the name of the HTML file in the templates folder (map2.html)
+	  
+	  @GetMapping("/add_rfidto_client")
+	    public String   rfidtoShowViewClient(Model model) {
+	        return "superadmin/add_rfidto_client"; // Should match the name of the HTML file in the templates folder (map2.html)
 	    }
-	    
-	    
-	    
-	    
-	    @GetMapping("/device_report")
-	    public String deviceReportShow() {
-	    	logger.info("SuperAdmin login Displaying the  device_report.html report ");
-	        return "device_report"; // This refers to replay.html in the templates directory
-	    }
-
-	    
-	    
-	    @GetMapping("/vehicle_violation")
-	    public String showVehicleReport() {
-	    	logger.info("SuperAdmin login Displaying the  vehicle_violation.html report ");
-	        return "vehicle_violation"; // Assuming you are using Thymeleaf templates (place in /templates)
-	    }
-	    
-	    
-	    @GetMapping("/driver_violation_report")
-	    public String   driverViolationReport() {
-	    	logger.info("SuperAdmin login Displaying the   driver_violation_report.html report ");
-	        return "driver_violation_report"; // Assuming you are using Thymeleaf templates (place in /templates)
-	    }
-	    
-	    
-
-	    @GetMapping("/renewal")
-	    public String   renewalShow() {
-	    	logger.info("SuperAdmin login Displaying the   renewal.html report ");
-	        return "renewal"; // Assuming you are using Thymeleaf templates (place in /templates)
-	    }
-	    
+	  
 }
-	  
-	  
-

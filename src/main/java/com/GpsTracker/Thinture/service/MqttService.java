@@ -91,10 +91,22 @@ public class MqttService {
                 });
                 logger.info("\u001B[32m[MQTT] Subscribed to topic: {}\u001B[0m", topic);
             }
+
+            // 🔥 Additional Subscription: Device Command Response Subscription
+            mqttClient.subscribe("device/response/#", (topic, message) -> {
+                String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
+                logger.info("\u001B[36m[MQTT-RESPONSE] Received device response on {}: {}\u001B[0m", topic, payload);
+
+                // Push the device response to WebSocket (for frontend to display)
+                messagingTemplate.convertAndSend("/topic/device-responses", payload);
+            });
+            logger.info("\u001B[32m[MQTT] Subscribed to device/response/# topic for command responses\u001B[0m");
+
         } catch (MqttException e) {
             logger.error("\u001B[31m[MQTT] Error while subscribing: {}\u001B[0m", e.getMessage(), e);
         }
     }
+
 
     public void publish(String topic, String message) {
         try {

@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -266,7 +267,8 @@ return saved;
             logger.info("📌 Adding Vehicle: Serial No = {}, IMEI = {}, Dealer ID = {}", serialNo, imei, dealerId);
 
             // ✅ Check if Serial Number Already Exists
-            if (vehicleRepository.findBySerialNo(serialNo).isPresent()) {
+            List<Vehicle> existingVehicles = vehicleRepository.findBySerialNo(serialNo);
+            if (!existingVehicles.isEmpty()) {
                 throw new IllegalArgumentException("❌ Serial No already exists: " + serialNo);
             }
 
@@ -297,6 +299,8 @@ return saved;
         }
     }
 
+    
+    
     // ✅ Add Multiple Vehicles in Range
     /**
      * ✅ Add Multiple Vehicles in a Dual Serial Range
@@ -311,7 +315,8 @@ return saved;
 
             // ✅ Loop through each Serial Number & Save Vehicle
             for (String serialNo : serialNumbers) {
-                if (vehicleRepository.findBySerialNo(serialNo).isPresent()) {
+                List<Vehicle> existingVehicles = vehicleRepository.findBySerialNo(serialNo);
+                if (!existingVehicles.isEmpty()) {
                     logger.warn("⚠️ Serial No already exists, skipping: {}", serialNo);
                     continue; // Skip duplicates
                 }
@@ -346,7 +351,9 @@ return saved;
             throw new IllegalArgumentException("❌ Serial number is required.");
         }
 
-        Vehicle existingVehicle = vehicleRepository.findBySerialNo(incomingSerialNo).orElse(new Vehicle());
+        // ✅ Fetch existing vehicle list by serial number (duplicate-safe)
+        List<Vehicle> existingList = vehicleRepository.findBySerialNo(incomingSerialNo);
+        Vehicle existingVehicle = existingList.isEmpty() ? new Vehicle() : existingList.get(0);
 
         // 🔒 Set serial number if not NA
         if (!"NA".equalsIgnoreCase(incomingSerialNo)) {
@@ -360,7 +367,6 @@ return saved;
         }
 
         Long driverId = vehicleDetails.getDriver_id();
-
         if (driverId != null) {
             boolean exists = driverRepository.existsById(driverId);
             if (!exists) {
@@ -369,7 +375,6 @@ return saved;
             }
             existingVehicle.setDriver_id(driverId); // ✅ Safe to set
         }
-
 
         // Set all other fields...
         existingVehicle.setVehicleNumber(vehicleDetails.getVehicleNumber());
@@ -418,7 +423,7 @@ return saved;
             logger.info("🚀 Adding vehicle: Serial No = {}, IMEI = {}, Client ID = {}", serialNo, imei, clientId);
 
             // ✅ Check if Serial Number Exists
-            if (vehicleRepository.findBySerialNo(serialNo).isPresent()) {
+            if (!vehicleRepository.findBySerialNo(serialNo).isEmpty()) {
                 throw new IllegalArgumentException("❌ Serial No already exists: " + serialNo);
             }
 
@@ -448,6 +453,7 @@ return saved;
             throw e;
         }
     }
+
     public void addDualClientVehicles(List<String> serialNumbers, Long clientId) {
         try {
             logger.info("📌 Adding Dual Vehicles for Client ID: {}", clientId);
@@ -458,7 +464,7 @@ return saved;
 
             // ✅ Loop through each Serial Number & Save
             for (String serialNo : serialNumbers) {
-                if (vehicleRepository.findBySerialNo(serialNo).isPresent()) {
+                if (!vehicleRepository.findBySerialNo(serialNo).isEmpty()) {
                     logger.warn("⚠️ Skipping existing Serial No: {}", serialNo);
                     continue;
                 }
@@ -485,6 +491,7 @@ return saved;
             throw e;
         }
     }
+
 
 
   
@@ -531,7 +538,9 @@ return saved;
         	    vehicle.getVehicleNumber(),
         	    vehicle.getEngineNumber(),
         	    vehicle.getModel(),
-        	    vehicle.getVehicleType()
+        	    vehicle.getVehicleType(),
+        	    vehicle.getInstallationDate(),
+        	    vehicle.getRenewalDate()
         	);
 
                
@@ -547,8 +556,16 @@ return saved;
     }
 
     public Optional<Vehicle> getVehicleBySerialNo(String serialNo) {
-        return vehicleRepository.findBySerialNo(serialNo);
+        List<Vehicle> vehicles = vehicleRepository.findBySerialNo(serialNo);
+
+        if (vehicles.isEmpty()) {
+            return Optional.empty();
+        } else {
+            logger.warn("⚠️ Multiple vehicles found with serialNo '{}', returning the first one", serialNo);
+            return Optional.of(vehicles.get(0)); // Or handle duplicates as needed
+        }
     }
+
     
     
     public List<Vehicle> getSerialNosStartingWithh(String query) {
@@ -564,18 +581,25 @@ return saved;
     // ✅ Update Client for a Vehicle
     @Transactional
     public boolean updateClientForVehicle(String serialNo, Long clientId) {
-        Optional<Vehicle> vehicleOptional = vehicleRepository.findBySerialNo(serialNo);
+        List<Vehicle> vehicles = vehicleRepository.findBySerialNo(serialNo); // Now returns List<Vehicle>
         Optional<Client> clientOptional = clientRepository.findById(clientId);
 
-        if (vehicleOptional.isPresent() && clientOptional.isPresent()) {
-            Vehicle vehicle = vehicleOptional.get();
-            vehicle.setClient(clientOptional.get());
-            vehicleRepository.save(vehicle);
+        if (!vehicles.isEmpty() && clientOptional.isPresent()) {
+            Client client = clientOptional.get();
+
+            for (Vehicle vehicle : vehicles) {
+                vehicle.setClient(client);
+                vehicleRepository.save(vehicle);
+                logger.info("✅ Updated vehicle with serialNo {} to clientId {}", serialNo, clientId);
+            }
+
             return true;
         } else {
+            logger.warn("❌ No vehicle(s) or client found for update (serialNo: {}, clientId: {})", serialNo, clientId);
             return false;
         }
     }
+
 
     public void deleteVehicleByDeviceID(String deviceID) {
         Optional<Vehicle> vehicle = vehicleRepository.findByDeviceID(deviceID);
@@ -694,7 +718,17 @@ return saved;
     }
 
     
+    public Map<String, Long> getVehicleTypeCounts() {
+        List<Object[]> result = vehicleRepository.countByVehicleType();
 
+        Map<String, Long> counts = new LinkedHashMap<>();
+        for (Object[] row : result) {
+            String type = (String) row[0];
+            Long count = ((Number) row[1]).longValue();
+            counts.put(type, count);
+        }
+        return counts;
+    }
 
     
     

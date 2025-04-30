@@ -1,151 +1,138 @@
 package com.GpsTracker.Thinture.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
+import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import com.GpsTracker.Thinture.model.Dealer;
 import com.GpsTracker.Thinture.model.Vehicle;
 import com.GpsTracker.Thinture.repository.DealerRepository;
 import com.GpsTracker.Thinture.repository.VehicleRepository;
+import com.GpsTracker.Thinture.security.AuthenticationFacade;
 import com.GpsTracker.Thinture.service.DealerService;
+import com.GpsTracker.Thinture.service.UserTypeFilterService;
 import com.GpsTracker.Thinture.service.VehicleService;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 @RestController
 @RequestMapping("/dealer")
 public class AddDevicesDealerController {
 
     private static final Logger logger = LoggerFactory.getLogger(AddDevicesDealerController.class);
 
-    @Autowired
-    private DealerService dealerService;
-    @Autowired
-    private DealerRepository dealerRepository;
+    @Autowired private DealerService dealerService;
+    @Autowired private DealerRepository dealerRepository;
+    @Autowired private VehicleRepository vehicleRepository;
+    @Autowired private VehicleService vehicleService;
+    @Autowired private ObjectMapper objectMapper;
 
-    @Autowired
-    private VehicleRepository vehicleRepository;
+    @Autowired private AuthenticationFacade authenticationFacade;
+    @Autowired private UserTypeFilterService userTypeFilterService;
 
-    @Autowired
-    private VehicleService vehicleService;
-    @Autowired
-    private ObjectMapper objectMapper; // ✅ Ensure correct JSON handling
-    /**
-     * Endpoint to add a single serial number and IMEI with deviceId.
-     */
-
+    // ✅ Add single device using session-based role
     @PostMapping("/add-single")
     public ResponseEntity<Map<String, String>> addSingleVehicle(@RequestBody Map<String, Object> payload) {
         Map<String, String> response = new HashMap<>();
         try {
             logger.info("📌 Received request to add single vehicle: {}", payload);
 
-            // Ensure all keys exist in the payload before fetching them
-            if (!payload.containsKey("serialNo") || !payload.containsKey("imei") || !payload.containsKey("dealerId")) {
-                throw new IllegalArgumentException("❌ Missing required parameters: serialNo, imei, dealerId");
+            String serialNo = (String) payload.get("serialNo");
+            String imei = (String) payload.get("imei");
+            Long selectedDealerId = payload.get("dealerId") != null 
+                    ? Long.parseLong(payload.get("dealerId").toString()) 
+                    : null;
+
+            if (serialNo == null || imei == null || selectedDealerId == null) {
+                throw new IllegalArgumentException("serialNo, imei, and dealerId are required.");
             }
 
-            String serialNo = payload.get("serialNo") != null ? payload.get("serialNo").toString() : null;
-            String imei = payload.get("imei") != null ? payload.get("imei").toString() : null;
-            Long dealerId = payload.get("dealerId") != null ? Long.parseLong(payload.get("dealerId").toString()) : null;
+            // Get logged-in user role and ID
+            String email = authenticationFacade.getAuthenticatedEmail();
+            UserTypeFilterService.UserTypeResult userInfo = userTypeFilterService.findUserAndTypeByEmail(email);
+            if (userInfo == null) throw new RuntimeException("Logged-in user not recognized.");
 
-            if (serialNo == null || imei == null || dealerId == null) {
-                throw new IllegalArgumentException("❌ serialNo, imei, or dealerId cannot be null.");
-            }
+            // Create Vehicle object
+            Vehicle vehicle = new Vehicle();
+            vehicle.setSerialNo(serialNo.trim());
+            vehicle.setImei(imei.trim());
+            vehicle.setDealer_id(selectedDealerId); // ✅ Store selected dealer ID
 
-            // Call Service to add vehicle
-            vehicleService.addVehicle(serialNo, imei, dealerId);
+            assignRoleIds(vehicle, userInfo); // ✅ Also assign session-based role IDs (creator info)
 
-            logger.info("✅ Successfully added single vehicle with Serial No: {}", serialNo);
+            vehicleRepository.save(vehicle);
+
+            logger.info("✅ Vehicle added by {} (ID={}) and assigned to dealer ID={}", userInfo.getRole(), userInfo.id(), selectedDealerId);
             response.put("success", "true");
-            response.put("message", "Single vehicle added successfully.");
+            response.put("message", "Vehicle assigned to dealer and saved.");
             return ResponseEntity.ok(response);
+
         } catch (Exception e) {
-            logger.error("❌ Error adding single vehicle", e);
+            logger.error("❌ Error saving vehicle", e);
             response.put("success", "false");
-            response.put("message", "Failed to add single vehicle: " + e.getMessage());
+            response.put("message", "Failed to save: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 
-    
 
-    // ✅ Add Dual Vehicles
-    /**
-     * ✅ Add Dual Serial Numbers with Dealer
-     */
-    /**
-     * ✅ Add Dual Serial Numbers with Dealer
-     */
+    // ✅ Add multiple devices using session-based role
     @PostMapping("/add-multiple")
     public ResponseEntity<Map<String, Object>> addMultipleDevices(@RequestBody Map<String, Object> payload) {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // ✅ Extract dealerId
-            Object dealerIdObj = payload.get("dealerId");
-            if (dealerIdObj == null) {
-                throw new IllegalArgumentException("Dealer ID is required");
-            }
-            Long dealerId = (dealerIdObj instanceof Number)
-                    ? ((Number) dealerIdObj).longValue()
-                    : Long.parseLong(dealerIdObj.toString());
-
-            Dealer dealer = dealerRepository.findById(dealerId)
-                    .orElseThrow(() -> new IllegalArgumentException("Dealer not found"));
-
-            // ✅ Extract and convert devices list
             List<Map<String, Object>> devices = (List<Map<String, Object>>) payload.get("devices");
             if (devices == null || devices.isEmpty()) {
                 throw new IllegalArgumentException("Device list is empty");
             }
 
+            String email = authenticationFacade.getAuthenticatedEmail(); // ✅
+            UserTypeFilterService.UserTypeResult userInfo = userTypeFilterService.findUserAndTypeByEmail(email);
+            if (userInfo == null) throw new RuntimeException("Logged-in user not recognized.");
+
+            int savedCount = 0;
             for (Map<String, Object> deviceMap : devices) {
                 String serialNo = (String) deviceMap.get("serialNo");
                 String imei = (String) deviceMap.get("imei");
 
-                if (serialNo == null || imei == null || serialNo.isBlank() || imei.isBlank()) {
-                    continue; // Skip incomplete entries
-                }
+                if (serialNo == null || imei == null || serialNo.isBlank() || imei.isBlank()) continue;
 
                 Vehicle vehicle = new Vehicle();
                 vehicle.setSerialNo(serialNo);
                 vehicle.setImei(imei);
-                vehicle.setDealer(dealer);
-
+                assignRoleIds(vehicle, userInfo);
                 vehicleRepository.save(vehicle);
+                savedCount++;
             }
 
             response.put("success", "true");
-            response.put("message", "Devices added successfully.");
+            response.put("message", savedCount + " devices added successfully.");
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("❌ Error adding devices", e);
             response.put("success", "false");
-            response.put("message", "Error adding devices: " + e.getMessage());
+            response.put("message", "Failed to add devices: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 
-    
+    // ✅ Helper: Assign role-based creator ID to vehicle
+    private void assignRoleIds(Vehicle vehicle, UserTypeFilterService.UserTypeResult userInfo) {
+        switch (userInfo.getRole()) {
+            case "SUPERADMIN" -> vehicle.setSuperadmin_id(userInfo.id());
+            case "ADMIN" -> vehicle.setAdmin_id(userInfo.id());
+            case "DEALER" -> vehicle.setDealer_id(userInfo.id());
+            case "CLIENT" -> vehicle.setClient_id(userInfo.id());
+            case "USER" -> vehicle.setUser_id(userInfo.id());
+            default -> logger.warn("⚠️ Unknown role: {}", userInfo.getRole());
+        }
+    }
 
-
-    /**
-     * Fetch all dealers with their names and IDs.
-     */
+    // ✅ Fetch all dealers
     @GetMapping("/all")
     public ResponseEntity<List<Map<String, Object>>> getAllDealers() {
         try {
@@ -167,29 +154,4 @@ public class AddDevicesDealerController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyList());
         }
     }
-    
-    
-    
-    
-
-    
-    /*
-    @GetMapping("/{serialNo}")
-    public ResponseEntity<Map<String, String>> getVehicleBySerialNo(@PathVariable String serialNo) {
-        Optional<Vehicle> vehicle = vehicleService.getVehicleBySerialNo(serialNo);
-        if (vehicle.isPresent()) {
-            Vehicle foundVehicle = vehicle.get();
-            Map<String, String> response = new HashMap<>();
-            response.put("imei", foundVehicle.getImei());
-            response.put("serialNo", foundVehicle.getSerialNo());
-            response.put("vehicleType", foundVehicle.getVehicleType());
-            response.put("technicianName", foundVehicle.getTechnicianName());
-            response.put("simNumber", foundVehicle.getSimNumber());
-            response.put("dealerName", foundVehicle.getDealerName());
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-    }
-*/
 }

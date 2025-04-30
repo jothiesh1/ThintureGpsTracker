@@ -82,12 +82,27 @@ public class VehicleApiController {
       
     
     // ✅ Fetch All Vehicles (Returns List of VehicleDTO)
+    
     @GetMapping("/details")
     public ResponseEntity<List<VehicleDTO>> getAllVehicleDetails() {
+        logger.debug("CHECKING FETCHING DATA - Vehicle: ");
+        
         List<VehicleDTO> vehicles = vehicleService.getAllVehicless();
+
+        // ✅ Add this block to log installation and renewal dates for each vehicle
+        for (VehicleDTO vehicle : vehicles) {
+            logger.info("Vehicle DeviceID={} | InstallationDate={} | RenewalDate={}", 
+                vehicle.getDeviceID(), 
+                vehicle.getInstallationDate(), 
+                vehicle.getRenewalDate());
+        }
+
         return ResponseEntity.ok(vehicles);
     }
 
+    
+    
+    
     // ✅ Fetch Single Vehicle by deviceID with Logging
    
     

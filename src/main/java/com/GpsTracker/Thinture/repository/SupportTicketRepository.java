@@ -23,5 +23,8 @@ public interface SupportTicketRepository extends JpaRepository<SupportTicket, Lo
 	    List<SupportTicket> findByClientId(Long id);
 	    List<SupportTicket> findByUserId(Long id);
 	    List<SupportTicket> findByDriverId(Long id);
+	    long countByStatus(String status);
 }
+
+
 

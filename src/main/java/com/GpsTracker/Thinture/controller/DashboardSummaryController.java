@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import com.GpsTracker.Thinture.repository.*;
 import com.GpsTracker.Thinture.service.VehicleService;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,9 +26,14 @@ public class DashboardSummaryController {
     @Autowired private UserRepository userRepository;
     @Autowired private DriverRepository driverRepository;
     @Autowired private VehicleRepository vehicleRepository;
+    
+    @Autowired private     VehicleService vehicleSerive;
+    
+
 
     @Autowired private VehicleService vehicleService;
-
+    @Autowired
+    private SupportTicketRepository supportTicketRepo;
     /**
      * 🚦 API to fetch all role & device counts
      */
@@ -57,4 +63,39 @@ public class DashboardSummaryController {
         logger.debug("📦 Report Data: {}", report);
         return ResponseEntity.ok(report);
     }
+    
+    
+    @GetMapping("/complaint-status-count")
+    public Map<String, Long> getComplaintStatusCount() {
+        Map<String, Long> counts = new HashMap<>();
+        counts.put("Open", supportTicketRepo.countByStatus("Open"));
+        counts.put("In Progress", supportTicketRepo.countByStatus("In Progress"));
+        counts.put("Closed", supportTicketRepo.countByStatus("Closed"));
+        counts.put("Rejected", supportTicketRepo.countByStatus("Rejected"));
+        counts.put("Escalate to Dealer", supportTicketRepo.countByStatus("Escalate to Dealer"));
+        counts.put("Escalate to Admin", supportTicketRepo.countByStatus("Escalate to Admin"));
+        counts.put("Escalate to Client", supportTicketRepo.countByStatus("Escalate to Client"));
+        counts.put("Escalate to SuperAdmin", supportTicketRepo.countByStatus("Escalate to SuperAdmin"));
+        return counts;
+    }
+
+    
+
+@GetMapping("/vehicle-type-count")
+public Map<String, Long> getVehicleTypeCount() {
+    logger.info("📊 Fetching vehicle type count from VehicleRepository...");
+
+    List<Object[]> result = vehicleRepository.countByVehicleType();
+    Map<String, Long> counts = new LinkedHashMap<>();
+
+    for (Object[] row : result) {
+        String type = (String) row[0];
+        Long count = ((Number) row[1]).longValue();
+        logger.debug("✅ VehicleType: {} | Count: {}", type, count);
+        counts.put(type, count);
+    }
+
+    logger.info("✅ Total vehicle types counted: {}", counts.size());
+    return counts;
+}
 }

@@ -17,7 +17,7 @@ public interface VehicleRepository extends BaseRestrictedRepository<Vehicle, Lon
 	@Transactional
     void deleteByDeviceID(String deviceID);
 
-    Optional<Vehicle> findByDeviceID(String deviceID);
+    
 
     Optional<Vehicle> findByVehicleNumber(String vehicleNumber);
 
@@ -33,8 +33,7 @@ public interface VehicleRepository extends BaseRestrictedRepository<Vehicle, Lon
     @Query("SELECT v.serialNo FROM Vehicle v WHERE v.serialNo LIKE CONCAT('%', :query, '%')")
     List<String> findSerialNosByQuery(@Param("query") String query);
 
-    Optional<Vehicle> findBySerialNo(String serialNo);
-    
+ 
     
  // Fetch all distinct device IDs from the vehicle table
     @Query("SELECT DISTINCT v.deviceID FROM Vehicle v")
@@ -93,6 +92,20 @@ public interface VehicleRepository extends BaseRestrictedRepository<Vehicle, Lon
     @Query("SELECT v.vehicleNumber FROM Vehicle v WHERE v.user_id = :userId")
     List<String> findVehicleNumbersByUserId(@Param("userId") Long userId);
 
+    List<Vehicle> findBySerialNo(String serialNo);
+    //  Optional<Vehicle> findBySerialNo(String serialNo);
+    
+    @Query("SELECT v FROM Vehicle v WHERE UPPER(v.deviceID) = UPPER(:deviceID)")
+    Optional<Vehicle> findByDeviceID(@Param("deviceID") String deviceID);
+    
+    
+    @Query("SELECT v.vehicleType, COUNT(v) " +
+            "FROM Vehicle v " +
+            "WHERE v.imei IS NOT NULL " +
+            "AND v.deviceID IS NOT NULL " +
+            "AND v.installationDate IS NOT NULL " +
+            "GROUP BY v.vehicleType")
+     List<Object[]> countByVehicleType();
 
 
 }

@@ -58,4 +58,15 @@ public class AuthenticationFacade {
         return SecurityContextHolder.getContext().getAuthentication();
     }
 
+    
+ // ✅ Add this to get the logged-in user's email (username)
+    public String getAuthenticatedEmail() {
+        Authentication authentication = getAuthentication();
+        if (authentication == null) {
+            logger.warn("⚠️ [AUTH] No authentication object found in SecurityContext.");
+            return null;
+        }
+        return authentication.getName(); // Returns the email or username
+    }
+
 }

@@ -93,7 +93,13 @@ body::before {
         .form-group input[type="submit"] {
             width: 100%;
             padding: 12px 20px;
-            background-color: darkblue;
+			background: linear-gradient(
+						 																					 	     135deg,
+						 																					 	    
+						 																					 	     rgba(15, 32, 65, 0.8),
+						 																					 	     rgba(15, 32, 65, 0.8),
+						 																					 	     rgba(15, 32, 65, 0.8)
+						 																					 	 );
             color: white;
             border: none;
             border-radius: 20px;
@@ -104,9 +110,18 @@ body::before {
         }
 
         .form-group input[type="submit"]:hover {
-            background-color: #0056b3;
+			background: linear-gradient(
+						 																					 	     135deg,
+						 																					 	    
+						 																					 	     rgba(15, 32, 65, 0.8),
+						 																					 	     rgba(15, 32, 65, 0.8),
+						 																					 	     rgba(15, 32, 65, 0.8)
+						 																					 	 );
         }
-
+		.file-error {
+		   border: 2px solid red !important;
+		   border-radius: 5px;
+		 }
         .rfid-list {
             margin-top: 10px;
             max-height: 150px;

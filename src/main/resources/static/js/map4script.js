@@ -738,7 +738,7 @@ class VehicleTracker {
 	        alert("Device ID is required to navigate to the replay page.");
 	        return;
 	    }
-	    window.location.href = `/playback?deviceId=${encodeURIComponent(deviceId)}`;
+	    window.location.href = `/superadmin/playback?deviceId=${encodeURIComponent(deviceId)}`;
 	}
 
 	

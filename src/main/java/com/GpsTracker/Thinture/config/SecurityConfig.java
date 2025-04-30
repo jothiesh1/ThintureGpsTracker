@@ -1,46 +1,5 @@
 package com.GpsTracker.Thinture.config;
 import java.util.List;
-
-
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;	
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
-
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
-
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -54,8 +13,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
-import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -64,81 +21,83 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        logger.info("Configuring security filter chain...");
+        logger.info("🔐 Configuring security filter chain...");
 
         http
-            .csrf().disable()  // Disable CSRF for development
+            .csrf().disable()
             .authorizeRequests(auth -> {
                 auth
-                    // Permit login, forgot password, reset password, static resources, etc.
                     .requestMatchers(
                         "/login",
                         "/forgot_password",
-                        "/reset_password",       // ✅ Added for reset link access
+                        "/reset_password",
                         "/resources/**",
                         "/map",
                         "/THINTURE_IMAGE/**",
                         "/css/**",
-                        "/js/**"
+                        "/js/**",
+                        "/static/**",
+                        "/firmware/**",
+                        "/firmware/main.hex"   // ✅ Public access to OTA hex file
                     ).permitAll()
-                    .requestMatchers(HttpMethod.POST, "/login").permitAll() // ✅ Important for custom login controller
+                    .requestMatchers(HttpMethod.POST, "/login").permitAll()
 
-                    // Dashboard access based on roles
+                    // Role-based dashboards
                     .requestMatchers("/dashboard").hasAnyRole("SUPERADMIN")
                     .requestMatchers("/dashboard_admin").hasRole("ADMIN")
                     .requestMatchers("/dashboard_dealer").hasRole("DEALER")
                     .requestMatchers("/dashboard_client").hasRole("CLIENT")
                     .requestMatchers("/dashboard_user").hasRole("USER")
 
-                    // All other requests require authentication
+                    // Everything else needs authentication
                     .anyRequest().authenticated();
-                logger.info("Role-based access configured.");
+
+                logger.info("🔐 Role-based access configured.");
             })
             .formLogin(form -> {
                 form
                     .loginPage("/login")
-                    .loginProcessingUrl("/noop") // ✅ disables Spring's default login
+                    .loginProcessingUrl("/noop") // disables default Spring login
                     .failureUrl("/login?error=true")
                     .permitAll();
-                logger.info("Login form configuration set.");
+                logger.info("🔐 Login form configuration set.");
             })
             .logout(logout -> {
                 logout
                     .logoutUrl("/logout")
                     .logoutSuccessUrl("/login?logout=true")
                     .permitAll();
-                logger.info("Logout configuration set.");
+                logger.info("🔐 Logout configuration set.");
             });
 
-        logger.info("✅ Security filter chain successfully initialized.");
+        logger.info("✅ Security filter chain initialized successfully.");
         return http.build();
     }
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider(UserDetailsService userDetailsService) {
-        logger.info("🔹 Setting up Authentication Provider...");
+        logger.info("🔧 Setting up Authentication Provider...");
 
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());  // ✅ Use plain text passwords
+        provider.setPasswordEncoder(passwordEncoder());
 
-        logger.info("✅ Authentication Provider configured successfully.");
+        logger.info("✅ Authentication Provider ready.");
         return provider;
     }
 
     @Bean
     public AuthenticationManager authenticationManager(UserDetailsService userDetailsService) {
-        logger.info("🔹 Initializing Authentication Manager...");
+        logger.info("🔧 Initializing Authentication Manager...");
         return new ProviderManager(List.of(authenticationProvider(userDetailsService)));
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        logger.warn("⚠ Using NoOpPasswordEncoder - Passwords are stored in PLAIN TEXT!");
-        return NoOpPasswordEncoder.getInstance();  // ✅ No password hashing (plain text passwords)
+        logger.warn("⚠ Using NoOpPasswordEncoder: Plain text passwords enabled.");
+        return NoOpPasswordEncoder.getInstance(); // only for testing
     }
 }
-
 
 /*
 @Configuration

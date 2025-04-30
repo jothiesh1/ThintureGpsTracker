@@ -1,4 +1,7 @@
 package com.GpsTracker.Thinture.dto;
+
+import java.sql.Date;
+
 public class VehicleDTO {
 	private String deviceID;
 	private String ownerName;
@@ -8,11 +11,10 @@ public class VehicleDTO {
 	private String engineNumber;
 	private String vehicleType;
 	private String model;
-
-  
-
+	private Date installationDate ;
+	private Date renewalDate ;
     // ✅ Constructor to Convert from Entity
-    public VehicleDTO(String deviceID, String ownerName, String imei, String simNumber, String vehicleNumber, String engineNumber, String model, String vehicleType) {
+    public VehicleDTO(String deviceID, String ownerName, String imei, String simNumber, String vehicleNumber, String engineNumber, String model, String vehicleType ,Date installationDate ,Date renewalDate) {
         this.deviceID = deviceID;
         this.ownerName = ownerName;
         this.imei = imei;
@@ -23,6 +25,9 @@ public class VehicleDTO {
       
         this.vehicleNumber = vehicleNumber;
         this.engineNumber = engineNumber;
+        
+        this.installationDate= installationDate;
+        this.renewalDate = renewalDate;
     }
 
     public String getDeviceID() {
@@ -85,22 +90,26 @@ public class VehicleDTO {
 		return model;
 	}
 
+	public Date getRenewalDate() {
+		return renewalDate;
+	}
+
+	public void setRenewalDate(Date renewalDate) {
+		this.renewalDate = renewalDate;
+	}
+
 	public void setModel(String model) {
 		this.model = model;
 	}
 
-	@Override
-    public String toString() {
-        return "VehicleDTO{" +
-                "deviceID='" + deviceID + '\'' +
-                ", ownerName='" + ownerName + '\'' +
-                ", imei='" + imei + '\'' +
-                ", simNumber='" + simNumber + '\'' +
-                ", vehicleNumber='" + vehicleNumber + '\'' +
-                ", engineNumber='" + engineNumber + '\'' +
-                ", vehicleType='" + vehicleType + '\'' +
-                ", model='" + model + '\'' +
-                '}';
-    }
+	
+
+	public Date getInstallationDate() {
+		return installationDate;
+	}
+
+	public void setInstallationDate(Date installationDate) {
+		this.installationDate = installationDate;
+	}
 
 }

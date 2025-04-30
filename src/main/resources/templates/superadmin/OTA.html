@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OTA Command Sender (Mobile Number, Device ID, Command, Response + Firmware Download)</title>
+
+    <!-- SockJS and STOMP libraries for WebSocket -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2/dist/stomp.min.js"></script>
+
+    <script>
+        let stompClient = null;
+
+        function connectWebSocket() {
+            const socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+
+                stompClient.subscribe('/topic/device-responses', function (response) {
+                    console.log('Device Response: ' + response.body);
+                    addResponseRow(response.body);
+                });
+            });
+        }
+
+        function sendOTACommand() {
+            const mobileNumber = document.getElementById('mobileNumber').value.trim();
+            const deviceId = document.getElementById('deviceId').value.trim();
+            const command = document.getElementById('command').value.trim();
+            const value = document.getElementById('value').value.trim();
+
+            if (!mobileNumber || !deviceId || !command) {
+                alert("Please enter Mobile Number, Device ID and Command");
+                return;
+            }
+
+            fetch('/api/ota/send-command', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mobileNumber, deviceId, command, value })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert('✅ Command Sent: ' + data.status);
+                addCommandRow(mobileNumber, deviceId, command + (value ? ':' + value : ''), "Pending...");
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                alert('❌ Failed to send command');
+            });
+        }
+
+        function addCommandRow(mobileNumber, deviceId, command, status) {
+            const tableBody = document.getElementById('commandTableBody');
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>${new Date().toLocaleTimeString()}</td>
+                <td>${mobileNumber}</td>
+                <td>${deviceId}</td>
+                <td>${command}</td>
+                <td class="status-cell">${status}</td>
+            `;
+
+            tableBody.insertBefore(row, tableBody.firstChild);
+        }
+
+        function addResponseRow(responseText) {
+            const tableBody = document.getElementById('commandTableBody');
+            const firstRow = tableBody.querySelector('tr');
+
+            if (firstRow) {
+                const statusCell = firstRow.querySelector('.status-cell');
+                statusCell.innerText = responseText;
+            } else {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date().toLocaleTimeString()}</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>${responseText}</td>
+                `;
+                tableBody.appendChild(row);
+            }
+        }
+
+        function downloadFirmware() {
+            const firmwareUrl = '/firmware/main.hex'; // Your firmware file path
+            const link = document.createElement('a');
+            link.href = firmwareUrl;
+            link.download = 'main.hex'; // Set the downloaded file name
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        window.onload = function() {
+            connectWebSocket();
+        }
+    </script>
+</head>
+
+<body style="padding:20px; font-family:Arial,sans-serif;">
+    <h2>🚀 GPS OTA Command Sender (Mobile Number + Device ID + Command + Response + Firmware Download)</h2>
+
+    <div style="margin-bottom:20px;">
+        <input type="text" id="mobileNumber" placeholder="Mobile Number" style="padding:8px; margin-right:10px;" />
+        <input type="text" id="deviceId" placeholder="Device ID" style="padding:8px; margin-right:10px;" />
+        <input type="text" id="command" placeholder="Command (Ex: Setspeed)" style="padding:8px; margin-right:10px;" />
+        <input type="text" id="value" placeholder="Value (Optional)" style="padding:8px; margin-right:10px;" />
+        <button onclick="sendOTACommand()" style="padding:10px 20px;">Send Command</button>
+    </div>
+
+    <table id="commandTable" border="1" cellpadding="8" cellspacing="0" style="width:100%; border-collapse:collapse;">
+        <thead style="background-color:#f0f0f0;">
+            <tr>
+                <th>Time</th>
+                <th>Mobile Number</th>
+                <th>Device ID</th>
+                <th>Sent Command</th>
+                <th>Device Response</th>
+            </tr>
+        </thead>
+        <tbody id="commandTableBody">
+            <!-- Command and Response rows will appear here dynamically -->
+        </tbody>
+    </table>
+
+    <div style="margin-top:30px;">
+        <h3>📥 Download OTA Firmware</h3>
+        <button onclick="downloadFirmware()" style="padding:10px 20px;">Download Firmware (main.hex)</button>
+    </div>
+
+</body>
+</html>

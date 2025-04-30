@@ -34,11 +34,12 @@
 							        <strong>SUPERADMIN</strong>
 							    </a>
 							    <ul class="dropdown-menu" aria-labelledby="managerDropdown">
-									<li><a class="dropdown-item"href="/admins/add">New Admin</a></li>
-																			<li><a class="dropdown-item" href="/add_dealer">New Dealer</a></li>
-																			<li><a class="dropdown-item" href="/add_client">New Client</a></li>
-														                   <li> <a class="dropdown-item" href="/add_user">New User</a></li>
-																		   <li><a class="dropdown-item" href="/add_driver">New Driver</a></li>
+									<!-- inside SUPERADMIN dropdown -->
+									<li><a class="dropdown-item" href="/superadmin/add-admin">New Admin</a></li>
+									<li><a class="dropdown-item" href="/superadmin/add-dealer">New Dealer</a></li>
+									<li><a class="dropdown-item" href="/superadmin/add-client">New Client</a></li>
+									<li><a class="dropdown-item" href="/superadmin/add-user">New User</a></li>
+									<li><a class="dropdown-item" href="/superadmin/add-driver">New Driver</a></li>
 																		   
 																		</ul>
 							</li>
@@ -47,25 +48,26 @@
 															<strong>ASSIGN DEVICES</strong>
 																				        </a>
 														    <ul class="dropdown-menu">
-														    <li><a class="dropdown-item" href="/Add_devices_dealer">Add Device To Dealer</a></li>
-															<li><a class="dropdown-item" href="/Add_devices_client">Add Device To Client</a></li>
-																																									   
-															<li><a class="dropdown-item" href="/add_rfidto_dealer">Add RFID To Dealer</a></li>
-															<li><a class="dropdown-item" href="/add_rfidto_client">Add RFID To Client</a></li>
+																<!-- inside ASSIGN DEVICES dropdown -->
+																<li><a class="dropdown-item" href="/superadmin/add-devices-dealer">Add Device To Dealer</a></li>
+																<li><a class="dropdown-item" href="/superadmin/add-devices-client">Add Device To Client</a></li>
+																<li><a class="dropdown-item" href="/add_rfidto_dealer">Add RFID To Dealer</a></li> <!-- No change for RFID -->
+																<li><a class="dropdown-item" href="/add_rfidto_client">Add RFID To Client</a></li> <!-- No change for RFID -->
+
 																												                          
 																												                       </ul>
 																												                   </li>
 		                    <li class="nav-item dropdown">
 		                        <a class="nav-link dropdown-toggle" href="#" id="trackingDropdown" role="button"
 		                            data-bs-toggle="dropdown" aria-expanded="false">
-		                            <strong>TRACKING</strong>
+		                            <strong>TRIP MANAGEMENT</strong>
 		                        </a>
 		                        <ul class="dropdown-menu">
-		                            <li><a class="dropdown-item" href="/map4">Live Map</a></li>
-		                            <li><a class="dropdown-item" href="/replay">Playback Track</a></li>
-		                            <li><a class="dropdown-item" href="/map2">Report</a></li>
+									<li><a class="dropdown-item" href="/superadmin/map4">Live Map</a></li>
+									<li><a class="dropdown-item" href="/superadmin/replay">Playback Track</a></li>
 									
-									   <li><a class="dropdown-item" href="/map7">maptest</a></li>
+									<li><a class="dropdown-item" href="superadmin/OTA">OTA</a></li> <!-- map7 remains -->
+
 		                        </ul>
 		                    </li>
 							<li class="nav-item dropdown">
@@ -73,10 +75,11 @@
 							                           <strong>CONFIGURATION</strong>
 							                       </a>
 							                       <ul class="dropdown-menu">
-							                           <li><a class="dropdown-item" href="/createdevices">Install</a></li>
-							                           <li><a class="dropdown-item" href="#renewal">Renewal</a></li>
-													    <li><a class="dropdown-item" href="/violation_send_mail">Mail</a></li>
-														
+													<!-- inside CONFIGURATION dropdown -->
+													<li><a class="dropdown-item" href="/superadmin/createdevices">Install</a></li>
+													<li><a class="dropdown-item" href="/superadmin/renewal">Renewal</a></li> <!-- Corrected from "#renewal" -->
+													<li><a class="dropdown-item" href="/violation_send_mail">Mail</a></li> <!-- No change -->
+
 							                          
 							                       </ul>
 							                   </li>
@@ -85,9 +88,11 @@
 											                             <strong>REPORT</strong>
 											                         </a>
 											                         <ul class="dropdown-menu">
-											                             <li><a class="dropdown-item" href="/event">Event & Violations</a></li>
-																		 <li><a class="dropdown-item" href="/device_report">Installation Report</a></li>
-																		 <li><a class="dropdown-item" href="/view_superadmin_complaints">view complaints </a></li>
+																		<!-- inside REPORT dropdown -->
+																		<li><a class="dropdown-item" href="/superadmin/event">Event & Violations</a></li>
+																		<li><a class="dropdown-item" href="/superadmin/device-report">Installation Report</a></li>
+																		<li><a class="dropdown-item" href="/view_superadmin_complaints">view complaints</a></li> <!-- No change -->
+
 											                         </ul>
 											                     </li>
 																 <li class="nav-item dropdown">
@@ -95,11 +100,12 @@
 																 	<strong>Users Management</strong>
 																  </a>
 																 <ul class="dropdown-menu">
-																  <li><a class="dropdown-item" href="/admin_view">Admin</a></li>
-																  <li><a class="dropdown-item" href="/dealer_view">Dealer</a></li>
-																  <li><a class="dropdown-item" href="/client_view">Client</a></li>
-																  <li><a class="dropdown-item" href="/users_view">User</a></li>
-																  <li><a class="dropdown-item" href="/driver_view">driver</a></li>
+																	<li><a class="dropdown-item" href="/superadmin/admin_view">Admin</a></li>
+																	<li><a class="dropdown-item" href="/superadmin/dealer_view">Dealer</a></li>
+																	<li><a class="dropdown-item" href="/superadmin/client_view">Client</a></li>
+																	<li><a class="dropdown-item" href="/superadmin/users_view">User</a></li>
+																	<li><a class="dropdown-item" href="/superadmin/driver_view">Driver</a></li>
+
 																  
 																 </ul>
 																 </li>
