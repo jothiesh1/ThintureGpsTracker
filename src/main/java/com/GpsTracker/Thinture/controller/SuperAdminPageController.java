@@ -207,4 +207,12 @@ public class SuperAdminPageController {
 	        return "superadmin/add_rfidto_client"; // Should match the name of the HTML file in the templates folder (map2.html)
 	    }
 	  
+	  
+	  @GetMapping("/serverLogs")
+	    public String   ShowVieeServer(Model model) {
+	        return "superadmin/serverLogs"; // Should match the name of the HTML file in the templates folder (map2.html)
+	    }
+	  
+	  
+	  
 }

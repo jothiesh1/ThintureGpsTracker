@@ -48,7 +48,9 @@ public class SecurityConfig {
                     .requestMatchers("/dashboard_dealer").hasRole("DEALER")
                     .requestMatchers("/dashboard_client").hasRole("CLIENT")
                     .requestMatchers("/dashboard_user").hasRole("USER")
-
+                    // ✅ Logs API + Logs Viewer page access for SUPERADMIN and ADMIN only
+                    .requestMatchers("/api/logs/**").hasAnyRole("SUPERADMIN", "ADMIN")
+                    .requestMatchers("/serverLogs.html").hasAnyRole("SUPERADMIN", "ADMIN")
                     // Everything else needs authentication
                     .anyRequest().authenticated();
 

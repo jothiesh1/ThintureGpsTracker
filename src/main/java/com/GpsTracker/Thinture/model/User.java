@@ -62,7 +62,8 @@ public class User extends BaseEntity {
     private String phone;
     private String country;
     private String password;
-    private boolean status ;
+    private boolean status = true;
+
 
   
 

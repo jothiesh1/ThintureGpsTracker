@@ -78,7 +78,8 @@ public class Client extends BaseEntity {
     private String phone;
     private String country;
     private String password;
-    private boolean status;
+    private boolean status = true;
+
     private String resetToken;
 
     // === Hybrid Mapping Accessors (from BaseEntity) ===

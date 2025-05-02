@@ -134,6 +134,7 @@
 		function addDualSerial() {
 		    const startSerial = parseInt(document.getElementById("startSerial").value.trim());
 		    const endSerial = parseInt(document.getElementById("endSerial").value.trim());
+		    const removedSerialInput = document.getElementById("removedSerial").value.trim();
 		    const dealerDropdown = document.getElementById("dealerDropdown");
 		    const dealerId = dealerDropdown.value;
 
@@ -146,19 +147,31 @@
 		        return;
 		    }
 
-		    const PREFIX = "TH/M4G/";
-
-		    // Reset the global object
-		    resetSerials();
-
-		    // Store serials with empty IMEI for manual input
-		    for (let i = startSerial; i <= endSerial; i++) {
-		        const serial = PREFIX + i;
-		        serialNumbers[serial] = ""; // IMEI will be filled later
+		    const removedSet = new Set();
+		    if (removedSerialInput) {
+		        removedSerialInput.split(',').forEach(val => {
+		            const num = parseInt(val.trim());
+		            if (!isNaN(num)) removedSet.add(num);
+		        });
 		    }
 
-		    updateSerialTable(); // Show the table with input fields
+		    resetSerials(); // Clear previous entries
+
+		    for (let i = startSerial; i <= endSerial; i++) {
+		        if (removedSet.has(i)) {
+		            console.log(`⛔ Skipping removed serial: ${i}`);
+		            continue;
+		        }
+
+		        const serial = PREFIX + i;
+		        if (!serialNumbers[serial]) {
+		            serialNumbers[serial] = ""; // Add new entry with blank IMEI
+		        }
+		    }
+
+		    updateSerialTable();
 		}
+
 		function addDevices() {
 		    const dealerId = document.getElementById("dealerDropdown").value;
 

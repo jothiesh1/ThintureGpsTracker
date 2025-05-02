@@ -1,25 +1,20 @@
 
+<!-- @Controller  class VehicleController -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	
-	<title>Thinture GPS</title>
-		    <link rel="icon" type="image/x-icon" href="THINTURE_IMAGE/favicon.jpg">
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Thinture-GPS</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
 	<link rel="stylesheet" type="text/css" th:href="@{/css/installstyle.css}">
-	<style>
-
-		
-			
-
-	    </style>
 </head>
 
 <header th:insert="navigation :: navbar"></header>
@@ -36,66 +31,67 @@
 	                </div>
 					</div>
 					
-					
 					<div class="form-row">
 					    <div class="form-group">
-							<label for="user-selection">Select User:</label>
+					        <label for="user-selection">Select User:</label>
 
-							
-							<!-- Autocomplete Input -->
-							<input list="user-list" id="user-selection" name="user-selection" placeholder="Select a user" required>
+					        <!-- Autocomplete Input -->
+					        <input type="text" 
+					               list="user-list" 
+					               id="user-selection" 
+					               name="user-selection" 
+					               placeholder="Select a user" 
+					               required 
+					               autocomplete="off"> <!-- 💡 Prevents Chrome suggestions -->
 
-							<!-- Datalist Options -->
-							<datalist id="user-list"></datalist>
+					        <button type="button" class="add" onclick="window.location.href='/adduser_admin'">Add User+</button>
 
-							<!-- Hidden field to store selected user ID -->
-							<input type="hidden" id="user-id" name="user-id">
+					        <!-- Datalist Options -->
+					        <datalist id="user-list"></datalist>
 
-						
-							    <!-- Options will be added dynamically -->
-							</datalist>
-
+					        <!-- Hidden field to store selected user ID -->
+					        <input type="hidden" id="user-id" name="user-id">
 
 					        <span id="user-selection-error" class="error"></span>
-					    </div>
+					    </div>
 					</div>
+
 					<div id="user-preview" style="margin-top: 10px; color: white; display: none;">
 					    <strong>Selected User:</strong> <span id="preview-username">None</span><br>
 					    <strong>User ID:</strong> <span id="preview-userid">N/A</span>
 					</div>
 
-					
 					<script>
+					    let userMap = {}; // name → id
 
-						
-						document.addEventListener("DOMContentLoaded", () => {
-						    fetchUsers();
-						    setupUserSelectionListener();
-						});
+					    document.addEventListener("DOMContentLoaded", () => {
+					        fetchUsers();
+					        setupUserSelectionListener();
+					    });
 
-						function fetchUsers() {
-						    fetch('/users/api/all')
-						        .then(response => {
-						            if (!response.ok) throw new Error("Failed to fetch users.");
-						            return response.json();
-						        })
-						        .then(users => {
-						            const datalist = document.getElementById("user-list");
-						            datalist.innerHTML = ""; // Clear options
-						            userMap = {}; // Just re-assign, not re-declare
+					    // 🔄 Fetch all users from backend
+					    function fetchUsers() {
+					        fetch('/users/api/all')
+					            .then(response => {
+					                if (!response.ok) throw new Error("Failed to fetch users.");
+					                return response.json();
+					            })
+					            .then(users => {
+					                const datalist = document.getElementById("user-list");
+					                datalist.innerHTML = ""; // Clear old
+					                userMap = {}; // Reset
 
-						            users.forEach(user => {
-						                const option = document.createElement("option");
-						                option.value = user.name;
-						                datalist.appendChild(option);
-						                userMap[user.name] = user.id;
-						            });
-						        })
-						        .catch(error => console.error("Error loading users:", error));
-						}
+					                users.forEach(user => {
+					                    const option = document.createElement("option");
+					                    option.value = user.name;
+					                    datalist.appendChild(option);
+					                    userMap[user.name] = user.id;
+					                });
+					            })
+					            .catch(error => console.error("Error loading users:", error));
+					    }
 
-
-					    // Attach input change listener to validate selection
+					    // ✅ Listen to changes and populate preview + hidden field
 					    function setupUserSelectionListener() {
 					        const userInput = document.getElementById("user-selection");
 
@@ -105,78 +101,103 @@
 
 					            if (userId) {
 					                document.getElementById("user-id").value = userId;
-					                console.log("✅ User ID set:", userId);
+					                document.getElementById("preview-username").textContent = selectedName;
+					                document.getElementById("preview-userid").textContent = userId;
+					                document.getElementById("user-preview").style.display = "block";
+					                console.log("✅ User selected:", selectedName, "ID:", userId);
 					            } else {
 					                document.getElementById("user-id").value = "";
+					                document.getElementById("preview-username").textContent = "None";
+					                document.getElementById("preview-userid").textContent = "N/A";
+					                document.getElementById("user-preview").style.display = "none";
 					                console.warn("❌ Invalid user selected or typed manually.");
 					            }
 					        });
 					    }
-						document.getElementById("user-selection").addEventListener("change", function () {
-						    const selectedName = this.value;
-						    const userId = userMap[selectedName];
-						    document.getElementById("user-id").value = userId || "";
-						});
-						function setupUserSelectionListener() {
-						    const userInput = document.getElementById("user-selection");
-
-						    userInput.addEventListener("change", function () {
-						        const selectedName = this.value;
-						        const userId = userMap[selectedName];
-
-						        if (userId) {
-						            document.getElementById("user-id").value = userId;
-
-						            // ✅ Update preview
-						            document.getElementById("preview-username").textContent = selectedName;
-						            document.getElementById("preview-userid").textContent = userId;
-
-						            console.log("✅ User selected:", selectedName, "ID:", userId);
-						        } else {
-						            document.getElementById("user-id").value = "";
-						            document.getElementById("preview-username").textContent = "None";
-						            document.getElementById("preview-userid").textContent = "N/A";
-						            console.warn("❌ Invalid user selected or typed manually.");
-						        }
-						    });
-						}
-
-					document.addEventListener("DOMContentLoaded", function () {
-					    fetchUsers();
-					});
-
-					let userMap = {}; // This will map user name to ID
-
-					function fetchUsers() {
-					    fetch('/users/api/all')
-					        .then(response => {
-					            if (!response.ok) throw new Error("Failed to fetch users.");
-					            return response.json();
-					        })
-					        .then(users => {
-					            const datalist = document.getElementById("user-list");
-					            datalist.innerHTML = "";
-					            userMap = {}; // Reset map
-
-					            users.forEach(user => {
-					                const option = document.createElement("option");
-					                option.value = user.name; // What user sees
-					                datalist.appendChild(option);
-					                userMap[user.name] = user.id; // What you use behind the scenes
-					            });
-					        })
-					        .catch(error => {
-					            console.error("Error loading users:", error);
-					        });
-					}
-
-
 					</script>
 
 
 	           
-				<br>
-				<br>
+					<div class="form-row">
+					    <div class="form-group">
+					        <label for="driver-selection">Select Driver:</label>
+
+					        <!-- Autocomplete Input -->
+					        <input type="text" list="driver-list" id="driver-selection" name="driver-selection" placeholder="Select a Driver" required>
+					        <button type="add" class="addd" onclick="window.location.href='/adddriver_admin'">Add Driver+</button>
+
+					        <!-- Datalist Options -->
+					        <datalist id="driver-list"></datalist>
+
+					        <!-- Hidden field to store selected driver ID -->
+					        <input type="hidden" id="driver-id" name="driver-id">
+
+					        <span id="driver-selection-error" class="error"></span>
+					    </div>
+					</div>
+
+					<div id="driver-preview" style="margin-top: 10px; color: white; display: none;">
+					    <strong>Selected Driver:</strong> <span id="preview-drivername">None</span><br>
+					    <strong>Driver ID:</strong> <span id="preview-driverid">N/A</span>
+					</div>
+					<script>
+					    let driverMap = {}; // name → id
+
+						function fetchDrivers() {
+						    fetch('/api/drivers/dropdown')
+						        .then(response => {
+						            if (!response.ok) throw new Error("Failed to fetch drivers.");
+						            return response.json();
+						        })
+						        .then(drivers => {
+						            const datalist = document.getElementById("driver-list");
+						            datalist.innerHTML = "";
+						            driverMap = {};
+
+						            drivers.forEach(driver => {
+						                const option = document.createElement("option");
+						                option.value = driver.name;
+						                datalist.appendChild(option);
+						                driverMap[driver.name] = driver.id;
+						            });
+						        })
+						        .catch(error => console.error("Error loading drivers:", error));
+						}
+
+
+					    function setupDriverSelectionListener() {
+					        const driverInput = document.getElementById("driver-selection");
+
+					        driverInput.addEventListener("change", function () {
+					            const selectedName = this.value;
+					            const driverId = driverMap[selectedName];
+
+					            if (driverId) {
+					                document.getElementById("driver-id").value = driverId;
+					                document.getElementById("preview-drivername").textContent = selectedName;
+					                document.getElementById("preview-driverid").textContent = driverId;
+					                document.getElementById("driver-preview").style.display = "block";
+
+					                console.log("✅ Driver selected:", selectedName, "ID:", driverId);
+					            } else {
+					                document.getElementById("driver-id").value = "";
+					                document.getElementById("preview-drivername").textContent = "None";
+					                document.getElementById("preview-driverid").textContent = "N/A";
+					                document.getElementById("driver-preview").style.display = "none";
+
+					                console.warn("❌ Invalid driver selected or typed manually.");
+					            }
+					        });
+					    }
+
+					    document.addEventListener("DOMContentLoaded", () => {
+					        fetchDrivers();
+					        setupDriverSelectionListener();
+					    });
+					</script>
+
+										<br>
+										<br>
 	            <div class="form-row">
 	                
 	                <div class="form-group">
@@ -248,9 +269,9 @@
 	    }
 	}
 
-	// Function to save the new vehicle
 	function saveVehicle() {
-	    const userId = document.getElementById('user-id').value;
+	    const userId = document.getElementById('user-id').value.trim();
+	    const driverId = document.getElementById('driver-id').value.trim(); // ✅ Added
 
 	    const newVehicleData = {
 	        vehicleNumber: document.getElementById('new-vehicle-number').value,
@@ -260,10 +281,19 @@
 	        manufacturer: document.getElementById('new-manufacturer').value,
 	        model: document.getElementById('new-model').value,
 	        deviceID: document.getElementById('new-device-id') ? document.getElementById('new-device-id').value : null,
-	       userId: document.getElementById("user-id").value.trim() // ✅ Add this line
+	        userId: userId,
+	        driverId: driverId // ✅ Now it will be sent to backend
 	    };
 
-	    if (newVehicleData.vehicleNumber && newVehicleData.vehicleType && newVehicleData.ownerName && newVehicleData.userId) {
+	    console.log("🚀 Submitting vehicle:", newVehicleData); // Debug output
+
+	    if (
+	        newVehicleData.vehicleNumber &&
+	        newVehicleData.vehicleType &&
+	        newVehicleData.ownerName &&
+	        newVehicleData.userId &&
+	        newVehicleData.driverId // ✅ Validate driverId too
+	    ) {
 	        fetch('/total_vehicles/createdevices', {
 	            method: 'POST',
 	            headers: {
@@ -273,21 +303,22 @@
 	        })
 	        .then(response => {
 	            if (response.ok) {
-	                alert('Vehicle created successfully');
+	                alert('✅ Vehicle created successfully');
 	                hideAddVehicleSection();
 	            } else {
-	                alert('Error saving vehicle. Please try again.');
+	                alert('❌ Error saving vehicle. Please try again.');
 	            }
 	        })
 	        .catch(error => {
-	            console.error('Error during save:', error);
-	            alert('An unexpected error occurred.');
+	            console.error('❌ Error during save:', error);
+	            alert('⚠️ An unexpected error occurred.');
 	        });
 	    } else {
 	        document.getElementById('add-vehicle-error').innerText =
-	            'Please fill out all fields, including selecting a valid user.';
+	            'Please fill out all fields, including selecting a valid user and driver.';
 	    }
 	}
+
 
 	// Function to search for a vehicle by number
 	function searchVehicle() {
@@ -416,78 +447,6 @@
 			    </div>
 			</div>
 	    </form>
-						<script>
-							// Function to open the Add Driver modal
-							function openAddDriverModal() {
-							    document.getElementById("add-driver-modal").classList.remove("hidden");
-							}
-
-							function closeAddDriverModal() {
-							    document.getElementById("add-driver-modal").classList.add("hidden");
-							}
-
-
-							// Function to save a new driver
-							function saveDriver() {
-							    const driverData = {
-							        driverName: document.getElementById("new-driver-name").value,
-							        address: document.getElementById("new-driver-address").value,
-							        licenseNumber: document.getElementById("new-driver-license").value,
-							        phone: document.getElementById("new-driver-phone").value,
-							        email: document.getElementById("driver-mail").value,
-							        country: document.getElementById("driver-country").value // Ensure this field is included
-							    };
-
-							    fetch("http://3.109.116.92:8181/drivers/add", {
-							        method: "POST",
-							        headers: {
-							            "Content-Type": "application/json"
-							        },
-							        body: JSON.stringify(driverData)
-							    })
-							    .then(response => {
-							        if (response.ok) {
-							            alert("Driver added successfully!");
-							            closeAddDriverModal();
-							        } else {
-							            return response.text().then(text => { throw new Error(text) });
-							        }
-							    })
-							    .catch(error => alert("Error: " + error.message));
-							}
-
-
-
-							function searchDriver() {
-							    const driverName = document.getElementById("search-driver").value;
-							    fetch(`http://3.109.116.92:8181/drivers/search?driverName=${driverName}`)
-							        .then(response => {
-							            if (!response.ok) {
-							                throw new Error("Driver not found");
-							            }
-							            return response.json();
-							        })
-							        .then(data => {
-							            // Display driver information
-							            if (data.length > 0) {
-							                const driver = data[0]; // Assuming the first match
-							                document.getElementById("driver-name").value = driver.driverName;
-							                document.getElementById("driver-address").value = driver.address;
-							                document.getElementById("driver-license").value = driver.licenseNumber;
-							                document.getElementById("driver-phone").value = driver.phone;
-							                document.getElementById("driver-email").value = driver.email;
-							            } else {
-							                alert("No drivers found with the given name.");
-							            }
-							        })
-							        .catch(error => {
-							            console.error("Error fetching driver data:", error);
-							            alert("Error fetching driver data. Please try again.");
-							        });
-							}
-
-						</script>
-
 			
 			
 			
@@ -674,29 +633,7 @@
 
 
 	</script>
-	<script>
-	    function showPart2() {
-	        document.getElementById('part1').classList.add('hidden');
-	        document.getElementById('part2').classList.remove('hidden');
-	        document.getElementById('part3').classList.add('hidden');
-	        document.getElementById('review-section').classList.add('hidden');
-	    }
-
-	    function showPart3() {
-	        document.getElementById('part1').classList.add('hidden');
-	        document.getElementById('part3').classList.remove('hidden');
-	        document.getElementById('review-section').classList.add('hidden');
-	    }
-
-	    function showPart1() {
-	        document.getElementById('part1').classList.remove('hidden');
-	        document.getElementById('part2').classList.add('hidden');
-	        document.getElementById('part3').classList.add('hidden');
-	        document.getElementById('review-section').classList.add('hidden');
-	    }
-
-	  
-		</script>
+	
 		<script>
 		    // Open the Add Driver Modal
 		   
@@ -889,10 +826,10 @@
 		
 		
 		<script>
-
 			function addDevice() {
 			    const userId = parseInt(document.getElementById("user-id").value.trim());
-			    
+			    const driverId = parseInt(document.getElementById("driver-id").value.trim()); // ✅ Add this line
+
 			    const vehicleDetails = {
 			        serialNo: document.getElementById("serialNoInput").value.trim(),
 			        imei: document.getElementById("imei").value.trim(),
@@ -909,8 +846,9 @@
 			        addressPhone: document.getElementById("dealer-phone").value.trim(),
 			        country: document.getElementById("country").value.trim(),
 
-			        // ✅ Wrap user ID into `user` object
-			        user: userId ? { id: userId } : null
+			        // ✅ Include user and driver in the request body
+			        user: userId ? { id: userId } : null,
+			        driver_id: driverId || null
 			    };
 
 			    fetch("/total_vehicles/add-vehicle-and-device", {
@@ -922,68 +860,43 @@
 			    })
 			    .then(response => {
 			        if (response.ok) {
-			            alert("Vehicle and device added successfully!");
-			            window.location.href = "/dashboard";
+			            alert("✅ Vehicle and device added successfully!");
+			            window.location.href = "/dashboard_admin";
 			        } else {
 			            return response.text().then(text => { throw new Error(text); });
 			        }
 			    })
 			    .catch(error => {
-			        console.error("Error:", error);
-			        alert("Failed to add vehicle/device. " + error.message);
+			        console.error("❌ Error:", error);
+			        alert("⚠️ Failed to add vehicle/device. " + error.message);
 			    });
 			}
 
-		    function addDevice() {
-				const selectedUserName = document.getElementById("user-selection").value;
-				const userId = userMap[selectedUserName];
-
-				if (!userId) {
-				    alert("Please select a valid user from the list.");
-				    return;
-				}
-
-		        // Fetch vehicle details, including Serial Number and IMEI
-		        const vehicleDetails = {
-		            serialNo: document.getElementById("serialNoInput").value.trim(), // Serial Number
-		            imei: document.getElementById("imei").value.trim(),             // IMEI
-		            vehicleNumber: document.getElementById("vehiclenumber").value.trim(),
-		            ownerName: document.getElementById("owner-name").value.trim(),
-		            vehicleType: document.getElementById("vehicle-type").value.trim(),
-		            engineNumber: document.getElementById("engine-number").value.trim(),
-		            manufacturer: document.getElementById("manufacturer").value.trim(),
-		            model: document.getElementById("model").value.trim(),
-		            installationDate: document.getElementById("installation-date").value.trim(),
-		            technicianName: document.getElementById("installer-name").value.trim(),
-		            simNumber: document.getElementById("sim-number").value.trim(),
-		            dealerName: document.getElementById("dealer-name").value.trim(),
-		            addressPhone: document.getElementById("dealer-phone").value.trim(),
-		            country: document.getElementById("country").value.trim(),
-					userId: userId // ✅ Set the user ID here
-		        };
-
-		        // Validate input fields
-		        const missingFields = [];
-		        for (const [key, value] of Object.entries(vehicleDetails)) {
-		            if (!value && key !== "serialNo" && key !== "imei") { // Exclude SerialNo and IMEI checks
-		                missingFields.push(key);
-		            }
-		        }
-
-		        // Ensure SerialNo and IMEI are present for new entries
-		        if (!vehicleDetails.serialNo || !vehicleDetails.imei) {
-		            alert("Serial Number and IMEI are required for adding new vehicles.");
-		            return;
-		        }
-
-		        if (missingFields.length > 0) {
-		            alert(`The following fields are required: ${missingFields.join(", ")}. Please fill them out.`);
-		            return;
-		        }
-
 
 		</script>
-		
+		<script>
+			    function showPart2() {
+			        document.getElementById('part1').classList.add('hidden');
+			        document.getElementById('part2').classList.remove('hidden');
+			        document.getElementById('part3').classList.add('hidden');
+			        document.getElementById('review-section').classList.add('hidden');
+			    }
+
+			    function showPart3() {
+			        document.getElementById('part1').classList.add('hidden');
+			        document.getElementById('part3').classList.remove('hidden');
+			        document.getElementById('review-section').classList.add('hidden');
+			    }
+
+			    function showPart1() {
+			        document.getElementById('part1').classList.remove('hidden');
+			        document.getElementById('part2').classList.add('hidden');
+			        document.getElementById('part3').classList.add('hidden');
+			        document.getElementById('review-section').classList.add('hidden');
+			    }
+
+			  
+				</script>
 		
 </body>
 </html>

@@ -49,7 +49,9 @@ public class Admin extends BaseEntity {
     private String phone;
     private String country;
     private String password;
-    private boolean status;
+    
+    private boolean status = true;
+
     private String resetToken;
 
     // === BaseEntity Implementation ===

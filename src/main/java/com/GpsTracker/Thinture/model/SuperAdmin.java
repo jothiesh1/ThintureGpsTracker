@@ -27,7 +27,8 @@ public class SuperAdmin extends BaseEntity {
     private String phone;
     private String name;
     private String resetToken;
-    private boolean status;
+    private boolean status = true;
+
 
  
 	@OneToMany(mappedBy = "superAdmin", cascade = CascadeType.ALL, orphanRemoval = true)

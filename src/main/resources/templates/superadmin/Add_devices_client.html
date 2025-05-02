@@ -190,55 +190,71 @@
         }
 
         // ✅ Add Dual Serial Number Range
-        function addDualSerial() {
-            console.log("🔹 Attempting to add dual serials...");
+		// ✅ Updated Dual Serial Input with multiple removal support
+		function addDualSerial() {
+		    console.log("🔹 Attempting to add dual serials...");
 
-            const startSerial = parseInt(document.getElementById("startSerial").value.trim());
-            const endSerial = parseInt(document.getElementById("endSerial").value.trim());
-            const removedSerial = document.getElementById("removedSerial").value.trim() || null;
-            const clientDropdown = document.getElementById("ClientDropdown");
-            const clientId = clientDropdown.value;
+		    const startSerial = parseInt(document.getElementById("startSerial").value.trim());
+		    const endSerial = parseInt(document.getElementById("endSerial").value.trim());
+		    const removedSerialInput = document.getElementById("removedSerial").value.trim();
+		    const clientDropdown = document.getElementById("ClientDropdown");
+		    const clientId = clientDropdown.value;
 
-            if (isNaN(startSerial) || isNaN(endSerial) || startSerial > endSerial || !clientId) {
-                Swal.fire({ icon: 'error', title: '❌ Invalid Input', text: 'Ensure valid Start/End Serial and select a Client.' });
-                return;
-            }
+		    if (isNaN(startSerial) || isNaN(endSerial) || startSerial > endSerial || !clientId) {
+		        Swal.fire({ icon: 'error', title: '❌ Invalid Input', text: 'Ensure valid Start/End Serial and select a Client.' });
+		        return;
+		    }
 
-            const serialNumbers = [];
-            for (let i = startSerial; i <= endSerial; i++) {
-                if (removedSerial && i == removedSerial) {
-                    console.log(`⚠️ Skipping removed serial number: ${i}`);
-                    continue;
-                }
-                serialNumbers.push(PREFIX + i);
-            }
+		    // Parse removed serials into a Set for fast lookup
+		    const removedSet = new Set();
+		    if (removedSerialInput) {
+		        removedSerialInput.split(",").forEach(num => {
+		            const parsed = parseInt(num.trim());
+		            if (!isNaN(parsed)) removedSet.add(parsed);
+		        });
+		    }
 
-            const payload = { serialNumbers: serialNumbers, clientId: clientId };
+		    const uniqueSerials = new Set();
+		    for (let i = startSerial; i <= endSerial; i++) {
+		        if (removedSet.has(i)) {
+		            console.log(`⚠️ Skipping removed serial: ${i}`);
+		            continue;
+		        }
+		        uniqueSerials.add(PREFIX + i);
+		    }
 
-            console.log("📤 Sending Dual Serial Payload:", payload);
+		    const serialNumbers = Array.from(uniqueSerials);
 
-            fetch('/client/add-dual', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("✅ API Response:", data);
-                if (data.success === "true") {
-                    Swal.fire({ icon: 'success', title: '✅ Success', text: 'Dual Serial Range added successfully!' });
-                    document.getElementById("startSerial").value = "";
-                    document.getElementById("endSerial").value = "";
-                    document.getElementById("removedSerial").value = "";
-                } else {
-                    Swal.fire({ icon: 'error', title: '❌ Error', text: 'Failed to add Dual Serial Range. Please try again.' });
-                }
-            })
-            .catch(error => {
-                console.error('❌ API Error:', error);
-                Swal.fire({ icon: 'error', title: '❌ Error', text: 'Failed to add Dual Serial Range. Please check your network and try again.' });
-            });
-        }
+		    const payload = {
+		        serialNumbers: serialNumbers,
+		        clientId: clientId
+		    };
+
+		    console.log("📤 Sending Dual Serial Payload:", payload);
+
+		    fetch('/client/add-dual', {
+		        method: 'POST',
+		        headers: { 'Content-Type': 'application/json' },
+		        body: JSON.stringify(payload),
+		    })
+		    .then(response => response.json())
+		    .then(data => {
+		        console.log("✅ API Response:", data);
+		        if (data.success === "true") {
+		            Swal.fire({ icon: 'success', title: '✅ Success', text: 'Dual Serial Range added successfully!' });
+		            document.getElementById("startSerial").value = "";
+		            document.getElementById("endSerial").value = "";
+		            document.getElementById("removedSerial").value = "";
+		        } else {
+		            Swal.fire({ icon: 'error', title: '❌ Error', text: 'Failed to add Dual Serial Range. Please try again.' });
+		        }
+		    })
+		    .catch(error => {
+		        console.error('❌ API Error:', error);
+		        Swal.fire({ icon: 'error', title: '❌ Error', text: 'Failed to add Dual Serial Range. Please check your network and try again.' });
+		    });
+		}
+
 
         openTab("single");
     </script>

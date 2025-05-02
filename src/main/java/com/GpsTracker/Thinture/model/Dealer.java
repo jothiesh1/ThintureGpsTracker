@@ -66,7 +66,8 @@ public class Dealer extends BaseEntity {
     private String phone;
     private String country;
     private String password;
-    private boolean status;
+    private boolean status = true;
+
 
     @ElementCollection
     private List<String> serialNumbers = new ArrayList<>();

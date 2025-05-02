@@ -70,7 +70,8 @@ public class Driver extends BaseEntity {
     private String address;
     private String license;
     private String licenseType;
-    private boolean status;
+    private boolean status = true;
+
 
     // === Getters and Setters ===
 
