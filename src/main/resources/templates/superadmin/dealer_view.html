@@ -92,7 +92,7 @@
         const row = document.createElement("tr");
         row.innerHTML = `
           <td>${dealer.id}</td>
-          <td>${dealer.name}</td>
+          <td>${dealer.companyName}</td>
           <td>${dealer.email}</td>
           <td>${dealer.address}</td>
           <td>${dealer.phone}</td>
@@ -193,7 +193,7 @@
 	  Swal.fire({
 	    title: 'Edit Dealer',
 	    html: `
-	      <input id="name" class="swal2-input" placeholder="Name" value="${dealer.name}">
+	      <input id="name" class="swal2-input" placeholder="Name" value="${dealer.companyName}">
 	      <input id="email" class="swal2-input" placeholder="Email" value="${dealer.email}">
 	      <input id="address" class="swal2-input" placeholder="Address" value="${dealer.address}">
 	      <input id="phone" class="swal2-input" placeholder="Phone" value="${dealer.phone}">

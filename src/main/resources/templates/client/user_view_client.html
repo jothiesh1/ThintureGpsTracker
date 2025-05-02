@@ -8,34 +8,26 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-  <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+  <link rel="stylesheet" type="text/css" th:href="@{/css/styled.css}">
   <link rel="stylesheet" type="text/css" th:href="@{/css/viewallstyle.css}">
-
   <title>Thinture GPS</title>
   <link rel="icon" type="image/x-icon" href="THINTURE_IMAGE/favicon.jpg">
-
-  <style>
-
-
- 
-  </style>
 </head>
 <body>
-	<!--<<<<< git conflict >>>>>-->
   <div th:insert="navigation_client :: navbar_client"></div>
   <div class="card">
-  <h2>Users  Management</h2>
-  <!-- 🔍 Search Bar -->
-      <div class="mb-3">
-        <input type="text" id="searchInput" class="form-control" placeholder="Search clients..." />
-      </div>
-	  <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
-	    <span id="totalRecords" class="text-white fw-semibold">Total Users: 0</span>
-	    <button class="btn btn-success btn-sm" onclick="exportToExcel()">
-	      <i class="fas fa-file-excel me-1"></i> Export to Excel
-	    </button>
-	  </div>
+    <h2>Users Management</h2>
+
+    <div class="mb-3">
+      <input type="text" id="searchInput" class="form-control" placeholder="Search users..." />
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
+      <span id="totalRecords" class="text-white fw-semibold">Total Users: 0</span>
+      <button class="btn btn-success btn-sm" onclick="exportToExcel()">
+        <i class="fas fa-file-excel me-1"></i> Export to Excel
+      </button>
+    </div>
 
     <div class="table-wrapper">
       <table id="userTable" class="table table-bordered table-hover table-dark">
@@ -47,17 +39,15 @@
             <th>Address</th>
             <th>Phone</th>
             <th>Country</th>
+            <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- User data will be loaded here -->
-        </tbody>
+        <tbody></tbody>
       </table>
-	  <div id="pagination" class="text-center mt-3"></div>
-
+      <div id="pagination" class="text-center mt-3"></div>
     </div>
-  </h2>
+  </div>
 
   <script>
     const API_URL = "/api/users/user";
@@ -70,87 +60,131 @@
       try {
         const response = await fetch(API_URL);
         if (!response.ok) throw new Error("Failed to fetch user data");
-
         usersData = await response.json();
-        filteredData = [...usersData]; // clone the original data for filtering
+        filteredData = [...usersData];
         renderTable();
       } catch (err) {
         alert("Error loading users: " + err.message);
-        console.error(err);
       }
     }
 
-	function renderTable() {
-	  const tbody = document.querySelector("#userTable tbody");
-	  const totalSpan = document.getElementById("totalRecords"); // ✅ count reference
-	  tbody.innerHTML = "";
+    function renderTable() {
+      const tbody = document.querySelector("#userTable tbody");
+      const totalSpan = document.getElementById("totalRecords");
+      tbody.innerHTML = "";
+      totalSpan.innerText = `Total Users: ${filteredData.length}`;
 
-	  // ✅ Update total count
-	  totalSpan.innerText = `Total Users: ${filteredData.length}`;
+      const start = (currentPage - 1) * ROWS_PER_PAGE;
+      const paginatedUsers = filteredData.slice(start, start + ROWS_PER_PAGE);
 
-	  const startIndex = (currentPage - 1) * ROWS_PER_PAGE;
-	  const endIndex = startIndex + ROWS_PER_PAGE;
-	  const paginatedUsers = filteredData.slice(startIndex, endIndex);
+      paginatedUsers.forEach(user => {
+        const isActive = user.status;
+        const statusBadge = isActive ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Locked</span>';
+        const toggleBtnClass = isActive ? 'btn-warning' : 'btn-dark';
+        const toggleIcon = isActive ? 'fa-user-lock' : 'fa-user-check';
+        const toggleText = isActive ? 'Lock' : 'Unlock';
 
-	  paginatedUsers.forEach(user => {
-	    const row = document.createElement("tr");
-	    row.innerHTML = `
-	      <td>${user.id}</td>
-	      <td>${user.name}</td>
-	      <td>${user.email}</td>
-	      <td>${user.address}</td>
-	      <td>${user.phone}</td>
-	      <td>${user.country}</td>
-	      <td>
-	        <button class="btn btn-sm btn-primary me-1" onclick="editUser(${user.id})"><i class="fas fa-edit"></i></button>
-	        <button class="btn btn-sm btn-danger me-1" onclick="deleteUser(${user.id})"><i class="fas fa-trash"></i></button>
-	        <button class="btn btn-sm btn-warning" onclick="toggleStatus(this)"><i class="fas fa-user-lock"></i> Toggle</button>
-	      </td>
-	    `;
-	    tbody.appendChild(row);
-	  });
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${user.id}</td>
+          <td>${user.companyName}</td>
+          <td>${user.email}</td>
+          <td>${user.address}</td>
+          <td>${user.phone}</td>
+          <td>${user.country}</td>
+          <td>${statusBadge}</td>
+          <td>
+            <button class="btn btn-sm btn-primary me-1" onclick="editUser(${user.id})"><i class="fas fa-edit"></i></button>
+            <button class="btn btn-sm btn-danger me-1" onclick="deleteUser(${user.id})"><i class="fas fa-trash"></i></button>
+            <button class="btn btn-sm ${toggleBtnClass}" data-id="${user.id}" onclick="toggleStatus(this)"><i class="fas ${toggleIcon}"></i> ${toggleText}</button>
+          </td>`;
+        tbody.appendChild(row);
+      });
 
-	  renderPagination();
-	}
+      renderPagination();
+    }
+
+    async function toggleStatus(button) {
+      const row = button.closest("tr");
+      const userId = row.querySelector("td").textContent;
+
+      try {
+        const response = await fetch(`/users/${userId}/toggle-status`, { method: "PUT" });
+        const result = await response.text();
+        const isNowActive = result.toLowerCase().includes("unlock");
+
+        button.classList.toggle("btn-warning", isNowActive);
+        button.classList.toggle("btn-dark", !isNowActive);
+        button.innerHTML = isNowActive ? '<i class="fas fa-user-lock"></i> Lock' : '<i class="fas fa-user-check"></i> Unlock';
+        row.querySelector("td:nth-child(7)").innerHTML = isNowActive ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Locked</span>';
+
+        Swal.fire({ icon: "success", title: `User is now ${result}`, timer: 1500, showConfirmButton: false });
+      } catch (error) {
+        Swal.fire({ icon: "error", title: "Failed to toggle", text: error.message });
+      }
+    }
 
     function renderPagination() {
-      const paginationContainer = document.getElementById("pagination");
-      paginationContainer.innerHTML = "";
-
+      const pagination = document.getElementById("pagination");
+      pagination.innerHTML = "";
       const totalPages = Math.ceil(filteredData.length / ROWS_PER_PAGE);
 
-      const prevBtn = document.createElement("button");
-      prevBtn.innerText = "Previous";
-      prevBtn.className = "btn btn-sm btn-light";
-      prevBtn.disabled = currentPage === 1;
-      prevBtn.onclick = () => {
-        if (currentPage > 1) {
-          currentPage--;
-          renderTable();
-        }
-      };
-      paginationContainer.appendChild(prevBtn);
+      const prev = document.createElement("button");
+      prev.innerText = "Previous";
+      prev.className = "btn btn-sm btn-light";
+      prev.disabled = currentPage === 1;
+      prev.onclick = () => { currentPage--; renderTable(); };
+      pagination.appendChild(prev);
 
-      const pageInfo = document.createElement("span");
-      pageInfo.className = "mx-3 text-light align-self-center";
-      pageInfo.innerText = `Page ${currentPage} of ${totalPages}`;
-      paginationContainer.appendChild(pageInfo);
+      const info = document.createElement("span");
+      info.className = "mx-3 text-light";
+      info.innerText = `Page ${currentPage} of ${totalPages}`;
+      pagination.appendChild(info);
 
-      const nextBtn = document.createElement("button");
-      nextBtn.innerText = "Next";
-      nextBtn.className = "btn btn-sm btn-light";
-      nextBtn.disabled = currentPage === totalPages;
-      nextBtn.onclick = () => {
-        if (currentPage < totalPages) {
-          currentPage++;
-          renderTable();
-        }
-      };
-      paginationContainer.appendChild(nextBtn);
+      const next = document.createElement("button");
+      next.innerText = "Next";
+      next.className = "btn btn-sm btn-light";
+      next.disabled = currentPage === totalPages;
+      next.onclick = () => { currentPage++; renderTable(); };
+      pagination.appendChild(next);
     }
 
     function editUser(id) {
-      alert("Edit User: " + id);
+      const user = usersData.find(u => u.id === id);
+      if (!user) return alert("User not found");
+
+      Swal.fire({
+        title: 'Edit User',
+        html: `
+          <input id="name" class="swal2-input" value="${user.companyName}">
+          <input id="email" class="swal2-input" value="${user.email}">
+          <input id="address" class="swal2-input" value="${user.address}">
+          <input id="phone" class="swal2-input" value="${user.phone}">
+          <input id="country" class="swal2-input" value="${user.country}">
+        `,
+        focusConfirm: false,
+        preConfirm: () => ({
+          name: document.getElementById('name').value,
+          email: document.getElementById('email').value,
+          address: document.getElementById('address').value,
+          phone: document.getElementById('phone').value,
+          country: document.getElementById('country').value
+        })
+      }).then(result => {
+        if (result.isConfirmed) {
+          fetch(`/users/edit/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(result.value)
+          })
+          .then(res => res.text())
+          .then(msg => {
+            Swal.fire("✅ Updated!", msg, "success");
+            loadUsers();
+          })
+          .catch(err => Swal.fire("❌ Error", "Update failed: " + err.message, "error"));
+        }
+      });
     }
 
     function deleteUser(id) {
@@ -159,52 +193,36 @@
         text: "You won't be able to revert this!",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!',
-      }).then((result) => {
+        confirmButtonText: 'Yes, delete it!'
+      }).then(result => {
         if (result.isConfirmed) {
-          Swal.fire('Deleted!', 'User has been deleted.', 'success');
+          fetch(`/users/delete/${id}`, { method: 'DELETE' })
+          .then(res => res.text())
+          .then(msg => {
+            Swal.fire("🗑️ Deleted!", msg, "success");
+            loadUsers();
+          })
+          .catch(err => Swal.fire("❌ Error", "Delete failed: " + err.message, "error"));
         }
       });
     }
 
-    function toggleStatus(button) {
-      const isBlocked = button.classList.contains("btn-dark");
-      if (isBlocked) {
-        button.classList.remove("btn-dark");
-        button.classList.add("btn-warning");
-        button.innerHTML = '<i class="fas fa-user-lock"></i> Toggle';
-      } else {
-        button.classList.remove("btn-warning");
-        button.classList.add("btn-dark");
-        button.innerHTML = '<i class="fas fa-user-check"></i> Unblock';
-      }
-    }
-
-    // 🔍 Live Search
-    document.addEventListener("input", function (e) {
-      if (e.target.id === "searchInput") {
-        const searchText = e.target.value.toLowerCase();
-
-        filteredData = usersData.filter(user =>
-          Object.values(user).some(value =>
-            String(value).toLowerCase().includes(searchText)
-          )
-        );
-
-        currentPage = 1;
-        renderTable();
-      }
+    document.getElementById("searchInput").addEventListener("input", e => {
+      const searchText = e.target.value.toLowerCase();
+      filteredData = usersData.filter(user => Object.values(user).some(val => String(val).toLowerCase().includes(searchText)));
+      currentPage = 1;
+      renderTable();
     });
-	function exportToExcel() {
-	  const worksheet = XLSX.utils.json_to_sheet(filteredData);
-	  const workbook = XLSX.utils.book_new();
-	  XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
-	  XLSX.writeFile(workbook, "Users_List.xlsx");
-	}
+
+    function exportToExcel() {
+      const worksheet = XLSX.utils.json_to_sheet(filteredData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+      XLSX.writeFile(workbook, "Users_List.xlsx");
+    }
 
     window.onload = loadUsers;
   </script>
-
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

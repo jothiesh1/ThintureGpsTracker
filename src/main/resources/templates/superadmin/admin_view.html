@@ -22,16 +22,14 @@
     <div class="mb-3">
       <input type="text" id="searchInput" class="form-control" placeholder="Search admins..." />
     </div>
-	
-	
-	<div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
-	   <span id="totalRecords" class="text-white fw-semibold">Total Dealers: 0</span>
-	   <button class="btn btn-success btn-sm" onclick="exportToExcel()">
-	     <i class="fas fa-file-excel me-1"></i> Export to Excel
-	   </button>
-	 </div>
-	 
-	 
+
+    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
+      <span id="totalRecords" class="text-white fw-semibold">Total Admins: 0</span>
+      <button class="btn btn-success btn-sm" onclick="exportToExcel()">
+        <i class="fas fa-file-excel me-1"></i> Export to Excel
+      </button>
+    </div>
+
     <div class="table-wrapper">
       <table id="adminTable" class="table table-bordered table-hover table-dark">
         <thead>
@@ -42,6 +40,7 @@
             <th>Address</th>
             <th>Phone</th>
             <th>Country</th>
+            <th>Status</th> <!-- ✅ Added status column -->
             <th>Actions</th>
           </tr>
         </thead>
@@ -76,37 +75,43 @@
       }
     }
 
-	function renderTable() {
-	  const tbody = document.querySelector("#adminTable tbody");
-	  tbody.innerHTML = "";
+    function renderTable() {
+      const tbody = document.querySelector("#adminTable tbody");
+      tbody.innerHTML = "";
 
-	  // ✅ Update total count dynamically
-	  document.getElementById("totalRecords").innerText = `Total Admins: ${filteredData.length}`;
+      // ✅ Update total count dynamically
+      document.getElementById("totalRecords").innerText = `Total Admins: ${filteredData.length}`;
 
-	  const start = (currentPage - 1) * ROWS_PER_PAGE;
-	  const paginatedAdmins = filteredData.slice(start, start + ROWS_PER_PAGE);
+      const start = (currentPage - 1) * ROWS_PER_PAGE;
+      const paginatedAdmins = filteredData.slice(start, start + ROWS_PER_PAGE);
 
-	  paginatedAdmins.forEach(admin => {
-	    const row = document.createElement("tr");
-	    row.innerHTML = `
-	      <td>${admin.id}</td>
-	      <td>${admin.name}</td>
-	      <td>${admin.email}</td>
-	      <td>${admin.address}</td>
-	      <td>${admin.phone}</td>
-	      <td>${admin.country}</td>
-	      <td>
-	        <button class="btn btn-sm btn-primary me-1" onclick="editAdmin(${admin.id})"><i class="fas fa-edit"></i></button>
-	        <button class="btn btn-sm btn-danger me-1" onclick="deleteAdmin(${admin.id})"><i class="fas fa-trash"></i></button>
-	        <button class="btn btn-sm btn-warning" onclick="toggleStatus(this)"><i class="fas fa-user-lock"></i> Toggle</button>
-	      </td>
-	    `;
-	    tbody.appendChild(row);
-	  });
+      paginatedAdmins.forEach(admin => {
+        const statusBadge = admin.status
+          ? '<span class="badge bg-success">Active</span>'
+          : '<span class="badge bg-danger">Locked</span>';
 
-	  renderPagination();
-	}
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${admin.id}</td>
+          <td>${admin.companyName}</td>
+          <td>${admin.email}</td>
+          <td>${admin.address}</td>
+          <td>${admin.phone}</td>
+          <td>${admin.country}</td>
+          <td>${statusBadge}</td> <!-- ✅ Show status -->
+          <td>
+            <button class="btn btn-sm btn-primary me-1" onclick="editAdmin(${admin.id})"><i class="fas fa-edit"></i></button>
+            <button class="btn btn-sm btn-danger me-1" onclick="deleteAdmin(${admin.id})"><i class="fas fa-trash"></i></button>
+            <button class="btn btn-sm ${admin.status ? 'btn-warning' : 'btn-dark'}" data-id="${admin.id}" onclick="toggleStatus(this)">
+              <i class="fas ${admin.status ? 'fa-user-lock' : 'fa-user-check'}"></i> ${admin.status ? 'Lock' : 'Unlock'}
+            </button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
 
+      renderPagination();
+    }
 
     function renderPagination() {
       const paginationContainer = document.getElementById("pagination");
@@ -145,7 +150,46 @@
     }
 
     function editAdmin(id) {
-      alert("Edit Admin: " + id);
+      const admin = adminsData.find(a => a.id === id);
+      if (!admin) return Swal.fire("❌ Not found", "Admin not found", "error");
+
+      Swal.fire({
+        title: '✏️ Edit Admin',
+        html: `
+          <input id="companyName" class="swal2-input" placeholder="Company Name" value="${admin.companyName}">
+          <input id="email" class="swal2-input" placeholder="Email" value="${admin.email}">
+          <input id="address" class="swal2-input" placeholder="Address" value="${admin.address}">
+          <input id="phone" class="swal2-input" placeholder="Phone" value="${admin.phone}">
+          <input id="country" class="swal2-input" placeholder="Country" value="${admin.country}">
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Update',
+        preConfirm: () => {
+          return {
+            companyName: document.getElementById("companyName").value,
+            email: document.getElementById("email").value,
+            address: document.getElementById("address").value,
+            phone: document.getElementById("phone").value,
+            country: document.getElementById("country").value
+          };
+        }
+      }).then(result => {
+        if (result.isConfirmed) {
+          fetch(`/admins/${id}/edit`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(result.value)
+          })
+          .then(res => res.text())
+          .then(msg => {
+            Swal.fire("✅ Updated", msg, "success");
+            loadAdmins();
+          })
+          .catch(err => {
+            Swal.fire("❌ Error", "Update failed: " + err.message, "error");
+          });
+        }
+      });
     }
 
     function deleteAdmin(id) {
@@ -154,25 +198,48 @@
         text: "You won't be able to revert this!",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!',
+        confirmButtonText: 'Yes, delete it!'
       }).then((result) => {
         if (result.isConfirmed) {
-          Swal.fire('Deleted!', 'Admin has been deleted.', 'success');
+          fetch(`/admins/delete/${id}`, {
+            method: 'DELETE'
+          })
+          .then(res => res.text())
+          .then(msg => {
+            Swal.fire('✅ Deleted!', msg, 'success');
+            loadAdmins();
+          })
+          .catch(err => {
+            Swal.fire('❌ Error', 'Failed to delete: ' + err.message, 'error');
+          });
         }
       });
     }
 
     function toggleStatus(button) {
-      const isBlocked = button.classList.contains("btn-dark");
-      if (isBlocked) {
-        button.classList.remove("btn-dark");
-        button.classList.add("btn-warning");
-        button.innerHTML = '<i class="fas fa-user-lock"></i> Block';
-      } else {
-        button.classList.remove("btn-warning");
-        button.classList.add("btn-dark");
-        button.innerHTML = '<i class="fas fa-user-check"></i> Unblock';
-      }
+      const adminId = button.getAttribute("data-id");
+
+      fetch(`/admins/${adminId}/toggle-status`, {
+        method: 'PUT'
+      })
+      .then(res => res.text())
+      .then(statusMsg => {
+        Swal.fire({
+          icon: 'success',
+          title: statusMsg,
+          timer: 1500,
+          showConfirmButton: false
+        });
+
+        loadAdmins(); // Reload full table to update status + button
+      })
+      .catch(err => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed to toggle status',
+          text: err.message
+        });
+      });
     }
 
     // 🔍 Live Search
@@ -190,13 +257,13 @@
         renderTable();
       }
     });
-	function exportToExcel() {
-	  const worksheet = XLSX.utils.json_to_sheet(filteredData);
-	  const workbook = XLSX.utils.book_new();
-	  XLSX.utils.book_append_sheet(workbook, worksheet, "admin");
-	  XLSX.writeFile(workbook, "Admins_List.xlsx");
-	}
 
+    function exportToExcel() {
+      const worksheet = XLSX.utils.json_to_sheet(filteredData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "admin");
+      XLSX.writeFile(workbook, "Admins_List.xlsx");
+    }
 
     window.onload = loadAdmins;
   </script>

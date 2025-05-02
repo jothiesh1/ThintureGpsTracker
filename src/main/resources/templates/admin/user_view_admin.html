@@ -87,7 +87,7 @@
         const row = document.createElement("tr");
         row.innerHTML = `
           <td>${user.id}</td>
-          <td>${user.name}</td>
+          <td>${user.companyName}</td>
           <td>${user.email}</td>
           <td>${user.address}</td>
           <td>${user.phone}</td>
@@ -156,7 +156,7 @@
       Swal.fire({
         title: 'Edit User',
         html: `
-          <input id="name" class="swal2-input" value="${user.name}">
+          <input id="name" class="swal2-input" value="${user.companyName}">
           <input id="email" class="swal2-input" value="${user.email}">
           <input id="address" class="swal2-input" value="${user.address}">
           <input id="phone" class="swal2-input" value="${user.phone}">
