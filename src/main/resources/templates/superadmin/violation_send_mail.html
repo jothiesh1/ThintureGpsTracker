@@ -1,0 +1,91 @@
+;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="mb-4">🚀 Server Logs Viewer</h2>
+
+        <!-- Search + Download Controls -->
+        <div class="row mb-3">
+            <div class="col-md-4 mb-2">
+                <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search logs...">
+            </div>
+            <div class="col-md-2 mb-2">
+                <button class="btn btn-secondary w-100" id="searchBtn">Search</button>
+            </div>
+            <div class="col-md-6 mb-2 text-end">
+                <input type="date" id="startDate">
+                <input type="date" id="endDate">
+                <button class="btn btn-success" id="downloadBtn">📥 Download Logs</button>
+            </div>
+        </div>
+
+        <!-- Refresh Button -->
+        <div class="mb-3">
+            <button class="btn btn-primary" id="refreshBtn">🔄 Refresh Logs</button>
+        </div>
+
+        <!-- Logs Display -->
+        <div id="logsContainer">Loading logs...</div>
+    </div>
+
+    <script>
+        let allLogs = '';
+
+        // ✅ Fetch all logs from backend
+        async function fetchLogs() {
+            document.getElementById('logsContainer').textContent = 'Loading logs...';
+            try {
+                const response = await fetch('/api/logs/all');
+                if (response.ok) {
+                    const text = await response.text();
+                    allLogs = text;
+                    document.getElementById('logsContainer').textContent = text;
+                    scrollToBottom();
+                } else {
+                    document.getElementById('logsContainer').textContent = "❌ Failed to load logs.";
+                }
+            } catch (error) {
+                document.getElementById('logsContainer').textContent = "❌ Error loading logs.";
+            }
+        }
+
+        // ✅ Search logs client-side
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+            if (!keyword) {
+                document.getElementById('logsContainer').textContent = allLogs;
+                return;
+            }
+            const filtered = allLogs.split('\n').filter(line => line.toLowerCase().includes(keyword));
+            document.getElementById('logsContainer').textContent = filtered.join('\n') || 'No matching logs found.';
+        });
+
+        // ✅ Download logs by date range
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            if (!startDate || !endDate) {
+                alert("⚠️ Please select both start and end dates.");
+                return;
+            }
+            const url = /api/logs/download?startDate=${startDate}&endDate=${endDate};
+            window.open(url, '_blank');
+        });
+
+        // ✅ Refresh logs
+        document.getElementById('refreshBtn').addEventListener('click', fetchLogs);
+
+        // ✅ Auto-scroll helper
+        function scrollToBottom() {
+            const container = document.getElementById('logsContainer');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Initial load
+        fetchLogs();
+    </script>
+</body>
+</html>

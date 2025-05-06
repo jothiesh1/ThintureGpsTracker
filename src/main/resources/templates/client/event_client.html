@@ -31,17 +31,17 @@
 
         <div class="report-grid">
             <div class="report-card" id="event">
-                <img src="THINTURE_IMAGE/event.jpg" alt="Event Report">
+                <img src="/THINTURE_IMAGE/event.jpg" alt="Event Report">
                 <span>Event Report</span>
             </div>
 
             <div class="report-card" id="vehicleReport">
-                <img src="THINTURE_IMAGE/vehile4.jpg" alt="Vehicle Report">
+                <img src="/THINTURE_IMAGE/vehile4.jpg" alt="Vehicle Report">
                 <span>Vehicle Report</span>
             </div>
 
             <div class="report-card" id="driver">
-                <img src="THINTURE_IMAGE/driver3.jpg" alt="Driver Report">
+                <img src="/THINTURE_IMAGE/driver3.jpg" alt="Driver Report">
                 <span>Driver Report</span>
             </div>
         </div>
@@ -50,15 +50,15 @@
     <script>
         // Redirects to respective reports
         document.getElementById('event').addEventListener('click', function () {
-            window.location.href = '/client_eventreport';
+            window.location.href = '/client/client_eventreport';
         });
 
         document.getElementById('vehicleReport').addEventListener('click', function () {
-            window.location.href = '/client_vehicle_violation';
+            window.location.href = '/client/client_vehicle_violation';
         });
 
         document.getElementById('driver').addEventListener('click', function () {
-            window.location.href = '/driver_violation';
+            window.location.href = '/client/driver_violation';
         });
     </script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>

@@ -27,105 +27,97 @@
 
 
 		            <div class="collapse navbar-collapse" id="navbarNav">
-		                <ul class="navbar-nav ms-auto">
-		                    <li class="nav-item">
-		                        <a class="nav-link" href="/dashboard_dealer"><strong>HOME</strong></a>
-		                    </li>
-							<li class="nav-item dropdown">
-							    <a class="nav-link dropdown-toggle" href="#" id="managerDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-							        <strong>MANAGER</strong>
-							    </a>
-							    <ul class="dropdown-menu" aria-labelledby="managerDropdown">
-							        <li><a class="dropdown-item" href="/addclient_dealer">Add Client</a></li>
-							        <li><a class="dropdown-item" href="/adduser_dealer">Add User</a></li>
-									
-									<li><a class="dropdown-item" href="/adddriver_dealer">Add Driver</a></li>
-									
-									
-							    </ul>
-							</li>
-							<li class="nav-item dropdown">
-												           <a class="nav-link dropdown-toggle" href="#" id="configDropdown" data-bs-toggle="dropdown">
-											               <strong>ASSIGN DEVICES</strong>
-													        </a>
-															<ul class="dropdown-menu">
-																<li><a class="dropdown-item" href="/add_dealer_device_to_client">Assign Device To Client</a></li>
-																									<li><a class="dropdown-item" href="/addrfid_dealer_client">Assign RFID To Client</a></li>
-																					                          
-																					                       </ul>
-																					                   </li>
-		                    <li class="nav-item dropdown">
-		                        <a class="nav-link dropdown-toggle" href="#" id="trackingDropdown" role="button"
-		                            data-bs-toggle="dropdown" aria-expanded="false">
-		                            <strong>TRACKING</strong>
-		                        </a>
-		                        <ul class="dropdown-menu">
-		                            <li><a class="dropdown-item" href="/mapDealer">Live Map</a></li>
-		                            <li><a class="dropdown-item" href="/playback_dealer">Playback Track</a></li>
-		                 
-		                        </ul>
-		                    </li>
-							<li class="nav-item dropdown">
-							                       <a class="nav-link dropdown-toggle" href="#" id="configDropdown" data-bs-toggle="dropdown">
-							                           <strong>CONFIGURATION</strong>
-							                       </a>
-							                       <ul class="dropdown-menu">
-							                           <li><a class="dropdown-item" href="/installationDealer">Installation</a></li>
-							                           <li><a class="dropdown-item" href="#renewal">Renewal</a></li>
-							                           
-							                       </ul>
-							                   </li>
-											   <li class="nav-item dropdown">
-											                         <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" data-bs-toggle="dropdown">
-											                             <strong>REPORT</strong>
-											                         </a>
-											                         <ul class="dropdown-menu">
-											                             <li><a class="dropdown-item" href="/event_dealer">Event & Violations</a></li>
-																		 <li><a class="dropdown-item" href="/dealer_device_report">Installation Report</a></li>
-																		 <li><a class="dropdown-item" href="/view_dealer_complaints">complaint Report</a></li>
-											                         </ul>
-											                     </li>
-																 <li class="nav-item dropdown">
-																 															  <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" data-bs-toggle="dropdown">
-																 															 	<strong>Users Management</strong>
-																 															  </a>
-																 															 <ul class="dropdown-menu">
-																 															  
-																 															  <li><a class="dropdown-item" href="/client_view_dealer">Client</a></li>
-																 															 
-																 															  <li><a class="dropdown-item" href="/users_view_dealer">User</a></li>
-																															  <li><a class="dropdown-item" href="/dealer_driver_view">driver</a></li>
-																															  
-																 															 </ul>
-																 															 </li>
-																															 <li class="nav-item dropdown">
-																															 															 <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" data-bs-toggle="dropdown">
-																															 															 <strong>NOTIFICATIONS</strong>
-																															 															  </a>
-																															 															  <ul class="dropdown-menu">
-																															 																<li><a class="dropdown-item" href="/alert_dealer">Alerts</a></li>																 																 										                             
-																															 																</ul>													 																 																	 
-																															 																</li>																	 																 										                       
-																															 															  		
-																 																 																 			
-											                     <li class="nav-item dropdown">
-											                         <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" data-bs-toggle="dropdown">
-											                             <strong id="profileid">PROFILE</strong>
-											                         </a>
-											                         <ul class="dropdown-menu">
-											                             <li><a class="dropdown-item" href="">Profile</a></li>
-																		  <li><a class="dropdown-item" href="/dealer_support">Register Complaints</a></li>
-											                             <li>																		 <a class="dropdown-item logout-item" onclick="logout()">
-																		 																	    <i class="fas fa-sign-out-alt"></i> Logout
-																		 																	  </a></li>
-											                         </ul>
-											                     </li>
-																 <li class="nav-item">
-																 																     <a class="nav-link" href="#" id="refreshPage">
-																 																           <strong><i class="fas fa-redo" id="refreshIcon"></i> REFRESH</strong>
-																 																     </a>
-																 																 </li>
-		                </ul>
+						
+						<ul class="navbar-nav ms-auto">
+						    <li class="nav-item">
+						        <a class="nav-link" href="/dealer/dashboard"><strong>HOME</strong></a>
+						    </li>
+						    <li class="nav-item dropdown">
+						        <a class="nav-link dropdown-toggle" href="#" id="managerDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+						            <strong>MANAGER</strong>
+						        </a>
+						        <ul class="dropdown-menu" aria-labelledby="managerDropdown">
+						            <li><a class="dropdown-item" href="/dealer/addclient">Add Client</a></li>
+						            <li><a class="dropdown-item" href="/dealer/adduser">Add User</a></li>
+						            <li><a class="dropdown-item" href="/dealer/adddriver">Add Driver</a></li>
+						        </ul>
+						    </li>
+						    <li class="nav-item dropdown">
+						        <a class="nav-link dropdown-toggle" href="#" id="configDropdown" data-bs-toggle="dropdown">
+						            <strong>ASSIGN DEVICES</strong>
+						        </a>
+						        <ul class="dropdown-menu">
+						            <li><a class="dropdown-item" href="/dealer/add_device_to_client">Assign Device To Client</a></li>
+						            <li><a class="dropdown-item" href="/dealer/addrfid_to_client">Assign RFID To Client</a></li>
+						        </ul>
+						    </li>
+						    <li class="nav-item dropdown">
+						        <a class="nav-link dropdown-toggle" href="#" id="trackingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+						            <strong>TRACKING</strong>
+						        </a>
+						        <ul class="dropdown-menu">
+						            <li><a class="dropdown-item" href="/dealer/map">Live Map</a></li>
+						            <li><a class="dropdown-item" href="/dealer/playback">Playback Track</a></li>
+						        </ul>
+						    </li>
+						    <li class="nav-item dropdown">
+						        <a class="nav-link dropdown-toggle" href="#" id="configDropdown" data-bs-toggle="dropdown">
+						            <strong>CONFIGURATION</strong>
+						        </a>
+						        <ul class="dropdown-menu">
+						            <li><a class="dropdown-item" href="/dealer/installation">Installation</a></li>
+						            <li><a class="dropdown-item" href="#renewal">Renewal</a></li>
+						        </ul>
+						    </li>
+						    <li class="nav-item dropdown">
+						        <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" data-bs-toggle="dropdown">
+						            <strong>REPORT</strong>
+						        </a>
+						        <ul class="dropdown-menu">
+						            <li><a class="dropdown-item" href="/dealer/event">Event & Violations</a></li>
+						            <li><a class="dropdown-item" href="/dealer/device_report">Installation Report</a></li>
+						            <li><a class="dropdown-item" href="/dealer/view_complaints">Complaint Report</a></li>
+						        </ul>
+						    </li>
+						    <li class="nav-item dropdown">
+						        <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" data-bs-toggle="dropdown">
+						            <strong>Users Management</strong>
+						        </a>
+						        <ul class="dropdown-menu">
+						            <li><a class="dropdown-item" href="/dealer/client_view">Client</a></li>
+						            <li><a class="dropdown-item" href="/dealer/user_view">User</a></li>
+						            <li><a class="dropdown-item" href="/dealer/driver_view">Driver</a></li>
+						        </ul>
+						    </li>
+						    <li class="nav-item dropdown">
+						        <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" data-bs-toggle="dropdown">
+						            <strong>NOTIFICATIONS</strong>
+						        </a>
+						        <ul class="dropdown-menu">
+						            <li><a class="dropdown-item" href="/dealer/alerts">Alerts</a></li>
+						        </ul>
+						    </li>
+						    <li class="nav-item dropdown">
+						        <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" data-bs-toggle="dropdown">
+						            <strong id="profileid">PROFILE</strong>
+						        </a>
+						        <ul class="dropdown-menu">
+						            <li><a class="dropdown-item" href="/dealer/profile_dealer">Profile</a></li>
+						            <li><a class="dropdown-item" href="/dealer/support">Register Complaints</a></li>
+						            <li>
+						                <a class="dropdown-item logout-item" onclick="logout()">
+						                    <i class="fas fa-sign-out-alt"></i> Logout
+						                </a>
+						            </li>
+						        </ul>
+						    </li>
+						    <li class="nav-item">
+						        <a class="nav-link" href="#" id="refreshPage">
+						            <strong><i class="fas fa-redo" id="refreshIcon"></i> REFRESH</strong>
+						        </a>
+						    </li>
+						</ul>
+
 		            </div>
 		        </div>
 		    </nav>

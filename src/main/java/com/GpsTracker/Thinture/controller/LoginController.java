@@ -3,7 +3,6 @@ package com.GpsTracker.Thinture.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
@@ -15,12 +14,15 @@ import org.springframework.web.servlet.ModelAndView;
 import com.GpsTracker.Thinture.model.*;
 import com.GpsTracker.Thinture.security.CustomUserDetails;
 import com.GpsTracker.Thinture.service.UserTypeFilterService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
 @Controller
 public class LoginController {
 
@@ -42,7 +44,8 @@ public class LoginController {
     public ModelAndView login(@RequestParam String username,
                               @RequestParam String password,
                               @RequestParam String usertype,
-                              HttpServletRequest request) {
+                              HttpServletRequest request,
+                              HttpServletResponse response) {   // ✅ Added HttpServletResponse
         logger.info("🔐 Login attempt - Username: {}, Selected Type: {}", username, usertype);
 
         if (loginAttempts.getOrDefault(username, 0) >= 5) {
@@ -67,10 +70,8 @@ public class LoginController {
             return new ModelAndView("login", "error", "Selected user type is incorrect for this account.");
         }
 
-        // ✅ Check status before password verification
         boolean isActive = switch (actualUserType) {
-            
-        case "SUPERADMIN" -> ((SuperAdmin) userObj).isStatus();
+            case "SUPERADMIN" -> ((SuperAdmin) userObj).isStatus();
             case "ADMIN" -> ((Admin) userObj).isStatus();
             case "DEALER" -> ((Dealer) userObj).isStatus();
             case "CLIENT" -> ((Client) userObj).isStatus();
@@ -81,7 +82,6 @@ public class LoginController {
         if (!isActive) {
             logger.warn("⛔ Login blocked - Inactive account for user: {}", username);
             return new ModelAndView("login", "error", "Your account is inactive. Please contact your Admin or Dealer.");
-
         }
 
         String encodedPassword = switch (actualUserType) {
@@ -100,6 +100,25 @@ public class LoginController {
         }
 
         logger.info("✅ Login successful - Username: {}, Role: {}, ID: {}", username, actualUserType, userId);
+
+        // ✅ Set userType cookie (clear old one if exists)
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("userType".equals(cookie.getName())) {
+                    cookie.setMaxAge(0);  // delete old cookie
+                    cookie.setPath("/");  // important: match the same path
+                    response.addCookie(cookie);
+                    logger.info("🧹 Deleted old userType cookie.");
+                }
+            }
+        }
+
+        Cookie userTypeCookie = new Cookie("userType", actualUserType);
+        userTypeCookie.setMaxAge(60 * 60); // 1 hour
+        userTypeCookie.setPath("/");       // ✅ must be '/'
+        response.addCookie(userTypeCookie);
+        logger.info("🍪 Set userType cookie: {}", actualUserType);
 
         CustomUserDetails customUserDetails = switch (actualUserType) {
             case "SUPERADMIN" -> new CustomUserDetails((SuperAdmin) userObj);
@@ -124,10 +143,10 @@ public class LoginController {
 
         return switch (actualUserType) {
             case "SUPERADMIN" -> new ModelAndView("redirect:/dashboard");
-            case "ADMIN" -> new ModelAndView("redirect:/dashboard_admin");
-            case "DEALER" -> new ModelAndView("redirect:/dashboard_dealer");
-            case "USER" -> new ModelAndView("redirect:/dashboard_user");
-            case "CLIENT" -> new ModelAndView("redirect:/dashboard_client");
+            case "ADMIN" -> new ModelAndView("redirect:/admin/dashboard");
+            case "DEALER" -> new ModelAndView("redirect:/dealer/dashboard");
+            case "USER" -> new ModelAndView("redirect:/user/dashboard_user");
+            case "CLIENT" -> new ModelAndView("redirect:/client/dashboard_client");
             default -> new ModelAndView("redirect:/login");
         };
     }

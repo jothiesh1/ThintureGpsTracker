@@ -37,115 +37,99 @@
 
 
 		            <div class="collapse navbar-collapse" id="navbarNav">
-		                <ul class="navbar-nav ms-auto">
-		                    <li class="nav-item">
-		                        <a class="nav-link" href="/dashboard_admin"><strong>HOME</strong></a>
-		                    </li>
-							<li class="nav-item dropdown">
-							    <a class="nav-link dropdown-toggle" href="#" id="managerDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-							        <strong>ADMIN</strong>
-							    </a>
-							    <ul class="dropdown-menu" aria-labelledby="managerDropdown">
-									
-																			<li><a class="dropdown-item" href="/adddealer_admin">New Dealer</a></li>
-																			<li><a class="dropdown-item" href="/addclient_admin">New Client</a></li>
-														                   <li> <a class="dropdown-item" href="/adduser_admin">New User</a></li>
-																		   <li><a class="dropdown-item" href="/adddriver_admin">New Driver</a></li>
-																		  
-							    </ul>
-							</li>
-							<li class="nav-item dropdown">
-												           <a class="nav-link dropdown-toggle" href="#" id="configDropdown" data-bs-toggle="dropdown">
-											               <strong>ASSIGN DEVICES</strong>
-													        </a>
-															<ul class="dropdown-menu">
-																<li><a class="dropdown-item" href="/add_devices_dealer_admin">Add Device To Dealer</a></li>
-																<li><a class="dropdown-item" href="/add_devices_client_admin">Add Device To Client</a></li>
-																<li><a class="dropdown-item" href="/addrfid_admin_dealer">Add RFID To Dealer</a></li>
-																<li><a class="dropdown-item" href="/addrfid_admin_client">Add RFID To Client</a></li>
-																					                          
-																					                       </ul>
-																					                   </li>
-		                    <li class="nav-item dropdown">
-		                        <a class="nav-link dropdown-toggle" href="#" id="trackingDropdown" role="button"
-		                            data-bs-toggle="dropdown" aria-expanded="false">
-		                            <strong>TRACKING</strong>
-		                        </a>
-		                        <ul class="dropdown-menu">
-		                            <li><a class="dropdown-item" href="/map_admin">Live Map</a></li>
-		                            <li><a class="dropdown-item" href="/replay_admin">Playback Track</a></li>
-		                         
-									
-									   <li><a class="dropdown-item" href="/map7">maptest</a></li>
-									   <li><a class="dropdown-item" href="/map_view">map_view</a></li>
-									   <li><a class="dropdown-item" href="/device_logs">device_logs</a></li>
-									   <li><a class="dropdown-item" href="/daily_km_chart">/daily_km_chart</a></li>
-									   
-									   
-									   <li><a class="dropdown-item" href="/daily_km_chart">map_view</a></li>
-									   
-									   
-		                        </ul>
-		                    </li>
-							<li class="nav-item dropdown">
-							                       <a class="nav-link dropdown-toggle" href="#" id="configDropdown" data-bs-toggle="dropdown">
-							                           <strong>CONFIGURATION</strong>
-							                       </a>
-							                       <ul class="dropdown-menu">
-							                           <li><a class="dropdown-item" href="/install_admin">Install</a></li>
-							                          <!-- <li><a class="dropdown-item" href="/renewal">Renewal</a></li>-->
-							                          
-							                       </ul>
-							                   </li>
-											   <li class="nav-item dropdown">
-											                         <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" data-bs-toggle="dropdown">
-											                             <strong>REPORT</strong>
-											                         </a>
-											                         <ul class="dropdown-menu">
-											                             <li><a class="dropdown-item" href="/event_admin">Event & Violations</a></li>
-																		 <li><a class="dropdown-item" href="/install_report_admin">Installation Report</a></li>
-																		 
-																		 <li><a class="dropdown-item" href="/view_admin_complaints">view complaints </a></li>
-																		 
-											                         </ul>
-											                     </li>
-																 <li class="nav-item dropdown">
-																  <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" data-bs-toggle="dropdown">
-																 	<strong>Users Management</strong>
-																  </a>
-																 <ul class="dropdown-menu">
-																	
-																	
-																	<li><a class="dropdown-item" href="/dealer_view_admin">Dealer</a></li>
-																																  <li><a class="dropdown-item" href="/client_view_admin">Client</a></li>
-																																  <li><a class="dropdown-item" href="/user_view_admin">User</a></li>
-																																  <li><a class="dropdown-item" href="/admin_view_driver">driver</a></li>
-																																  
-																 </ul>
-																 </li>
-																 <li class="nav-item dropdown">
-																 															 <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" data-bs-toggle="dropdown">
-																 															 <strong>NOTIFICATIONS</strong>
-																 															  </a>
-																 															  <ul class="dropdown-menu">
-																 																<li><a class="dropdown-item" href="/alert_admin">Alerts</a></li>																 																 										                             
-																 																</ul>													 																 																	 
-																 																</li>																	 																 										                       
-																 															  		
-											                     <li class="nav-item dropdown">
-											                         <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" data-bs-toggle="dropdown">
-											                             <strong id="profileid">PROFILE</strong>
-											                         </a>
-											                         <ul class="dropdown-menu">
-											                             <li><a class="dropdown-item" href="">Profile</a></li>
-																		 <li><a class="dropdown-item" href="/view_admin_complaints">support</a></li>
-																		 
-											                             <li>																		 <a class="dropdown-item logout-item" onclick="logout()">
-																		 																		    <i class="fas fa-sign-out-alt"></i> Logout
-																		 																		  </a></li>
-											                         </ul>
-											                     </li>
-		                </ul>
+						<ul class="navbar-nav ms-auto">
+						    <li class="nav-item" id="menu-home">
+						        <a class="nav-link" href="/admin/dashboard"><strong>HOME</strong></a>
+						    </li>
+						    <li class="nav-item dropdown" id="menu-admin">
+						        <a class="nav-link dropdown-toggle" href="#" id="managerDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+						            <strong>ADMIN</strong>
+						        </a>
+						        <ul class="dropdown-menu" aria-labelledby="managerDropdown">
+						            <li><a class="dropdown-item" href="/admin/adddealer">New Dealer</a></li>
+						            <li><a class="dropdown-item" href="/admin/addclient">New Client</a></li>
+						            <li><a class="dropdown-item" href="/admin/adduser">New User</a></li>
+						            <li><a class="dropdown-item" href="/admin/adddriver">New Driver</a></li>
+						        </ul>
+						    </li>
+						    <li class="nav-item dropdown" id="menu-assign-device">
+						        <a class="nav-link dropdown-toggle" href="#" id="configDropdown" data-bs-toggle="dropdown">
+						            <strong>ASSIGN DEVICES</strong>
+						        </a>
+						        <ul class="dropdown-menu">
+						            <li><a class="dropdown-item" href="/admin/add_devices_dealer">Add Device To Dealer</a></li>
+						            <li><a class="dropdown-item" href="/admin/add_devices_client">Add Device To Client</a></li>
+						            <li><a class="dropdown-item" href="/admin/addrfid_dealer">Add RFID To Dealer</a></li>
+						            <li><a class="dropdown-item" href="/admin/addrfid_client">Add RFID To Client</a></li>
+						        </ul>
+						    </li>
+						    <li class="nav-item dropdown" id="menu-tracking">
+						        <a class="nav-link dropdown-toggle" href="#" id="trackingDropdown" role="button"
+						           data-bs-toggle="dropdown" aria-expanded="false">
+						            <strong>TRACKING</strong>
+						        </a>
+						        <ul class="dropdown-menu">
+						            <li><a class="dropdown-item" href="/admin/map">Live Map</a></li>
+						            <li><a class="dropdown-item" href="/admin/replay">Playback Track</a></li>
+						            <li><a class="dropdown-item" href="/map7">maptest</a></li>
+						            <li><a class="dropdown-item" href="/map_view">map_view</a></li>
+						            <li><a class="dropdown-item" href="/device_logs">device_logs</a></li>
+						            <li><a class="dropdown-item" href="/daily_km_chart">/daily_km_chart</a></li>
+						        </ul>
+						    </li>
+						    <li class="nav-item dropdown" id="menu-configuration">
+						        <a class="nav-link dropdown-toggle" href="#" id="configDropdown" data-bs-toggle="dropdown">
+						            <strong>CONFIGURATION</strong>
+						        </a>
+						        <ul class="dropdown-menu">
+						            <li><a class="dropdown-item" href="/admin/install">Install</a></li>
+						        </ul>
+						    </li>
+						    <li class="nav-item dropdown" id="menu-report">
+						        <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" data-bs-toggle="dropdown">
+						            <strong>REPORT</strong>
+						        </a>
+						        <ul class="dropdown-menu">
+						            <li><a class="dropdown-item" href="/admin/event">Event & Violations</a></li>
+						            <li><a class="dropdown-item" href="/admin/install_report">Installation Report</a></li>
+						            <li><a class="dropdown-item" href="/admin/view_complaints">View Complaints</a></li>
+						        </ul>
+						    </li>
+						    <li class="nav-item dropdown" id="menu-users">
+						        <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" data-bs-toggle="dropdown">
+						            <strong>Users Management</strong>
+						        </a>
+						        <ul class="dropdown-menu" id="menu-users">
+						            <li><a class="dropdown-item" href="/admin/dealer_view">Dealer</a></li>
+						            <li><a class="dropdown-item" href="/admin/client_view">Client</a></li>
+						            <li><a class="dropdown-item" href="/admin/user_view">User</a></li>
+						            <li><a class="dropdown-item" href="/admin/driver_view">Driver</a></li>
+						        </ul>
+						    </li>
+						    <li class="nav-item dropdown" id="menu-notifications">
+						        <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" data-bs-toggle="dropdown">
+						            <strong>NOTIFICATIONS</strong>
+						        </a>
+						        <ul class="dropdown-menu">
+						            <li><a class="dropdown-item" href="/admin/alert">Alerts</a></li>
+						        </ul>
+						    </li>
+						    <li class="nav-item dropdown"  id="menu-profile">
+						        <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" data-bs-toggle="dropdown">
+						            <strong id="profileid">PROFILE</strong>
+						        </a>
+						        <ul class="dropdown-menu">
+						            <li><a class="dropdown-item" href="/admin/profile_admin">Profile</a></li>
+						            <li><a class="dropdown-item" href="/admin/view_complaints">Support</a></li>
+						            <li>
+						                <a class="dropdown-item logout-item" onclick="logout()">
+						                    <i class="fas fa-sign-out-alt"></i> Logout
+						                </a>
+						            </li>
+						        </ul>
+						    </li>
+						</ul>
+
 		            </div>
 		        </div>
 		    </nav>
@@ -270,14 +254,69 @@
 </script>
 
 <script>
-		    document.getElementById('backward-button').addEventListener('click', () => {
-		        window.history.back();
-		    });
+  const API_URL = "/api/users/admin";
 
-		    document.getElementById('forward-button').addEventListener('click', () => {
-		        window.history.forward();
-		    });
-		</script>
+  async function fetchAdminAndToggleMenu() {
+    try {
+      const response = await fetch(API_URL);
+      if (!response.ok) throw new Error("Failed to fetch admin data");
+
+      const data = await response.json();
+
+      // ✅ Fix: If API returns a list, get the first admin
+      const admin = Array.isArray(data) ? data[0] : data;
+
+      if (!admin || !admin.id) throw new Error("No admin ID found in response");
+
+      const adminId = String(admin.id);
+      localStorage.setItem("adminid", adminId);
+      console.log("✅ Admin ID saved:", adminId);
+
+      // Menu toggle logic
+      const allMenuIds = [
+        "menu-home",
+        "menu-admin",
+        "menu-assign-device",
+        "menu-tracking",
+        "menu-configuration",
+        "menu-report",
+        "menu-users",
+        "menu-notifications",
+        "menu-profile"
+      ];
+
+      const limitedMenuIds = [
+	  "menu-home",
+        "menu-admin",
+        "menu-assign-device",
+        "menu-profile"
+      ];
+
+      allMenuIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = "none";
+      });
+
+      if (adminId === "1" || adminId === "2") {
+        allMenuIds.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = "block";
+        });
+      } else {
+        limitedMenuIds.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = "block";
+        });
+      }
+
+    } catch (err) {
+      console.error("❌ Error loading admin:", err.message);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", fetchAdminAndToggleMenu);
+</script>
+
 
 
 

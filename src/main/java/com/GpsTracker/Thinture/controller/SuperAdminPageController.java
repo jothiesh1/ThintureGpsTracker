@@ -183,10 +183,10 @@ public class SuperAdminPageController {
     }
     
 
-    @GetMapping("/superadmin/alert")
+    @GetMapping("/superadmin/alerts")
     public String showAlert() {
-        logger.info("🔹 Accessed SuperAdmin - alert   ");
-        return "superadmin/alert";
+        logger.info("🔹 Accessed SuperAdmin - alerts   ");
+        return "superadmin/alerts";
     }
     
     
@@ -214,6 +214,11 @@ public class SuperAdminPageController {
 	    }
 	  
 	  
+	  @GetMapping("/superadmin/profile_superadmin")
+	    public String showProfile() {
+	        logger.info("🔹 Accessed SuperAdmin - profile   ");
+	        return "superadmin/profile_superadmin";
+	    }
 
 		/*Original Map
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

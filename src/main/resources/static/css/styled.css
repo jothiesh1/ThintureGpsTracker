@@ -118,10 +118,14 @@
 @media (min-width: 1200px) {
     .navbar {
 		background: linear-gradient(
-		       135deg,
+		       115deg,
 		       rgba(255, 255, 255, 1.5), 
-		       rgba(255, 255, 255, 1.5),
+		       rgba(255, 255, 255, 4.5),
+			   
+			   rgba(15, 32, 65, 1.9),
+			   rgba(15, 32, 65, 1.9),
 		       rgba(15, 32, 65, 1.9),
+			   rgba(15, 32, 65, 1.6),
 		       rgba(15, 32, 65, 1.6),
 		       rgba(15, 32, 65, 1.6),
 		       rgba(15, 32, 65, 1.6),
@@ -315,7 +319,7 @@
 	
 
 	.navbar-nav .nav-link {
-	        font-size:11px;
+	        font-size:10px;
 			color: white;
 	        padding: 1px;
 			right: 0px;

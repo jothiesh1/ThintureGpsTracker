@@ -74,7 +74,7 @@
 		</style>
 </head>
 <body>
-	<header th:replace="~{navigation :: navbar}"></header>
+	<header th:replace="~{navigation_client :: navbar_client}"></header>
 	
 	
 	
@@ -82,7 +82,7 @@
 	<div class="profile-card">
 	   <img src="/THINTURE_IMAGE/pro.png" alt="Fleet Tracking Logo" class="profile-pic">
 	   <div class="profile-info">
-	     <h5 id="companyName">Not Available</h5>
+	     <h5 id="companyName">CLIENT</h5>
 	     <p><strong>Email:</strong> <span id="email">Not Available</span></p>
 	     <p><strong>Address:</strong> <span id="address">Not Available</span></p>
 	     <p><strong>Phone:</strong> <span id="phone">Not Available</span></p>
@@ -92,15 +92,7 @@
 
 	 <script>
 	   // Simulated user data (replace this with your backend data or PHP variables)
-	   const user = {
-	     photo: "", // Add image URL if available
-	     companyName: undefined,
-	     email: "vijesh@redtronicllc.com",
-	     address: "q",
-	     phone: "111",
-	     country: "q"
-	   };
-
+	  
 	   document.getElementById("companyName").textContent = user.companyName || "Not Available";
 	   document.getElementById("email").textContent = user.email || "Not Available";
 	   document.getElementById("address").textContent = user.address || "Not Available";

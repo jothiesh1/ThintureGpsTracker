@@ -85,7 +85,49 @@ public class Vehicle extends BaseEntity {
 	    private String addressPhone;
 	    private String country;
 	    private String clientName;
-	    public String getClientName() {
+	    
+		@Column(name = "superadmin_id")
+		private Long superadmin_id;
+
+		@Column(name = "dealer_id")
+		private Long dealer_id;
+
+		@Column(name = "client_id")
+		private Long client_id;
+
+	
+
+		@Column(name = "user_id")
+		private Long user_id;
+
+		@Column(name = "driver_id")
+		private Long driver_id;
+
+		@ManyToOne(fetch = FetchType.LAZY)
+		@JoinColumn(name = "driver_id", insertable = false, updatable = false)
+		private Driver driver;
+
+
+		@Override public Long getAdmin_id() { return admin_id; }
+		@Override public void setAdmin_id(Long admin_id) { this.admin_id = admin_id; }
+
+		@Override public Long getDealer_id() { return dealer_id; }
+		@Override public void setDealer_id(Long dealer_id) { this.dealer_id = dealer_id; }
+
+		@Override public Long getClient_id() { return client_id; }
+		@Override public void setClient_id(Long client_id) { this.client_id = client_id; }
+
+		@Override public Long getSuperadmin_id() { return superadmin_id; }
+		@Override public void setSuperadmin_id(Long superadmin_id) { this.superadmin_id = superadmin_id; }
+
+		@Override public Long getUser_id() { return user_id; }
+		@Override public void setUser_id(Long user_id) { this.user_id = user_id; }
+
+		@Override public Long getDriver_id() { return driver_id; }
+		@Override public void setDriver_id(Long driver_id) { this.driver_id = driver_id; }
+
+		
+		public String getClientName() {
 			return clientName;
 		}
 
@@ -288,47 +330,6 @@ public class Vehicle extends BaseEntity {
 		public void setUser(User user) {
 			this.user = user;
 		}
-		@Column(name = "superadmin_id")
-		private Long superadmin_id;
-
-		@Column(name = "dealer_id")
-		private Long dealer_id;
-
-		@Column(name = "client_id")
-		private Long client_id;
-
-	
-
-		@Column(name = "user_id")
-		private Long user_id;
-
-		@Column(name = "driver_id")
-		private Long driver_id;
-
-		@ManyToOne(fetch = FetchType.LAZY)
-		@JoinColumn(name = "driver_id", insertable = false, updatable = false)
-		private Driver driver;
-
-
-		@Override public Long getAdmin_id() { return admin_id; }
-		@Override public void setAdmin_id(Long admin_id) { this.admin_id = admin_id; }
-
-		@Override public Long getDealer_id() { return dealer_id; }
-		@Override public void setDealer_id(Long dealer_id) { this.dealer_id = dealer_id; }
-
-		@Override public Long getClient_id() { return client_id; }
-		@Override public void setClient_id(Long client_id) { this.client_id = client_id; }
-
-		@Override public Long getSuperadmin_id() { return superadmin_id; }
-		@Override public void setSuperadmin_id(Long superadmin_id) { this.superadmin_id = superadmin_id; }
-
-		@Override public Long getUser_id() { return user_id; }
-		@Override public void setUser_id(Long user_id) { this.user_id = user_id; }
-
-		@Override public Long getDriver_id() { return driver_id; }
-		@Override public void setDriver_id(Long driver_id) { this.driver_id = driver_id; }
-
-		
 		
 		
 		@Column(name = "renewalDate")

@@ -59,7 +59,23 @@ public class VehicleLastLocation extends BaseEntity {
     
     
     private String speed ;
-    
+      
+    @Column(name = "serial_no")
+    private String serialNo;
+
+    @Column(name = "imei")
+    private String imei;
+
+    // Add getters and setters
+    public String getSerialNo() {
+        return serialNo;
+    }
+
+    public void setSerialNo(String serialNo) {
+        this.serialNo = serialNo;
+    }
+
+  
  public String getSpeed() {
 		return speed;
 	}
@@ -189,6 +205,13 @@ public Admin getAdmin() {
 	@Override public Long getDriver_id() { return driver_id; }
 	@Override public void setDriver_id(Long driver_id) { this.driver_id = driver_id; }
 
-	
+	public String getImei() {
+	    return imei;
+	}
+
+	public void setImei(String imei) {
+	    this.imei = imei;
+	}
+
 	
 }

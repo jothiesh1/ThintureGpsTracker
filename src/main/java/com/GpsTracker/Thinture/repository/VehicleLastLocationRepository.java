@@ -17,8 +17,11 @@ import java.util.Optional;
 
 @Repository
 public interface VehicleLastLocationRepository extends BaseRestrictedRepository<VehicleLastLocation, Long> {
-
-
+	 //code imie 
+    
+	  
+	  Optional<VehicleLastLocation> findByImei(String imei);
+	
     /**
      * Fetch all records.
      * @return List of VehicleLastLocation.
@@ -47,4 +50,6 @@ public interface VehicleLastLocationRepository extends BaseRestrictedRepository<
     @Query("SELECT v FROM VehicleLastLocation v WHERE v.deviceId = :deviceId ORDER BY v.timestamp DESC")
     VehicleLastLocation findTopByDeviceIDOrderByTimestampDesc(@Param("deviceId") String deviceId);
 
+    
+   
 }

@@ -2,6 +2,7 @@ package com.GpsTracker.Thinture.model;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,6 +38,17 @@ public class GpsData implements Serializable {
 	private String gsmStrength;
     // Getters and Setters
 
+	// :CODE IMEI
+	  @JsonProperty("IMEI")  
+	private String imei;  // ✅ Add this field
+
+	public String getImei() {
+	    return imei;
+	}
+
+	public void setImei(String imei) {
+	    this.imei = imei;
+	}
 
 
 
@@ -199,6 +211,7 @@ public class GpsData implements Serializable {
     public String toString() {
         return "GpsData{" +
                 "DeviceID='" + deviceID + '\'' +
+                "imei='" + imei + '\'' +
                 ", timestamp='" + timestamp + '\'' +
                 ", DataValidity='" + dataValidity + '\'' +
                 ", status='" + status + '\'' +

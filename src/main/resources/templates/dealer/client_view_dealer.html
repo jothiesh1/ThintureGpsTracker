@@ -18,9 +18,9 @@
  
  
  
- dealerPageViewController
+ 
   <div class="card">
-    <h2>Dealers Management</h2>
+    <h2>Client Management</h2>
 
     <div class="mb-3">
       <input type="text" id="searchInput" class="form-control" placeholder="Search dealers..." />
@@ -54,7 +54,8 @@
   </div>
 
   <script>
-    const API_URL = "/api/users/dealer";
+	const API_URL = "/api/users/client";
+
     const ROWS_PER_PAGE = 10;
     let currentPage = 1;
     let dealersData = [];

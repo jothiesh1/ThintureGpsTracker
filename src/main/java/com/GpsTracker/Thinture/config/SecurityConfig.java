@@ -1,5 +1,6 @@
 package com.GpsTracker.Thinture.config;
-import java.util.List;
+
+import com.GpsTracker.Thinture.security.CookieValidationFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -13,11 +14,20 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
+    private final CookieValidationFilter cookieValidationFilter;
+
+    public SecurityConfig(CookieValidationFilter cookieValidationFilter) {
+        this.cookieValidationFilter = cookieValidationFilter;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -27,6 +37,7 @@ public class SecurityConfig {
             .csrf().disable()
             .authorizeRequests(auth -> {
                 auth
+                    // ✅ Public URLs (no login required)
                     .requestMatchers(
                         "/login",
                         "/forgot_password",
@@ -38,52 +49,49 @@ public class SecurityConfig {
                         "/js/**",
                         "/static/**",
                         "/firmware/**",
-                        "/firmware/main.hex"   // ✅ Public access to OTA hex file
+                        "/firmware/main.hex",
+                        "/access-denied"
                     ).permitAll()
                     .requestMatchers(HttpMethod.POST, "/login").permitAll()
 
-                    // Role-based dashboards
-                    .requestMatchers("/dashboard").hasAnyRole("SUPERADMIN")
-                    .requestMatchers("/dashboard_admin").hasRole("ADMIN")
-                    .requestMatchers("/dashboard_dealer").hasRole("DEALER")
-                    .requestMatchers("/dashboard_client").hasRole("CLIENT")
-                    .requestMatchers("/dashboard_user").hasRole("USER")
-                    // ✅ Logs API + Logs Viewer page access for SUPERADMIN and ADMIN only
-                    .requestMatchers("/api/logs/**").hasAnyRole("SUPERADMIN", "ADMIN")
-                    .requestMatchers("/serverLogs.html").hasAnyRole("SUPERADMIN", "ADMIN")
-                    // Everything else needs authentication
-                    .anyRequest().authenticated();
+                    // 🚨 ✅ ✅ 🚨 BLOCK *ONLY* PAGE URLs (NOT APIs)
+                    // Make sure your pages are grouped like this:
+                    .requestMatchers("/superadmin/page/**").hasRole("SUPERADMIN")
+                    .requestMatchers("/admin/page/**").hasRole("ADMIN")
+                    .requestMatchers("/dealer/page/**").hasRole("DEALER")
+                    .requestMatchers("/client/page/**").hasRole("CLIENT")
+                    .requestMatchers("/user/page/**").hasRole("USER")
 
-                logger.info("🔐 Role-based access configured.");
+                    // ✅ Everything else (like APIs) stays allowed if authenticated
+                    .anyRequest().authenticated();
             })
             .formLogin(form -> {
                 form
                     .loginPage("/login")
-                    .loginProcessingUrl("/noop") // disables default Spring login
+                    .loginProcessingUrl("/noop")
                     .failureUrl("/login?error=true")
                     .permitAll();
-                logger.info("🔐 Login form configuration set.");
             })
             .logout(logout -> {
                 logout
                     .logoutUrl("/logout")
                     .logoutSuccessUrl("/login?logout=true")
                     .permitAll();
-                logger.info("🔐 Logout configuration set.");
-            });
+            })
+            .exceptionHandling(exception -> exception.accessDeniedPage("/access-denied"))
+            .addFilterBefore(cookieValidationFilter, UsernamePasswordAuthenticationFilter.class);
 
         logger.info("✅ Security filter chain initialized successfully.");
         return http.build();
     }
 
+
     @Bean
     public DaoAuthenticationProvider authenticationProvider(UserDetailsService userDetailsService) {
         logger.info("🔧 Setting up Authentication Provider...");
-
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
-
         logger.info("✅ Authentication Provider ready.");
         return provider;
     }
@@ -96,10 +104,13 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        logger.warn("⚠ Using NoOpPasswordEncoder: Plain text passwords enabled.");
-        return NoOpPasswordEncoder.getInstance(); // only for testing
+        logger.warn("⚠ Using NoOpPasswordEncoder: Plain text passwords enabled. ⚠");
+        return NoOpPasswordEncoder.getInstance(); // Change to BCrypt in production
     }
 }
+
+
+
 
 /*
 @Configuration

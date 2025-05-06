@@ -90,21 +90,24 @@ public class AddDevicesClientController {
                 throw new IllegalArgumentException("❌ Missing required parameters: serialNumbers, clientId");
             }
 
-            List<String> serialNumbers = (List<String>) payload.get("serialNumbers");
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> serialNumbers = (List<Map<String, Object>>) payload.get("serialNumbers");
             Long clientId = Long.parseLong(payload.get("clientId").toString());
 
-            // ✅ Call VehicleService Instead of ClientService
-            vehicleService.addDualVehicles(serialNumbers, clientId);
+            // ✅ Use your existing service method that handles Map<String, Object>
+            vehicleService.addDualClientVehicles(serialNumbers, clientId);
 
             response.put("success", "true");
             response.put("message", "Dual vehicles added successfully for client.");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            logger.error("❌ Exception in /add-dual: {}", e.getMessage(), e);  // 🚨 Add this to log exceptions
             response.put("success", "false");
             response.put("message", "Failed to add dual vehicles: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
+
 
     /**
      * Fetch all clients with their names and IDs.

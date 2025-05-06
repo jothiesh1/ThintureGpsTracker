@@ -1,292 +1,425 @@
-#map { height: 100%; width: 100%; position: absolute; top: 0; left: 0; z-index: 0; }
-/* Start panel hidden */
-/* Panel - hidden by default, slides from right */
-.modern-panel {
-  position: fixed;
-  top: 120px;
-  right: -320px; /* hidden */
-  width: 320px;
-  height: calc(100vh - 120px);
-  background: linear-gradient(
-  																					 	     135deg,
-  																					 	    
-  																					 	     rgba(15, 32, 65, 0.8),
-  																					 	     rgba(15, 32, 65, 0.8),
-  																					 	     rgba(15, 32, 65, 0.8)
-  																					 	 );
-  padding: 15px;
-  color: white;
-  overflow-y: auto;
-  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  transition: right 0.3s ease-in-out;
-}
-@media (max-width: 576px) {
-  input, select, .button {
-    font-size: 14px;
-    padding: 6px;
-  }
-
-  .button, .btn {
-    font-size: 14px;
-    padding: 8px;
-  }
-
-  .modern-panel {
-    padding: 10px;
-  }
-
-  #progress-bar {
-    height: 10px;
-  }
-}
-@media (max-width: 768px) {
-  .tab-button {
-    flex: 1 0 48%; /* Allow buttons to wrap */
-    font-size: 14px;
-    padding: 8px;
-  }
-
-  .modern-panel {
-    top: 80px;
-    height: calc(100vh - 80px);
-  }
-
-  #mapSwitcher {
-    top: auto;
-    bottom: 20px;
-    right: 20px;
-    flex-direction: row;
-    width: auto;
-    height: auto;
-    gap: 10px;
-  }
-
-  .panel-toggle-button {
-    top: auto;
-    bottom: 80px;
-  }
-}
-@media (max-width: 576px) {
-  input, select, .button {
-    font-size: 14px;
-    padding: 6px;
-  }
-
-  .button, .btn {
-    font-size: 14px;
-    padding: 8px;
-  }
-
-  .modern-panel {
-    padding: 10px;
-  }
-
-  #progress-bar {
-    height: 10px;
-  }
-}
-
-/* When panel is shown */
-.modern-panel.show {
-  right: 0;
-}
-
-/* Toggle button positioned at edge of panel */
-.panel-toggle-button {
-  position: fixed;
-  top: 200px;
-  right: 20px;
-  width: 79px;
-  height: 45px;
-  z-index: 1100;
-  background: linear-gradient(
-  	 	     135deg,
-  	 	    
-  	 	     rgba(15, 32, 65, 1.6),
-  	 	     rgba(15, 32, 65, 1.6),
-  	 	     rgba(15, 32, 65, 1.6)
-  	 	 );
-  color: white;
-  border: none;
-  border-radius: 8px 0 0 8px;
-  cursor: pointer;
-  transition: right 0.3s ease-in-out;
-  font-size: 18px;
-}
-
-/* When panel is open, move button with it */
-.panel-toggle-button.open {
-  right: 320px;
-}
+#map {
+          width: 100%;
+          height: 100vh;
+      }
+      
+      /* Improved Speedometer positioning */
+      #speedometer-toggle-wrapper {
+          position: absolute;
+          top: 340px;
+          right: 20px;
+          z-index: 10001;
+          background: rgba(255, 255, 255, 0.8);
+          padding: 8px;
+          border-radius: 8px;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+          cursor: pointer;
+      }
+      
+	#speedometer-container {
+	    position: absolute;
+	    bottom: 20px;
+	    left: 20px;
+	
+	    z-index: 9999;
+	    
+	    border-radius: 10px;
+	   
+	    padding: 15px;
+	    width: 250px;
+	    opacity: 1 !important;
+	    visibility: visible !important;
+	    transform: translateY(0) !important;
+	}
 
 
-   .tabs { display: flex; justify-content: space-between; margin-bottom: 10px; }
-   .tab-button {
-     flex: 1; padding: 10px; cursor: pointer; background: #eee;
-     border: none; font-weight: bold; border-radius: 8px 8px 0 0; transition: 0.3s;
-   }
-   .tab-button.active { 	background: linear-gradient(
-	 	     135deg,
-	 	    
-	 	     rgba(15, 32, 65, 1.6),
-	 	     rgba(15, 32, 65, 1.6),
-	 	     rgba(15, 32, 65, 1.6)
-	 	 ); color: white; }
-   .tab-content { display: none; }
-   .tab-content.active-tab { display: block; animation: fadeIn 0.3s ease-in-out; }
-   input, select, .button { width: 100%; margin-bottom: 10px; padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
-   .button {
-	background: linear-gradient(
-		 	     135deg,
-		 	    
-		 	     rgba(15, 32, 65, 1.6),
-		 	     rgba(15, 32, 65, 1.6),
-		 	     rgba(15, 32, 65, 1.6)
-		 	 ); color: white; border: none; border-radius: 8px; cursor: pointer;
-   }
-  
-   .legend {
-     position: absolute; display: none; bottom: 10px; left: 10px; background: white;
-     padding: 10px; border-radius: 5px; font-size: 14px; z-index: 1000;
-     box-shadow: 0 0 5px rgba(0,0,0,0.2);
-   }
-   .legend div { margin-bottom: 5px; }
-   .legend span { display: inline-block; width: 12px; height: 12px; margin-right: 5px; }
-/* Responsive panel behavior */
-@media (max-width: 768px) {
-  .modern-panel {
-    right: -100%;
-    transition: right 0.3s ease-in-out;
-    height: 100vh;
-    width: 100%;
-  }
+      #speedometer-container.visible {
+          opacity: 1;
+          visibility: visible;
+          transform: translateY(0);
+      }
 
-  .modern-panel.show {
-    right: 0;
-  }
-}
-.leaflet-tile {
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  outline: none !important;
-  image-rendering: pixelated;
-}
-.leaflet-tile {
-  transform: translateZ(0);
-}
-.leaflet-tile-container {
-  will-change: transform;
-}
-.btn{
-	background: linear-gradient(
-		 	     135deg,
-		 	    
-		 	     rgba(15, 32, 65, 1.6),
-		 	     rgba(15, 32, 65, 1.6),
-		 	     rgba(15, 32, 65, 1.6)
-		 	 );
-			 color: white;
-}
-#progress-bar{
-	background: linear-gradient(
-				 	     135deg,
-				 	    
-				 	     rgba(15, 32, 65, 1.6),
-				 	     rgba(15, 32, 65, 1.6),
-				 	     rgba(15, 32, 65, 1.6)
-				 	 );
-}
-#mapSwitcher {
-				    position: fixed;
-				    top: 280px; /* Adjust based on your navbar height */
-				    right: 20px;
-					width:79px;
-					height: 45px;
-				    z-index: 1000;
-					background: linear-gradient(
-								 	     135deg,
-								 	    
-								 	     rgba(15, 32, 65, 1.6),
-								 	     rgba(15, 32, 65, 1.6),
-								 	     rgba(15, 32, 65, 1.6)
-								 	 );
-				    padding: 10px;
-				    border-radius: 10px;
-				    display: flex;
-				    flex-direction: column;
-				    gap: 5px;
-					color: white;
-				}
-				
-				.map-button{
-					background: linear-gradient(
-														 	     135deg,
-														 	    
-														 	     rgba(15, 32, 65, 1.6),
-														 	     rgba(15, 32, 65, 1.6),
-														 	     rgba(15, 32, 65, 1.6)
-														 	 );
-															 color: white;
-				}
-				/* 🌙 Custom Flatpickr Theme to Match Dark Blue */
-				.flatpickr-calendar {
-					background: linear-gradient(
-																				 	     135deg,
-																				 	    
-																				 	     rgba(15, 32, 65, 1.6),
-																				 	     rgba(15, 32, 65, 1.6),
-																				 	     rgba(15, 32, 65, 1.6)
-																				 	 );
-				  border: 1px solid #0f2041 !important;
-				  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
-				  color:white;
-				  font-family: 'Segoe UI', sans-serif;
-				}
+      #speedDisplay {
+          font-size: 1.4rem;
+          font-weight: bold;
+          color: rgb(0, 0, 64);
+          margin-top: 10px;
+          text-align: center;
+          text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+      }
 
-				.flatpickr-months,
-				.flatpickr-weekdays {
-					color: #fff;
-					background-color: azure;
-				 
-				  border-bottom: 1px solid #1e365e;
-				}
+      canvas {
+          display: block;
+          width: 100%;
+          height: auto;
+          border-radius: 8px;
+      }
 
-				.flatpickr-day {
-				  background: transparent;
-				  color:white !important;
-				  border-radius: 6px;
-				}
+      #toggleSpeedometer {
+          font-size: 24px;
+          color: rgb(0,0,64);
+          cursor: pointer;
+      }
+      
+      /* Export buttons */
+      .export-buttons {
+          margin-top: 15px;
+          display: flex;
+          justify-content: space-between;
+      }
+      
+      .export-btn {
+          padding: 8px 12px;
+          background-color: #007bff;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 14px;
+          transition: background-color 0.2s;
+      }
+      
+      .export-btn:hover {
+          background-color: #0056b3;
+      }
+      
+      /* Modern panel improvements */
+      .modern-panel {
+          max-height: 80vh;
+          overflow-y: auto;
+      }
+      
+      /* Trip statistics */
+      .trip-stats {
+          background-color: #f8f9fa;
+          border-radius: 8px;
+          padding: 10px;
+          margin-top: 10px;
+      }
+      
+      /* Add styling for trip stat items */
+      .stat-item {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 5px;
+          border-bottom: 1px solid #eee;
+          padding-bottom: 5px;
+      }
+      
+      .stat-label {
+          font-weight: bold;
+      }
+      
+      /* Legend improvements */
+      .legend {
+          background-color: rgba(255, 255, 255, 0.9);
+          padding: 10px;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      
+      /* Heatmap toggle */
+      #heatmap-toggle {
+          position: absolute;
+          top: 20px;
+          left: 80px;
+          z-index: 1000;
+          background: white;
+          padding: 6px 10px;
+          border-radius: 4px;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+          font-size: 14px;
+          cursor: pointer;
+      }
+	  #map { height: 100%; width: 100%; position: absolute; top: 0; left: 0; z-index: 0; }
+	  /* Start panel hidden */
+	  /* Panel - hidden by default, slides from right */
+	  .modern-panel {
+	    position: fixed;
+	    top: 120px;
+	    right: -320px; /* hidden */
+	    width: 320px;
+	    height: calc(100vh - 120px);
+	    background: linear-gradient(
+	    																					 	     135deg,
+	    																					 	    
+	    																					 	     rgba(15, 32, 65, 0.8),
+	    																					 	     rgba(15, 32, 65, 0.8),
+	    																					 	     rgba(15, 32, 65, 0.8)
+	    																					 	 );
+	    padding: 15px;
+	    color: white;
+	    overflow-y: auto;
+	    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+	    z-index: 1000;
+	    transition: right 0.3s ease-in-out;
+	  }
+	  @media (max-width: 576px) {
+	    input, select, .button {
+	      font-size: 14px;
+	      padding: 6px;
+	    }
 
-				.flatpickr-day:hover,
-				.flatpickr-day.today {
-				  background: #1e365e !important;
-				  color: #fff !important;
-				}
+	    .button, .btn {
+	      font-size: 14px;
+	      padding: 8px;
+	    }
 
-				.flatpickr-day.selected {
-					background: linear-gradient(
-																				 	     135deg,
-																				 	    
-																				 	     rgba(15, 32, 65, 1.6),
-																				 	     rgba(15, 32, 65, 1.6),
-																				 	     rgba(15, 32, 65, 1.6)
-																				 	 );
-				  color: white !important;
-				}
+	    .modern-panel {
+	      padding: 10px;
+	    }
 
-				.flatpickr-time input,
-				.flatpickr-time-separator {
-				  background: transparent;
-				  color: white;
-				  border: none;
-				  border-bottom: 1px solid white;
-				}
+	    #progress-bar {
+	      height: 10px;
+	    }
+	  }
+	  @media (max-width: 768px) {
+	    .tab-button {
+	      flex: 1 0 48%; /* Allow buttons to wrap */
+	      font-size: 14px;
+	      padding: 8px;
+	    }
 
-				.flatpickr-calendar.arrowTop:before,
-				.flatpickr-calendar.arrowTop:after {
-				  border-bottom-color: rgba(15, 32, 65, 0.96) !important;
-				}
+	    .modern-panel {
+	      top: 80px;
+	      height: calc(100vh - 80px);
+	    }
 
-			
+	    #mapSwitcher {
+	      top: auto;
+	      bottom: 20px;
+	      right: 20px;
+	      flex-direction: row;
+	      width: auto;
+	      height: auto;
+	      gap: 10px;
+	    }
+
+	    .panel-toggle-button {
+	      top: auto;
+	      bottom: 80px;
+	    }
+	  }
+	  @media (max-width: 576px) {
+	    input, select, .button {
+	      font-size: 14px;
+	      padding: 6px;
+	    }
+
+	    .button, .btn {
+	      font-size: 14px;
+	      padding: 8px;
+	    }
+
+	    .modern-panel {
+	      padding: 10px;
+	    }
+
+	    #progress-bar {
+	      height: 10px;
+	    }
+	  }
+
+	  /* When panel is shown */
+	  .modern-panel.show {
+	    right: 0;
+	  }
+
+	  /* Toggle button positioned at edge of panel */
+	  .panel-toggle-button {
+	    position: fixed;
+	    top: 200px;
+	    right: 20px;
+	    width: 79px;
+	    height: 45px;
+	    z-index: 1100;
+	    background: linear-gradient(
+	    	 	     135deg,
+	    	 	    
+	    	 	     rgba(15, 32, 65, 1.6),
+	    	 	     rgba(15, 32, 65, 1.6),
+	    	 	     rgba(15, 32, 65, 1.6)
+	    	 	 );
+	    color: white;
+	    border: none;
+	    border-radius: 8px 0 0 8px;
+	    cursor: pointer;
+	    transition: right 0.3s ease-in-out;
+	    font-size: 18px;
+	  }
+
+	  /* When panel is open, move button with it */
+	  .panel-toggle-button.open {
+	    right: 320px;
+	  }
+
+
+	     .tabs { display: flex; justify-content: space-between; margin-bottom: 10px; }
+	     .tab-button {
+	       flex: 1; padding: 10px; cursor: pointer; background: #eee;
+	       border: none; font-weight: bold; border-radius: 8px 8px 0 0; transition: 0.3s;
+	     }
+	     .tab-button.active { 	background: linear-gradient(
+	  	 	     135deg,
+	  	 	    
+	  	 	     rgba(15, 32, 65, 1.6),
+	  	 	     rgba(15, 32, 65, 1.6),
+	  	 	     rgba(15, 32, 65, 1.6)
+	  	 	 ); color: white; }
+	     .tab-content { display: none; }
+	     .tab-content.active-tab { display: block; animation: fadeIn 0.3s ease-in-out; }
+	     input, select, .button { width: 100%; margin-bottom: 10px; padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
+	     .button {
+	  	background: linear-gradient(
+	  		 	     135deg,
+	  		 	    
+	  		 	     rgba(15, 32, 65, 1.6),
+	  		 	     rgba(15, 32, 65, 1.6),
+	  		 	     rgba(15, 32, 65, 1.6)
+	  		 	 ); color: white; border: none; border-radius: 8px; cursor: pointer;
+	     }
+	    
+	     .legend {
+	       position: absolute; display: none; bottom: 10px; left: 10px; background: white;
+	       padding: 10px; border-radius: 5px; font-size: 14px; z-index: 1000;
+	       box-shadow: 0 0 5px rgba(0,0,0,0.2);
+	     }
+	     .legend div { margin-bottom: 5px; }
+	     .legend span { display: inline-block; width: 12px; height: 12px; margin-right: 5px; }
+	  /* Responsive panel behavior */
+	  @media (max-width: 768px) {
+	    .modern-panel {
+	      right: -100%;
+	      transition: right 0.3s ease-in-out;
+	      height: 100vh;
+	      width: 100%;
+	    }
+
+	    .modern-panel.show {
+	      right: 0;
+	    }
+	  }
+	  .leaflet-tile {
+	    background-color: transparent !important;
+	    border: none !important;
+	    box-shadow: none !important;
+	    outline: none !important;
+	    image-rendering: pixelated;
+	  }
+	  .leaflet-tile {
+	    transform: translateZ(0);
+	  }
+	  .leaflet-tile-container {
+	    will-change: transform;
+	  }
+	  .btn{
+	  	background: linear-gradient(
+	  		 	     135deg,
+	  		 	    
+	  		 	     rgba(15, 32, 65, 1.6),
+	  		 	     rgba(15, 32, 65, 1.6),
+	  		 	     rgba(15, 32, 65, 1.6)
+	  		 	 );
+	  			 color: white;
+	  }
+	  #progress-bar{
+	  	background: linear-gradient(
+	  				 	     135deg,
+	  				 	    
+	  				 	     rgba(15, 32, 65, 1.6),
+	  				 	     rgba(15, 32, 65, 1.6),
+	  				 	     rgba(15, 32, 65, 1.6)
+	  				 	 );
+	  }
+	  #mapSwitcher {
+	  				    position: fixed;
+	  				    top: 280px; /* Adjust based on your navbar height */
+	  				    right: 20px;
+	  					width:79px;
+	  					height: 45px;
+	  				    z-index: 1000;
+	  					background: linear-gradient(
+	  								 	     135deg,
+	  								 	    
+	  								 	     rgba(15, 32, 65, 1.6),
+	  								 	     rgba(15, 32, 65, 1.6),
+	  								 	     rgba(15, 32, 65, 1.6)
+	  								 	 );
+	  				    padding: 10px;
+	  				    border-radius: 10px;
+	  				    display: flex;
+	  				    flex-direction: column;
+	  				    gap: 5px;
+	  					color: white;
+	  				}
+	  				
+	  				.map-button{
+	  					background: linear-gradient(
+	  														 	     135deg,
+	  														 	    
+	  														 	     rgba(15, 32, 65, 1.6),
+	  														 	     rgba(15, 32, 65, 1.6),
+	  														 	     rgba(15, 32, 65, 1.6)
+	  														 	 );
+	  															 color: white;
+	  				}
+	  				/* 🌙 Custom Flatpickr Theme to Match Dark Blue */
+	  				.flatpickr-calendar {
+	  					background: linear-gradient(
+	  																				 	     135deg,
+	  																				 	    
+	  																				 	     rgba(15, 32, 65, 1.6),
+	  																				 	     rgba(15, 32, 65, 1.6),
+	  																				 	     rgba(15, 32, 65, 1.6)
+	  																				 	 );
+	  				  border: 1px solid #0f2041 !important;
+	  				  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
+	  				  color:white;
+	  				  font-family: 'Segoe UI', sans-serif;
+	  				}
+
+	  				.flatpickr-months,
+	  				.flatpickr-weekdays {
+	  					color: #fff;
+	  					background-color: azure;
+	  				 
+	  				  border-bottom: 1px solid #1e365e;
+	  				}
+
+	  				.flatpickr-day {
+	  				  background: transparent;
+	  				  color:white !important;
+	  				  border-radius: 6px;
+	  				}
+
+	  				.flatpickr-day:hover,
+	  				.flatpickr-day.today {
+	  				  background: #1e365e !important;
+	  				  color: #fff !important;
+	  				}
+
+	  				.flatpickr-day.selected {
+	  					background: linear-gradient(
+	  																				 	     135deg,
+	  																				 	    
+	  																				 	     rgba(15, 32, 65, 1.6),
+	  																				 	     rgba(15, 32, 65, 1.6),
+	  																				 	     rgba(15, 32, 65, 1.6)
+	  																				 	 );
+	  				  color: white !important;
+	  				}
+
+	  				.flatpickr-time input,
+	  				.flatpickr-time-separator {
+	  				  background: transparent;
+	  				  color: white;
+	  				  border: none;
+	  				  border-bottom: 1px solid white;
+	  				}
+
+	  				.flatpickr-calendar.arrowTop:before,
+	  				.flatpickr-calendar.arrowTop:after {
+	  				  border-bottom-color: rgba(15, 32, 65, 0.96) !important;
+	  				}
+
+	  			

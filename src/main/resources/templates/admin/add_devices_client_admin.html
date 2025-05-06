@@ -3,203 +3,326 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Thinture GPS</title>
-				    <link rel="icon" type="image/x-icon" href="/THINTURE_IMAGE/favicon.jpg">
-					
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
 	
-		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<title>Thinture GPS</title>
+			    <link rel="icon" type="image/x-icon" href="/THINTURE_IMAGE/favicon.jpg">
+				
+				
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+			<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 		<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
 		<link rel="stylesheet" type="text/css" th:href="@{/css/adddevicesstyle.css}">
-   
+  
 </head>
 
 <body>
-    <div th:insert="navigation_admin :: navbar_admin"></div>
+	
+	<header th:replace="navigation_admin :: navbar_admin"></header>
+  <div class="card p-4">
+    <h2>DEVICE TO CLIENT</h2>
 
-    <div class="card">
-        <h2>DEVICE TO CLIENT</h2>
+    <!-- Client Dropdown -->
+    <label for="ClientDropdown">Select Client:</label>
+    <select id="ClientDropdown" onchange="fetchSelectedClientId()" class="form-select mb-2">
+      <option value="" disabled selected>Select Client</option>
+    </select>
 
-        <!-- Client Dropdown -->
-        <label for="ClientName">Select Client:</label>
-        <select id="ClientDropdown" onchange="fetchSelectedClientId()">
-            <option value="" disabled selected>Select Client</option>
-        </select>
+    <!-- Display Selected Client ID -->
+    <p id="selectedClientId">Selected Client ID: </p>
 
-        <!-- Display Selected Client ID -->
-        <p id="selectedClientId">Selected Client ID: </p>
-
-        <!-- Tab Navigation -->
-        <div class="tab-container">
-            <button class="tab-link active" onclick="openTab('single')">Single</button>
-            <button class="tab-link" onclick="openTab('dual')">Dual</button>
-        </div>
-
-        <!-- Single Serial Form -->
-        <div id="single" class="tab-content active">
-            <h3>Single Serial Number</h3>
-            <input type="text" id="singleSerial" placeholder="Enter Serial Number">
-            <input type="text" id="singleImei" placeholder="Enter IMEI Number">
-            <button onclick="addSingleSerial()">Add Serial</button>
-        </div>
-
-        <!-- Dual Serial Form -->
-        <div id="dual" class="tab-content">
-            <h3>Dual Serial Number Range</h3>
-            <input type="text" id="startSerial" placeholder="Start Serial Number">
-            <input type="text" id="endSerial" placeholder="End Serial Number">
-            <input type="text" id="removedSerial" placeholder="Remove Serial Number (Optional)">
-            <button onclick="addDualSerial()">Add Range</button>
-        </div>
-
-        <!-- Serial Table -->
-        <div id="serialTableContainer"></div>
-
-        <!-- Add Devices Button -->
-        <button id="addDevicesButton" style="display: none;" onclick="addDevices()">Add Devices</button>
+    <!-- Tab Navigation -->
+    <div class="tab-container mb-3">
+      <button class="tab-link active" onclick="openTab('single')">Single</button>
+      <button class="tab-link" onclick="openTab('dual')">Dual</button>
     </div>
 
-    <!-- Include SweetAlert2 Library -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Single Serial Form -->
+    <div id="single" class="tab-content active">
+      <h3>Single Serial Number</h3>
+      <input type="text" id="singleSerial" placeholder="Enter Serial Number" class="form-control mb-2">
+      <input type="text" id="singleImei" placeholder="Enter IMEI Number" class="form-control">
+      <button onclick="addSingleSerial()">Add Serial</button>
+    </div>
 
-    <script>
-        const PREFIX = "TH/M4G/";
+    <!-- Dual Serial Form -->
+    <div id="dual" class="tab-content" style="display:none;">
+      <h3>Dual Serial Number Range</h3>
+      <input type="text" id="startSerial" placeholder="Start Serial Number" class="form-control mb-2">
+      <input type="text" id="endSerial" placeholder="End Serial Number" class="form-control mb-2">
+      <input type="text" id="removedSerial" placeholder="Remove Serial Numbers (e.g., 2,4)" class="form-control">
+      <button onclick="addDualSerial()">Add Range</button>
+    </div>
 
-        // ✅ Open Tabs
-        function openTab(tabName) {
-            document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
-            document.querySelectorAll(".tab-link").forEach(tab => tab.classList.remove("active"));
-            document.getElementById(tabName).classList.add("active");
-            document.querySelector(`[onclick="openTab('${tabName}')"]`).classList.add("active");
-        }
+    <!-- Serial Table -->
+    <div id="serialTableContainer" class="mt-4"></div>
 
-        // ✅ Fetch and Populate Client Dropdown
-        document.addEventListener("DOMContentLoaded", function () {
-            fetchClients();
+    <!-- Add Devices Button -->
+	<button id="addDevicesButton" class="btn btn-success mt-2" style="display: none;" onclick="handleAddDevices()">Add Devices</button>
+
+  </div>
+  <!-- Add this modal at the end of <body> -->
+  <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirm Serial and IMEI Entries</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="confirmationModalBody">
+          <!-- Content dynamically added -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const PREFIX = "TH/M4G/";
+    const serialNumbers = {};
+	let previewShown = false;
+
+    // ✅ Tab Switching
+    function openTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+      document.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
+
+      document.getElementById(tabName).style.display = 'block';
+      event.target.classList.add('active');
+    }
+
+    // ✅ Fetch clients on load
+    document.addEventListener("DOMContentLoaded", function () {
+      fetchClients();
+      openTab('single');
+    });
+
+    function fetchClients() {
+      fetch("/client/all")
+        .then(response => response.json())
+        .then(clients => {
+          const dropdown = document.getElementById("ClientDropdown");
+          dropdown.innerHTML = `<option value="" disabled selected>Select Client</option>`;
+          clients.forEach(client => {
+            let option = document.createElement("option");
+            option.value = client.id;
+            option.textContent = client.name;
+            dropdown.appendChild(option);
+          });
+        })
+        .catch(error => console.error("Error fetching clients:", error));
+    }
+
+    function fetchSelectedClientId() {
+      const dropdown = document.getElementById("ClientDropdown");
+      const clientId = dropdown.value;
+      const clientName = dropdown.options[dropdown.selectedIndex]?.text;
+      document.getElementById("selectedClientId").innerText = `Selected Client: ${clientName} (ID: ${clientId})`;
+    }
+
+    function addSingleSerial() {
+      const serial = document.getElementById("singleSerial").value.trim();
+      const imei = document.getElementById("singleImei").value.trim();
+      const clientId = document.getElementById("ClientDropdown").value;
+
+      if (!serial || !imei || !clientId) {
+        Swal.fire({ icon: 'error', title: 'Missing Input', text: 'Fill all fields and select client.' });
+        return;
+      }
+
+      const payload = { serialNo: `${PREFIX}${serial}`, imei, clientId };
+
+      fetch('/client/add-single', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success === "true") {
+            Swal.fire({ icon: 'success', title: 'Success', text: 'Single Serial added!' });
+            document.getElementById("singleSerial").value = "";
+            document.getElementById("singleImei").value = "";
+          } else {
+            Swal.fire({ icon: 'error', title: 'Failed', text: 'Could not add serial.' });
+          }
+        })
+        .catch(err => {
+          console.error("Error:", err);
+          Swal.fire({ icon: 'error', title: 'Network Error', text: 'Please check your connection.' });
         });
+    }
 
-        function fetchClients() {
-            console.log("Fetching client data...");
-            fetch("/client/all")
-                .then(response => response.json())
-                .then(clients => {
-                    const dropdown = document.getElementById("ClientDropdown");
-                    dropdown.innerHTML = `<option value="" disabled selected>Select Client</option>`;
-                    clients.forEach(client => {
-                        let option = document.createElement("option");
-                        option.value = client.id; // ✅ Store Client ID
-                        option.textContent = client.name; // ✅ Display Client Name
-                        dropdown.appendChild(option);
-                    });
-                    console.log("✅ Client dropdown populated successfully.");
-                })
-                .catch(error => console.error("❌ Error fetching clients:", error));
+    function resetSerials() {
+      for (const key in serialNumbers) {
+        delete serialNumbers[key];
+      }
+    }
+
+    function updateImei(serial, value) {
+      serialNumbers[serial] = value.trim();
+    }
+
+    function addDualSerial() {
+      const startSerial = parseInt(document.getElementById("startSerial").value.trim());
+      const endSerial = parseInt(document.getElementById("endSerial").value.trim());
+      const removedInput = document.getElementById("removedSerial").value.trim();
+      const clientId = document.getElementById("ClientDropdown").value;
+
+      if (isNaN(startSerial) || isNaN(endSerial) || startSerial > endSerial || !clientId) {
+        Swal.fire({ icon: 'error', title: 'Invalid Input', text: 'Check Serial Range and Client.' });
+        return;
+      }
+
+      resetSerials();
+      const removedSet = new Set(removedInput.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n)));
+
+      for (let i = startSerial; i <= endSerial; i++) {
+        if (!removedSet.has(i)) {
+          const serial = PREFIX + i;
+          serialNumbers[serial] = "";
         }
+      }
 
-        // ✅ Fetch Selected Client ID
-        function fetchSelectedClientId() {
-            const dropdown = document.getElementById("ClientDropdown");
-            const clientId = dropdown.value;
-            const clientName = dropdown.options[dropdown.selectedIndex]?.text;
-            document.getElementById("selectedClientId").innerText = `Selected Client: ${clientName} (ID: ${clientId})`;
-            console.log(`📌 Client Selected: ${clientName} (ID: ${clientId})`);
-        }
+      updateSerialTable();
+    }
 
-        // ✅ Add Single Serial Number
-        function addSingleSerial() {
-            console.log("🔹 Attempting to add single serial...");
+    function updateSerialTable() {
+      const tableContainer = document.getElementById("serialTableContainer");
+      tableContainer.innerHTML = "";
 
-            const serial = document.getElementById("singleSerial").value.trim();
-            const imei = document.getElementById("singleImei").value.trim();
-            const clientDropdown = document.getElementById("ClientDropdown");
-            const clientId = clientDropdown.value;
+      if (Object.keys(serialNumbers).length === 0) {
+        document.getElementById("addDevicesButton").style.display = "none";
+        return;
+      }
 
-            if (!serial || !imei || !clientId) {
-                Swal.fire({ icon: 'error', title: '❌ Missing Input', text: 'Please enter Serial, IMEI, and select a Client.' });
-                return;
-            }
+      const table = document.createElement("table");
+      table.className = "table table-dark table-bordered";
+      table.innerHTML = `
+        <thead><tr><th>Serial Number</th><th>IMEI Number</th></tr></thead>
+        <tbody>
+        ${Object.entries(serialNumbers).map(([serial, imei]) => `
+          <tr>
+            <td>${serial}</td>
+            <td><input type="text" class="form-control" value="${imei}" placeholder="Enter IMEI" oninput="updateImei('${serial}', this.value)"></td>
+          </tr>`).join('')}
+        </tbody>`;
 
-            const payload = { serialNo: `${PREFIX}${serial}`, imei, clientId };
+      tableContainer.appendChild(table);
+      document.getElementById("addDevicesButton").style.display = "block";
+    }
+	function submitDevices() {
+	  const clientId = document.getElementById("ClientDropdown").value;
 
-            console.log("📤 Sending Single Serial Payload:", payload);
+	  if (!clientId || Object.keys(serialNumbers).length === 0) {
+	    Swal.fire({ icon: 'error', title: 'Missing Data', text: 'No serials or client selected.' });
+	    return;
+	  }
 
-            fetch('/client/add-single', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("✅ API Response:", data);
-                if (data.success === "true") {
-                    Swal.fire({ icon: 'success', title: '✅ Success', text: 'Single Serial added successfully!' });
-                    document.getElementById("singleSerial").value = "";
-                    document.getElementById("singleImei").value = "";
-                } else {
-                    Swal.fire({ icon: 'error', title: '❌ Error', text: 'Failed to add Single Serial. Please try again.' });
-                }
-            })
-            .catch(error => {
-                console.error('❌ API Error:', error);
-                Swal.fire({ icon: 'error', title: '❌ Error', text: 'Failed to add Single Serial. Please check your network and try again.' });
-            });
-        }
+	  const payload = {
+	    serialNumbers: Object.entries(serialNumbers).map(([serialNo, imei]) => ({ serialNo, imei })),
+	    clientId
+	  };
 
-        // ✅ Add Dual Serial Number Range
-        function addDualSerial() {
-            console.log("🔹 Attempting to add dual serials...");
+	  fetch('/client/add-dual', {
+	    method: 'POST',
+	    headers: { 'Content-Type': 'application/json' },
+	    body: JSON.stringify(payload)
+	  })
+	    .then(res => res.json())
+	    .then(data => {
+	      if (data.success === "true" || data.success === true) {
+	        Swal.fire({ icon: 'success', title: 'Success', text: 'Devices added successfully!' });
+	        resetSerials();
+	        document.getElementById("serialTableContainer").innerHTML = "";
+	        document.getElementById("addDevicesButton").style.display = "none";
+	      } else {
+	        Swal.fire({ icon: 'error', title: 'Failed', text: data.message || 'Error adding devices.' });
+	      }
+	    })
+	    .catch(err => {
+	      console.error(err);
+	      Swal.fire({ icon: 'error', title: 'Network Error', text: 'Try again later.' });
+	    });
+	}
 
-            const startSerial = parseInt(document.getElementById("startSerial").value.trim());
-            const endSerial = parseInt(document.getElementById("endSerial").value.trim());
-            const removedSerial = document.getElementById("removedSerial").value.trim() || null;
-            const clientDropdown = document.getElementById("ClientDropdown");
-            const clientId = clientDropdown.value;
+	
+	
+	
+	function handleAddDevices() {
+	  const clientId = document.getElementById("ClientDropdown").value;
 
-            if (isNaN(startSerial) || isNaN(endSerial) || startSerial > endSerial || !clientId) {
-                Swal.fire({ icon: 'error', title: '❌ Invalid Input', text: 'Ensure valid Start/End Serial and select a Client.' });
-                return;
-            }
+	  if (!clientId || Object.keys(serialNumbers).length === 0) {
+	    Swal.fire({ icon: 'error', title: 'Missing Data', text: 'Please add serials and select client.' });
+	    return;
+	  }
 
-            const serialNumbers = [];
-            for (let i = startSerial; i <= endSerial; i++) {
-                if (removedSerial && i == removedSerial) {
-                    console.log(`⚠️ Skipping removed serial number: ${i}`);
-                    continue;
-                }
-                serialNumbers.push(PREFIX + i);
-            }
+	  if (!previewShown) {
+	    const missing = Object.entries(serialNumbers).filter(([_, imei]) => !imei.trim());
+	    if (missing.length > 0) {
+	      Swal.fire({ icon: 'warning', title: 'Incomplete IMEI', text: 'Please fill all IMEI numbers.' });
+	      return;
+	    }
 
-            const payload = { serialNumbers: serialNumbers, clientId: clientId };
+	    const modalBody = document.getElementById("confirmationModalBody");
+	    modalBody.innerHTML = `
+	      <table class="table table-striped">
+			<thead><tr><th>Select</th><th>Serial Number</th><th>IMEI Number</th></tr></thead>
 
-            console.log("📤 Sending Dual Serial Payload:", payload);
+	        <tbody>
+	          ${Object.entries(serialNumbers).map(([serial, imei], i) => `
+	            <tr>
+	              <td><input type="checkbox" class="form-check-input confirm-checkbox" id="chk${i}"></td>
+	              <td>${serial}</td>
+	              <td>${imei}</td>
+	            </tr>`).join('')}
+	        </tbody>
+	      </table>
+	      <button class="btn btn-primary mt-2" onclick="confirmAndCloseModal()">Confirm</button>
+	    `;
 
-            fetch('/client/add-dual', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("✅ API Response:", data);
-                if (data.success === "true") {
-                    Swal.fire({ icon: 'success', title: '✅ Success', text: 'Dual Serial Range added successfully!' });
-                    document.getElementById("startSerial").value = "";
-                    document.getElementById("endSerial").value = "";
-                    document.getElementById("removedSerial").value = "";
-                } else {
-                    Swal.fire({ icon: 'error', title: '❌ Error', text: 'Failed to add Dual Serial Range. Please try again.' });
-                }
-            })
-            .catch(error => {
-                console.error('❌ API Error:', error);
-                Swal.fire({ icon: 'error', title: '❌ Error', text: 'Failed to add Dual Serial Range. Please check your network and try again.' });
-            });
-        }
+	    const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+	    modal.show();
+		setTimeout(() => {
+			document.querySelectorAll('.confirm-checkbox').forEach(checkbox => {
+			  checkbox.addEventListener('change', function () {
+			    const row = this.closest('tr');
+			    row.classList.toggle('selected', this.checked);
+			  });
+			});
 
-        openTab("single");
-    </script>
+		    }, 100);
+		  } else {
+	    submitDevices();
+	    previewShown = false;
+	    document.getElementById("addDevicesButton").textContent = "Add Devices";
+	  }
+	}
+	function confirmAndCloseModal() {
+	  const checkboxes = document.querySelectorAll(".confirm-checkbox");
+	  const allChecked = Array.from(checkboxes).every(c => c.checked);
+
+	  if (!allChecked) {
+	    Swal.fire({
+	      icon: 'warning',
+	      title: 'Confirmation Required',
+	      text: 'Please check all Serial Numbers and IMEI Numbers.'
+	    });
+	    return;
+	  }
+
+	  const modal = bootstrap.Modal.getInstance(document.getElementById('confirmationModal'));
+	  modal.hide();
+
+	  Swal.fire({
+	    icon: 'success',
+	    title: 'Verified',
+	    text: 'Now click again to submit all devices.'
+	  });
+
+	  previewShown = true;
+	  document.getElementById("addDevicesButton").textContent = "Submit Devices";
+	}
+
+  </script>
 </body>
-
-
-
 </html>
