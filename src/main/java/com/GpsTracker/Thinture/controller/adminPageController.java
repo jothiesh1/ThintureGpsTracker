@@ -75,6 +75,13 @@ public class adminPageController {
         logger.info("🔹 Accessed Admin - Playback Track");
         return "admin/replay_admin";
     }
+    
+    @GetMapping("/admin/playback")
+    public String playbackAdmin() {
+        logger.info("🔹 Accessed Admin - Playback Track");
+        return "admin/playback_admin";
+    }
+
 
     @GetMapping("/admin/install")
     public String installAdmin() {

@@ -32,24 +32,22 @@
             <img src="/THINTURE_IMAGE/event.jpg" alt="Event Report">
             <span>Event Report</span>
         </div>
-		<!--
-        <div class="report-card" id="history">
-            <img src="THINTURE_IMAGE/history.jpg" alt="Historical Data">
-            <span>Historical Data</span>
-        </div>
-	
-        <div class="report-card" id="parking">
-            <img src="THINTURE_IMAGE/parking.jpg" alt="Parking Report">
-            <span>Parking Report</span>
-        </div>
-		-->
+		<div class="report-card" id="install">
+		            <img src="/THINTURE_IMAGE/installation.jpg" class="install" alt="Historical Data">
+		            <span>Installation Report</span>
+		        </div>
+				
+		        <div class="report-card" id="complaint">
+		            <img src="/THINTURE_IMAGE/complaints.jpg" alt="Parking Report">
+		            <span>Complaints Report</span>
+		        </div>
         <div class="report-card" id="vehicleReport">
             <img src="/THINTURE_IMAGE/vehile4.jpg" alt="Vehicle Report">
-            <span>Vehicle Report</span>
+            <span>Vehicle Violation Report</span>
         </div>
         <div class="report-card" id="driver">
             <img src="/THINTURE_IMAGE/driver3.jpg" alt="Driver Report">
-            <span>Driver Report</span>
+            <span>Driver RAG Report</span>
         </div>
         
     </div>
@@ -77,7 +75,13 @@
         document.getElementById('event').addEventListener('click', function() {
             window.location.href = '/admin/event_report';
         });
-
+		document.getElementById('complaint').addEventListener('click', function() {
+						            window.location.href = ' /admin/view_complaints'; // or 'vehicle_violation.html' if static file
+						        });
+				
+				document.getElementById('install').addEventListener('click', function() {
+				            window.location.href = '/admin/install_report'; // or 'vehicle_violation.html' if static file
+				        });
         document.getElementById('vehicleReport').addEventListener('click', function() {
             window.location.href = '/admin/vehicle_violation'; // or 'vehicle_violation.html' if static file
         });

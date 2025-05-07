@@ -90,9 +90,8 @@
 						            <strong>REPORT</strong>
 						        </a>
 						        <ul class="dropdown-menu">
-						            <li><a class="dropdown-item" href="/admin/event">Event & Violations</a></li>
-						            <li><a class="dropdown-item" href="/admin/install_report">Installation Report</a></li>
-						            <li><a class="dropdown-item" href="/admin/view_complaints">View Complaints</a></li>
+						            <li><a class="dropdown-item" href="/admin/event">All Reports</a></li>
+						           
 						        </ul>
 						    </li>
 						    <li class="nav-item dropdown" id="menu-users">
@@ -253,6 +252,15 @@
     });
 </script>
 <script>
+		    document.getElementById('backward-button').addEventListener('click', () => {
+		        window.history.back();
+		    });
+
+		    document.getElementById('forward-button').addEventListener('click', () => {
+		        window.history.forward();
+		    });
+		</script>
+<script>
   document.addEventListener("DOMContentLoaded", function () {
     const adminEmail = localStorage.getItem("username"); // ← already saved on login
     if (!adminEmail) {
@@ -281,6 +289,7 @@
       "menu-home",
       "menu-admin",
       "menu-assign-device",
+	  "menu-tracking",
       "menu-profile"
     ];
 

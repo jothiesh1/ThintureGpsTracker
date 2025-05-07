@@ -703,7 +703,7 @@ return saved;
         return vehicleRepository.findAllSerialNumbers();
     }
 
-    // ✅ Update Client for a Vehicle
+    // ✅ Update Client for a Vehicle html code is add_device_to_client.html
     @Transactional
     public boolean updateClientForVehicle(String serialNo, Long clientId) {
         List<Vehicle> vehicles = vehicleRepository.findBySerialNo(serialNo);
@@ -711,9 +711,25 @@ return saved;
 
         if (!vehicles.isEmpty() && clientOptional.isPresent()) {
             for (Vehicle vehicle : vehicles) {
-                vehicle.setClient_id(clientId);  // ✅ Only set the ID field
+                vehicle.setClient_id(clientId);
                 vehicleRepository.save(vehicle);
                 logger.info("✅ Updated vehicle with serialNo {} to clientId {}", serialNo, clientId);
+
+                // 🔄 Also update vehicle_last_location with clientId (based on IMEI)
+                String imei = vehicle.getImei();
+                if (imei != null && !imei.trim().isEmpty()) {
+                    Optional<VehicleLastLocation> locOpt = vehicleLastLocationRepository.findByImei(imei);
+                    if (locOpt.isPresent()) {
+                        VehicleLastLocation loc = locOpt.get();
+                        loc.setClient_id(clientId);
+                        vehicleLastLocationRepository.save(loc);
+                        logger.info("📍 Updated vehicle_last_location for IMEI {} with clientId {}", imei, clientId);
+                    } else {
+                        logger.warn("⚠️ No vehicle_last_location found for IMEI {}", imei);
+                    }
+                } else {
+                    logger.warn("⚠️ Vehicle with serialNo {} has no IMEI set", serialNo);
+                }
             }
             return true;
         } else {
@@ -721,6 +737,7 @@ return saved;
             return false;
         }
     }
+
 
 
 
