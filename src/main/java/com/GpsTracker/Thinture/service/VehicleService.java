@@ -423,21 +423,23 @@ return saved;
             throw new IllegalArgumentException("❌ Serial number is required.");
         }
 
-        // ✅ Fetch existing vehicle list by serial number (duplicate-safe)
+        // ✅ Fetch or create new Vehicle
         List<Vehicle> existingList = vehicleRepository.findBySerialNo(incomingSerialNo);
         Vehicle existingVehicle = existingList.isEmpty() ? new Vehicle() : existingList.get(0);
 
-        // 🔒 Set serial number if not NA
         if (!"NA".equalsIgnoreCase(incomingSerialNo)) {
             existingVehicle.setSerialNo(incomingSerialNo);
         }
 
-        // 👤 Set User if exists
+        // 👤 Set user_id directly
+        Long userId = null;
         if (vehicleDetails.getUser() != null && vehicleDetails.getUser().getId() != null) {
-            userRepository.findById(vehicleDetails.getUser().getId())
-                .ifPresent(existingVehicle::setUser);
+            userId = vehicleDetails.getUser().getId();
+            existingVehicle.setUser_id(userId);
+            logger.info("👤 Set user_id to: {}", userId);
         }
 
+        // 👥 Set driver_id
         Long driverId = vehicleDetails.getDriver_id();
         if (driverId != null) {
             boolean exists = driverRepository.existsById(driverId);
@@ -445,10 +447,10 @@ return saved;
                 logger.warn("❌ Driver with ID {} does not exist", driverId);
                 throw new IllegalArgumentException("Invalid driver ID: " + driverId);
             }
-            existingVehicle.setDriver_id(driverId); // ✅ Safe to set
+            existingVehicle.setDriver_id(driverId);
         }
 
-        // Set all other fields...
+        // 📋 Set remaining fields
         existingVehicle.setVehicleNumber(vehicleDetails.getVehicleNumber());
         existingVehicle.setOwnerName(vehicleDetails.getOwnerName());
         existingVehicle.setVehicleType(vehicleDetails.getVehicleType());
@@ -463,7 +465,7 @@ return saved;
         existingVehicle.setCountry(vehicleDetails.getCountry());
         existingVehicle.setImei(vehicleDetails.getImei());
 
-        // Default Renewal Date Logic
+        // 📆 Renewal Date
         if (vehicleDetails.getInstallationDate() != null && existingVehicle.getRenewalDate() == null) {
             existingVehicle.setRenewalDate(Date.valueOf(vehicleDetails.getInstallationDate().toLocalDate().plusYears(1)));
         }
@@ -472,13 +474,29 @@ return saved;
             existingVehicle.setRenewed(false);
         }
 
+        // 🛠️ Save vehicle
         vehicleRepository.save(existingVehicle);
 
-        logger.info("✅ Vehicle saved with driver_id: {}", driverId);
+        // 🚦 Update vehicle_last_location (if imei matches)
+        if (vehicleDetails.getImei() != null && !vehicleDetails.getImei().trim().isEmpty()) {
+            Optional<VehicleLastLocation> locationOpt = vehicleLastLocationRepository.findByImei(vehicleDetails.getImei());
+            if (locationOpt.isPresent()) {
+                VehicleLastLocation loc = locationOpt.get();
+                if (userId != null) loc.setUser_id(userId);
+                if (driverId != null) loc.setDriver_id(driverId);
+                vehicleLastLocationRepository.save(loc);
+                logger.info("📍 Updated vehicle_last_location for IMEI {} with user_id: {}, driver_id: {}", 
+                            vehicleDetails.getImei(), userId, driverId);
+            } else {
+                logger.warn("⚠️ No record found in vehicle_last_location for IMEI: {}", vehicleDetails.getImei());
+            }
+        }
+
+        // ✅ Final log
+        logger.info("✅ Vehicle saved with serialNo: {}, user_id: {}, driver_id: {}", 
+            existingVehicle.getSerialNo(), existingVehicle.getUser_id(), existingVehicle.getDriver_id());
     }
 
-    
-    
     
     
     
@@ -646,7 +664,8 @@ return saved;
         	    vehicle.getModel(),
         	    vehicle.getVehicleType(),
         	    vehicle.getInstallationDate(),
-        	    vehicle.getRenewalDate()
+        	    vehicle.getRenewalDate() ,
+        	    vehicle.getSerialNo()
         	);
 
                
@@ -687,24 +706,23 @@ return saved;
     // ✅ Update Client for a Vehicle
     @Transactional
     public boolean updateClientForVehicle(String serialNo, Long clientId) {
-        List<Vehicle> vehicles = vehicleRepository.findBySerialNo(serialNo); // Now returns List<Vehicle>
+        List<Vehicle> vehicles = vehicleRepository.findBySerialNo(serialNo);
         Optional<Client> clientOptional = clientRepository.findById(clientId);
 
         if (!vehicles.isEmpty() && clientOptional.isPresent()) {
-            Client client = clientOptional.get();
-
             for (Vehicle vehicle : vehicles) {
-                vehicle.setClient(client);
+                vehicle.setClient_id(clientId);  // ✅ Only set the ID field
                 vehicleRepository.save(vehicle);
                 logger.info("✅ Updated vehicle with serialNo {} to clientId {}", serialNo, clientId);
             }
-
             return true;
         } else {
             logger.warn("❌ No vehicle(s) or client found for update (serialNo: {}, clientId: {})", serialNo, clientId);
             return false;
         }
     }
+
+
 
 
     public void deleteVehicleByDeviceID(String deviceID) {

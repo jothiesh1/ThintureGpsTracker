@@ -111,12 +111,17 @@ public class VehicleController {
             return ResponseEntity.status(500).body("Error adding device information");
         }
     }
-
     @PostMapping("/add-vehicle-and-device")
     public ResponseEntity<String> addVehicleAndDevice(@RequestBody Vehicle vehicleDetails) {
-        logger.info("📩 Received vehicle request: {}", vehicleDetails);
+        logger.info("📩 [Incoming Payload] vehicleDetails: {}", vehicleDetails);
 
-        logger.info("🔍 Extracted user ID: {}", vehicleDetails.getUser() != null ? vehicleDetails.getUser().getId() : "null");
+        if (vehicleDetails.getUser() != null) {
+            logger.info("🔍 User Object Received: {}", vehicleDetails.getUser());
+            logger.info("🆔 Extracted user ID: {}", vehicleDetails.getUser().getId());
+        } else {
+            logger.warn("⚠️ No user info (null user object) received in request.");
+        }
+
         logger.info("🔍 Extracted driver ID: {}", vehicleDetails.getDriver_id());
 
         try {
@@ -125,30 +130,25 @@ public class VehicleController {
                 vehicleDetails.setDeviceID("NA");
             }
 
-            // 💡 Ensure the driver exists before setting
             Long driverId = vehicleDetails.getDriver_id();
             if (driverId != null && driverService.getDriverById(driverId).isEmpty()) {
                 throw new IllegalArgumentException("Driver ID " + driverId + " does not exist.");
             }
 
             vehicleService.saveVehicleAndDevice(vehicleDetails);
-
-            logger.info("✅ Vehicle and device saved with driver_id: {}", vehicleDetails.getDriver_id());
+            logger.info("✅ Vehicle and device saved with driver_id: {}", driverId);
 
             return ResponseEntity.ok("✅ Vehicle and device information saved successfully.");
-
         } catch (IllegalArgumentException e) {
             logger.error("🚨 Validation Error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Validation Error: " + e.getMessage());
-
         } catch (Exception e) {
             logger.error("🚨 Internal Error: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Internal Server Error: " + e.getMessage());
         }
     }
-
 
 
     

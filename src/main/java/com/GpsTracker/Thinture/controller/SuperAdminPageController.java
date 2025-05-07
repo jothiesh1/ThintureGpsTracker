@@ -192,8 +192,8 @@ public class SuperAdminPageController {
     
     
 	  @GetMapping("/view_superadmin_complaints")
-	    public String   superAdminShowView(Model model) {
-	        return "view_superadmin_complaints"; // Should match the name of the HTML file in the templates folder (map2.html)
+	    public String  superAdminShowView(Model model) {
+	        return "superadmin/view_superadmin_complaints"; // Should match the name of the HTML file in the templates folder (map2.html)
 	    }
 	  
 	

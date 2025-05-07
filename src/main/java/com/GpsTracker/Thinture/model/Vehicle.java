@@ -50,12 +50,15 @@ public class Vehicle extends BaseEntity {
     // new code for createdevice.html 
    
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id",  insertable = false, updatable = false)
     private User user;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "client_id", referencedColumnName = "id", insertable = false, updatable = false)
-	private Client client;
+	@Override public Long getUser_id() { return user_id; }
+	@Override public void setUser_id(Long user_id) { this.user_id = user_id; }
+
+	@Column(name = "user_id")
+	private Long user_id;
+
 
     
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -75,11 +78,13 @@ public class Vehicle extends BaseEntity {
     private String manufacturer;
     private String model;
     private Date installationDate;
-    @Column(name = "serial_no") // Ensure database column is mapped correctly
-    private String serialNo; // Changed from 'SerialNo' to 'serialNo'
+    @Column(name = "serial_no", unique = true)
+    private String serialNo;
+
 
 	    private String technicianName;
-	    private  String imei;
+	    @Column(name = "imei", unique = true)
+	    private String imei;
 	    private String simNumber;
 	    private String dealerName;
 	    private String addressPhone;
@@ -92,13 +97,6 @@ public class Vehicle extends BaseEntity {
 		@Column(name = "dealer_id")
 		private Long dealer_id;
 
-		@Column(name = "client_id")
-		private Long client_id;
-
-	
-
-		@Column(name = "user_id")
-		private Long user_id;
 
 		@Column(name = "driver_id")
 		private Long driver_id;
@@ -113,15 +111,24 @@ public class Vehicle extends BaseEntity {
 
 		@Override public Long getDealer_id() { return dealer_id; }
 		@Override public void setDealer_id(Long dealer_id) { this.dealer_id = dealer_id; }
+		
+		
+		@Column(name = "client_id")
+		private Long client_id;
 
+		@ManyToOne(fetch = FetchType.LAZY)
+		@JoinColumn(name = "client_id", referencedColumnName = "id", insertable = false, updatable = false)
+		private Client client;
+		
+		
+		
 		@Override public Long getClient_id() { return client_id; }
 		@Override public void setClient_id(Long client_id) { this.client_id = client_id; }
 
 		@Override public Long getSuperadmin_id() { return superadmin_id; }
 		@Override public void setSuperadmin_id(Long superadmin_id) { this.superadmin_id = superadmin_id; }
 
-		@Override public Long getUser_id() { return user_id; }
-		@Override public void setUser_id(Long user_id) { this.user_id = user_id; }
+	
 
 		@Override public Long getDriver_id() { return driver_id; }
 		@Override public void setDriver_id(Long driver_id) { this.driver_id = driver_id; }

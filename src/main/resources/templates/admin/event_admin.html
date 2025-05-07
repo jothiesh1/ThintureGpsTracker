@@ -29,7 +29,7 @@
 
     <div id="use-normal" class="report-grid">
         <div class="report-card" id="event">
-            <img src="THINTURE_IMAGE/event.jpg" alt="Event Report">
+            <img src="/THINTURE_IMAGE/event.jpg" alt="Event Report">
             <span>Event Report</span>
         </div>
 		<!--
@@ -44,11 +44,11 @@
         </div>
 		-->
         <div class="report-card" id="vehicleReport">
-            <img src="THINTURE_IMAGE/vehile4.jpg" alt="Vehicle Report">
+            <img src="/THINTURE_IMAGE/vehile4.jpg" alt="Vehicle Report">
             <span>Vehicle Report</span>
         </div>
         <div class="report-card" id="driver">
-            <img src="THINTURE_IMAGE/driver3.jpg" alt="Driver Report">
+            <img src="/THINTURE_IMAGE/driver3.jpg" alt="Driver Report">
             <span>Driver Report</span>
         </div>
         
@@ -75,13 +75,13 @@
 	   }
     document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('event').addEventListener('click', function() {
-            window.location.href = '/event_report_admin';
+            window.location.href = '/admin/event_report';
         });
 
         document.getElementById('vehicleReport').addEventListener('click', function() {
-            window.location.href = '/vehicle_violation_admin'; // or 'vehicle_violation.html' if static file
+            window.location.href = '/admin/vehicle_violation'; // or 'vehicle_violation.html' if static file
         });
-
+		
         document.getElementById('driver').addEventListener('click', function() {
             window.location.href = '';
         });

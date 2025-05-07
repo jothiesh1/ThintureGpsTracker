@@ -39,12 +39,168 @@ import org.slf4j.LoggerFactory;
 import lombok.extern.slf4j.Slf4j;
 
 
+
+
+
+
+import com.GpsTracker.Thinture.dto.VehicleDTO;
+import com.GpsTracker.Thinture.mapper.VehicleMapper;
 @Controller
 @RequestMapping("/total_vehicless")
 @Slf4j
-public class installDealer2Controler {
+public class installationControler {
 
-   private static final Logger logger = LoggerFactory.getLogger(installDealer2Controler.class);
+    private static final Logger logger = LoggerFactory.getLogger(installationControler.class);
+
+    @Autowired
+    private VehicleService vehicleService;
+
+    @Autowired
+    private DriverService driverService;
+
+    @Autowired
+    private DeviceService deviceService;
+
+    @Autowired
+    private MailService mailService;
+
+    @GetMapping("/search")
+    public ResponseEntity<Vehicle> searchVehicle(@RequestParam String vehicleNumber) {
+        logger.info("Searching for vehicle with number: {}", vehicleNumber);
+        Vehicle vehicle = vehicleService.findByVehicleNumber(vehicleNumber);
+        if (vehicle != null) {
+            return ResponseEntity.ok(vehicle);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @PostMapping("/createdevices")
+    public ResponseEntity<String> createVehicle(@RequestBody VehicleDTO dto) {
+        logger.info("Received request to create vehicle: {}", dto);
+        try {
+            Vehicle vehicle = VehicleMapper.toEntity(dto);
+            vehicleService.save(vehicle);
+            logger.info("Vehicle created successfully: {}", vehicle);
+            return ResponseEntity.ok("Vehicle created successfully");
+        } catch (ConstraintViolationException e) {
+            StringBuilder errors = new StringBuilder("Validation failed: ");
+            e.getConstraintViolations().forEach(violation ->
+                    errors.append(violation.getPropertyPath()).append(": ").append(violation.getMessage()).append("; ")
+            );
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.toString());
+        } catch (Exception e) {
+            logger.error("Error saving vehicle: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving vehicle");
+        }
+    }
+
+    @PostMapping("/add-device")
+    public ResponseEntity<String> addDeviceInformation(@RequestBody VehicleDTO dto) {
+        logger.info("Received request to add device information.");
+        try {
+            vehicleService.addDeviceInformation(
+                    dto.getInstallationDate(),
+                    dto.getDeviceID(),
+                    dto.getTechnicianName(),
+                    dto.getImei(),
+                    dto.getSimNumber(),
+                    dto.getDealerName(),
+                    dto.getAddressPhone(),
+                    dto.getCountry()
+            );
+            return ResponseEntity.ok("Device information added successfully");
+        } catch (Exception e) {
+            logger.error("Error adding device information: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding device information");
+        }
+    }
+
+    @PostMapping("/add-vehicle-and-device")
+    public ResponseEntity<String> addVehicleAndDevice(@RequestBody VehicleDTO dto) {
+        logger.info("Received request to add/update vehicle and device: {}", dto);
+        try {
+            if (dto.getSerialNo() == null || dto.getImei() == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Serial number and IMEI are required.");
+            }
+
+            Vehicle vehicle = VehicleMapper.toEntity(dto);
+
+            // ✅ Explicitly set user_id from DTO
+            if (dto.getUserId() != null) {
+                vehicle.setUser_id(dto.getUserId());
+                logger.info("✅ Assigned user_id from dto.userId: {}", dto.getUserId());
+            } else if (dto.getUser_id() != null) {
+                vehicle.setUser_id(dto.getUser_id());
+                logger.info("✅ Assigned user_id from dto.user_id: {}", dto.getUser_id());
+            }
+
+            // ✅ Explicitly set driver_id from DTO
+            if (dto.getDriverId() != null) {
+                vehicle.setDriver_id(dto.getDriverId());
+                logger.info("✅ Assigned driver_id from dto.driverId: {}", dto.getDriverId());
+            } else if (dto.getDriver_id() != null) {
+                vehicle.setDriver_id(dto.getDriver_id());
+                logger.info("✅ Assigned driver_id from dto.driver_id: {}", dto.getDriver_id());
+            }
+
+            vehicleService.saveVehicleAndDevice(vehicle);
+            return ResponseEntity.ok("Vehicle and device updated successfully");
+        } catch (IllegalArgumentException e) {
+            logger.error("Validation error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            logger.error("Error processing vehicle/device info: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing vehicle/device info");
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<Object> handleVehicleRequests(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) String serialNo) {
+
+        if (query != null) {
+            List<String> serialNos = vehicleService.getSerialNosStartingWith(query);
+            return ResponseEntity.ok(serialNos.isEmpty() ? Collections.emptyList() : serialNos);
+        } else if (serialNo != null) {
+            Optional<Vehicle> optVehicle = vehicleService.getVehicleBySerialNo(serialNo);
+            if (optVehicle.isPresent()) {
+                Vehicle vehicle = optVehicle.get();
+                Map<String, String> response = new HashMap<>();
+                response.put("imei", vehicle.getImei() != null ? vehicle.getImei() : "NA");
+                response.put("technicianName", vehicle.getTechnicianName() != null ? vehicle.getTechnicianName() : "NA");
+                response.put("simNumber", vehicle.getSimNumber() != null ? vehicle.getSimNumber() : "NA");
+                response.put("dealerName", vehicle.getDealerName() != null ? vehicle.getDealerName() : "NA");
+                response.put("vehicleType", vehicle.getVehicleType() != null ? vehicle.getVehicleType() : "NA");
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Vehicle not found");
+            }
+        }
+        return ResponseEntity.badRequest().body("Invalid request. Provide either 'query' or 'serialNo'.");
+    }
+}
+
+
+
+
+
+
+
+
+
+
+/*
+
+
+//command user id and helper map code today 07/05/2025
+@Controller
+@RequestMapping("/total_vehicless")
+@Slf4j
+public class installationControler {
+
+   private static final Logger logger = LoggerFactory.getLogger(installationControler.class);
 
     @Autowired
     private VehicleService vehicleService;
@@ -175,7 +331,7 @@ public class installDealer2Controler {
      * @param query (Optional) If provided, fetches serial number suggestions.
      * @param serialNo (Optional) If provided, fetches vehicle details by serial number.
      * @return ResponseEntity containing serial numbers or vehicle details.
-     */
+     
    
     @GetMapping
     public ResponseEntity<Object> handleVehicleRequests(
@@ -283,4 +439,4 @@ public class installDealer2Controler {
 //      return ResponseEntity.noContent().build();
 //  }
     
-
+*/

@@ -252,72 +252,54 @@
         });
     });
 </script>
-
 <script>
-  const API_URL = "/api/users/admin";
-
-  async function fetchAdminAndToggleMenu() {
-    try {
-      const response = await fetch(API_URL);
-      if (!response.ok) throw new Error("Failed to fetch admin data");
-
-      const data = await response.json();
-
-      // ✅ Fix: If API returns a list, get the first admin
-      const admin = Array.isArray(data) ? data[0] : data;
-
-      if (!admin || !admin.id) throw new Error("No admin ID found in response");
-
-      const adminId = String(admin.id);
-      localStorage.setItem("adminid", adminId);
-      console.log("✅ Admin ID saved:", adminId);
-
-      // Menu toggle logic
-      const allMenuIds = [
-        "menu-home",
-        "menu-admin",
-        "menu-assign-device",
-        "menu-tracking",
-        "menu-configuration",
-        "menu-report",
-        "menu-users",
-        "menu-notifications",
-        "menu-profile"
-      ];
-
-      const limitedMenuIds = [
-	  "menu-home",
-        "menu-admin",
-        "menu-assign-device",
-        "menu-profile"
-      ];
-
-      allMenuIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.display = "none";
-      });
-
-      if (adminId === "1" || adminId === "2") {
-        allMenuIds.forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.style.display = "block";
-        });
-      } else {
-        limitedMenuIds.forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.style.display = "block";
-        });
-      }
-
-    } catch (err) {
-      console.error("❌ Error loading admin:", err.message);
+  document.addEventListener("DOMContentLoaded", function () {
+    const adminEmail = localStorage.getItem("username"); // ← already saved on login
+    if (!adminEmail) {
+      console.warn("⚠️ No email found in localStorage under 'username'");
+      return;
     }
-  }
 
-  document.addEventListener("DOMContentLoaded", fetchAdminAndToggleMenu);
+    const normalizedEmail = adminEmail.trim().toLowerCase();
+    const allowedEmails = ["info1@thinture.com", "info2@thinture.com"];
+    const showAllNavItems = allowedEmails.includes(normalizedEmail);
+
+    // List of top-level nav-item <li> IDs
+    const allNavItemIds = [
+      "menu-home",
+      "menu-admin",
+      "menu-assign-device",
+      "menu-tracking",
+      "menu-configuration",
+      "menu-report",
+      "menu-users",
+      "menu-notifications",
+      "menu-profile"
+    ];
+
+    const allowedNavItemIds = [
+      "menu-home",
+      "menu-admin",
+      "menu-assign-device",
+      "menu-profile"
+    ];
+
+    // Hide all first
+    allNavItemIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = "none";
+    });
+
+    // Show allowed ones
+    const visibleIds = showAllNavItems ? allNavItemIds : allowedNavItemIds;
+    visibleIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = "block";
+    });
+
+    console.log("✅ Menu adjusted for:", normalizedEmail);
+  });
 </script>
-
-
 
 
 

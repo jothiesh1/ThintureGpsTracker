@@ -21,7 +21,7 @@ public class VehicleLastLocation extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "device_id", nullable = false, unique = true)
+    @Column(name = "device_id", unique = true)
     private String deviceId;
 
     @Column(name = "latitude", nullable = false)
@@ -60,10 +60,10 @@ public class VehicleLastLocation extends BaseEntity {
     
     private String speed ;
       
-    @Column(name = "serial_no")
+    @Column(name = "serial_no", unique = true)
     private String serialNo;
 
-    @Column(name = "imei")
+    @Column(name = "imei", unique = true)
     private String imei;
 
     // Add getters and setters
