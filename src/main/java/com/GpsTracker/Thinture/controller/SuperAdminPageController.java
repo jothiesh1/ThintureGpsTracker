@@ -219,6 +219,12 @@ public class SuperAdminPageController {
 	        logger.info("🔹 Accessed SuperAdmin - profile   ");
 	        return "superadmin/profile_superadmin";
 	    }
+	  
+	  @GetMapping("/superadmin/viewdevices")
+	    public String showView() {
+	        logger.info("🔹 Accessed SuperAdmin - viewdevices   ");
+	        return "superadmin/viewdevices";
+	    }
 
 		/*Original Map
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

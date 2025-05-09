@@ -112,6 +112,7 @@
 </dependency>
 
 
+
 		<!-- MQTT Integration -->
 		<dependency>
 			<groupId>org.springframework.integration</groupId>

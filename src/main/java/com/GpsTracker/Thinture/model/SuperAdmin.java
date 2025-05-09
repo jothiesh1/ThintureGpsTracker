@@ -10,8 +10,19 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+
+
 
 @Entity
+@Table(
+    name = "SuperAdmin",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = "email") // only email is recommended to be unique
+        // remove password uniqueness unless you're sure it's needed
+    }
+)
 public class SuperAdmin extends BaseEntity {
 
     @Id
@@ -20,8 +31,9 @@ public class SuperAdmin extends BaseEntity {
 
     @Column(name = "superadmin_id") // optional: keep this if you need a column
     private Long superadmin_id; // self-mapping, just return `id`
-
+    @Column(nullable = false, unique = true)
     private String email;
+
     private String password;
     private String country;
     private String phone;

@@ -14,16 +14,36 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 
 @Entity
-@Table(name = "Client")
+@Table(
+    name = "client",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = "email") // ✅ Enforce unique email
+        // Add more if needed: phone, companyName
+    }
+)
 public class Client extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    private String companyName;
+    private String address;
+    private String phone;
+    private String country;
+    private String password;
+    private boolean status = true;
+
+    
+    
+    private String resetToken;
     // Hybrid ID Fields
     @Column(name = "admin_id")
     private Long admin_id;
@@ -70,17 +90,7 @@ public class Client extends BaseEntity {
     private List<VehicleLastLocation> vehicleLastLocations = new ArrayList<>();
 
     // Login Fields
-    @Column(unique = true, nullable = true)
-    private String email;
 
-    private String companyName;
-    private String address;
-    private String phone;
-    private String country;
-    private String password;
-    private boolean status = true;
-
-    private String resetToken;
 
     // === Hybrid Mapping Accessors (from BaseEntity) ===
     @Override public Long getAdmin_id() { return admin_id; }

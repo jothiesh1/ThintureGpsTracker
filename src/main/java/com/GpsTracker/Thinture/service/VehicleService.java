@@ -18,6 +18,7 @@ import com.GpsTracker.Thinture.repository.VehicleHistoryRepository;
 import com.GpsTracker.Thinture.repository.VehicleLastLocationRepository;
 import com.GpsTracker.Thinture.repository.VehicleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -882,6 +883,88 @@ return saved;
         }
         logger.info("🔍 Fetching vehicle by IMEI: {}", imei);
         return vehicleRepository.findByImei(imei);
+    }
+
+    
+    //serial no edit
+    
+    public List<Vehicle> getAllDevices() {
+        return vehicleRepository.findAll();
+    }
+
+    // Update in both tables
+    @Transactional
+    public String updateDeviceBothTables(String oldSerial, Map<String, String> payload) {
+        try {
+            String newSerial = payload.get("serialNo");
+            String newImei = payload.get("imei");
+
+            logger.info("🔁 Update requested: oldSerial={}, newSerial={}, newImei={}", oldSerial, newSerial, newImei);
+
+            Optional<Vehicle> vehicleOpt = vehicleRepository.findBySerialNo(oldSerial).stream().findFirst();
+            if (vehicleOpt.isEmpty()) {
+                logger.warn("🚫 Vehicle not found for serialNo={}", oldSerial);
+                return null;
+            }
+
+            Vehicle vehicle = vehicleOpt.get();
+            String oldImei = vehicle.getImei(); // Save original IMEI before update
+
+            vehicle.setSerialNo(newSerial);
+            vehicle.setImei(newImei);
+            vehicleRepository.save(vehicle);
+            logger.info("✅ Vehicle updated: id={}, serialNo={}, imei={}", vehicle.getId(), newSerial, newImei);
+
+            // Now, only update VehicleLastLocation if serialNo also matches
+            Optional<VehicleLastLocation> lastOpt = vehicleLastLocationRepository.findByImeiAndSerialNo(oldImei, oldSerial);
+            if (lastOpt.isPresent()) {
+                VehicleLastLocation last = lastOpt.get();
+                last.setSerialNo(newSerial);
+                last.setImei(newImei);
+                last.setDeviceId(newSerial);
+                vehicleLastLocationRepository.save(last);
+                logger.info("✅ VehicleLastLocation updated: id={}, serialNo={}, imei={}", last.getId(), newSerial, newImei);
+            } else {
+                logger.warn("⚠️ No matching VehicleLastLocation for serialNo={} and imei={}", oldSerial, oldImei);
+            }
+
+            return "✅ Updated both vehicle and last location (if matched)";
+        } catch (Exception e) {
+            logger.error("❌ Exception in updateDeviceBothTables: {}", e.getMessage(), e);
+            throw new RuntimeException("Update failed", e);
+        }
+    }
+
+
+    // Delete from both tables
+    @Transactional
+    public String deleteBySerialNo(String serialNo) {
+        try {
+            List<Vehicle> vehicles = vehicleRepository.findBySerialNo(serialNo);
+            if (vehicles.isEmpty()) {
+                logger.warn("🚫 No vehicle found for serialNo={}", serialNo);
+                return null;
+            }
+
+            String imei = vehicles.get(0).getImei(); // Assuming unique serialNo = one record
+
+            Optional<VehicleLastLocation> lastOpt = vehicleLastLocationRepository.findByImeiAndSerialNo(imei, serialNo);
+
+            vehicleRepository.deleteAll(vehicles);
+            logger.info("✅ Deleted vehicle(s) with serialNo={}", serialNo);
+
+            if (lastOpt.isPresent()) {
+                vehicleLastLocationRepository.delete(lastOpt.get());
+                logger.info("✅ Deleted matching VehicleLastLocation for serialNo={} and imei={}", serialNo, imei);
+            } else {
+                logger.warn("⚠️ No matching VehicleLastLocation for serialNo={} and imei={}", serialNo, imei);
+            }
+
+            return "✅ Deleted from both tables (if matched)";
+        } catch (Exception e) {
+            logger.error("❌ Exception in deleteBySerialNo: {}", e.getMessage(), e);
+            throw new RuntimeException("Delete failed", e);
+        }
     }
 
 

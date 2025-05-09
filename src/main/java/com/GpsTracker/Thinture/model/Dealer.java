@@ -15,16 +15,26 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 
 @Entity
-@Table(name = "dealers")
+@Table(
+    name = "dealers",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = "email") // ✅ Ensure unique email
+    }
+)
 public class Dealer extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
+    
     @Column(name = "admin_id")
     private Long admin_id;
 
@@ -60,8 +70,7 @@ public class Dealer extends BaseEntity {
     private String companyName;
     private String address;
 
-    @Column(name = "email", unique = true, nullable = false)
-    private String email;
+
 
     private String phone;
     private String country;

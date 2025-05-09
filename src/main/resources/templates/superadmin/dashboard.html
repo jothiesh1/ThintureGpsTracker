@@ -4,18 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Thinture GPS Dashboard</title>
-  <link rel="icon" type="image/x-icon" href="THINTURE_IMAGE/favicon.jpg">
+  <link rel="icon" type="image/x-icon" href="/THINTURE_IMAGE/favicon.jpg">
 
   <!-- CSS CDN -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js/dist/Chart.min.css">
 
-  
-  <link rel="stylesheet" type="text/css" th:href="@{/css/styled.css}">
-  
-  
-  
+  <link rel="stylesheet" type="text/css" href="/css/styled.css">
+
   <!-- JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
@@ -40,8 +37,8 @@
       padding-bottom: 120px;
     }
     .card-custom {
-		position: relative;
-		top:50px;
+      position: relative;
+      top: 50px;
       background-color: rgba(255, 255, 255, 0.05);
       border: 1px solid #ccc;
       border-radius: 1rem;
@@ -49,184 +46,155 @@
       margin-bottom: 30px;
       box-shadow: 0 0 10px rgba(0,0,0,0.3);
     }
-    .card-title {
+    .table {
       color: #ffffff;
     }
+    .card-title { color: #ffffff; }
     .footer {
       background-color: rgba(15, 32, 65, 1);
       font-size: 12px;
       position: fixed;
-      bottom: 0; width: 100%;
-      text-align: center;
+      bottom: 0; width: 100%; text-align: center;
       padding: 10px;
     }
-	
     @media only screen and (max-width: 768px) {
-      canvas {
-        max-width: 100% !important;
-      }
+      canvas { max-width: 100% !important; }
     }
   </style>
 </head>
 <body>
   <div th:insert="navigation :: navbar"></div>
-
   <div class="container mt-5">
     <div class="row g-4">
+      <!-- Vehicle Status -->
       <div class="col-md-4">
-        <div class="card-custom">
-          <h5 class="card-title">Users Distribution</h5>
-          <canvas id="userTypeChart"></canvas>
+        <div class="card card-custom">
+          <div class="card-body">
+            <h5 class="card-title">Vehicle Status</h5>
+            <ul class="list-group list-group-flush" id="vehicleStatusList"></ul>
+          </div>
         </div>
       </div>
-
+      <!-- Vehicle Type Count -->
       <div class="col-md-4">
-        <div class="card-custom">
-          <h5 class="card-title">Vehicle Type Count</h5>
-          <canvas id="vehicleTypePieChart"></canvas>
+        <div class="card card-custom">
+          <div class="card-body">
+            <h5 class="card-title">Vehicle Type Count</h5>
+            <ul class="list-group list-group-flush" id="vehicleTypeList"></ul>
+          </div>
         </div>
       </div>
-
-	  <div class="col-md-4">
-	    <div class="card-custom">
-	      <h5 class="card-title">Driver Performance Report</h5>
-	      <canvas id="driverPerformanceChart"></canvas>
-	    </div>
-	  </div>
-	  <div class="col-md-4">
-	    <div class="card-custom">
-	      <h5 class="card-title">Violation Report</h5>
-	      <canvas id="violationChart"></canvas>
-	    </div>
-	  </div>
-	  	  <div class="col-md-4">
-	    <div class="card-custom">
-	      <h5 class="card-title">Complaint Status</h5>
-	      <canvas id="complaintStatusChart"></canvas>
-	    </div>
-	  </div>
-	  <div class="col-md-4">
-	    <div class="card-custom">
-	      <h5 class="card-title">Vehicle Status</h5>
-	      <canvas id="vehicleStatusChart"></canvas>
-	    </div>
-	  </div>
-<!--
-	  <div class="col-md-6">
-	  	    <div class="card-custom">
-	  	      <h5 class="card-title">Top 5 Vehicles by Usage (KM)</h5>
-	  	      <canvas id="topVehiclesChart"></canvas>
-	  	    </div>
-	  	  </div>
-		  
-		  
-		  <div class="col-md-6">
-		    <div class="card-custom">
-		      <h5 class="card-title">Device Expiry Status</h5>
-		      <div class="row g-2 mb-3">
-		        <div class="col-md-4">
-		          <label for="expiryYearFilter">Year</label>
-		          <select id="expiryYearFilter" class="form-select">
-		            <option value="All">All</option>
-		            <option value="2024">2024</option>
-		            <option value="2025">2025</option>
-		          </select>
-		        </div>
-		        <div class="col-md-4">
-		          <label for="expiryMonthFilter">Month</label>
-		          <select id="expiryMonthFilter" class="form-select">
-		            <option value="All">All</option>
-		            <option value="Jan">Jan</option>
-		            <option value="Feb">Feb</option>
-		            <option value="Mar">Mar</option>
-		            <option value="Apr">Apr</option>
-		            <option value="May">May</option>
-		            <option value="Jun">Jun</option>
-		            <option value="Jul">Jul</option>
-		            <option value="Aug">Aug</option>
-		            <option value="Sep">Sep</option>
-		            <option value="Oct">Oct</option>
-		            <option value="Nov">Nov</option>
-		            <option value="Dec">Dec</option>
-		          </select>
-		        </div>
-		        <div class="col-md-4">
-		          <label for="statusFilter">Status</label>
-		          <select id="statusFilter" class="form-select">
-		            <option value="All">All</option>
-		            <option value="Expiring This Month">Expiring This Month</option>
-		            <option value="Next Month">Next Month</option>
-		            <option value="Expired">Expired</option>
-		            <option value="Active">Active</option>
-		          </select>
-		        </div>
-		      </div>
-		      <canvas id="deviceExpiryChart" height="100"></canvas>
-		    </div>
-		  </div>
-		  -->
-
-	  <div class="card-custom mt-4">
-	    <h5 class="card-title">Vehicle Driven KM</h5>
-
-	    <div class="row mb-3">
-	      <div class="col-md-4">
-	        <label for="vehicleSelect">Select Vehicle</label>
-	        <select id="vehicleSelect" class="form-select">
-	          <option value="">-- Select Vehicle --</option>
-	          <!-- JS will populate options -->
-	        </select>
-	      </div>
-		 
-
-	      <div class="col-md-4">
-	        <label for="durationSelect">Filter By</label>
-	        <select id="durationSelect" class="form-select">
-	          <option value="day">Daily</option>
-	          <option value="week">Weekly</option>
-	          <option value="month" selected>Monthly</option>
-	        </select>
-	      </div>
-	      <div class="col-md-4 d-flex align-items-end">
-	        <button class="btn btn-primary w-100" onclick="loadKmChart()">🔄 Load Report</button>
-	      </div>
-	    </div>
-
-	    <canvas id="vehicleKmLineChart" height="100"></canvas>
-	  </div>
-
+      <!-- Users Distribution -->
+      <div class="col-md-4">
+        <div class="card card-custom">
+          <div class="card-body">
+            <h5 class="card-title">Users Distribution</h5>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Admin <span id="adminCount" class="badge bg-primary rounded-pill">0</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Dealer <span id="dealerCount" class="badge bg-success rounded-pill">0</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Client <span id="clientCount" class="badge bg-warning text-dark rounded-pill">0</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                User <span id="userCount" class="badge bg-danger rounded-pill">0</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
 
-	
-	
-	
+    <!-- Reports Row -->
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card card-custom">
+          <div class="card-body">
+            <h5 class="card-title">Driver Performance</h5>
+            <ul class="list-group list-group-flush" id="driverPerfList"></ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card card-custom">
+          <div class="card-body">
+            <h5 class="card-title">Violation Report</h5>
+            <ul class="list-group list-group-flush" id="violationList"></ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card card-custom">
+          <div class="card-body">
+            <h5 class="card-title">Complaint Status</h5>
+            <ul class="list-group list-group-flush" id="complaintList"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Vehicles Table -->
+    <div class="row g-4">
+      <div class="col-12">
+        <div class="card card-custom">
+          <div class="card-body">
+            <h5 class="card-title">Top 5 Vehicles by Usage (KM)</h5>
+            <div class="table-responsive">
+              <table class="table table-striped mb-0" id="topVehiclesTable">
+                <thead>
+                  <tr><th>#</th><th>Vehicle ID</th><th>Total KM Driven</th></tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vehicle KM Chart -->
+    <div class="card-custom mt-4">
+      <h5 class="card-title">Vehicle Driven KM</h5>
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label for="vehicleSelect">Select Vehicle</label>
+          <select id="vehicleSelect" class="form-select"><option value="">-- Select Vehicle --</option></select>
+        </div>
+        <div class="col-md-4">
+          <label for="durationSelect">Filter By</label>
+          <select id="durationSelect" class="form-select">
+            <option value="day">Daily</option>
+            <option value="week">Weekly</option>
+            <option value="month" selected>Monthly</option>
+          </select>
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+          <button class="btn btn-primary w-100" onclick="loadKmChart()">🔄 Load Report</button>
+        </div>
+      </div>
+      <canvas id="vehicleKmLineChart" height="100"></canvas>
+    </div>
+
+    <!-- Monthly Installation & Renewal Report -->
     <div class="card-custom mt-4">
       <h5 class="card-title">Monthly Installation & Renewal Report</h5>
       <div class="row g-2 mb-3">
         <div class="col-md-3">
           <label for="yearFilter">Year</label>
           <select id="yearFilter" class="form-select">
-            <option value="All">All</option>
-            <option value="2024">2024</option>
-            <option value="2025">2025</option>
+            <option value="All">All</option><option value="2024">2024</option><option value="2025">2025</option>
           </select>
         </div>
         <div class="col-md-3">
           <label for="monthFilter">Month</label>
           <select id="monthFilter" class="form-select">
             <option value="All">All</option>
-            <option value="Jan">Jan</option>
-            <option value="Feb">Feb</option>
-            <option value="Mar">Mar</option>
-            <option value="Apr">Apr</option>
-            <option value="May">May</option>
-            <option value="Jun">Jun</option>
-            <option value="Jul">Jul</option>
-            <option value="Aug">Aug</option>
-            <option value="Sep">Sep</option>
-            <option value="Oct">Oct</option>
-            <option value="Nov">Nov</option>
-            <option value="Dec">Dec</option>
+            <option>Jan</option><option>Feb</option><option>Mar</option><option>Apr</option>
+            <option>May</option><option>Jun</option><option>Jul</option><option>Aug</option><option>Sep</option>
+            <option>Oct</option><option>Nov</option><option>Dec</option>
           </select>
         </div>
         <div class="col-md-3">
@@ -240,127 +208,99 @@
       </div>
       <canvas id="monthlyReportChart" height="100"></canvas>
     </div>
-
-
   </div>
 
   <footer class="footer">
-    <div class="container">
+    <div class="container text-center">
       <p class="mb-1">© 2025 Thinture Technologies Pvt. Ltd. All rights reserved.</p>
       <p class="mb-1">Version v0.1</p>
-      <p class="mb-0">
-        <a href="mailto:info@thinture.com" class="text-info">info@thinture.com</a>
-      </p>
+      <a href="mailto:info@thinture.com" class="text-info">info@thinture.com</a>
     </div>
   </footer>
 
 	<script>
 		
 		
-		async function refreshVehicleStatusChart() {
-		    try {
-		        const response = await fetch('/api/vehicle/last/latests-locations/all');
-		        const data = await response.json();
+		async function refreshVehicleStatusList() {
+		  try {
+		    const response = await fetch('/api/vehicle/last/latests-locations/all');
+		    const data = await response.json();
 
-		        const statusCounts = { RUNNING: 0, IDLE: 0, PARKED: 0, OFFLINE: 0 };
-		        data.forEach(item => {
-		            const status = (item.vehicleStatus || '').toUpperCase();
-		            if (statusCounts[status] !== undefined) statusCounts[status]++;
-		        });
+		    // tally statuses
+		    const statusCounts = { Running: 0, Idle: 0, Parked: 0, Offline: 0 };
+		    data.forEach(item => {
+		      const s = (item.vehicleStatus || '').toUpperCase();
+		      if (statusCounts[s.charAt(0) + s.slice(1).toLowerCase()] !== undefined) {
+		        const key = s.charAt(0) + s.slice(1).toLowerCase();
+		        statusCounts[key]++;
+		      }
+		    });
 
-		        vehicleStatusChart.data.datasets[0].data = [
-		            statusCounts.RUNNING,
-		            statusCounts.IDLE,
-		            statusCounts.PARKED,
-		            statusCounts.OFFLINE
-		        ];
-		        vehicleStatusChart.update();
-		    } catch (err) {
-		        Swal.fire('Error!', 'Failed to refresh chart data.', 'error');
+		    // build list
+		    const ul = document.getElementById('vehicleStatusList');
+		    ul.innerHTML = ''; // clear existing
+		    const badgeClasses = {
+		      Running: 'bg-success',
+		      Idle:    'bg-warning text-dark',
+		      Parked:  'bg-info',
+		      Offline: 'bg-danger'
+		    };
+
+		    for (const [label, count] of Object.entries(statusCounts)) {
+		      const li = document.createElement('li');
+		      li.className = 'list-group-item d-flex justify-content-between align-items-center';
+		      li.innerHTML = `
+		        ${label}
+		        <span class="badge ${badgeClasses[label] || 'bg-secondary'} rounded-pill">${count}</span>
+		      `;
+		      ul.appendChild(li);
 		    }
+		  } catch (err) {
+		    console.error('Error refreshing vehicle status list:', err);
+		    Swal.fire('Error!', 'Failed to load vehicle status. Please try again.', 'error');
+		  }
 		}
 
-		
-		
-		
-		
-		
-		
-		document.addEventListener('DOMContentLoaded', async function () {
-		    const ctx = document.getElementById('userTypeChart').getContext('2d');
+		// call it once on page load:
+		document.addEventListener('DOMContentLoaded', refreshVehicleStatusList);
 
-		    try {
-		        const response = await fetch('/api/dashboard-summary/counts');
-		        const data = await response.json();
+		
+		
+		
+		
+		
+		
+		document.addEventListener('DOMContentLoaded', async () => {
+		  try {
+		    const res = await fetch('/api/dashboard-summary/counts');
+		    const data = await res.json();
 
-				const userTypeChart = new Chart(ctx, {
-				    type: 'doughnut',
-				    data: {
-				        labels: ['Admin', 'Dealer', 'Client', 'User'],
-				        datasets: [{
-				            data: [
-				                data.Admin || 0,
-				                data.Dealer || 0,
-				                data.Client || 0,
-				                data.User || 0
-				            ],
-				            backgroundColor: ['#9b59b6', '#2196F3', '#FFC107', '#F44336'],
-				            hoverBackgroundColor: ['#af7ac5', '#42A5F5', '#FFCA28', '#E57373'],
-				            borderColor: '#ffffff',
-				            borderWidth: 2
-				        }]
-				    },
-				    options: {
-				        cutout: '70%',
-				        plugins: {
-				            tooltip: {
-				                callbacks: {
-				                    label: function(context) {
-				                        const label = context.label || '';
-				                        const value = context.raw || 0;
-				                        return `${label}: ${value}`;
-				                    }
-				                }
-				            },
-				            legend: {
-				                display: true,
-				                position: 'bottom'
-				            },
-				            datalabels: {
-				                color: '#000',
-				                font: {
-				                    weight: 'bold',
-				                    size: 16
-				                },
-				                formatter: function(value) {
-				                    return value;
-				                }
-				            }
-				        },
-				        onClick: function(evt) {
-				            const activePoints = userTypeChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
-				            if (activePoints.length) {
-				                const clickedLabel = userTypeChart.data.labels[activePoints[0].index];
-				                if (clickedLabel === 'Admin') {
-				                    window.location.href = '/admin_view';
-				                } else if (clickedLabel === 'Dealer') {
-				                    window.location.href = '/dealer_view';
-				                } else if (clickedLabel === 'Client') {
-				                    window.location.href = 'clients.html';
-				                } else if (clickedLabel === 'User') {
-				                    window.location.href = 'users.html';
-				                }
-				            }
-				        }
-				    },
-				    plugins: [ChartDataLabels]
-				});
+		    document.getElementById('adminCount').textContent  = data.Admin  || 0;
+		    document.getElementById('dealerCount').textContent = data.Dealer || 0;
+		    document.getElementById('clientCount').textContent = data.Client || 0;
+		    document.getElementById('userCount').textContent   = data.User   || 0;
 
+		    // Optional: make the rows clickable exactly like your chart used to be
+		    document.querySelectorAll('.list-group-item').forEach(item => {
+		      item.style.cursor = 'pointer';
+		      item.addEventListener('click', () => {
+		        const label = item.firstChild.textContent.trim();
+		        if (label === 'Admin') {
+		          window.location.href = '/admin_view';
+		        } else if (label === 'Dealer') {
+		          window.location.href = '/dealer_view';
+		        } else if (label === 'Client') {
+		          window.location.href = 'clients.html';
+		        } else if (label === 'User') {
+		          window.location.href = 'users.html';
+		        }
+		      });
+		    });
 
-		    } catch (error) {
-		        console.error('Error fetching user type data:', error);
-		        Swal.fire('Error!', 'Failed to load user distribution. Please try again later.', 'error');
-		    }
+		  } catch (err) {
+		    console.error('Error fetching user distribution:', err);
+		    Swal.fire('Error!', 'Failed to load user distribution. Please try again later.', 'error');
+		  }
 		});
 
 		
@@ -371,220 +311,90 @@
 		
 		
 		
-		document.addEventListener('DOMContentLoaded', async function () {
-		    try {
-		        // Fetch vehicle status data
-		        const response = await fetch('/api/vehicle-status');
-		        const data = await response.json();
-
-		        // Assuming your API returns a structure like:
-		        // {
-		        //     running: 40, 
-		        //     idle: 30, 
-		        //     parked: 20, 
-		        //     offline: 10, 
-		        //     total: 100
-		        // }
-
-		        // Update total vehicles
-		        document.getElementById('dashboardTotalVehicles').textContent = data.total;
-
-		        // Update progress bars
-		        const total = data.total;
-
-		        // Calculate percentages for each status
-		        const runningPercentage = (data.running / total) * 100;
-		        const idlePercentage = (data.idle / total) * 100;
-		        const parkedPercentage = (data.parked / total) * 100;
-		        const offlinePercentage = (data.offline / total) * 100;
-
-		        // Set the width and label of each progress bar
-		        document.getElementById('runningBar').style.width = `${runningPercentage}%`;
-		        document.getElementById('runningBar').textContent = `Running (${data.running})`;
-
-		        document.getElementById('idleBar').style.width = `${idlePercentage}%`;
-		        document.getElementById('idleBar').textContent = `Idle (${data.idle})`;
-
-		        document.getElementById('parkedBar').style.width = `${parkedPercentage}%`;
-		        document.getElementById('parkedBar').textContent = `Parked (${data.parked})`;
-
-		        document.getElementById('offlineBar').style.width = `${offlinePercentage}%`;
-		        document.getElementById('offlineBar').textContent = `Offline (${data.offline})`;
-
-		    } catch (error) {
-		        console.error('Error fetching vehicle status data:', error);
-		        Swal.fire('Error!', 'Failed to load vehicle status data. Please try again later.', 'error');
+		document.addEventListener('DOMContentLoaded', async () => {
+		  // helper to render a list from an object of { label: count }
+		  function renderList(containerId, dataObj, badgeClassMap = {}) {
+		    const ul = document.getElementById(containerId);
+		    ul.innerHTML = ''; // clear
+		    for (let [label, count] of Object.entries(dataObj)) {
+		      const cls = badgeClassMap[label] || 'bg-secondary';
+		      ul.insertAdjacentHTML('beforeend', `
+		        <li class="list-group-item d-flex justify-content-between align-items-center">
+		          ${label}
+		          <span class="badge ${cls} rounded-pill">${count}</span>
+		        </li>
+		      `);
 		    }
+		  }
+
+		  try {
+		    // 1) Vehicle Type
+		    let res = await fetch('/api/dashboard-summary/vehicle-type-count');
+		    let vehicleTypes = await res.json(); 
+		    // optional: map colors per type
+		    renderList('vehicleTypeList', vehicleTypes, {
+		      Car:    'bg-primary',
+		      Truck:  'bg-success',
+		      Bike:   'bg-warning text-dark',
+		      // etc…
+		    });
+
+		    // 2) Driver Performance
+		    res = await fetch('/api/driver-performance');
+		    // assume [{ label:'Excellent', count:10 }, …]
+		    let perfArr = await res.json();
+		    let perfObj = Object.fromEntries(perfArr.map(d=>[d.label, d.count]));
+		    renderList('driverPerfList', perfObj, {
+		      Excellent: 'bg-success',
+		      Good:      'bg-primary',
+		      Average:   'bg-warning text-dark',
+		      Poor:      'bg-danger'
+		    });
+
+		    // 3) Violations
+		    res = await fetch('/api/violations-summary');
+		    let vioArr = await res.json();
+		    let vioObj = Object.fromEntries(vioArr.map(d=>[d.label, d.count]));
+		    renderList('violationList', vioObj, {
+		      'Driver: Overspeed': 'bg-danger',
+		      'Driver: Harsh Brake': 'bg-warning text-dark',
+		      'Vehicle: Engine Idle': 'bg-info',
+		      'Vehicle: Offline': 'bg-secondary'
+		    });
+
+		    // 4) Complaint Status
+		    res = await fetch('/api/dashboard-summary/complaint-status-count');
+		    let compObj = await res.json(); // { Open: x, 'In Progress': y, … }
+		    renderList('complaintList', compObj, {
+		      Open:          'bg-warning text-dark',
+		      'In Progress': 'bg-primary',
+		      Closed:        'bg-success',
+		      Rejected:      'bg-danger'
+		    });
+
+		    // 5) Vehicle Status
+		    res = await fetch('/api/vehicle-status');
+		    let vs = await res.json(); 
+		    // e.g. { running:40, idle:20, parked:10, offline:5 }
+		    // normalize keys to Title Case
+		    let vsObj = {
+		      Running: vs.running || 0,
+		      Idle:    vs.idle    || 0,
+		      Parked:  vs.parked  || 0,
+		      Offline: vs.offline || 0
+		    };
+		    renderList('vehicleStatusList', vsObj, {
+		      Running: 'bg-success',
+		      Idle:    'bg-warning text-dark',
+		      Parked:  'bg-info',
+		      Offline: 'bg-danger'
+		    });
+
+		  } catch (err) {
+		    console.error('Error populating lists:', err);
+		    Swal.fire('Error!', 'Could not load distribution data.', 'error');
+		  }
 		});
-
-
-		
-		
-		
-		
-		
-
-	
-	
-	
-	
-	
-	
-	
-	
-	//vehicle pie chart
-	
-	document.addEventListener('DOMContentLoaded', async function () {
-	          const vehicleCtx = document.getElementById('vehicleStatusPieChart').getContext('2d');
-
-	          // Default static data
-	          const defaultData = {
-	              running: 15,
-	              idle: 10,
-	              parked: 8,
-	              offline: 5
-	          };
-
-	          // Initialize Ring (Doughnut) Chart
-	          const vehicleStatusRingChart = new Chart(vehicleCtx, {
-	              type: 'doughnut', // Use doughnut for ring chart
-	              data: {
-	                  labels: ['Running', 'Idle', 'Parked', 'Offline'],
-	                  datasets: [{
-	                      data: [defaultData.running, defaultData.idle, defaultData.parked, defaultData.offline],
-	                      backgroundColor: ['#4CAF50', '#FFC107', '#2196F3', '#F44336'],
-	                      borderColor: '#ffffff',
-	                      borderWidth: 2
-	                  }]
-	              },
-	              options: {
-	                  responsive: true,
-	                  cutout: '70%', // Creates a ring chart (controls the inner cutout size)
-	                  plugins: {
-	                      legend: {
-	                          display: true,
-	                          position: 'bottom',
-	                          labels: {
-	                              color: '#fff' // makes legend visible on dark background
-	                          }
-	                      },
-	                      tooltip: {
-	                          callbacks: {
-	                              label: function(context) {
-	                                  return `${context.label}: ${context.raw}`;
-	                              }
-	                          }
-	                      },
-	                      datalabels: {
-	                          color: '#fff',  // White color for the data label
-	                          font: {
-	                              weight: 'bold',
-	                              size: 16
-	                          },
-	                          formatter: function(value) {
-	                              return value;  // Display count inside the chart
-	                          },
-	                          align: 'center', // Center the labels inside the ring
-	                          anchor: 'center' // Anchor the label to the center
-	                      }
-	                  }
-	              }
-	          });
-
-	          // Attempt to fetch real data
-	          try {
-	              const response = await fetch('/api/vehicle-status');
-	              const data = await response.json();
-
-	              // Update the chart with the fetched data, fallback to default if no data
-	              vehicleStatusRingChart.data.datasets[0].data = [
-	                  data.running || defaultData.running,
-	                  data.idle || defaultData.idle,
-	                  data.parked || defaultData.parked,
-	                  data.offline || defaultData.offline
-	              ];
-	              vehicleStatusRingChart.update();
-
-	          } catch (error) {
-	              // If the fetch fails, use the default data
-	              console.error('Error fetching vehicle status data:', error);
-	              Swal.fire('Error!', 'Failed to load live data. Showing default.', 'warning');
-	          }
-	      });
-
-
-	</script>
-	<script>
-	document.addEventListener('DOMContentLoaded', async function () {
-	    const ctxType = document.getElementById('vehicleTypePieChart').getContext('2d');
-
-	    const vehicleTypeChart = new Chart(ctxType, {
-	        type: 'doughnut',
-	        data: {
-	            labels: [],
-	            datasets: [{
-	                data: [],
-	                backgroundColor: ['#3498db', '#f1c40f', '#e74c3c', '#2ecc71', '#9b59b6', '#1abc9c'],
-	                borderWidth: 0,
-	                hoverOffset: 10
-	            }]
-	        },
-	        options: {
-	            responsive: true,
-	            cutout: '65%',
-	            plugins: {
-	                legend: {
-	                    display: true,
-	                    position: 'bottom',
-	                    labels: { color: '#ffffff' }
-	                },
-	                tooltip: {
-	                    enabled: true,
-	                    backgroundColor: '#2c3e50',
-	                    titleColor: '#fff',
-	                    bodyColor: '#fff',
-	                    padding: 10,
-	                    borderWidth: 2
-	                }
-	            }
-	        },
-	        plugins: [{
-	            id: 'label-inside-ring',
-	            afterDatasetDraw(chart) {
-	                const { ctx, data } = chart;
-	                const meta = chart.getDatasetMeta(0);
-	                ctx.fillStyle = '#fff';
-	                ctx.font = 'bold 16px Segoe UI';
-	                ctx.textAlign = 'center';
-	                ctx.textBaseline = 'middle';
-
-	                meta.data.forEach((arc, i) => {
-	                    const center = arc.tooltipPosition();
-	                    ctx.fillText(data.datasets[0].data[i], center.x, center.y);
-	                });
-	            }
-	        }]
-	    });
-
-	    // 🔄 Fetch real data from backend
-	    try {
-	        const response = await fetch('/api/dashboard-summary/vehicle-type-count'); // Update endpoint if needed
-	        const result = await response.json();
-
-	        const labels = Object.keys(result);
-	        const counts = Object.values(result);
-
-	        vehicleTypeChart.data.labels = labels;
-	        vehicleTypeChart.data.datasets[0].data = counts;
-	        vehicleTypeChart.update();
-
-	        console.log("✅ Vehicle Type Chart Updated:", { labels, counts });
-
-	    } catch (error) {
-	        console.error("❌ Vehicle type pie chart fetch failed:", error);
-	        Swal.fire('Error!', 'Could not load vehicle type data. Showing empty chart.', 'warning');
-	    }
-	});
 	</script>
 
 	
@@ -1262,7 +1072,39 @@
 			
 	
 
-	
+			document.addEventListener('DOMContentLoaded', async () => {
+			  const tbody = document.querySelector('#topVehiclesTable tbody');
+			  tbody.innerHTML = ''; // clear any placeholder
+
+			  try {
+			    const res = await fetch('/api/top-vehicles-by-usage');
+			    const list = await res.json();  // expecting [{ deviceId, totalKm }, …]
+
+			    list.forEach((item, idx) => {
+			      const tr = document.createElement('tr');
+			      tr.innerHTML = `
+			        <td>${idx + 1}</td>
+			        <td>${item.deviceId}</td>
+			        <td>${item.totalKm.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+			      `;
+			      tbody.appendChild(tr);
+			    });
+
+			    if (list.length === 0) {
+			      tbody.innerHTML = `
+			        <tr><td colspan="3" class="text-center">No data available</td></tr>
+			      `;
+			    }
+			  } catch (err) {
+			    console.error('Failed to load top vehicles:', err);
+			    tbody.innerHTML = `
+			      <tr><td colspan="3" class="text-center text-danger">
+			        Error loading data
+			      </td></tr>
+			    `;
+			  }
+			});
+
 	</script>
 
 	

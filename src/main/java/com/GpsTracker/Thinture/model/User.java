@@ -4,15 +4,33 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-
 @Entity
-@Table(name = "users")
+@Table(
+    name = "users",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = "email") // ✅ Ensure email is unique
+    }
+)
 public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
+    private String email;
+    
+    
+    private String companyName;
+    private String address;
+  
+    private String phone;
+    private String country;
+    private String password;
+    private boolean status = true;
+
+    
+    
     // Hybrid ID fields
     @Column(name = "admin_id")
     private Long admin_id;
@@ -55,14 +73,6 @@ public class User extends BaseEntity {
     // Additional fields
     @Column(unique = true, nullable = true)
     private String username;
-
-    private String companyName;
-    private String address;
-    private String email;
-    private String phone;
-    private String country;
-    private String password;
-    private boolean status = true;
 
 
   

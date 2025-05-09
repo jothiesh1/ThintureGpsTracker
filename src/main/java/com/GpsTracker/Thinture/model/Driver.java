@@ -6,10 +6,21 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 
+
 @Entity
-@Table(name = "newdrivers")
+@Table(
+    name = "newdrivers",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = "email") // ✅ Ensure email is unique
+    }
+)
 public class Driver extends BaseEntity {
 
+  
+
+    @Column(nullable = false, unique = true)
+    private String email;
+	 
     // Hybrid ID Fields
     @Column(name = "admin_id")
     private Long admin_id;
@@ -66,7 +77,7 @@ public class Driver extends BaseEntity {
     private String fullName;
     private LocalDate dob;
     private String contact;
-    private String email;
+   
     private String address;
     private String license;
     private String licenseType;

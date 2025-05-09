@@ -153,5 +153,12 @@ public class adminPageController {
     public String loadAdminProfilePage() {
         return "admin/profile_admin"; // not profile_admin.html
     }
-
+    @GetMapping("/admin/viewdevices_admin")
+    public String loadAdminDevicePage() {
+        return "admin/viewdevices_admin"; // not profile_admin.html
+    }
+    @GetMapping("/admin/serverLogs_admin")
+    public String serverLogsAdmin() {
+        return "admin/serverLogs_admin"; // not profile_admin.html
+    }
 }

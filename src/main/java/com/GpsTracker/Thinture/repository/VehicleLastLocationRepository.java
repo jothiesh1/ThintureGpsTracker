@@ -21,7 +21,12 @@ public interface VehicleLastLocationRepository extends BaseRestrictedRepository<
     
 	  
 	  Optional<VehicleLastLocation> findByImei(String imei);
-	
+	  Optional<VehicleLastLocation> findBySerialNo(String serialNo);
+
+	  Optional<VehicleLastLocation> findByImeiAndSerialNo(String imei, String serialNo);
+
+	  
+	  
     /**
      * Fetch all records.
      * @return List of VehicleLastLocation.

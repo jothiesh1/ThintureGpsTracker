@@ -8,6 +8,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -17,15 +18,40 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "admins")
+@Table(
+    name = "admins",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = "email") // ✅ Email must be unique
+        // You can add more like: @UniqueConstraint(columnNames = "phone") if needed
+    }
+)
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "vehicleHistory"})
 public class Admin extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
+    private String companyName;
+
+    private String address;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    private String phone;
+    private String country;
+    private String password;
+    
+    private boolean status = true;
+
+    private String resetToken;
+
+    
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "superadmin_id", nullable = true)
@@ -42,18 +68,6 @@ public class Admin extends BaseEntity {
 
     @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Driver> drivers = new ArrayList<>();
-
-    private String companyName;
-    private String address;
-    private String email;
-    private String phone;
-    private String country;
-    private String password;
-    
-    private boolean status = true;
-
-    private String resetToken;
-
     // === BaseEntity Implementation ===
     @Override public Long getAdmin_id() { return id; }
     @Override public void setAdmin_id(Long admin_id) { this.id = admin_id; }
