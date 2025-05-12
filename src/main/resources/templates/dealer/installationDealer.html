@@ -814,62 +814,90 @@
 		
 		<script>
 			function addDevice() {
-			    const userId = parseInt(document.getElementById("user-id").value.trim());
-			    const driverId = parseInt(document.getElementById("driver-id").value.trim()); // ✅ Add this line
+			    // 1️⃣ Define all required fields here:
+			    const required = [
+			      { id: "user-id",           name: "User"               },
+			      { id: "driver-id",         name: "Driver"             },
+			      { id: "owner-name",        name: "Owner Name"         },
+			      { id: "vehiclenumber",     name: "Vehicle Number"     },
+			      { id: "vehicle-type",      name: "Vehicle Type"       },
+			      { id: "engine-number",     name: "Engine Number"      },
+			      { id: "manufacturer",      name: "Manufacturer"       },
+			      { id: "model",             name: "Model"              },
+			      { id: "installation-date", name: "Installation Date"  },
+			      { id: "serialNoInput",     name: "Serial No"          },
+			      { id: "installer-name",    name: "Technician Name"    },
+			      { id: "imei",              name: "IMEI"               },
+			      { id: "sim-number",        name: "SIM Number"         },
+			      { id: "dealer-name",       name: "Dealer Name"        },
+			      { id: "dealer-phone",      name: "Dealer Phone"       },
+			      { id: "country",           name: "Country"            }
+			    ];
+
+			    // 2️⃣ Find which ones are empty
+			    const missing = required
+			      .filter(f => !document.getElementById(f.id).value.trim())
+			      .map(f => f.name);
+
+			    if (missing.length) {
+			      // 3️⃣ Show a Swal error and stop
+			      Swal.fire({
+			        icon: 'error',
+			        title: 'Missing Fields',
+			        html: `Please fill out the following:<br><strong>${missing.join('</strong>, <strong>')}</strong>`
+			      });
+			      return;
+			    }
+
+			    // — all good, collect your data and POST —
+			    const userId   = parseInt(document.getElementById("user-id").value, 10);
+			    const driverId = parseInt(document.getElementById("driver-id").value, 10);
 
 			    const vehicleDetails = {
-			        serialNo: document.getElementById("serialNoInput").value.trim(),
-			        imei: document.getElementById("imei").value.trim(),
-			        vehicleNumber: document.getElementById("vehiclenumber").value.trim(),
-			        ownerName: document.getElementById("owner-name").value.trim(),
-			        vehicleType: document.getElementById("vehicle-type").value.trim(),
-			        engineNumber: document.getElementById("engine-number").value.trim(),
-			        manufacturer: document.getElementById("manufacturer").value.trim(),
-			        model: document.getElementById("model").value.trim(),
-			        installationDate: document.getElementById("installation-date").value.trim(),
-			        technicianName: document.getElementById("installer-name").value.trim(),
-			        simNumber: document.getElementById("sim-number").value.trim(),
-			        dealerName: document.getElementById("dealer-name").value.trim(),
-			        addressPhone: document.getElementById("dealer-phone").value.trim(),
-			        country: document.getElementById("country").value.trim(),
-
-			        // ✅ Include user and driver in the request body
-			        user: userId ? { id: userId } : null,
-			        driver_id: driverId || null
+			      user:            { id: userId },
+			      driver_id:       driverId,
+			      ownerName:       document.getElementById("owner-name").value.trim(),
+			      vehicleNumber:   document.getElementById("vehiclenumber").value.trim(),
+			      vehicleType:     document.getElementById("vehicle-type").value.trim(),
+			      engineNumber:    document.getElementById("engine-number").value.trim(),
+			      manufacturer:    document.getElementById("manufacturer").value.trim(),
+			      model:           document.getElementById("model").value.trim(),
+			      installationDate:document.getElementById("installation-date").value.trim(),
+			      serialNo:        document.getElementById("serialNoInput").value.trim(),
+			      technicianName:  document.getElementById("installer-name").value.trim(),
+			      imei:            document.getElementById("imei").value.trim(),
+			      simNumber:       document.getElementById("sim-number").value.trim(),
+			      dealerName:      document.getElementById("dealer-name").value.trim(),
+			      addressPhone:    document.getElementById("dealer-phone").value.trim(),
+			      country:         document.getElementById("country").value.trim()
 			    };
 
 			    fetch("/total_vehicles/add-vehicle-and-device", {
-			        method: "POST",
-			        headers: {
-			            "Content-Type": "application/json"
-			        },
-			        body: JSON.stringify(vehicleDetails)
+			      method: "POST",
+			      headers: { "Content-Type": "application/json" },
+			      body: JSON.stringify(vehicleDetails)
 			    })
-				.then(response => {
-								    if (response.ok) {
-								        Swal.fire({
-								            icon: 'success',
-								            title: 'Success!',
-								            text: '✅ Vehicle and device added successfully!',
-								            timer: 2000,
-								            showConfirmButton: false
-								        });
-								    } else {
-								        return response.text().then(text => {
-								            throw new Error(text);
-								        });
-								    }
-								})
-								.catch(error => {
-								    Swal.fire({
-								        icon: 'error',
-								        title: 'Error!',
-								        text: error.message || 'Something went wrong while adding the vehicle/device.',
-								    });
-								});
-
-							}
-
+			      .then(resp => {
+			        if (resp.ok) {
+			          Swal.fire({
+			            icon: 'success',
+			            title: 'Success',
+			            text: 'Vehicle and device added successfully!',
+			            timer: 2000,
+			            showConfirmButton: false
+			          });
+			        } else {
+			          return resp.text().then(txt => { throw new Error(txt) });
+			        }
+			      })
+			      .catch(err => {
+			        Swal.fire({
+			          icon: 'error',
+			          title: 'Error',
+			          text: err.message || 'Something went wrong.'
+			        });
+			      });
+			  }
 
 		</script>
 		<script>

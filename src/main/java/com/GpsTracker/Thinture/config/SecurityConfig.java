@@ -16,8 +16,12 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.List;
+
+
+
 @Configuration
 public class SecurityConfig {
 
@@ -28,12 +32,24 @@ public class SecurityConfig {
         this.cookieValidationFilter = cookieValidationFilter;
     }
 
-    // ✅ FILTER CHAIN FOR API URLs (OTA check should be public)
+    // ✅ 1. Allow public access to /mapHere via separate filter chain
+    @Bean
+    @Order(0)
+    public SecurityFilterChain mapHereFilterChain(HttpSecurity http) throws Exception {
+        return http
+            .securityMatcher(new AntPathRequestMatcher("/mapHere/**")) // ✅ use Ant-style pattern matcher
+            .csrf().disable()
+            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+            .build();
+    }
+
+
+    // ✅ 2. API security chain
     @Bean
     @Order(1)
     public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
         http
-            .securityMatcher("/api/**") // Applies to all /api/... requests
+            .securityMatcher("/api/**")
             .csrf().disable()
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/ota/firmware/update_check").permitAll()
@@ -45,7 +61,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // ✅ DEFAULT FILTER CHAIN for UI
+    // ✅ 3. Default web UI filter chain
     @Bean
     @Order(2)
     public SecurityFilterChain defaultFilterChain(HttpSecurity http) throws Exception {
@@ -57,7 +73,7 @@ public class SecurityConfig {
                     "/forgot_password",
                     "/reset_password",
                     "/resources/**",
-                    "/map",
+                    "/map",                   // ✅ other public pages if needed
                     "/THINTURE_IMAGE/**",
                     "/css/**",
                     "/js/**",
@@ -68,6 +84,7 @@ public class SecurityConfig {
                 ).permitAll()
                 .requestMatchers(HttpMethod.POST, "/login").permitAll()
 
+                // ✅ Role-based access
                 .requestMatchers("/superadmin/page/**").hasRole("SUPERADMIN")
                 .requestMatchers("/admin/page/**").hasRole("ADMIN")
                 .requestMatchers("/dealer/page/**").hasRole("DEALER")
@@ -96,6 +113,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // ✅ Authentication manager setup
     @Bean
     public DaoAuthenticationProvider authenticationProvider(UserDetailsService userDetailsService) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -111,10 +129,9 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance(); // ⚠ use BCrypt for production
+        return NoOpPasswordEncoder.getInstance(); // ⚠️ use BCrypt in production
     }
 }
-
 
 
 

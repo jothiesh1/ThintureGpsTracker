@@ -78,4 +78,12 @@ public class userPageController {
         logger.info("🔹 Displaying user/vehicle_violation_user.html");
         return "user/profile_user";
     }
+    
+
+    @GetMapping("/error")
+    public String UserProfilerror (Model model) {
+        logger.info("🔹 Displaying user/vehicle_violation_user.html");
+        return "error";
+    }
 }
+

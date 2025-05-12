@@ -60,54 +60,7 @@ public class VehicleController {
     private MailService mailService;
 
     
-    @GetMapping("/api/devices")
-    public ResponseEntity<List<Map<String, String>>> getAllVehicles() {
-        logger.info("🔍 Fetching all vehicles from the database...");
-        
-        List<Vehicle> vehicles = vehicleService.getAllDevices();
-        logger.info("✅ Retrieved {} vehicle records", vehicles.size());
-
-        List<Map<String, String>> result = new ArrayList<>();
-        for (Vehicle v : vehicles) {
-            Map<String, String> item = new HashMap<>();
-            item.put("serialNo", v.getSerialNo());
-            item.put("imei", v.getImei());
-            result.add(item);
-            logger.debug("📦 Vehicle - Serial: {}, IMEI: {}", v.getSerialNo(), v.getImei());
-        }
-
-        return ResponseEntity.ok(result);
-    }
-
-    @PutMapping("/api/devicesedit")
-    public ResponseEntity<String> updateDeviceBothTables(@RequestParam String serialNo, @RequestBody Map<String, String> payload) {
-        logger.info("🛠️ Update request for serialNo: {}", serialNo);
-        logger.debug("📥 Payload: {}", payload);
-
-        String result = vehicleService.updateDeviceBothTables(serialNo, payload);
-        if (result != null) {
-            logger.info("✅ Update successful for serialNo: {}", serialNo);
-            return ResponseEntity.ok(result);
-        } else {
-            logger.warn("❌ Update failed — Device not found: {}", serialNo);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("❌ Device not found");
-        }
-    }
-
-    @DeleteMapping("/api/devicesdelete")
-    public ResponseEntity<String> deleteDevice(@RequestParam String serialNo) {
-        logger.info("🗑️ Delete request for serialNo: {}", serialNo);
-
-        String result = vehicleService.deleteBySerialNo(serialNo);
-        if (result != null) {
-            logger.info("✅ Deletion successful for serialNo: {}", serialNo);
-            return ResponseEntity.ok(result);
-        } else {
-            logger.warn("❌ Deletion failed — Device not found: {}", serialNo);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("❌ Device not found");
-        }
-    }
-
+   
 
     
     
@@ -215,6 +168,7 @@ public class VehicleController {
      * @param serialNo (Optional) If provided, fetches vehicle details by serial number.
      * @return ResponseEntity containing serial numbers or vehicle details.
      */
+    
     @GetMapping
     public ResponseEntity<Object> handleVehicleRequests(
             @RequestParam(required = false) String query,
@@ -245,7 +199,53 @@ public class VehicleController {
     }
     
     
-    
+    @GetMapping("/api/devices")
+    public ResponseEntity<List<Map<String, String>>> getAllVehicles() {
+        logger.info("🔍 Fetching all vehicles from the database...");
+        
+        List<Vehicle> vehicles = vehicleService.getAllDevices();
+        logger.info("✅ Retrieved {} vehicle records", vehicles.size());
+
+        List<Map<String, String>> result = new ArrayList<>();
+        for (Vehicle v : vehicles) {
+            Map<String, String> item = new HashMap<>();
+            item.put("serialNo", v.getSerialNo());
+            item.put("imei", v.getImei());
+            result.add(item);
+            logger.debug("📦 Vehicle - Serial: {}, IMEI: {}", v.getSerialNo(), v.getImei());
+        }
+
+        return ResponseEntity.ok(result);
+    }
+
+    @PutMapping("/api/devicesedit")
+    public ResponseEntity<String> updateDeviceBothTables(@RequestParam String serialNo, @RequestBody Map<String, String> payload) {
+        logger.info("🛠️ Update request for serialNo: {}", serialNo);
+        logger.debug("📥 Payload: {}", payload);
+
+        String result = vehicleService.updateDeviceBothTables(serialNo, payload);
+        if (result != null) {
+            logger.info("✅ Update successful for serialNo: {}", serialNo);
+            return ResponseEntity.ok(result);
+        } else {
+            logger.warn("❌ Update failed — Device not found: {}", serialNo);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("❌ Device not found");
+        }
+    }
+
+    @DeleteMapping("/api/devicesdelete")
+    public ResponseEntity<String> deleteDevice(@RequestParam String serialNo) {
+        logger.info("🗑️ Delete request for serialNo: {}", serialNo);
+
+        String result = vehicleService.deleteBySerialNo(serialNo);
+        if (result != null) {
+            logger.info("✅ Deletion successful for serialNo: {}", serialNo);
+            return ResponseEntity.ok(result);
+        } else {
+            logger.warn("❌ Deletion failed — Device not found: {}", serialNo);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("❌ Device not found");
+        }
+    }
 
 
 }

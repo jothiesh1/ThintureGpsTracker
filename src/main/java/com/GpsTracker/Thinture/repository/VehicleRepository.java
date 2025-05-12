@@ -30,10 +30,12 @@ public interface VehicleRepository extends BaseRestrictedRepository<Vehicle, Lon
  // Find Serial Numbers by Prefix
    // @Query("SELECT v FROM Vehicle v WHERE v.serialNo = :serialNo")
     // Optional<Vehicle> findBySerialNo(@Param("serialNo") String serialNo);
-    @Query("SELECT v.serialNo FROM Vehicle v WHERE v.serialNo LIKE CONCAT('%', :query, '%')")
+    @Query("SELECT v.serialNo FROM Vehicle v WHERE v.serialNo LIKE CONCAT('%', :query, '%') AND v.installationDate IS NULL")
     List<String> findSerialNosByQuery(@Param("query") String query);
 
- 
+    
+   List<Vehicle> findBySerialNo(String serialNo);
+  
     
  // Fetch all distinct device IDs from the vehicle table
     @Query("SELECT DISTINCT v.deviceID FROM Vehicle v")
@@ -92,9 +94,7 @@ public interface VehicleRepository extends BaseRestrictedRepository<Vehicle, Lon
     @Query("SELECT v.vehicleNumber FROM Vehicle v WHERE v.user_id = :userId")
     List<String> findVehicleNumbersByUserId(@Param("userId") Long userId);
 
-    List<Vehicle> findBySerialNo(String serialNo);
-    //  Optional<Vehicle> findBySerialNo(String serialNo);
-    
+   
     @Query("SELECT v FROM Vehicle v WHERE UPPER(v.deviceID) = UPPER(:deviceID)")
     Optional<Vehicle> findByDeviceID(@Param("deviceID") String deviceID);
     

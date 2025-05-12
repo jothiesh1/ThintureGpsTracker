@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>HERE Map Speed Limit Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- HERE Maps SDK -->
+  <script src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
+  <script src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
+  <script src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
+  <script src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
+  <link rel="stylesheet" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
+
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; }
+    #mapContainer { width: 100%; height: 100vh; }
+    .info-label {
+      background: white;
+      border: 1px solid #333;
+      padding: 5px 8px;
+      font-size: 14px;
+      color: #333;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="mapContainer"></div>
+
+<script>
+  const API_KEY = '1Z7vOo2mWZb0FOU2teP-ETBhWxQ44ANqGBPvNZd5aaM';
+
+  // Initialize platform
+  const platform = new H.service.Platform({ apikey: API_KEY });
+  const defaultLayers = platform.createDefaultLayers();
+
+  // Initialize map
+  const map = new H.Map(document.getElementById('mapContainer'),
+    defaultLayers.vector.normal.map, {
+      center: { lat: 12.9716, lng: 77.5946 },
+      zoom: 13,
+      pixelRatio: window.devicePixelRatio || 1
+  });
+
+  // Add interactions
+  const behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+  const ui = H.ui.UI.createDefault(map, defaultLayers);
+
+  // Resize map
+  window.addEventListener('resize', () => map.getViewPort().resize());
+
+  // Handle map click
+  map.addEventListener('tap', function(evt) {
+    const coord = map.screenToGeo(evt.currentPointer.viewportX, evt.currentPointer.viewportY);
+    fetchSpeedLimit(coord.lat, coord.lng);
+  });
+
+  // Fetch speed limit using HERE Map Attributes API
+  async function fetchSpeedLimit(lat, lng) {
+    const bbox = `${lat - 0.001},${lng - 0.001};${lat + 0.001},${lng + 0.001}`;
+    const url = `https://mapattributes.hereapi.com/v2/attributes.json?apiKey=${API_KEY}&layer=ROAD_GEOM_FCn&attributes=SPEED_LIMITS_FCn&bbox=${bbox}`;
+
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+
+      // Clear old markers
+      map.removeObjects(map.getObjects());
+
+      if (data.features && data.features.length > 0) {
+        const feature = data.features[0];
+        const coords = feature.geometry.coordinates[0];
+        const speed = feature.properties.SPEED_LIMITS_FCn?.speedLimit?.value;
+
+        const roadLine = new H.map.Polyline(
+          new H.geo.LineString().pushLatLngAlt(...coords),
+          { style: { strokeColor: 'red', lineWidth: 4 } }
+        );
+        map.addObject(roadLine);
+
+        const labelEl = document.createElement('div');
+        labelEl.className = 'info-label';
+        labelEl.innerText = speed ? `Speed Limit: ${speed} km/h` : 'No speed data';
+        const label = new H.map.DomMarker({ lat, lng }, { domElement: labelEl });
+        map.addObject(label);
+
+      } else {
+        alert("❌ No speed limit data found.");
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+      alert("❌ Failed to fetch speed limit.");
+    }
+  }
+</script>
+
+</body>
+</html>
