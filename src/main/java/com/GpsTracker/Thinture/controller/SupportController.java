@@ -96,32 +96,25 @@ public class SupportController {
         return ResponseEntity.ok(result);
     }
 
-    /**
-     * 🔎 Get IMEI number by vehicle number
-     */
-    @GetMapping("/imei-by-number/{vehicleNumber}")
-    public ResponseEntity<String> getImeiByVehicleNumber(@PathVariable String vehicleNumber) {
-    	
-    	
-        logger.info("🔍 IMEI fetch requested for vehicle number: {}", vehicleNumber);
+ 
+        
+    
 
-        Optional<Vehicle> vehicleOpt = vehicleRepository.findByVehicleNumber(vehicleNumber);
+    @GetMapping("/serialno-by-deviceid/{deviceID}")
+    public ResponseEntity<String> getSerialNoByDeviceID(@PathVariable String deviceID) {
+        logger.info("🔍 Fetching serial number for device ID (from UI vehicleNumber): {}", deviceID);
 
-        if (vehicleOpt.isPresent()) {
-            String imei = vehicleOpt.get().getImei();
-            logger.info("✅ IMEI found for {}: {}", vehicleNumber, imei);
-            return ResponseEntity.ok(imei);
-        } else {
-            logger.warn("❌ No IMEI found for vehicle: {}", vehicleNumber);
-            return ResponseEntity.notFound().build();
-        }
+        Optional<Vehicle> vehicleOpt = vehicleRepository.findByDeviceID(deviceID);
+
+        return vehicleOpt.map(vehicle -> {
+            String serialNo = vehicle.getSerialNo();
+            logger.info("✅ Found serial number for {}: {}", deviceID, serialNo);
+            return ResponseEntity.ok(serialNo);
+        }).orElseGet(() -> {
+            logger.warn("❌ No vehicle found for device ID: {}", deviceID);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Serial number not found");
+        });
     }
-
-
-
-
-
-
 
 
     /**

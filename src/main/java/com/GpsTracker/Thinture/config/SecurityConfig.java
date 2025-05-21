@@ -80,6 +80,8 @@ public class SecurityConfig {
                     "/static/**",
                     "/firmware/**",
                     "/firmware/main.hex",
+                    "/map",            // ✅ Thymeleaf route, public access
+                    "/map.html", 
                     "/access-denied"
                 ).permitAll()
                 .requestMatchers(HttpMethod.POST, "/login").permitAll()

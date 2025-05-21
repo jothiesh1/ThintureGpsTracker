@@ -1,1434 +1,2058 @@
-
 <!DOCTYPE html>
 <html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Thinture GPS</title>
-		    <link rel="icon" type="image/x-icon" href="THINTURE_IMAGE/favicon.jpg">
+    <title>Thinture GPS</title>
+    <link rel="icon" type="image/x-icon" href="/THINTURE_IMAGE/favicon.jpg">
+
+    <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
-	<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css">
-	<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/sdist/MarkerCluster.Default.css">
-	<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <!-- WebSocket Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+	<script src="https://cdn.jsdelivr.net/npm/tz-lookup@6.1.25/tz.min.js"></script>
+
     <style>
+		/* Prevent main body scroll */
+		html, body {
+		    overflow: hidden;
+		    
+		}
+
+		.custom-tab-bar {
+		       display: flex;
+		       background-color: #f0f0f0;
+		       border-bottom: 1px solid #ccc;
+		       border-radius: 8px 8px 0 0;
+		       overflow: hidden;
+		   }
+
+		   .custom-tab-btn {
+		       flex: 1;
+		       padding: 8px 12px;
+		       border: none;
+		       background-color: #f0f0f0;
+		       color: black;
+		       font-weight: bold;
+		       cursor: pointer;
+		       outline: none;
+		       transition: background-color 0.3s;
+		   }
+
+		   .custom-tab-btn.active {
+		       background-color: #0f1e41;
+		       color: white;
+		   }
+
+		   .custom-tab-content {
+		       display: none;
+		       padding: 10px 0;
+		   }
+
+		   .custom-tab-content.active {
+		       display: block;
+		   }
+		   
+		   
+		   
+		   
+		   
+		   
+		
+				#toggleButton {
+				    position: fixed;
+				    top: 210px;
+				    right: 20px;
+				    z-index: 1001;
+				     background-color: rgba(15, 32, 65, 0.9);
+				    color: white;
+				    border: none;
+				    border-radius: 45px;
+				    padding: 10px 14px;
+				    font-size: 18px;
+				    cursor: pointer;
+				    transition: all 0.3s ease;
+				    
+				}
+				@media (max-width: 768px) {
+				    #toggleButton {
+				        position: fixed;
+				        top: 190px !important;  /* Or adjust slightly */
+				        right: 10px;
+				        background-color: #0f1e41;
+				        color: white;
+				        font-size: 16px;
+				        border-radius: 30px;
+				        z-index: 5000;
+				        padding: 10px 14px;
+				    }
+				}
+
+
+				#toggleButton.active {
+				    right: 370px;
+				}
+
+				
+				
+				
+				
+				/* Sidebar positioning and transitions */
+				#sidebar {
+				    position: fixed;
+				    top: 120px;
+				    right: -450px;
+				    width: 380px;
+				    height: 75vh;
+				    background: rgba(15, 32, 65, 0.8);
+				   
+				    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.6);
+				    border-radius: 12px 0 0 12px;
+				    backdrop-filter: blur(12px);
+				    padding: 20px;
+				    color: #ffffff;
+				    z-index: 1000;
+				    transition: right 0.4s ease;
+				    overflow: hidden;
+				    animation: slideIn 0.5s ease;
+				}
+
+				#sidebar.active {
+				    right: 0;
+				}
+
+				#sidebar h2 {
+				    font-size: 24px;
+				    font-weight: bold;
+				    color: #00f7ff;
+				    margin-bottom: 20px;
+				    border-bottom: 2px solid #00f7ff;
+				    padding-bottom: 10px;
+				    text-shadow: 0 0 4px #00f7ff;
+				}
+
+			
+
+				#searchBar {
+				    background: rgba(0, 0, 0, 0.3);
+				    border: 1px solid darkslategrey;
+				    border-radius: 8px;
+				    padding: 10px;
+				    color: white;
+				    font-size: 13px;
+				    margin-bottom: 20px;
+				    width: 100%;
+				    box-shadow: 0 0 8px rgba(0, 209, 178, 0.2);
+				}
+
+				#searchBar::placeholder {
+				    color: #aaa;
+				}
+
+				.table {
+				    font-size: 12px;
+				    border-radius: 10px;
+				    overflow: hidden;
+				    background-color: #fefefe;
+				}
+
+				.table th {
+				    background: linear-gradient(90deg,  rgba(15, 32, 65, 0.9),  rgba(15, 32, 65, 0.9));
+				    color: white;
+				    font-weight: bold;
+				    text-align: center;
+				    padding: 8px;
+				}
+
+				.table td {
+				    background: white;
+				    text-align: center;
+				    padding: 8px;
+				    vertical-align: middle;
+				}
+
+			
+
+
+				@media (max-width: 768px) {
+				  #sidebar {
+				    width: 90% !important;
+				    right: -100%;
+				    top: 150px !important;
+				    height: 70vh !important;
+				    z-index: 2000;
+				    border-radius: 0;
+				  }
+				  #sidebar.active {
+				    right: 0;
+				  }
+				}
+
+				
+				
+				
+				
+				
+				
+				#map {
+							margin-top: 10px;
+							height: calc(120vh - 150px);
+							position: relative;
+						}
+						
+
+						
+						
+						
+        /* Marker Animation */
+        .highlight-marker { animation: bounce 0.5s ease-in-out 2; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+		
+		
 		
 
-		#map {
-				position: absolute;
-				height: calc(100vh - 150px);
-				position: sticky;
-				top:55px;
-			}
-
-		/* Icon and Animation Styles */
-		.custom-icon img {
-		    transform-origin: center center;
-		    transition: transform 0.5s ease-in-out;
+		/* Live indicator with ripple effect */
+		.live-indicator {
+		    display: inline-block;
+		    position: relative;
+		    color: green;
+		    font-weight: bold;
 		}
 
-		@keyframes blink-zoom {
-		    0% { transform: scale(1) rotate(var(--rotation)); }
-		    50% { transform: scale(1.3) rotate(var(--rotation)); }
-		    100% { transform: scale(1) rotate(var(--rotation)); }
+		/* Water ripple animation */
+		.live-indicator .ripple {
+		    position: absolute;
+		    width: 12px;
+		    height: 12px;
+		    border-radius: 50%;
+		    background-color: rgba(0, 255, 0, 0.4);
+		    animation: rippleEffect 1.5s infinite;
 		}
 
-		/* Base */
-		.alert-container {
-		   display: flex;
-		   flex-direction: column;
-		   gap: 10px;
-		   max-width: 400px;
-		   position: fixed;
-		   top: 20px;
-		   right: 20px;
-		   z-index: 1000;
+		.live-indicator .ripple:nth-child(2) {
+		    animation-delay: 0.5s;
+		}
+		.live-indicator .ripple:nth-child(3) {
+		    animation-delay: 1s;
 		}
 
-		/* Alert Styles */
-		.live-alert, .parking-alert {
-		   opacity: 0;
-		   transform: translateX(100%);
-		   animation: slideIn 0.5s ease-out forwards;
-		   display: flex;
-		   align-items: center;
-		   gap: 15px;
-		   padding: 15px 20px;
-		   border-radius: 10px;
-		   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-		   backdrop-filter: blur(5px);
-		   border: 1px solid rgba(255, 255, 255, 0.1);
-		   color: white;
-		   width: 100%;
-		   box-sizing: border-box;
+		@keyframes rippleEffect {
+		    0% {
+		        transform: scale(0.5);
+		        opacity: 1;
+		    }
+		    100% {
+		        transform: scale(2.5);
+		        opacity: 0;
+		    }
 		}
 
-		.live-alert { background: linear-gradient(135deg, #27ae60, #2ecc71); }
-		.parking-alert { background: linear-gradient(135deg, #2c3e50, #3498db); }
-
-		/* Icons */
-		.live-icon, .parking-icon {
-		   width: 32px;
-		   height: 32px;
-		   animation: pulse 2s infinite;
-		   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-		   flex-shrink: 0;
+		
+		
+		
+		#vehicle-details-popup {
+		    position: absolute;
+		    background: white;
+		    color: black;
+		    font-size: 14px;
+		    padding: 15px;
+		    border-radius: 8px;
+		    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+		    border: 1px solid #ddd;
+		    display: none;
+		    z-index: 1000;
+		    width: 280px;
 		}
 
-		/* Info */
-		.live-info, .parking-info {
-		   display: flex;
-		   flex-direction: column;
-		   gap: 4px;
-		   flex: 1;
+		.popup-header {
+		    display: flex;
+		    justify-content: space-between;
+		    font-weight: bold;
+		    color: darkblue;
+		    border-bottom: 1px solid #ddd;
+		    padding-bottom: 5px;
+		    margin-bottom: 10px;
 		}
 
-		.live-info strong, .parking-info strong {
-		   font-size: 16px;
-		   margin-bottom: 2px;
+		.close-btn {
+		    cursor: pointer;
+		    font-size: 18px;
+		    color: red;
+		    font-weight: bold;
 		}
 
-		.live-info span, .parking-info span {
-		   font-size: 14px;
-		   opacity: 0.9;
+		.popup-content {
+		    line-height: 1.5;
+		}
+		
+		
+		
+		
+		
+		
+		
+		/* Map Switcher Container */
+		#mapSwitcher {
+		    position: fixed;
+		    top: 280px; /* Adjust based on your navbar height */
+		    right: 5px;
+		    z-index: 1000;
+			color: rgba(15, 32, 65, 0.9);
+		    padding: 5px;
+		    border-radius: 10px;
+		    display: flex;
+		    flex-direction: column;
+		    gap: 5px;
+		}
+
+		/* Map Switching Buttons */
+		.map-button {
+		    display: flex;
+		    align-items: center;
+		    gap: 8px;
+		    background:transparent;
+		   color: rgba(15, 32, 65, 0.9);
+		    border: none;
+		    padding: 10px 15px;
+		    border-radius: 8px;
+		    cursor: pointer;
+		    font-size: 14px;
+		    transition: all 0.3s ease;
+		    width:50px;
+		    text-align: left;
+		    font-weight: bold;
+		   
+		}
+
+		.map-button i {
+		    font-size: 18px;
+		}
+
+		/* Hover and Active States */
+		.map-button:hover {
+			color: white;
+		    background-color: rgba(15, 32, 65, 0.9);
+		}
+
+		.map-button.active {
+		    background-color: rgba(15, 32, 65, 0.9);
+			color:white;
+			
+		}
+
+		/* Responsive for smaller screens */
+		@media (max-width: 768px) {
+		    #mapSwitcher {
+		        top: 310px;
+		        right: 10px;
+		        background: rgba(255, 255, 255, 0.2);
+		        z-index: 1000;
+		    }
+
+		    .map-button {
+		        font-size: 10px;
+		        width: 80px;
+		        padding: 8px 10px;
+		    }
+
+			
+
+		}
+
+		
+		
+
+		/* Status Badge */
+		.status-badge {
+		    display: inline-block;
+		    padding: 4px 10px;
+		    border-radius: 8px;
+		    font-weight: bold;
+		}
+
+		.status-badge.live {
+		   
+		    color:#27ae60;
+		}
+
+		.status-badge.offline {
+		    
+		    color: #e74c3c;
+		}
+
+		
+
+		/* Popup Buttons */
+		.popup-buttons {
+		    display: flex;
+		    gap: 10px;
+		    margin-top: 10px;
+		}
+
+		.popup-btn {
+		    flex: 1;
+		    border: none;
+		    padding: 8px;
+		    font-size: 14px;
+		    cursor: pointer;
+		    border-radius: 6px;
+		    transition: all 0.3s ease;
+		    color: white;
+		}
+
+		.popup-btn.replay {
+		    background: #3498db;
+		}
+
+		.popup-btn.details {
+		    background: #2ecc71;
+		}
+
+		.popup-btn:hover {
+		    opacity: 0.8;
+		}
+	
+
+		.popup-header {
+		    display: flex;
+		    align-items: center;
+		    justify-content: space-between;
+		    font-size: 14px;
+		    font-weight: bold;
+		    border-bottom: 1px solid #e0e0e0;
+		    padding-bottom: 6px;
+		}
+
+		.close-btn {
+		    font-size: 18px;
+		    color: #d32f2f;
+		    cursor: pointer;
+		}
+
+		.popup-content p {
+		    margin: 6px 0;
+		    font-size: 13px;
+		}
+
+		
+
+
+		/* Popup Overlay */
+		.popup-overlay {
+		    position: fixed;
+		    top: 0;
+		    left: 0;
+		    width: 100%;
+		    height: 100%;
+		    background: rgba(0, 0, 0, 0.5);
+		    z-index: 999;
+		    display: none;
+		}
+
+		/* Popup Container */
+		.popup-container {
+		    position: fixed;
+		    top: 50%;
+		    left: 50%;
+		    transform: translate(-50%, -50%);
+		    background: linear-gradient(135deg,lightgrey,white);
+		    border-radius: 12px;
+		    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+		    width: 320px;
+		    max-width: 90%;
+		    padding: 15px;
+		    z-index: 1000;
+		    display: none;
+		}
+
+		/* Popup Header */
+		.popup-header {
+		    display: flex;
+		    justify-content: space-between;
+		    font-size: 16px;
+		    font-weight: bold;
+		    color: #2c3e50;
+		    padding-bottom: 5px;
+		    border-bottom: 2px solid #3498db;
 		}
 
 		/* Close Button */
-		.alert-close {
-		   position: absolute;
-		   top: 8px;
-		   right: 8px;
-		   background: none;
-		   border: none;
-		   color: white;
-		   font-size: 20px;
-		   cursor: pointer;
-		   opacity: 0.7;
-		   transition: all 0.3s ease;
-		   padding: 0;
-		   width: 24px;
-		   height: 24px;
-		   display: flex;
-		   align-items: center;
-		   justify-content: center;
-		   border-radius: 50%;
-		}
-
-		.alert-close:hover {
-		   opacity: 1;
-		   background: rgba(255, 255, 255, 0.1);
-		   transform: scale(1.1);
-		}
-
-		/* Animations */
-		@keyframes slideIn {
-		   0% { transform: translateX(100%); opacity: 0; }
-		   100% { transform: translateX(0); opacity: 1; }
-		}
-
-		@keyframes slideOut {
-		   0% { transform: translateX(0); opacity: 1; }
-		   100% { transform: translateX(100%); opacity: 0; }
-		}
-
-		@keyframes pulse {
-		   0%, 100% { transform: scale(1); }
-		   50% { transform: scale(1.1); }
-		}
-
-		.slide-out { animation: slideOut 0.5s ease-out forwards; }
-
-		/* Responsive */
-		@media (max-width: 768px) {
-		   .alert-container {
-		       max-width: 100%;
-		       padding: 0 10px;
-		   }
-		   
-		   .live-alert, .parking-alert { padding: 12px 15px; }
-		   .live-info strong, .parking-info strong { font-size: 14px; }
-		   .live-info span, .parking-info span { font-size: 12px; }
-		}
-
-		.status-indicator {
-		    padding: 2px 6px;
-		    border-radius: 3px;
-		    color: white;
-		    font-weight: normal;
-		}
-
-		/* Status Colors */
-		.status-parked {
-		    background-color: #f39c12;
-		}
-
-		.status-running {
-		    background-color: #27ae60;
-		}
-
-		.ignition-on {
-		    color: #27ae60;
+		.close-btn {
+		    cursor: pointer;
+		    font-size: 18px;
+		    color: red;
 		    font-weight: bold;
+		    transition: all 0.3s ease;
 		}
 
-		.ignition-off {
-		    color: #e74c3c;
+		.close-btn:hover {
+		    color: darkred;
+		    transform: scale(1.2);
+		}
+
+		/* Popup Table */
+		.popup-table {
+		    width: 100%;
+		    margin-top: 10px;
+		    border-collapse: collapse;
+		}
+
+		.popup-table td {
+		    padding: 5px;
+		    font-size: 14px;
+		    border-bottom: 1px solid #ddd;
+		}
+
+		/* Popup Animation */
+		@keyframes fadeIn {
+		    from { opacity: 0; transform: scale(0.9); }
+		    to { opacity: 1; transform: scale(1); }
+		}
+
+		.popup-container.show {
+		    display: block;
+		    animation: fadeIn 0.3s ease-out;
+		}
+
+		
+
+		.popup-header {
+		    padding: 10px;
 		    font-weight: bold;
+		    text-align: center;
+		    font-size: 14px;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    gap: 8px;
 		}
 
-		/* Update Status Styles */
 		.live-update {
-		    border-bottom: 2px solid #27ae60;
+		    background: white;
+		    color: green;
 		}
 
 		.last-known {
-		    border-bottom: 2px solid #e74c3c;
+		    background:white;
+		    color:red;
 		}
 
-		/* Responsive Styles */
+		.header-title {
+		    font-size: 14px;
+		    font-weight: bold;
+		}
+
+		.popup-content {
+		    padding: 10px;
+		    font-size: 13px;
+		    color: #333;
+		}
+
+		.popup-content p {
+		    margin: 8px 0;
+		    display: flex;
+		    justify-content: space-between;
+		}
+
+		.popup-content p strong {
+		    color: #2c3e50;
+		}
+
+		.popup-actions {
+		    display: flex;
+		    justify-content: space-between;
+		    padding: 10px;
+		    background: #f7f7f7;
+		    border-top: 1px solid #ddd;
+		}
+
+		.details-btn, .playback-btn {
+		    padding: 6px 10px;
+		    font-size: 12px;
+		    border: none;
+		    border-radius: 5px;
+		    cursor: pointer;
+		    transition: 0.2s ease-in-out;
+		}
+
+		.details-btn {
+		    background: #3498db;
+		    color: white;
+		}
+
+		.playback-btn {
+		    background: #f39c12;
+		    color: white;
+		}
+
+		.details-btn:hover {
+		    background: #2980b9;
+		}
+
+		.playback-btn:hover {
+		    background: #e67e22;
+		}
+
+		/* Default Status Style */
+		.status {
+		    padding: 4px 8px;
+		    border-radius: 5px;
+		    font-weight: bold;
+		    text-transform: uppercase;
+		    display: inline-block;
+		    font-size: 11px;
+		}
+
+		/* Running (Green) */
+		.status-running {
+		    background-color: white;
+		    color: green;
+		}
+
+		/* Idle (Orange) */
+		.status-idle {
+			background-color: white;
+		      color:orange;
+		}
+
+		/* Parked (Blue) */
+		.status-parked {
+			background-color: white;
+		    color:orange;
+		}
+
+		/* Connection Lost (Red) */
+		.status-connection-lost {
+			background-color: white;
+		    color: red;
+		}
+
+		/* Unknown (Gray) */
+		.status-unknown {
+			background-color: white;
+					    color: red;
+		}
+
+		/* Hover Effects */
+		
+
+		.live-indicator {
+		    display: flex;
+		    align-items: center;
+		    gap: 5px;
+		    font-size: 14px;
+		    font-weight: bold;
+		    color: green;
+		    position: relative;
+		}
+
+		.live-ripple {
+		    width: 12px;
+		    height: 12px;
+		    background-color: green;
+		    border-radius: 50%;
+		    position: relative;
+		}
+
+		.live-ripple::before,
+		.live-ripple::after {
+		    content: '';
+		    position: absolute;
+		    top: 50%;
+		    left: 50%;
+		    width: 100%;
+		    height: 100%;
+		    border-radius: 50%;
+		    transform: translate(-50%, -50%);
+		    background: rgba(0, 255, 0, 0.5);
+		    animation: ripple-animation 1.5s infinite ease-out;
+		}
+
+		.live-ripple::after {
+		    animation-delay: 0.75s; /* Creates the second ripple effect */
+		}
+
+		@keyframes ripple-animation {
+		    0% {
+		        width: 12px;
+		        height: 12px;
+		        opacity: 0.7;
+		    }
+		    100% {
+		        width: 30px;
+		        height: 30px;
+		        opacity: 0;
+		    }
+		}
+
+		.speed {
+		    font-weight: bold;
+		    padding: 2px 6px;
+		    border-radius: 5px;
+		}
+
+		.speed-slow {
+		    color: green;
+		}
+
+		.speed-medium {
+		    color: orange;
+		}
+
+		.speed-fast {
+		    color: red;
+		    animation: blink 1s infinite alternate; /* Blink effect for overspeeding */
+		}
+
+		.speed-unknown {
+		    color: gray;
+		}
+		.ignition-status {
+		    font-weight: bold;
+		    padding: 3px 8px;
+		    border-radius: 5px;
+		}
+
+		.ignition-status.on {
+		    color: green;
+		}
+
+		.ignition-status.off {
+		    color: red;
+		}
+
+		.ignition-status.unknown {
+		    color: gray;
+		}
+
+		/* Blinking effect for high speed */
+		@keyframes blink {
+		    0% { opacity: 1; }
+		    100% { opacity: 0.5; }
+		}
+		.clickable-icon {
+		    cursor: pointer;
+		    fill: darkblue; /* Fill the icon with dark blue */
+		    stroke: white;  /* Outline color */
+		    transition: transform 0.2s ease-in-out, fill 0.2s ease-in-out;
+		}
+
+		.clickable-icon:active {
+		    transform: scale(0.8);
+		    transition: transform 0.1s ease-in-out;
+		    fill: #ff5733; /* Change color on click */
+		}
+
+		/* Ripple Effect */
+		.ripple {
+		    position: absolute;
+		    border-radius: 50%; /* Perfect circle */
+		    background: rgba(255, 87, 51, 0.5);
+		    transform: scale(0);
+		    animation: ripple-animation 0.6s linear;
+		    pointer-events: none; /* Prevent interference */
+		}
+
+		
+
+
+		
+
+		.vehicle-popup .popup-line {
+		    display: flex;
+		    align-items: center;
+		    justify-content: space-between;
+		    padding: 8px 0;
+		    border-bottom: 1px dashed #ddd;
+		}
+
+		.vehicle-popup .popup-line i {
+		    margin-right: 10px;
+		    color: #007bff;
+		}
+
+		.vehicle-popup .popup-label {
+		    font-weight: 600;
+		    font-size: 14px;
+		    display: flex;
+		    align-items: center;
+		    color: #34495e;
+		}
+
+		.vehicle-popup .popup-value {
+		    font-weight: 500;
+		    font-size: 14px;
+		    text-align: right;
+		    color: #2c3e50;
+		}
+
+		.vehicle-popup .live-indicator {
+		    font-size: 14px;
+		    font-weight: bold;
+		    margin-bottom: 12px;
+		    color: red;
+		}
+
+		.vehicle-popup .popup-actions {
+		    display: flex;
+		    justify-content: space-between;
+		    margin-top: 16px;
+		    gap: 10px;
+		}
+
+		.vehicle-popup button {
+		    flex: 1;
+		    border: none;
+		    padding: 10px;
+		    font-size: 14px;
+		    font-weight: 600;
+		    border-radius: 8px;
+		    cursor: pointer;
+		    transition: background 0.3s ease;
+		}
+
+		.vehicle-popup .details-btn {
+		    background: #2980b9;
+		    color: white;
+		}
+
+		.vehicle-popup .details-btn:hover {
+		    background: #1f618d;
+		}
+
+		.vehicle-popup .playback-btn {
+		    background: #27ae60;
+		    color: white;
+		}
+
+		.vehicle-popup .playback-btn:hover {
+		    background: #1e8449;
+		}
+
+		
+
+		/* Status Summary - Fix Alignment */
+		/* Fix Status Summary Position */
+		.status-summary {
+		    display: none; /* Start hidden */
+		    transition: opacity 0.3s ease-in-out;
+		}
+
+		.status-summary {
+		    position: fixed;
+		    top: 150px;  /* Adjust as per toggle button */
+		    left: 520px; /* Same as toggle button */
+		    width: auto;
+		    height: auto;
+		    background: rgba(255, 255, 255, 0.8); /* Semi-transparent */
+		    padding: 10px 15px;
+		    border-radius: 10px;
+		    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+		    z-index: 1100; /* Ensure it's above the map */
+		    display: flex;
+		    flex-wrap: wrap;
+		    justify-content: center;
+		    align-items: center;
+		    gap: 10px;
+		}
+
+		/* Status Items */
+		.status-summary p {
+		    font-size: 10px;
+		    font-weight: bold;
+		    padding: 5px 10px;
+		    text-align: center;
+		    border-radius: 5px;
+		    background: rgba(255, 255, 255, 0.5);
+		    margin: 0;
+		}
+		/* 📌 Fix Status Summary Position for Laptop Screens */
+		@media screen and (min-width: 1024px) {
+		    .status-summary {
+		        position: fixed;
+		        top: 120px; /* Adjust for better placement */
+		        left: 100px; /* Move it to the left */
+		        width: 250px; /* Set a fixed width */
+		        height: auto;
+		        background: rgba(255, 255, 255, 0.8); /* Semi-transparent */
+		        padding: 10px 15px;
+		        border-radius: 10px;
+		        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+		        z-index: 1100; /* Ensure it's above the map */
+		        display: flex;
+		        flex-direction: column;
+		        align-items: flex-start;
+		        gap: 10px;
+		    }
+		}
+
+		
+
+		/* 📌 Make It Fully Responsive */
+		@media screen and (max-width: 1024px) {
+		    .status-summary {
+		        width: 100%;
+		        left: 0; /* Full width for smaller screens */
+		        text-align: center;
+		        flex-direction: row;
+		        justify-content: space-around;
+		        padding: 10px;
+		    }
+		}
+
 		@media (max-width: 768px) {
-		    .alert-container {
-		        max-width: 100%;
-		        padding: 0 10px;
-		    }
-
-		    .parking-alert {
-		        padding: 12px 15px;
-		    }
-
-		    .parking-info strong {
-		        font-size: 14px;
-		    }
-
-		    .parking-info span {
-		        font-size: 12px;
+		    .status-summary {
+		        top: auto;   /* Remove fixed top */
+		        bottom: 20px; /* Place at bottom */
+		        left: 10px;
+		        right: 10px;
+		        width: 95%;  /* Expand width */
+		        flex-direction: row; /* Keep horizontal layout */
+		        justify-content: space-around; /* Space evenly */
+		        background: rgba(255, 255, 255, 0.8); /* Make it more visible */
 		    }
 		}
+
+		/* Status Icons */
+		.status-summary span {
+		    font-size: 18px;
+		    font-weight: bold;
+		}
+
+	
+		/* Status Count Colors */
+		#totalCount { color: black; font-weight: bold; }  /* Total */
+		#runningCount { color: #2ecc71; font-weight: bold; }  /* Green */
+		#idleCount { color: #f39c12; font-weight: bold; }  /* Orange */
+		#parkedCount { color: #3498db; font-weight: bold; }  /* Blue */
+		#lostCount { color: #e74c3c; font-weight: bold; }  /* Red */
+
+
+		/* Responsive Fix */
 		
-		
-		/* Sidebar Styles */
-		#sidebar {
-		    position: fixed;
-		    right: -400px;
+		.switch {
+		    position: relative;
+		    display: inline-block;
+		    width: 34px;
+		    height: 20px;
+		}
+
+		.switch input {
+		    opacity: 0;
+		    width: 0;
+		    height: 0;
+		}
+
+		.slider {
+		    position: absolute;
+		    cursor: pointer;
 		    top: 0;
-		    width: 380px;
-		    height: 100vh;
-		    background: rgba(255, 255, 255, 0.95);
-		    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-		    transition: right 0.3s ease;
-		    z-index: 1000;
-		    padding: 20px;
-		    backdrop-filter: blur(10px);
-		    border-left: 1px solid rgba(0, 0, 0, 0.1);
-		}
-
-		#sidebar.active {
+		    left: 0;
 		    right: 0;
+		    bottom: 0;
+		    background-color: #ccc;
+		    transition: .4s;
+		    border-radius: 20px;
 		}
 
-		/* Essential toggle button and sidebar styles */
-		#toggleButton {
+		.slider:before {
+		    position: absolute;
+		    content: "";
+		    height: 14px;
+		    width: 14px;
+		    left: 3px;
+		    bottom: 3px;
+		    background-color: white;
+		    transition: .4s;
+		    border-radius: 50%;
+		}
+
+		input:checked + .slider {
+		    background-color: #4CAF50;
+		}
+
+		input:checked + .slider:before {
+		    transform: translateX(14px);
+		}
+
+		.device-popup {
 		    position: fixed;
-		    top: 200px;
-		    right: 20px;
-		    z-index: 1001;
-		    background: darkblue;
+		    top: 50%;
+		    left: 50%;
+		    transform: translate(-50%, -50%);
+		    background: rgba(255, 255, 255, 0.95);
+		    padding: 15px;
+		    border-radius: 10px;
+		    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+		    display: none;
+		    width: 350px;
+		    z-index: 1000;
+		}
+
+		.popup-header {
+		    display: flex;
+		    justify-content: space-between;
+		    font-weight: bold;
+		    font-size: 16px;
+		    color: darkblue;
+		    border-bottom: 2px solid #3498db;
+		    padding-bottom: 5px;
+		}
+
+		.close-btn {
+		    cursor: pointer;
+		    font-size: 18px;
+		    color: red;
+		}
+
+		.device-list {
+		    list-style: none;
+		    padding: 0;
+		    max-height: 200px;
+		    overflow-y: auto;
+		}
+
+		.device-list li {
+		    padding: 8px;
+		    border-bottom: 1px solid #ddd;
+		    font-size: 14px;
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		}
+
+		.pagination-controls {
+		    display: flex;
+		    justify-content: center;
+		    align-items: center;
+		    margin-top: 1px;
+		}
+
+		.pagination-controls button {
+		    background: #3498db;
 		    color: white;
 		    border: none;
-		    border-radius: 8px;
-		    padding: 12px 15px;
-		    font-size: 10px;
+		    padding: 5px 10px;
+		    margin: 5px;
 		    cursor: pointer;
-		    transition: all 0.3s ease;
-		    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+		    border-radius: 5px;
+		    transition: all 0.3s;
 		}
 
-		#toggleButton:hover {
-		    background: blue;
-		    transform: scale(1.05);
+		.pagination-controls button:disabled {
+		    background:white;
+			color:white;
+		    cursor: not-allowed;
 		}
 
-		#toggleButton.active {
-		    right: 400px; /* Matches sidebar width */
+		.pagination-controls .active {
+		    background: #2980b9;
+		    font-weight: bold;
 		}
-
-		/* Sidebar positioning and transitions */
-		#sidebar {
+		/* Speed Alert Popup */
+		.speed-alert-popup {
 		    position: fixed;
-		    right: -450px; /* Hidden by default */
-		    top: 150px;
-		    width: 380px;
-		    height: 100vh;
-		    background: rgba(0, 0, 0, 0.4);
-		    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-		    transition: right 0.3s ease;
+		     top: 355px;
+		    right: 608px;
+		    background: rgba(255, 0, 0, 0.9);
+		    color: white;
+		    padding: 15px;
+		    border-radius: 8px;
+		    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 		    z-index: 1000;
-		    padding: 5px;
+		    display: none;
+		    animation: blink 1s infinite alternate;
+		}
+
+		/* Blinking Effect */
+		@keyframes blink {
+		    0% { opacity: 1; }
+		    100% { opacity: 0.5; }
+		}
+
+		
+		/* Settings Sidebar */
+		#settingsSidebar {
+		    position: fixed;
+		    right: -350px; /* Default hidden for desktop */
+		    top: 120px;
+		    width: 320px;
+		    height: auto;
+		    background: rgba(0, 0, 0, 0.9);
+		    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+		    transition: right 0.3s ease-in-out, bottom 0.3s ease-in-out;
+		    z-index: 1100;
+		    padding: 15px;
+			color: white;
 		    backdrop-filter: blur(10px);
 		    border-left: 1px solid rgba(0, 0, 0, 0.1);
+		    border-radius: 10px 0 0 10px;
+		    display: none; /* Hide initially */
 		}
 
-		#sidebar.active {
-		    right: 0;
+		/* Mobile Responsive */
+		@media (max-width: 768px) {
+		    #settingsSidebar {
+		        right: auto;
+		        left: 50%;
+		        bottom: -100%; /* Default hidden */
+		        width: 95%;
+		        transform: translateX(-50%);
+		        height: auto;
+		        border-radius: 10px 10px 0 0;
+		    }
+		    #settingsSidebar.active {
+		        bottom: 0; /* Slide up on mobile */
+		    }
 		}
 
-		/* Sidebar header styles */
-		#sidebar h2 {
-		    color:darkblue;
+
+
+		/* Settings Header */
+		.settings-header {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
 		    font-size: 20px;
-		    margin-bottom: 20px;
+		    font-weight: bold;
 		    padding-bottom: 10px;
 		    border-bottom: 2px solid #3498db;
 		}
 
-		/* Search bar styles */
-		#searchBar {
-		    width: calc(50% - 14px);
-		    padding: 8px;
-		    border: 1px solid #e0e0e0;
-		    border-radius: 8px;
-		    margin-bottom: 20px;
-		    font-size: 10px;
-		    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+		.close-settings-btn {
+		    background: none;
+		    border: none;
+		    font-size: 20px;
+		    cursor: pointer;
+		    color: red;
 		}
 
-		#searchBar:focus {
+		/* Toggle Switch Styles */
+		.toggle-container {
+		    display: flex;
+		    align-items: center;
+		    gap: 10px;
+		    font-size: 16px;
+		    margin-top: 10px;
+		}
+
+		.toggle-switch {
+		    position: relative;
+		    width: 50px;
+		    height: 25px;
+		}
+
+		.toggle-switch input {
+		    opacity: 0;
+		    width: 0;
+		    height: 0;
+		}
+
+		.slider {
+		    position: absolute;
+		    top: 0;
+		    left: 0;
+		    right: 0;
+		    bottom: 0;
+		    background-color: #ccc;
+		    border-radius: 25px;
+		    transition: 0.3s;
+		}
+
+		.slider:before {
+		    content: "";
+		    position: absolute;
+		    height: 18px;
+		    width: 18px;
+		    left: 4px;
+		    bottom: 3.5px;
+		    background-color: white;
+		    border-radius: 50%;
+		    transition: 0.3s;
+		}
+
+		input:checked + .slider {
+		    background-color: #4caf50;
+		}
+
+		input:checked + .slider:before {
+		    transform: translateX(24px);
+		}
+		/* Modern Settings Button */
+		.settings-btn {
+		    background-color: transparent;
+		    color: white;
+		    border: none;
+		    padding: 12px 20px;
+		    font-size: 16px;
+		    font-weight: bold;
+		    border-radius: 10px;
+		    cursor: pointer;
+		    transition: all 0.3s ease-in-out;
+		    display: flex;
+		    align-items: center;
+		    gap: 8px;
+		    
 		    outline: none;
-		    border-color: #3498db;
-		    box-shadow: 0 2px 10px rgba(52, 152, 219, 0.2);
+		    position: relative;
+		    overflow: hidden;
 		}
 
-		/* Mobile responsiveness */
+		
+		/* Active Click Effect */
+		.settings-btn:active {
+		    transform: scale(0.98);
+		}
+
+		/* Icon Animation */
+		
+		.settings-btn::after::before {
+				    content: "⚙"; /* Gear Icon */
+				    position: absolute;
+				    left: 12px;
+				    font-size: 18px;
+				    opacity: 0;
+				    transform: rotate(-90deg);
+				    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+				}
+		/* Show Icon on Hover */
+		.settings-btn:hover::before {
+		    opacity: 1;
+		    transform: rotate(0deg);
+		}
+		
 		@media (max-width: 768px) {
 		    #sidebar {
 		        width: 100%;
-		        right: -100%;
+		        right: -100%; /* Fully slide out */
+		        top: 0;
+		        height: 100vh;
+		        z-index: 2000;
+		        border-radius: 0;
 		    }
-		    
-		    #toggleButton.active {
-		        right: 20px;
+
+		    #sidebar.active {
+		        right: 0; /* Slide in full screen */
+		    }
+			.leaflet-control-zoom {
+			    display: none !important;
+			}
+
+		    #toggleButton {
+		        top: 10px;
+		        right: 15%;
+		        padding: 8px 12px;
+		        font-size: 16px;
+		    }
+		}
+		.table-responsive {
+		    overflow-x: auto;
+		}
+		@media (max-width: 768px) {
+		    .status-summary {
+		        position: fixed;
+		        bottom: 0;
+		        left: 0;
+		        width: 100%;
+		        flex-wrap: wrap;
+		        justify-content: space-evenly;
+		        background: rgba(255, 255, 255, 0.95);
+		        padding: 10px 0;
 		    }
 		}
 
-		/* Table styles */
-		#sidebar table {
-		    width: 100%;
-		    border-collapse: collapse;
-		    margin-top: 10px;
-		    background: white;
-		    border-radius: 8px;
-		    overflow: hidden;
-		    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+		@media (max-width: 768px) {
+		    #settingsSidebar {
+		        right: auto;
+		        left: 0;
+		        bottom: -100%;
+		        width: 100%;
+		        border-radius: 10px 10px 0 0;
+		        transition: bottom 0.3s ease-in-out;
+		    }
+
+		    #settingsSidebar.active {
+		        bottom: 0;
+		    }
 		}
 
-		#sidebar th {
-		    background:darkblue;
-		    color: white;
-		    padding: 2px;
-		    font-size: 10px;
-		    text-align: left;
-		    font-weight: 600;
-		}
-
-		#sidebar td {
-		    padding: 3px;
-		    font-size: 13px;
-		    border-bottom: 1px solid #eee;
-		}
-		#map {
-			position: absolute;
-							height: calc(120vh - 150px);
-							position: sticky;
-							top:35px;
-						}
-				.notification {
-					display: none;
-				    position: fixed;
-				    bottom: 20px;
-				    right: 20px;
-				    background: #fff;
-				    border: 1px solid #ddd;
-				    border-radius: 5px;
-				    padding: 10px 20px;
-				    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-				    display: flex;
-				    align-items: center;
-				    z-index: 1000;
-				    opacity: 0;
-				    transform: translateY(10px);
-				    transition: opacity 0.5s ease, transform 0.5s ease;
-				}
-
-				.notification.animate {
-				    opacity: 1;
-				    transform: translateY(0);
-				    animation: pulse 1s ease-in-out;
-				}
-
-				@keyframes pulse {
-				    0% {
-				        transform: scale(1);
-				    }
-				    50% {
-				        transform: scale(1.05);
-				    }
-				    100% {
-				        transform: scale(1);
-				    }
-				}
-
-				.notification-icon {
-				    font-size: 24px;
-				    margin-right: 10px;
-				}
-
-				.notification-content h4 {
-				    margin: 0;
-				    font-size: 16px;
-				    color: #333;
-				}
-
-				.notification-content p {
-				    margin: 0;
-				    font-size: 14px;
-				    color: #666;
-				}
-
-				.notification-content small {
-				    display: block;
-				    margin-top: 5px;
-				    font-size: 12px;
-				    color: #999;
-				}
-
-				.marker-cluster-small {
-				    background-color: rgba(181, 226, 140, 0.6);
-				    border: 2px solid rgba(110, 204, 57, 0.8);
-				    color: white;
-				    border-radius: 20px;
-				    width: 40px;
-				    height: 40px;
-				    line-height: 40px;
-				    text-align: center;
-				}
-
-				.marker-cluster-medium {
-				    background-color: rgba(241, 211, 87, 0.6);
-				    border: 2px solid rgba(240, 194, 12, 0.8);
-				    color: white;
-				    border-radius: 30px;
-				    width: 50px;
-				    height: 50px;
-				    line-height: 50px;
-				    text-align: center;
-				}
-
-				.marker-cluster-large {
-				    background-color: rgba(253, 156, 115, 0.6);
-				    border: 2px solid rgba(241, 128, 23, 0.8);
-				    color: white;
-				    border-radius: 40px;
-				    width: 60px;
-				    height: 60px;
-				    line-height: 60px;
-				    text-align: center;
-				}
-				.replay-button {
-				    display: none; /* Hide button initially */
-				}
-
-/* Small Cluster */
-.marker-cluster-small {
-    background-color: rgba(181, 226, 140, 0.6);
-    border: 2px solid rgba(110, 204, 57, 0.8);
-    border-radius: 20px;
-    width: 40px;
-    height: 40px;
-    line-height: 40px;
-    text-align: center;
-    font-size: 14px;
+/*popup style */
+		
+.mobile-header {
+    display: none;
+    background: #0077ff;
     color: white;
+    padding: 12px;
+    text-align: center;
     font-weight: bold;
 }
 
-/* Medium Cluster */
-.marker-cluster-medium {
-    background-color: rgba(241, 211, 87, 0.6);
-    border: 2px solid rgba(240, 194, 12, 0.8);
-    border-radius: 30px;
-    width: 50px;
-    height: 50px;
-    line-height: 50px;
-    text-align: center;
-    font-size: 16px;
-    color: white;
-    font-weight: bold;
+@media (max-width: 768px) {
+    .mobile-header {
+        display: block;
+    }
 }
-
-/* Large Cluster */
-.marker-cluster-large {
-    background-color: rgba(253, 156, 115, 0.6);
-    border: 2px solid rgba(241, 128, 23, 0.8);
-    border-radius: 40px;
-    width: 60px;
-    height: 60px;
-    line-height: 60px;
-    text-align: center;
-    font-size: 18px;
-    color: white;
-    font-weight: bold;
+   
+.leaflet-control-layers {
+  top: 160px;
+  margin-right: 10px;
 }
-
-/* Cluster Count Number */
-.marker-cluster div {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: Arial, sans-serif;
+@media (max-width: 768px) {
+    #mobileCloseBtn {
+        display: block;
+    }
 }
-
-/* Hover Effect */
-.marker-cluster:hover {
-    transform: scale(1.1);
-    transition: transform 0.2s ease-in-out;
-}
-.highlight-marker {
-           animation: bounce 0.5s ease-in-out 2;
-       }
-
-       @keyframes bounce {
-           0%, 100% { transform: translateY(0); }
-           50% { transform: translateY(-10px); }
-       }
-	   .popup-container {
-	       background: white;
-	       border-radius: 10px;
-	       box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
-	       padding: 20px;
-	       width: 400px;
-	       max-width: 90%; /* Responsive on smaller screens */
-	       position: fixed;
-	       top: 50%;
-	       left: 50%;
-	       transform: translate(-50%, -50%);
-	       z-index: 1000;
-	       display: none;
-	       animation: fadeIn 0.3s ease-in-out;
-	   }
-
-	   /* Add a background overlay */
-	   .popup-overlay {
-	       position: fixed;
-	       top: 0;
-	       left: 0;
-	       width: 100%;
-	       height: 100%;
-	       background: rgba(0, 0, 0, 0.5);
-	       z-index: 999;
-	       display: none;
-	   }
-
-	   /* Close Button */
-	   .close-btn {
-	       position: absolute;
-	       top: 10px;
-	       right: 15px;
-	       background: red;
-	       color: white;
-	       border: none;
-	       border-radius: 50%;
-	       width: 30px;
-	       height: 30px;
-	       text-align: center;
-	       font-size: 20px;
-	       cursor: pointer;
-	       transition: 0.3s;
-	   }
-
-	   .close-btn:hover {
-	       background: darkred;
-	   }
-
-	   /* Table Styling */
-	   .details-table {
-	       width: 100%;
-	       border-collapse: collapse;
-	       background: white;
-	       border-radius: 5px;
-	       overflow: hidden;
-	   }
-
-	   .details-table th {
-	       background: #3498db;
-	       color: white;
-	       padding: 10px;
-	       text-align: left;
-	   }
-
-	   .details-table td {
-	       padding: 8px;
-	       border-bottom: 1px solid #ddd;
-	   }
-
-	   /* Animation */
-	   @keyframes fadeIn {
-	       from { opacity: 0; transform: translate(-50%, -55%); }
-	       to { opacity: 1; transform: translate(-50%, -50%); }
-	   }
-
-	   #vehicleDetailsModal{
-		background: rgba(0, 0, 0, 0.5);
-	   }
-	   /* Modal container */
-	   #vehicleDetailsModal {
-	     position: relative; /* This makes positioning inside relative to this container */
-	     background: white;
-		 font-size: 12px;
-	     padding: 20px;
-	     border-radius: 8px;
-	     box-shadow: 0 0 10px rgba(0,0,0,0.3);
-	   }
-
-	   /* Close button positioned at top-right */
-	   .closeb {
-	     position: absolute;
-	     top: 10px;    /* Adjust as needed */
-	     right: 8px;  /* Adjust as needed */
-	     background: none;
-	     border: none;
-	     font-size: 14px;
-	     cursor: pointer;
-	     color: red;   /* Or any color you prefer */
-	   }
 
     </style>
 </head>
 <body>
 	<header th:insert="navigation_admin :: navbar_admin"></header>
+	<header class="mobile-header">Thinture GPS</header>
 
-    <div id="map"></div>
+<header><button id="toggleButton">☰</button></header>
 
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<!-- Map Container -->
+<div id="map"></div>
+
+<div class="status-summary">
+    <p><strong>Total Vehicles:</strong> 
+        <span id="totalCount" onclick="fetchDevicesByStatus('total')">0</span>
+    </p>
+    <p><strong>Running:</strong> 
+        <span id="runningCount" onclick="fetchDevicesByStatus('running')">0</span>
+    </p>
+    <p><strong>Idle:</strong> 
+        <span id="idleCount" onclick="fetchDevicesByStatus('idle')">0</span>
+    </p>
+    <p><strong>Parked:</strong> 
+        <span id="parkedCount" onclick="fetchDevicesByStatus('parked')">0</span>
+    </p>
+    <p><strong>Offline:</strong> 
+        <span id="lostCount" onclick="fetchDevicesByStatus('lost')">0</span>
+    </p>
+</div>
+<div id="speedAlertPopup" class="speed-alert-popup">
+    <span class="close-btn" onclick="closeSpeedAlert()">×</span>
+    <h4>🚨 Overspeed Alert</h4>
+    <p><strong>Vehicle No:</strong> <span id="alertDeviceID"></span></p>
+    <p><strong>Speed:</strong> <span id="alertSpeed"></span> km/h</p>
+</div>
+
+
+<!-- Device Details Popup -->
+<div id="deviceDetailsPopup" class="device-popup">
+    <div class="popup-header">
+        <strong id="popup-title">Device Details</strong>
+        <span class="close-btn" onclick="closeDevicePopup()">×</span>
+    </div>
+    <div class="popupcontent">
+        <ul id="deviceList"></ul>
+    </div>
+	<div id="paginationControls" class="pagination-controls"></div>
+</div>
+
+<div class="popup-line">
+    <div class="popup-label"><i class="fas fa-gauge"></i> Speed Limit:</div>
+    <div class="popup-value">${speedLimit} km/h</div>
+</div>
+
+<!-- Map Switcher Buttons -->
+<div id="mapSwitcher">
+	<button class="map-button active" data-map="osm" onclick="switchLiveMap('osm')">
+	        <i class="fas fa-map"></i> 
+	    </button>
+    <!--<button class="map-button" data-map="googleSatellite" onclick="switchLiveMap('googleSatellite')">Satellite</button> -->
+	<button class="map-button" data-map="googleRoadMap" onclick="switchLiveMap('googleRoadMap')">
+	       <i class="fas fa-road"></i> 
+	   </button>
+   <!-- <button class="map-button" data-map="googleHybrid" onclick="switchLiveMap('googleHybrid')">Hybrid</button> 
+   <button class="settings-btn" onclick="openSettingsSidebar()">    ⚙</button>--> 
+   <!--
+   <button id="centerLocationBtn" class="map-button" onclick="centerToUserLocation()">
+       <i class="fas fa-crosshairs"></i>
+   </button>
+  
+  
+   <button id="darkModeToggleBtn" class="map-button" onclick="toggleDarkMode()">
+       <i class="fas fa-moon"></i>
+   </button>
+   -->
+   <button id="fullScreenBtn" class="map-button" onclick="toggleFullScreen()">
+       <i class="fas fa-expand"></i>
+   </button>
+
+</div>
+
+
+<!--
+
+<audio id="overspeedAudio" src="/THINTURE_IMAGE/alertsspeed.mp3" preload="auto"></audio>
+
+-->
+<!-- Sidebar -->
+<!-- Sidebar -->
+<div id="sidebar">
+	<div id="mobileCloseBtn" style="text-align: right; margin: 5px 0; display: none;">
+		  <button class="btn btn-sm btn" style="font-size: 13px; color:red"; onclick="closeSidebar()">✖</button>
+		</div>
+    <div class="custom-tab-bar">
+        <button class="custom-tab-btn active" onclick="showSidebarTab('devicesTab', this)">Device</button>
+        <button class="custom-tab-btn" onclick="showSidebarTab('alertsTab', this)">Alerts</button>
+    </div>
 	
-	<!-- Toggle Button -->
-	<!-- Toggle Button -->
-	<button id="toggleButton">☰</button>
+    <!-- Device Tab Content -->
+    <div id="devicesTab" class="custom-tab-content active">
+        <!--<h2>Tracker Details</h2>-->
+        <input type="text" id="searchBar" placeholder="Search by Device ID" class="form-control mb-2">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                       
+                        <th>Status</th>
+                        <th>Vehicle No</th>
+                        <th>Last Upload</th>
+                        <th>Select Device</th>
+                    </tr>
+                </thead>
+                <tbody id="trackerTableBody"></tbody>
+            </table>
+            <div id="sidebarPagination" class="pagination-controls mt-2"></div>
+        </div>
+    </div>
 
-	<!-- Sidebar -->
-	<!-- Sidebar -->
-	<div id="sidebar">
-	    <h2>Tracker Details</h2>
-	    <input type="text" id="searchBar" placeholder="Search by Device ID">
-	    <table>
-	        <thead>
-	            <tr>
-	                <th>Status</th>
-	                <th>Device ID</th>
-	                <th>Last Upload</th>
-	            </tr>
-	        </thead>
-	        <tbody id="trackerTableBody">
-	            <!-- Rows will be dynamically added here -->
-	        </tbody>
-	    </table>
-	</div>
+    <!-- Alerts Tab Content -->
+    <div id="alertsTab" class="custom-tab-content">
+        <p style="color: white; padding: 10px;">Alerts data will appear here...</p>
+    </div>
+</div>
 
-	<!-- ✅ Vehicle Details Modal (Initially Hidden) -->
-	<!-- Vehicle Details Modal (initially hidden) -->
-	<div id="vehicleDetailsModal" style="display:none; position:fixed; top:30%; left:56%; padding:20px; border-radius:8px; box-shadow:0px 0px 10px gray; z-index:1000;">
-	  <h2>Vehicle Details</h2>
-	  <table border="1">
-	    <tbody id="vehicleDetailsTable">
-	      <!-- Data will be dynamically inserted here -->
-	    </tbody>
-	  </table>
-	  <button class="closeb"   onclick="closeVehicleDetails()">X</button>
-	</div>
+<!-- Popup Overlay -->
+<div id="popupOverlay" class="popup-overlay" onclick="closePopup()"></div>
 
-	<!-- Example Details Button inside a popup (dynamically generated in your marker popup) -->
-	<button style="padding: 5px 10px; background-color: #2196F3;  border: none; border-radius: 5px; cursor: pointer;"
-	        onclick="fetchVehicleDetails(this.getAttribute('data-deviceid'))"
-	        data-deviceid="12345">
-	  Details
-	</button>
+<!-- Vehicle Details Modal -->
+<div id="vehicleDetailsModal" class="popup-container">
+    <div class="popup-header">
+        <strong>Vehicle Details</strong>
+        <span class="close-btn" onclick="closePopup()">×</span>
+    </div>
+    <div class="popup-content">
+        <table id="vehicleDetailsTable" class="popup-table">
+			
 
+            <tr><td><strong>Vehicle No:</strong></td><td id="popup-deviceID">Loading...</td></tr>
+			<tr><td><strong>Serial number:</strong></td><td id="popup-serialno">Loading...</td></tr>
+            <tr><td><strong>Owner:</strong></td><td id="popup-ownerName">Loading...</td></tr>
+            <tr><td><strong>Model:</strong></td><td id="popup-model">Loading...</td></tr>
+			<tr><td><strong>SIM Number:</strong></td><td id="popup-simnumber">Loading...</td></tr>
 
+          
+           
+        </table>
+    </div>
+</div>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<!-- Add before your main <script> -->
+<script src="https://cdn.jsdelivr.net/npm/tz-lookup@6.1.25/tz.min.js"></script>
 
+<script>
+	class VehicleTracker {
+		
+		constructor(mapElementId) {
+			
+		    const mapElement = document.getElementById(mapElementId);
+		    if (!mapElement) {
+		        console.error("❌ Map element not found! Make sure the ID is correct.");
+		        return;
+		    }
 
-	</div>
+		    this.map = L.map(mapElementId, {
+		        zoomControl: false
+		    }).setView([13.07757, 77.55928], 15);
+
+		    if (!this.map) {
+		        console.error("❌ Map failed to initialize.");
+		        return;
+		    }
+
+		    // OSM English layer
+		    const osmEnglish = L.tileLayer('https://{s}.tile.openstreetmap.fr/osm-en/{z}/{x}/{y}.png', {
+		        maxZoom: 15,
+		        attribution: '&copy; OpenStreetMap contributors'
+		    });
+
+		    // Carto Light layer
+		    const cartoLight = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+		        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+		        subdomains: 'abcd',
+		        maxZoom: 19
+		    });
+
+		    // Add default layer to map
+		    osmEnglish.addTo(this.map);
+
+		    // Add layer switcher with position bottomright
+		    L.control.layers({
+		        'OSM (English)': osmEnglish,
+		        'Carto Light': cartoLight
+		    }, null, {
+		        position: 'bottomright'
+		    }).addTo(this.map);
+
+		    this.markers = {};
+
+		    // Load vehicle data after map initializes
+		    setTimeout(() => this.fetchVehicleData(), 1000);
+		    this.initWebSocket();
+		}
 
 		
-    <script>
-		class VehicleTracker {
-			constructor(mapElementId) {
-						this.map = L.map(mapElementId, {
-						    zoomControl: false  // ← disables the + / – buttons
-						}).setView([13.07757, 77.55928], 5);
-		        this.markers = {};
-		        this.liveDevices = new Set();
-		        this.deviceLastUpdate = {};
-		        this.previousCourses = {};
-		        this.inactivityThreshold = 30000;
-		        this.activeAlerts = new Set();
-		        this.alertContainer = this.createAlertContainer();
 
-		        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-		            attribution: '&copy; OpenStreetMap contributors',
-		        }).addTo(this.map);
 
-		        this.loadLastKnownPositions();
-		        this.initWebSocket();
-		        this.pollOfflineDevices();
-		        this.checkInactiveDevices();
-		    }
+		fetchVehicleData() {
+		    fetch('/api/vehicle/last/latests-locations/all')
+		        .then(res => res.json())
+		        .then(data => {
+		            data.forEach(vehicle => {
+		                const lat = parseFloat(vehicle.latitude);
+		                const lng = parseFloat(vehicle.longitude);
+		                const speed = parseFloat(vehicle.speed);
+		                const deviceId = vehicle.deviceId || vehicle.deviceID || "N/A";
 
-			createAlertContainer() {
-			   const container = document.createElement('div');
-			   container.className = 'alert-container';
-			   document.body.appendChild(container);
-			   return container;
-			}
+		                if (!isNaN(lat) && !isNaN(lng)) {
+		                    // 🔄 Call the existing marker creation method
+		                    this.createOrUpdateMarker(vehicle);
 
-			showAlert(vehicle, type) {
-			   const deviceId = vehicle.deviceId || vehicle.deviceID || 'Unknown';
-			   if (this.activeAlerts.has(deviceId)) return;
-
-			   const config = {
-			       parking: {
-			           class: 'parking-alert',
-			           icon: '/THINTURE_IMAGE/car/parking-area.png',
-			           title: 'Vehicle Parked' 
-			       },
-			       live: {
-			           class: 'live-alert', 
-			           icon: '/THINTURE_IMAGE/car/car_icon4.png',
-			           title: 'Live Message Alert'
-			       }
-			   };
-
-			   const alertConfig = config[type];
-			   const alertDiv = document.createElement('div');
-			   alertDiv.className = alertConfig.class;
-			   alertDiv.style.opacity = '0';
-
-			   alertDiv.innerHTML = `
-			       <img src="${alertConfig.icon}" class="${type}-icon" alt="${type}">
-			       <div class="${type}-info">
-			           <strong>${alertConfig.title}</strong>
-			           <span>Device ID: ${deviceId}</span>
-			           <span>Time: ${new Date().toLocaleTimeString()}</span>
-			       </div>
-			       <button class="alert-close" onclick="this.parentElement.remove(); window.vehicleTracker.removeAlert('${deviceId}')">×</button>
-			   `;
-
-			   void alertDiv.offsetWidth;
-			   this.alertContainer.appendChild(alertDiv);
-			   alertDiv.style.opacity = '1';
-			   
-			   this.activeAlerts.add(deviceId);
-
-			   setTimeout(() => {
-			       if (alertDiv.parentNode) {
-			           alertDiv.classList.add('slide-out');
-			           setTimeout(() => {
-			               alertDiv.remove();
-			               this.removeAlert(deviceId);
-			           }, 500);
-			       }
-			   }, 10000);
-			}
-
-			showParkingAlert(vehicle) {
-			   this.showAlert(vehicle, 'parking');
-			}
-
-			showLiveAlert(vehicle) {
-			   this.showAlert(vehicle, 'live'); 
-			}
-
-			updateVehicleStatusOnMap(vehicle) {
-			    const deviceId = vehicle.deviceId || vehicle.deviceID || 'Unknown';
-			    const latitude = parseFloat(vehicle.latitude);
-			    const longitude = parseFloat(vehicle.longitude);
-
-			    if (!latitude || !longitude) {
-			        console.warn(`Invalid coordinates for Device ID: ${deviceId}`);
-			        return;
-			    }
-
-			    const status = vehicle.vehicleStatus?.trim().toUpperCase();
-			    const ignition = vehicle.ignition?.trim().toUpperCase();
-
-			    console.log(`Processing Vehicle: ${deviceId}`);
-			    console.log(`Status: ${status}, Ignition: ${ignition}`);
-
-			    if (status === 'RUNNING' || ignition === 'IGON') {
-			        console.log(`Displaying Live Alert for ${deviceId}`);
-			        this.showLiveAlert(vehicle);
-			    } else if (status === 'PARKED') {
-			        console.log(`Displaying Parking Alert for ${deviceId}`);
-			        this.showParkingAlert(vehicle);
-			    } else {
-			        console.log(`No alert triggered for ${deviceId}. Status: ${status}, Ignition: ${ignition}`);
-			    }
-
-			    const iconPath = status === 'PARKED'
-			        ? '/THINTURE_IMAGE/car/parking-area.png'
-			        : (status === 'RUNNING' || ignition === 'IGON') 
-			            ? '/THINTURE_IMAGE/car/car_icon4.png'
-			            : '/THINTURE_IMAGE/car/car_default.png';
-
-			    console.log(`Updating map icon for ${deviceId}: ${iconPath}`);
-
-			    if (this.markers[deviceId]) {
-			        // Update existing marker position and icon
-			        this.markers[deviceId]
-			            .setLatLng([latitude, longitude])
-			            .setIcon(this.createIcon(iconPath));
-			    } else {
-			        // Create a new marker and add it to the cluster group
-			        const newMarker = L.marker([latitude, longitude], {
-			            icon: this.createIcon(iconPath)
-			        }).bindPopup(`
-			            <strong>Device ID:</strong> ${deviceId}<br>
-			            <strong>Status:</strong> ${status}
-			        `);
-
-			        this.markers[deviceId] = newMarker;
-			        this.markerClusterGroup.addLayer(newMarker); // Add marker to cluster group
-			    }
-			
-
-			this.markerClusterGroup = L.markerClusterGroup({
-			    iconCreateFunction: function(cluster) {
-			        const count = cluster.getChildCount(); // Number of markers in cluster
-			        let className = 'marker-cluster-small';
-
-			        if (count > 10) {
-			            className = 'marker-cluster-medium';
-			        } else if (count > 50) {
-			            className = 'marker-cluster-large';
-			        }
-
-			        return new L.DivIcon({
-			            html: `<div><span>${count}</span></div>`,
-			            className,
-			            iconSize: [40, 40]
-			        });
-			    }
-			});
-
-			
-			}
-			
-			
-			
-			
-			
-		    createOrUpdateMarker(vehicle, isLive = false) {
-		        if (!vehicle.latitude || !vehicle.longitude) {
-		            console.error('Invalid latitude or longitude for vehicle:', vehicle);
-		            return;
-		        }
-
-		        const deviceId = vehicle.deviceId || vehicle.deviceID || 'Unknown';
-		        const latitude = parseFloat(vehicle.latitude);
-		        const longitude = parseFloat(vehicle.longitude);
-		        const course = parseFloat(vehicle.course || 0);
-		        const ignition = vehicle.ignition || 'IGoff';
-		        const vehicleStatus = vehicle.vehicleStatus || vehicle.VehicleStatus || 'Unknown';
-		        const speed = vehicle.speed || '0';
-				const timeIntervals =vehicle.timeIntervals
-
-		        // Calculate rotation for smooth transition
-		        let rotation = course;
-		        if (this.previousCourses[deviceId]) {
-		            const prevCourse = this.previousCourses[deviceId];
-		            const diff = course - prevCourse;
-		            if (Math.abs(diff) > 180) {
-		                rotation = diff > 0 ? course - 360 : course + 360;
-		            }
-		        }
-		        this.previousCourses[deviceId] = course;
-
-		        if (isLive) {
-		            console.log('Live update received:', {
-		                deviceId,
-		                status: vehicleStatus,
-		                ignition,
-		                course: rotation,
-		                speed,
-		                isLive
-		            });
-		        }
-
-		        const icon = this.getVehicleIcon(rotation, ignition, vehicleStatus);
-		        const timestamp = vehicle.timestamp ? new Date(vehicle.timestamp).toLocaleString() : 'N/A';
-
-		        const markerHtml = `
-		            <img 
-		                src="${icon.path}" 
-		                style="transform: rotate(${icon.rotation}deg); width: 38px; height: 38px;" 
-		                alt="vehicle-icon"
-		                onerror="
-		                    console.log('Icon load failed for ${deviceId}:', this.src);
-		                    if (!this.retryCount) {
-		                        this.retryCount = 1;
-		                        this.src = '/THINTURE_IMAGE/car/${icon.color}/car0.png';
-		                        console.log('Retrying with path:', this.src);
-		                    } else {
-		                        console.error('All icon load attempts failed for ${deviceId}');
-		                        this.style.display = 'none';
+		                    // 🔔 Trigger speed alert
+		                    if (speed > 140 && deviceId !== "N/A") {
+		                        playSpeedAlert(deviceId, speed);
 		                    }
-		                "
-		            >`;
+							
+							
+							const speedLimit = parseFloat(vehicle.speedLimit) || 140;
+							if (speed > speedLimit && deviceId !== "N/A") {
+							    playSpeedAlert(deviceId, speed);
+							}
 
-					const popupContent = `
-					    <div class="vehicle-popup">
-					        <div class="popup-header ${isLive ? 'live-update' : 'last-known'}">
-					            ${isLive ? 'Live Update' : 'Last Known Position'}
-					        </div>
-					        <div class="popup-content">
-					            <p><span class="popup-label">Device ID:</span> ${deviceId}</p>
-					            <p><span class="popup-label">Timestamp:</span> ${timestamp}</p>
-					            <p><span class="popup-label">Speed:</span> ${speed} km/h</p>
-					            <p>
-					                <span class="popup-label">Status:</span> 
-					                <span class="status-indicator ${
-					                    (ignition === 'IGoff' && (vehicleStatus || '').toUpperCase() === 'PARKED') 
-					                    ? 'status-parked' 
-					                    : 'status-running'
-					                }">
-					                    ${vehicleStatus}
-					                </span>
-					            </p>
-					            <p>
-					                <span class="popup-label">Ignition:</span> 
-					                <span class="${ignition === 'IGon' ? 'ignition-on' : 'ignition-off'}">
-					                    ${ignition === 'IGon' ? 'ON' : 'OFF'}
-					                </span>
-					            </p>
-					            ${vehicle.address ? `
-					                <p>
-					                    <span class="popup-label">Address:</span>
-					                    <span class="address">${vehicle.address}</span>
-					                </p>
-					            ` : ''}
-					            <div style="margin-top: 10px; text-align: center;">
-					                <button style="padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;" 
-					                        onclick="navigateToReplay('${encodeURIComponent(vehicle.deviceId)}')">
-					                    Playback
-					                </button>
-					                <button style="padding: 5px 10px; background-color: red; color: white; border: none; border-radius: 5px; cursor: pointer;" 
-					                        onclick="openSideTab()">Live</button>
-											
-											
-											<button style="padding: 5px 10px; background-color: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer;"
-											    onclick="fetchVehicleDetails(this.getAttribute('data-deviceid'))"
-											    data-deviceid="${deviceId}">
-											    Details
-											</button>
-
-
-					            </div>
-					        </div>
-					    </div>
-					`;
-
-
-		        if (this.markers[deviceId]) {
-		            this.markers[deviceId]
-		                .setLatLng([latitude, longitude])
-		                .setIcon(L.divIcon({
-		                    className: 'custom-icon',
-		                    html: markerHtml,
-		                    iconSize: [38, 38],
-		                    iconAnchor: [19, 19],
-		                    popupAnchor: [0, -19],
-		                }))
-		                .bindPopup(popupContent);
-		        } else {
-		            const marker = L.marker([latitude, longitude], {
-		                icon: L.divIcon({
-		                    className: 'custom-icon',
-		                    html: markerHtml,
-		                    iconSize: [38, 38],
-		                    iconAnchor: [19, 19],
-		                    popupAnchor: [0, -19],
-		                }),
-		            }).bindPopup(popupContent).addTo(this.map);
-
-		            this.markers[deviceId] = marker;
-		        }
-
-		        // Check for parking alert condition
-		        if (isLive && ignition === 'IGoff' && (vehicleStatus || '').toUpperCase() === 'PARKED') {
-		            this.showParkingAlert(vehicle);
-		        }
-
-		        this.deviceLastUpdate[deviceId] = Date.now();
-		        if (isLive) {
-		            this.liveDevices.add(deviceId);
-		        }
-		    }
-
-		    getVehicleIcon(course, ignition, vehicleStatus) {
-		        const basePath = '/THINTURE_IMAGE/car';
-		        let color = 'red';
-		        
-		        const normalizedStatus = (vehicleStatus || '').toUpperCase();
-		        const normalizedIgnition = (ignition || '').toUpperCase();
-		        
-		        if (normalizedStatus === 'PARKED' && normalizedIgnition === 'IGOFF') {
-		            color = 'orange';
-		        } else if (normalizedIgnition === 'IGON' || normalizedStatus === 'RUNNING') {
-		            color = 'green';
-		        }
-		        
-		        const adjustedCourse = ((parseFloat(course) % 360) + 360) % 360;
-		        const imagePath = `${basePath}/${color}/car0.png`;
-		        
-		        return {
-		            path: imagePath,
-		            color: color,
-		            rotation: adjustedCourse,
-		        };
-		    }
-			
-			
-			
-			
-			
-			
-			
-
-		    loadLastKnownPositions() {
-		        console.log('Loading last known positions...');
-		        this.fetchAndUpdateVehicleData('/api/vehicles/last-known', false);
-		    }
-		    
-			fetchAndUpdateVehicleData(url, isLive = false) {
-			    fetch(url)
-			        .then(response => {
-			            if (!response.ok) {
-			                console.error(`API call failed with status ${response.status}`);
-			                throw new Error(`Failed to fetch data: ${response.statusText}`);
-			            }
-			            return response.json();
-			        })
-			        .then(data => {
-			            console.log("Data received from API:", data);
-			            if (Array.isArray(data) && data.length > 0) {
-			                data.forEach(vehicle => this.createOrUpdateMarker(vehicle, isLive));
-			            } else if (typeof data === 'object' && data !== null) {
-			                this.createOrUpdateMarker(data, isLive);
-			            } else {
-			                console.warn('No data received for vehicles.');
-			            }
-			        })
-			        .catch(error => console.error('Error fetching vehicle data:', error));
-			}
-
-
-			
-			
-			
-			
-		    pollOfflineDevices() {
-		        setInterval(() => {
-		            console.log('Fetching offline vehicles...');
-		            this.fetchAndUpdateVehicleData('/api/vehicles/last-known', false);
-		        }, 30000);
-		    }
-
-		    checkInactiveDevices() {
-		        setInterval(() => {
-		            const now = Date.now();
-		            this.liveDevices.forEach(deviceId => {
-		                if (now - this.deviceLastUpdate[deviceId] > this.inactivityThreshold) {
-		                    console.log('Device became inactive:', deviceId);
-		                    this.liveDevices.delete(deviceId);
-		                    this.fetchAndUpdateVehicleData(`/api/vehicle/latest-location/${deviceId}`, false);
 		                }
 		            });
-		        }, this.inactivityThreshold);
-		    }
-			
-			
+		        });
+		}
+	
 
-		    initWebSocket() {
+
+
+        updateMapMarkers(vehicles) {
+            vehicles.forEach(vehicle => this.createOrUpdateMarker(vehicle));
+        }
+		
+		createOrUpdateMarker(vehicle, isLive) {
+		    if (!this.map) {
+		        console.error("❌ Map object is NULL. Cannot create marker.");
+		        return;
+		    }
+
+		    // ✅ Correct time formatter using tzlookup
+		    function formatTimezoneFromLatLng(timestamp, lat, lng, locale = 'en-IN') {
+		        let timeZone = "UTC";
+		        try {
+		            timeZone = tzlookup(lat, lng);
+		        } catch (err) {
+		            console.warn("⚠️ tzlookup failed, using UTC:", err);
+		        }
+
+		        const dateObj = new Date(timestamp);
+		        return dateObj.toLocaleString(locale, {
+		            timeZone,
+		            year: 'numeric',
+		            month: '2-digit',
+		            day: '2-digit',
+		            hour: '2-digit',
+		            minute: '2-digit',
+		            second: '2-digit',
+		            hour12: false
+		        });
+		    }
+
+		    const deviceId = vehicle.deviceId || vehicle.deviceID || "Unknown";
+		    const latitude = parseFloat(vehicle.latitude);
+		    const longitude = parseFloat(vehicle.longitude);
+		    const course = parseFloat(vehicle.course) || 0;
+
+		    if (!deviceId || deviceId.toLowerCase() === "null" || isNaN(latitude) || isNaN(longitude)) {
+		        console.warn(`⛔ Skipping marker for invalid device (${deviceId})`);
+		        return;
+		    }
+
+		    const speed = vehicle.speed || 0;
+		    const ignitionStatus = vehicle.ignition
+		        ? vehicle.ignition.toUpperCase() === "IGON"
+		            ? "ON"
+		            : vehicle.ignition.toUpperCase() === "IGOFF"
+		                ? "OFF"
+		                : "Unknown"
+		        : "Unknown";
+
+		    const vehicleStatus = vehicle.vehicleStatus || "Unknown";
+		    const formattedDateTime = formatTimezoneFromLatLng(vehicle.timestamp, latitude, longitude);
+
+		    const isLiveNow = !!isLive;
+
+		    const liveIndicator = isLiveNow
+		        ? `<span class="live-indicator"><span class="live-ripple"></span> LIVE</span>`
+		        : `<span class="status-badge last-known">🔴 Last Received: ${formattedDateTime}</span>`;
+
+		    const vehicleIcon = this.getVehicleIcon(course, vehicle.ignition, vehicleStatus);
+
+		    const popupContent = `
+		        <div class="vehicle-popup">
+		            ${liveIndicator}
+		            <div class="popup-line">
+		                <div class="popup-label"><i class="fas fa-car"></i> Vehicle No:</div>
+		                <div class="popup-value">${deviceId}</div>
+		            </div>
+		            <div class="popup-line">
+		                <div class="popup-label"><i class="fas fa-map-pin"></i> Latitude:</div>
+		                <div class="popup-value">${latitude.toFixed(5)}</div>
+		            </div>
+		            <div class="popup-line">
+		                <div class="popup-label"><i class="fas fa-map-pin"></i> Longitude:</div>
+		                <div class="popup-value">${longitude.toFixed(5)}</div>
+		            </div>
+		            <div class="popup-line">
+		                <div class="popup-label"><i class="fas fa-rocket"></i> Speed:</div>
+		                <div class="popup-value">${speed} km/h</div>
+		            </div>
+		            <div class="popup-line">
+		                <div class="popup-label"><i class="fas fa-key"></i> Ignition:</div>
+		                <div class="popup-value" style="color:${ignitionStatus === "ON" ? "green" : "red"};">${ignitionStatus}</div>
+		            </div>
+		            <div class="popup-line">
+		                <div class="popup-label"><i class="fas fa-check-square"></i> Status:</div>
+		                <div class="popup-value">${vehicleStatus}</div>
+		            </div>
+		            <div class="popup-actions">
+		                <button class="details-btn" onclick="fetchVehicleDetails('${deviceId}')">📋 Details</button>
+		                <button class="playback-btn" onclick="navigateToReplay('${deviceId}')">⏮ Playback</button>
+		            </div>
+		        </div>
+		    `;
+
+		    if (this.markers[deviceId]) {
+		        let marker = this.markers[deviceId];
+		        marker.setLatLng([latitude, longitude]);
+		        marker.setIcon(vehicleIcon).bindPopup(popupContent);
+		    } else {
+		        this.markers[deviceId] = L.marker([latitude, longitude], { icon: vehicleIcon })
+		            .bindPopup(popupContent)
+		            .addTo(this.map);
+		    }
+		}
+
+
+
+
+
+
+
+		// Helper function for speed color classes
+		getSpeedClass(speed) {
+		    if (speed < 2) return "speed-low";
+		    if (speed < 30) return "speed-medium";
+		    return "speed-high";
+		}
+
+		// Helper function for vehicle status classes
+		getStatusClass(status) {
+		    switch (status.toLowerCase()) {
+		        case "online": return "status-online";
+		        case "offline": return "status-offline";
+		        case "idle": return "status-idle";
+		        case "moving": return "status-moving";
+		        default: return "status-unknown";
+		    }
+		}
+
+
+
+
+		getVehicleIcon(course, ignition, vehicleStatus) {
+		    const basePath = '/THINTURE_IMAGE/car';
+		    let color = 'green'; // Default color
+
+		    // ✅ Change color based on vehicle status
+		    switch (vehicleStatus.toUpperCase()) {
+		        case 'PARKED': case 'IDLE': color = 'orange'; break;
+		        case 'RUNNING': color = 'green'; break;
+		        case 'OFFLINE': case 'CONNECTION LOST': color = 'red'; break;
+		    }
+
+		    console.log(`🚗 Vehicle Status: ${vehicleStatus}, Color Set To: ${color}`);
+
+		    const imagePath = `${basePath}/${color}/car0.png`;
+
+		    return L.divIcon({
+		        html: `<img src="${imagePath}" 
+		                    style="transform: rotate(${course}deg); width: 35px; height: 35px;">`,  // ✅ Instantly Rotates
+		        className: 'custom-icon',
+		        iconSize: [35, 35],
+		        iconAnchor: [17, 17],  // Center the icon
+		        popupAnchor: [0, -15]
+		    });
+		}
+
+
+
+
+
+		
+
+
+		      
+
+
+
+/*
+		getPopupContent(vehicle, isLiveNow, lastUpdated) {
+		    const lastUpdatedTime = lastUpdated ? lastUpdated.toLocaleString() : "N/A";
+
+		    const statusIndicator = isLiveNow
+		        ? `<span class="status-badge live">🟢 LIVE</span>`
+		        : `<span class="status-badge offline">🔴 Last Update</span>`;
+
+		    const ignitionIcon = vehicle.ignition === "IGon" 
+		        ? `<i class="fas fa-key ignition-on"></i> <span class="ignition-text">On</span>` 
+		        : `<i class="fas fa-power-off ignition-off"></i> <span class="ignition-text">Off</span>`;
+
+		    const speedIcon = vehicle.speed > 0 
+		        ? `<i class="fas fa-tachometer-alt speed-icon"></i> ${vehicle.speed} km/h`
+		        : `<i class="fas fa-car-side parked-icon"></i> Parked`;
+
+		    const address = vehicle.address || "Fetching address...";
+
+		    return `
+		        <div class="popup-container">
+		            <div class="popup-header">
+		                <span class="popup-title">Vehicle Details</span>
+		                <span class="close-btn" onclick="closePopup()">×</span>
+		            </div>
+		            <div class="popup-content">
+		                ${statusIndicator}
+		                <div class="popup-item">
+		                    <i class="fas fa-car"></i> <strong>Device ID:</strong> ${vehicle.deviceId}
+		                </div>
+		                <div class="popup-item">
+		                    ${ignitionIcon}
+		                </div>
+		                <div class="popup-item">
+		                    ${speedIcon}
+		                </div>
+		                <div class="popup-item">
+		                    <i class="fas fa-map-marker-alt"></i> <strong>Address:</strong> ${address}
+		                </div>
+		                ${!isLiveNow ? `<div class="popup-item"><i class="fas fa-clock"></i> <strong>Last Updated:</strong> ${lastUpdatedTime}</div>` : ''}
+		                <div class="popup-buttons">
+		                    <button class="popup-btn replay" onclick="navigateToReplay('${encodeURIComponent(vehicle.deviceId)}')">
+		                        <i class="fas fa-history"></i> Playback
+		                    </button>
+							<button style="padding: 5px 10px; background-color: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer;"
+																		    onclick="fetchVehicleDetails(this.getAttribute('data-deviceid'))"
+																		    data-deviceid="${deviceId}">
+																		    Details
+																		</button>
+		                </div>
+		            </div>
+		        </div>
+		    `;
+		}
+
+
+*/
+ updateSidebarTable(vehicles) {
+    const tableBody = document.getElementById("trackerTableBody");
+
+    // ✅ Format timestamp using timezone from lat/lng
+    function formatTimezoneFromLatLng(timestamp, lat, lng, locale = 'en-IN') {
+        let timeZone = "UTC";
+        try {
+            timeZone = tzlookup(lat, lng);
+        } catch (err) {
+            console.warn("⚠️ tzlookup failed, using UTC:", err);
+        }
+
+        const dateObj = new Date(timestamp);
+        return dateObj.toLocaleString(locale, {
+            timeZone,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
+    }
+
+    tableBody.innerHTML = vehicles
+        .filter(v => v.deviceId && v.deviceId.toLowerCase() !== 'null')
+        .map(v => {
+            const lat = parseFloat(v.latitude);
+            const lng = parseFloat(v.longitude);
+            const formattedDate = formatTimezoneFromLatLng(v.timestamp, lat, lng);
+
+            return `
+                <tr>
+                    <td>${v.vehicleStatus}</td>
+                    <td>${v.deviceId}</td>
+                    <td>${formattedDate}</td>
+                    <td>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
+                             fill="none" stroke="#ff5733" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                             class="clickable-icon"
+                             onclick="zoomEffect(event, '${v.deviceId}', ${v.latitude}, ${v.longitude})">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5 7 11 7 11s7-6 7-11c0-3.87-3.13-7-7-7z"></path>
+                            <circle cx="12" cy="9" r="3"></circle>
+                        </svg>
+                    </td>
+                </tr>`;
+        })
+        .join('');
+}
+
+
+
+
+
+
+
+
+
+
+zoomToVehicle(deviceId, latitude, longitude) {
+    if (!this.map) {
+        console.error("❌ Map not initialized.");
+        return;
+    }
+
+    if (!latitude || !longitude) {
+        console.error(`❌ Missing coordinates for device ${deviceId}`);
+        return;
+    }
+
+    const maxZoom = this.map.getMaxZoom() || 20;
+    this.map.setView([latitude, longitude], maxZoom);
+
+    // Hide other markers
+    Object.entries(this.markers).forEach(([id, marker]) => {
+        if (id !== deviceId && marker._icon) {
+            marker._icon.style.display = "none"; // Hide
+        }
+    });
+
+    const marker = this.markers[deviceId];
+    if (marker) {
+        marker.openPopup();
+        const icon = marker._icon;
+        if (icon) {
+            icon.classList.add("highlight-marker");
+
+            setTimeout(() => {
+                icon.classList.remove("highlight-marker");
+
+                // Show all markers again after highlight
+                Object.values(this.markers).forEach(m => {
+                    if (m._icon) m._icon.style.display = "";
+                });
+            }, 8000);
+        }
+    }
+}
+
+
+
+
+		
+
+		initWebSocket() {
+		    setTimeout(() => {
 		        const socket = new SockJS('/gs-guide-websocket');
 		        const stompClient = Stomp.over(socket);
 
 		        stompClient.connect({}, () => {
-		            console.log('WebSocket connected.');
+		            console.log('✅ WebSocket connected.');
 		            stompClient.subscribe('/topic/location-updates', (message) => {
 		                try {
 		                    const vehicleData = JSON.parse(message.body);
-		                    const standardizedData = {
-		                        ...vehicleData,
-		                        vehicleStatus: vehicleData.vehicleStatus || vehicleData.VehicleStatus
-		                    };
-		                    this.createOrUpdateMarker(standardizedData, true);
+		                    if (!vehicleData) {
+		                        console.warn("⚠ WebSocket received empty message.");
+		                        return;
+		                    }
+		                    this.createOrUpdateMarker(vehicleData, true);
 		                } catch (error) {
-		                    console.error('Error processing WebSocket message:', error);
-		                    console.error('Message body:', message.body);
+		                    console.error('🚨 WebSocket message error:', error);
 		                }
 		            });
 		        }, (error) => {
-		            console.error('WebSocket connection error:', error);
+		            console.error('❌ WebSocket connection error:', error);
 		            setTimeout(() => this.initWebSocket(), 5000);
 		        });
-		    }
+		    }, 2000);
 		}
 
-        // Initialize the VehicleTracker when the page is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            new VehicleTracker('map');
-        });
-		
-		
-		
-		
-		
-    </script>
+			}
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        window.vehicleTracker = new VehicleTracker('map');
+        document.getElementById("toggleButton").addEventListener("click", () => {});
+    });
+
+    function navigateToReplay(deviceId) {
+        
+		window.location.href = `/superadmin/replay?deviceId=${encodeURIComponent(deviceId)}`;
+    }
 	
 	
-	
-	<script>
-		document.addEventListener("DOMContentLoaded", function () {
-		        const tableBody = document.getElementById("trackerTableBody");
-		        const toggleButton = document.getElementById("toggleButton");
-		        const sidebar = document.getElementById("sidebar");
-		        const searchBar = document.getElementById("searchBar");
-		        let activeRow = null;
+	class MyWebSocketHandler {
+	    reconnectInterval = 5000; // Corrected: Move inside class
 
-		        // Function to format timestamp
-		        function formatTimestamp(timestamp) {
-		            if (!timestamp) return "N/A";
-		            const date = new Date(timestamp);
-		            const now = new Date();
-		            const diffMinutes = Math.floor((now - date) / (1000 * 60));
+	    constructor() {
+	        this.initWebSocket();
+	    }
+		}
+		
+		
+		// Function to fetch and update vehicle data every 5 seconds
+		function autoRefreshData() {
+		    fetch('/api/vehicle/last/latests-locations/all')
+		        .then(response => response.json())
+		        .then(data => {
+		            const currentTime = new Date();
 
-		            if (diffMinutes < 1) return "Just now";
-		            if (diffMinutes < 60) return `${diffMinutes} min ago`;
-		            if (diffMinutes < 1440) return `${Math.floor(diffMinutes / 60)} hours ago`;
-		            return date.toLocaleString();
-		        }
+		            let runningCount = 0, idleCount = 0, parkedCount = 0, lostCount = 0;
 
-		        // Function to fetch and populate the tracker table
-		        function fetchAndPopulateTrackerTable() {
-		            fetch("/api/vehicle/last/latests-locations/all")
-		                .then(response => {
-		                    if (!response.ok) {
-		                        throw new Error("Failed to fetch vehicle locations");
-		                    }
-		                    return response.json();
-		                })
-		                .then(data => {
-		                    if (Array.isArray(data) && data.length > 0) {
-		                        populateTable(data);
-		                        startAutoRefresh();
-		                    } else {
-		                        showError("No vehicles found");
-		                    }
-		                })
-		                .catch(error => {
-		                    console.error("Error fetching vehicle locations:", error);
-		                    showError("Failed to load vehicle data");
-		                });
-		        }
+		            const validVehicles = data.filter(vehicle => {
+		                const lat = parseFloat(vehicle.latitude);
+		                const lng = parseFloat(vehicle.longitude);
+		                const deviceId = vehicle.deviceId;
 
-	        // Function to fetch and populate the tracker table
-	        function fetchAndPopulateTrackerTable() {
-	            fetch("/api/vehicle/last/latests-locations/all")
-	                .then(response => {
-	                    if (!response.ok) {
-	                        throw new Error("Failed to fetch vehicle locations");
-	                    }
-	                    return response.json();
-	                })
-	                .then(data => {
-	                    if (Array.isArray(data) && data.length > 0) {
-	                        populateTable(data);
-	                        startAutoRefresh();
-	                    } else {
-	                        showError("No vehicles found");
-	                    }
-	                })
-	                .catch(error => {
-	                    console.error("Error fetching vehicle locations:", error);
-	                    showError("Failed to load vehicle data");
-	                });
-	        }
+		                // ✅ Filter only valid lat/lng and non-null deviceId
+		                return (
+		                    !isNaN(lat) &&
+		                    !isNaN(lng) &&
+		                    deviceId &&
+		                    deviceId.trim().toLowerCase() !== 'null'
+		                );
+		            }).map(vehicle => {
+		                const lastUpdated = new Date(vehicle.timestamp);
+		                const diffMinutes = (currentTime - lastUpdated) / (1000 * 60);
 
-	        // Function to show error message
-	        function showError(message) {
-	            tableBody.innerHTML = `
-	                <tr>
-	                    <td colspan="4" class="error">
-	                        <div class="error-message">
-	                            <span>${message}</span>
-	                           <button class="trybutton" onclick="fetchAndPopulateTrackerTable()">Retry</button>
-	                        </div>
-	                    </td>
-	                </tr>
-	            `;
-	        }
-			
-			// Helper function to determine status class, text, and trigger notifications
-			function getStatusInfo(vehicle) {
-			    const ignition = vehicle.ignition?.toLowerCase();
-			    const status = vehicle.vehicleStatus?.toUpperCase();
-			    const deviceId = vehicle.deviceId || "Unknown"; // Extract deviceId from vehicle
+		                // 🔄 Determine stale/offline logic
+		                if (
+		                    (vehicle.vehicleStatus === "PARKED" && diffMinutes > 45) ||
+		                    (vehicle.vehicleStatus === "IDLE" && diffMinutes > 5) ||
+		                    (vehicle.vehicleStatus !== "PARKED" && vehicle.vehicleStatus !== "IDLE" && diffMinutes > 1)
+		                ) {
+		                    vehicle.vehicleStatus = "Offline";
+		                }
 
-			    let statusInfo;
+		                // 🧮 Count status categories
+		                switch (vehicle.vehicleStatus) {
+		                    case "RUNNING": runningCount++; break;
+		                    case "IDLE": idleCount++; break;
+		                    case "PARKED": parkedCount++; break;
+		                    case "Offline":
+		                    case "Lost": lostCount++; break;
+		                }
 
-			    if (ignition === "igon") {
-			        statusInfo = { class: "status-on", text: "Running", icon: "🚗" };
-			        showNotification("Vehicle Status", "The vehicle is Running", "🚗", deviceId);
-			    } else if (status === "PARKED") {
-			        statusInfo = { class: "status-parked", text: "Parked", icon: "🅿️" };
-			        showNotification("Vehicle Status", "The vehicle is Parked", "🅿️", deviceId);
-					
-			    } else if (ignition === "igoff") {
-			        statusInfo = { class: "status-off", text: "Stopped", icon: "⭕" };
-			    } else {
-			        statusInfo = { class: "status-unknown", text: "Unknown", icon: "❓" };
-			    }
+		                return vehicle;
+		            });
 
-			    return statusInfo;
-			}
+		            // ✅ Accurate count
+		            const totalCount = validVehicles.length;
 
+		            // 🔄 Update DOM counters
+		            document.getElementById("totalCount").textContent = totalCount;
+		            document.getElementById("runningCount").textContent = runningCount;
+		            document.getElementById("idleCount").textContent = idleCount;
+		            document.getElementById("parkedCount").textContent = parkedCount;
+		            document.getElementById("lostCount").textContent = lostCount;
 
-			// Function to show notifications
-			
+		            console.log(`✅ Total: ${totalCount}, Running: ${runningCount}, Idle: ${idleCount}, Parked: ${parkedCount}, Offline: ${lostCount}`);
 
-			   
-
-			// Function to populate the table with data and trigger notifications
-			function populateTable(data) {
-			    tableBody.innerHTML = "";
-			    data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach(vehicle => {
-			        const statusInfo = getStatusInfo(vehicle);
-			        const row = document.createElement("tr");
-
-			        row.innerHTML = `
-			            <td class="${statusInfo.class}">
-			                <span class="status-icon">${statusInfo.icon}</span>
-			                ${statusInfo.text}
-			            </td>
-			            <td>${vehicle.deviceId || "N/A"}</td>
-			            <td data-timestamp="${vehicle.timestamp}">${formatTimestamp(vehicle.timestamp)}</td>
-			            <td class="replay-cell">
-			                <button class="replay-button" title="View Route History" onclick="openReplayPage('${vehicle.deviceId}', '${vehicle.startTime}', '${vehicle.endTime}')">
-			                    Replay
-			                </button>
-			            </td>
-			        `;
-
-			        // Row click event: Highlight table row and zoom to marker
-			        row.addEventListener("click", () => {
-			            if (activeRow) activeRow.classList.remove("active-row"); // Remove highlight from previous row
-			            row.classList.add("active-row");
-			            activeRow = row;
-
-			            zoomToVehicle(vehicle.deviceId, vehicle.latitude, vehicle.longitude);
-			        });
-
-			        row.style.cursor = "pointer";
-			        tableBody.appendChild(row);
-			    });
-			}
-
-			// Function to zoom in on the correct vehicle marker and highlight it
-			function zoomToVehicle(deviceId, latitude, longitude) {
-			    if (!latitude || !longitude) {
-			        console.warn(`Invalid coordinates for Device ID: ${deviceId}`);
-			        return;
-			    }
-				function highlightMarker(deviceId) {
-				        if (window.vehicleTracker && window.vehicleTracker.markers[deviceId]) {
-				            const marker = window.vehicleTracker.markers[deviceId];
-				            marker.openPopup();
-				            if (marker._icon) {
-				                marker._icon.classList.add('highlight-marker');
-				                setTimeout(() => marker._icon.classList.remove('highlight-marker'), 1000);
-				            }
-				        }
-				    }
-
-			    const vehicleTracker = window.vehicleTracker;
-			    if (!vehicleTracker || !vehicleTracker.map || !vehicleTracker.markers) {
-			        console.error("Vehicle tracker or map object not initialized!");
-			        return;
-			    }
-
-			    // Reset all markers to default icon
-			    Object.keys(vehicleTracker.markers).forEach(id => {
-			        const prevMarker = vehicleTracker.markers[id];
-			        if (prevMarker) {
-			            prevMarker.setIcon(L.divIcon({
-			                className: 'custom-icon',
-			                html: `<img src="/THINTURE_IMAGE/car/car_default.png" style="width: 35px; height: 35px;">`,
-			                iconSize: [35, 35],
-			                iconAnchor: [17, 17]
-			            }));
-			        }
-			    });
-
-			    // Highlight and zoom in on the selected marker
-			    const marker = vehicleTracker.markers[deviceId];
-			    if (marker) {
-			        marker.setIcon(L.divIcon({
-			            className: 'custom-icon',
-			            html: `<img src="/THINTURE_IMAGE/car/car_icon1.png" style="width: 50px; height: 50px;">`,
-			            iconSize: [50, 50],
-			            iconAnchor: [25, 25]
-			        }));
-
-			        marker.openPopup(); // Show the popup
-			        vehicleTracker.map.setView([latitude, longitude], 18, { animate: true }); // Smooth zoom-in
-			    } else {
-			        console.warn(`Marker not found for deviceId: ${deviceId}`);
-			    }
-			}
-			
-
-			function showNotification(title, message, icon, deviceId) {
-			    // Create notification container
-			    const notification = document.createElement("div");
-			    notification.classList.add("notifications");
-
-			    // Add notification content
-			    notification.innerHTML = `
-			        <div class="notification-icon">${icon}</div>
-			        <div class="notification-content">
-			            <h4>${title}</h4>
-			            <p>${message}</p>
-			            <small>Device ID: ${deviceId || "Unknown"}</small>
-			        </div>
-			    `;
-
-			    // Append to the body
-			    document.body.appendChild(notification);
-
-			    // Animate notification twice
-			    setTimeout(() => {
-			        notification.classList.add("animate");
-			    }, 100); // First animation starts
-			    setTimeout(() => {
-			        notification.classList.remove("animate");
-			        setTimeout(() => {
-			            notification.classList.add("animate");
-			        }, 100); // Second animation starts
-			    }, 2000); // Delay before repeating the animation
-
-			    // Automatically remove notification after both animations
-			    const autoRemoveTimeout = setTimeout(() => {
-			        notification.remove();
-			    }, 4000);
-
-			    // Hide notification on click
-			    notification.addEventListener("click", () => {
-			        clearTimeout(autoRemoveTimeout); // Cancel automatic removal
-			        notification.remove();
-			    });
-			}
+		            // 🗺️ Update map and sidebar
+		            window.vehicleTracker.updateMapMarkers(validVehicles);
+		            refreshSidebarTableWithPagination(validVehicles);
+		        })
+		        .catch(err => console.error('🚨 Error fetching vehicle data:', err));
+		}
 
 
 
-			// Call the fetch function to populate data and trigger notifications
-			document.addEventListener("DOMContentLoaded", fetchAndPopulateTrackerTable);
+		// ✅ Initial + periodic refresh
+		document.addEventListener('DOMContentLoaded', () => {
+		    autoRefreshData(); // ✅ uses your correct logic
+		    setInterval(autoRefreshData, 8000); // ✅ only this runs
+		});
 
 
-	        // Toggle button for the sidebar
-	        if (toggleButton) {
-	            toggleButton.addEventListener("click", e => {
-	                e.preventDefault();
-	                e.stopPropagation();
-	                sidebar.classList.toggle("active");
-	                toggleButton.classList.toggle("active");
-	            });
-	        }
+		function showIdleAlert(deviceId, minutesIdle) {
+		    // Prevent duplicate alerts
+		    if (document.getElementById("idleAlertPopup")) return;
 
-	        // Close sidebar when clicking outside
-	        document.addEventListener("click", function (event) {
-	            if (!sidebar.contains(event.target) &&
-	                !toggleButton.contains(event.target) &&
-	                sidebar.classList.contains("active")) {
-	                sidebar.classList.remove("active");
-	                toggleButton.classList.remove("active");
-	            }
-	        });
+		    const popup = document.createElement("div");
+		    popup.id = "idleAlertPopup";
+		    popup.className = "speed-alert-popup";
+		    popup.innerHTML = `
+		        <span class="close-btn" onclick="closeIdleAlert()">×</span>
+		        <h4>🛑 Idle Alert</h4>
+		        <p><strong>Vehicle:</strong> ${deviceId}</p>
+		        <p><strong>Idle Time:</strong> ${minutesIdle} minutes</p>
+		    `;
+		    document.body.appendChild(popup);
+		    popup.style.display = "block";
+		}
+		function closeIdleAlert() {
+		    const el = document.getElementById("idleAlertPopup");
+		    if (el) el.remove();
+		}
 
-	        // Add search functionality
-	        if (searchBar) {
-	            searchBar.addEventListener("input", function () {
-	                const searchText = this.value.trim().toLowerCase();
-	                const rows = tableBody.querySelectorAll("tr");
+</script>
 
-	                rows.forEach(row => {
-	                    const deviceId = row.children[1].textContent.toLowerCase();
-	                    const status = row.children[0].textContent.toLowerCase();
-
-	                    if (deviceId.includes(searchText) || status.includes(searchText)) {
-	                        row.style.display = "";
-	                    } else {
-	                        row.style.display = "none";
-	                    }
-	                });
-	            });
-	        }
-
-	        // Start auto-refresh
-	        function startAutoRefresh() {
-	            setInterval(() => {
-	                fetchAndPopulateTrackerTable();
-	            }, 70000);
-	        }
-
-	        // Initialize
-	        fetchAndPopulateTrackerTable();
-	    });
-	</script>
 <script>
 	function navigateToReplay(deviceId) {
-	    console.log("Navigating with Device ID:", deviceId);
 	    if (!deviceId) {
 	        alert("Device ID is required to navigate to the replay page.");
 	        return;
 	    }
-	    window.location.href = `/admin/playback?deviceId=${encodeURIComponent(deviceId)}`;
+	    window.location.href = `/superadmin/replay?deviceId=${encodeURIComponent(deviceId)}`;
 	}
 
-	
-	
-	const vehicle1 = { ignition: "igon", vehicleStatus: "running" };
-	const vehicle2 = { ignition: "igoff", vehicleStatus: "PARKED" };
-
-	getStatusInfo(vehicle1); // Notification: Running
-	getStatusInfo(vehicle2); // Notification: Parked
-	
+</script>
 
 
-		document.addEventListener("DOMContentLoaded", function () {
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
 	    fetch("/api/details")
 	        .then(response => response.json())
 	        .then(data => {
 	            console.log("✅ Received Data:", data);
 
-	            if (!data || data.length === 0) {
-	                console.error("❌ No vehicles found");
-	                document.getElementById("vehiclesTable").innerHTML = "<tr><td colspan='8'>No Data Available</td></tr>";
+	            const vehiclesTable = document.getElementById("vehiclesTable");
+	            if (!vehiclesTable) {
+	                console.warn("⚠️ Element with ID 'vehiclesTable' not found.");
 	                return;
 	            }
 
-	            let tableContent = "";
+	            let tableContent = ""; // ✅ declare before use
 	            data.forEach(vehicle => {
 	                tableContent += `
 	                    <tr>
@@ -1440,18 +2064,268 @@
 	                        <td>${vehicle.ownerName || "N/A"}</td>
 	                        <td>${vehicle.vehicleType || "N/A"}</td>
 	                        <td>
-	                            <button onclick="fetchVehicleDetails('${vehicle.deviceID}')">Details</button>
+	                            <button onclick="showVehicleDetails('${vehicle.deviceID}', event)">Details</button>
 	                        </td>
 	                    </tr>`;
 	            });
 
-	            document.getElementById("vehiclesTable").innerHTML = tableContent;
+	            vehiclesTable.innerHTML = tableContent; // ✅ moved after loop
 	        })
 	        .catch(error => console.error("🚨 Error fetching vehicle list:", error));
 	});
 
-	// ✅ Function to fetch vehicle details and show in popup
-	// ✅ Function to fetch vehicle details and show in popup
+
+
+	// ✅ Function to fetch and display vehicle details in a popup
+	async function showVehicleDetails(deviceID, event) {
+	    if (!deviceID) {
+	        console.error("❌ Device ID is missing!");
+	        alert("❌ No Device ID found!");
+	        return;
+	    }
+
+	    console.log("🚀 Fetching details for Device ID:", deviceID);
+
+	    try {
+	        const response = await fetch(`/api/details/${deviceID}`);
+	        if (!response.ok) {
+	            throw new Error("❌ Server returned error " + response.status);
+	        }
+
+	        const vehicle = await response.json();
+	        console.log("📡 Vehicle Details Received:", vehicle);
+
+	        if (!vehicle || Object.keys(vehicle).length === 0) {
+	            alert("❌ No data found for this vehicle!");
+	            return;
+	        }
+
+	        // Check if popup exists, create if not
+	        let detailsPopup = document.getElementById("vehicle-details-popup");
+	        if (!detailsPopup) {
+	            detailsPopup = document.createElement("div");
+	            detailsPopup.id = "vehicle-details-popup";
+	            document.body.appendChild(detailsPopup);
+	        }
+
+	        // Populate popup with vehicle details
+	        detailsPopup.innerHTML = `
+	            <div class="popup-header">
+	                <strong>Vehicle Details</strong>
+	                <span class="close-btn" onclick="closeVehiclePopup()">×</span>
+	            </div>
+	            <div class="popup-content">
+	                <strong>Owner:</strong> ${vehicle.ownerName || "N/A"} <br>
+	                <strong>Vehicle Number:</strong> ${vehicle.vehicleNumber || "N/A"} <br>
+	                <strong>Total Distance:</strong> ${vehicle.totalDistance || "N/A"} km <br>
+	                <strong>Device ID:</strong> ${vehicle.deviceID || "N/A"} <br>
+	                <strong>Driver RFID:</strong> ${vehicle.driverRFID || "N/A"} <br>
+	                <strong>GSM Strength:</strong> ${vehicle.gsmStrength || "N/A"} <br>
+	                <strong>IMEI:</strong> ${vehicle.imei || "N/A"} <br>
+	                <strong>Vehicle Model:</strong> ${vehicle.model || "N/A"} <br>
+	            </div>
+	        `;
+
+	        // Show popup near clicked button
+	        detailsPopup.style.display = "block";
+	        const button = event.target;
+	        const rect = button.getBoundingClientRect();
+	        detailsPopup.style.top = `${rect.top + window.scrollY + 40}px`;
+	        detailsPopup.style.left = `${rect.left + window.scrollX}px`;
+
+	        // Add event listener to close when clicking outside
+	        setTimeout(() => {
+	            document.addEventListener("click", outsideClickListener);
+	        }, 100);
+
+	    } catch (error) {
+	        console.error("🚨 Error fetching vehicle details:", error);
+	        alert("⚠️ Error fetching data. Check console for details.");
+	    }
+	}
+
+	// Function to close the popup
+	function closeVehiclePopup() {
+	    let detailsPopup = document.getElementById("vehicle-details-popup");
+	    if (detailsPopup) {
+	        detailsPopup.style.display = "none";
+	    }
+	}
+
+	// Click outside listener to close popup
+	function outsideClickListener(event) {
+	    let detailsPopup = document.getElementById("vehicle-details-popup");
+	    if (detailsPopup && !detailsPopup.contains(event.target)) {
+	        closeVehiclePopup();
+	        document.removeEventListener("click", outsideClickListener);
+	    }
+	}
+
+	// Function to close the popup
+	function closeVehiclePopup() {
+	    const popup = document.getElementById("vehicle-details-popup");
+	    if (popup) {
+	        popup.style.display = "none";
+	        document.removeEventListener("click", outsideClickListener); // Remove event listener
+	    }
+	}
+
+	// Function to detect outside click
+	function outsideClickListener(event) {
+	    const popup = document.getElementById("vehicle-details-popup");
+	    if (popup && event.target !== popup && !popup.contains(event.target)) {
+	        closeVehiclePopup();
+	    }
+	}
+
+
+	
+	document.getElementById("searchBar").addEventListener("input", function() {
+	    const searchValue = this.value.toLowerCase();
+	    const rows = document.querySelectorAll("#trackerTableBody tr");
+
+	    rows.forEach(row => {
+	        const deviceId = row.cells[1]?.textContent.toLowerCase() || ""; // Assuming device ID is in the 2nd column (index 1)
+	        if (deviceId.includes(searchValue)) {
+	            row.style.display = "";
+	        } else {
+	            row.style.display = "none";
+	        }
+	    });
+	});
+	// Speed alert popup logic
+	function playSpeedAlert(deviceId, speed) {
+	    showSpeedAlert(deviceId, speed);
+
+	    const audio = document.getElementById("overspeedAudio");
+	    if (audio) {
+	        audio.currentTime = 0;
+	        audio.play().catch(err => {
+	            console.warn("⚠️ Audio play failed:", err);
+	        });
+	    }
+	}
+
+
+	   function showSpeedAlert(deviceId, speed) {
+	       document.getElementById("alertDeviceID").textContent = deviceId;
+	       document.getElementById("alertSpeed").textContent = speed;
+
+	       const popup = document.getElementById("speedAlertPopup");
+	       popup.style.display = "block";
+
+	       // ⏱️ Auto-close after 5 seconds
+	       setTimeout(() => {
+	           popup.style.display = "none";
+	       }, 3000);
+	   }
+
+
+	   function closeSpeedAlert() {
+	     document.getElementById("speedAlertPopup").style.display = "none";
+	   }
+
+	   setInterval(() => window.vehicleTracker.fetchVehicleData(), 8000);
+	   document.addEventListener("DOMContentLoaded", () => window.vehicleTracker.fetchVehicleData());
+
+	
+	
+	function autoRefreshSidebar() {
+			    fetch('/api/vehicle/last/latests-locations/all')
+			        .then(response => response.json())
+			        .then(data => {
+			            updateSidebarTable(data);
+			        })
+			        .catch(error => console.error('Error fetching vehicle data:', error));
+			
+
+			// Set interval to refresh sidebar table every 30 seconds
+			setInterval(autoRefreshSidebar, 30000);
+
+			// Run it once on page load
+			document.addEventListener('DOMContentLoaded', autoRefreshSidebar);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+</script>
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+	    let currentLayer;
+	    let mapLayers = {
+	        "osm": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	            attribution: '&copy; OpenStreetMap contributors'
+	        }),
+	        "googleSatellite": L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+	            attribution: '&copy; Google Satellite'
+	        }),
+	        "googleRoadMap": L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+	            attribution: '&copy; Google '
+	        }),
+	        "googleHybrid": L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+	            attribution: '&copy; Google Hybrid'
+	        })
+	    };
+
+		function switchLiveMap(mapType) {
+		    const nextLayer = mapLayers[mapType];
+
+		    if (!nextLayer || typeof nextLayer.addTo !== "function") {
+		        console.error("❌ Invalid map layer:", mapType, nextLayer);
+		        return;
+		    }
+
+		    if (currentLayer && typeof currentLayer.remove === "function") {
+		        window.vehicleTracker.map.removeLayer(currentLayer);
+		    }
+
+		    currentLayer = nextLayer;
+		    currentLayer.addTo(window.vehicleTracker.map);
+
+		    // Update button UI
+		    document.querySelectorAll(".map-button").forEach(btn => btn.classList.remove("active"));
+		    document.querySelector(`.map-button[data-map="${mapType}"]`).classList.add("active");
+		}
+
+
+	    // Initialize map with OSM by default
+	    currentLayer = mapLayers["osm"];
+	    currentLayer.addTo(window.vehicleTracker.map);
+
+	    // Assign switching function globally
+	    window.switchLiveMap = switchLiveMap;
+	});
+
+	
+	document.addEventListener('DOMContentLoaded', () => {
+	    const sidebar = document.getElementById("sidebar");
+	    const toggleButton = document.getElementById("toggleButton");
+	    const mobileCloseBtn = document.getElementById("mobileCloseBtn");
+
+	    toggleButton.addEventListener("click", function () {
+	        sidebar.classList.toggle("active");
+	        toggleButton.classList.toggle("active");
+
+	        // Show or hide the mobile close button
+	        if (window.innerWidth <= 768) {
+	            mobileCloseBtn.style.display = sidebar.classList.contains("active") ? "block" : "none";
+	        }
+	    });
+	});
+	function closeSidebar() {
+	    const sidebar = document.getElementById("sidebar");
+	    const toggleButton = document.getElementById("toggleButton");
+	    sidebar.classList.remove("active");
+	    toggleButton.classList.remove("active");
+	}
+
+
+	// ✅ Fetch Vehicle Details & Show Popup
 	function fetchVehicleDetails(deviceID) {
 	    if (!deviceID) {
 	        console.error("❌ Device ID is missing!");
@@ -1477,22 +2351,19 @@
 	                return;
 	            }
 
-	            // ✅ Populate Table Data Inside Popup
-	            let tableContent = `
-	                <tr><td><strong>Device ID:</strong></td><td>${vehicle.deviceID || "N/A"}</td></tr>
-	                <tr><td><strong>Vehicle Number:</strong></td><td>${vehicle.vehicleNumber || "N/A"}</td></tr>
-	                <tr><td><strong>IMEI:</strong></td><td>${vehicle.imei || "N/A"}</td></tr>
-	                <tr><td><strong>Engine Number:</strong></td><td>${vehicle.engineNumber || "N/A"}</td></tr>
-	                <tr><td><strong>Model:</strong></td><td>${vehicle.model || "N/A"}</td></tr>
-	                <tr><td><strong>Owner Name:</strong></td><td>${vehicle.ownerName || "N/A"}</td></tr>
-	                <tr><td><strong>Vehicle Type:</strong></td><td>${vehicle.vehicleType || "N/A"}</td></tr>
-	            `;
+	            // ✅ Populate Popup Data
+	            document.getElementById("popup-deviceID").textContent = vehicle.deviceID || "N/A";
+				document.getElementById("popup-serialno").textContent = vehicle.serialNo || "N/A";
+	            document.getElementById("popup-ownerName").textContent = vehicle.ownerName || "N/A";
+	            document.getElementById("popup-model").textContent = vehicle.model || "N/A";
+				document.getElementById("popup-simnumber").textContent = vehicle.simNumber || "N/A";
 
-	            document.getElementById("vehicleDetailsTable").innerHTML = tableContent;
-
-	            // ✅ Show Modal
-	            document.getElementById("vehicleDetailsModal").style.display = "block";
-	            console.log("✅ Table Populated & Modal Opened!");
+	            
+	           
+	            // ✅ Show Popup
+	            document.getElementById("popupOverlay").style.display = "block";
+	            document.getElementById("vehicleDetailsModal").classList.add("show");
+	            console.log("✅ Popup Opened!");
 	        })
 	        .catch(error => {
 	            console.error("🚨 Error fetching vehicle details:", error);
@@ -1501,34 +2372,387 @@
 	}
 
 	// ✅ Function to Close Popup
-	function closeVehicleDetails() {
-	  const modal = document.getElementById("vehicleDetailsModal");
-	  if (modal) {
-	    modal.style.display = "none";
-	  }
-	}
-
-
-	
-	function showPopup() {
-	    document.getElementById("detailsPopup").style.display = "block";
-	    document.getElementById("popupOverlay").style.display = "block";
-	}
-
 	function closePopup() {
-	    document.getElementById("detailsPopup").style.display = "none";
-	    document.getElementById("popupOverlay").style.display = "none";
+	    const overlay = document.getElementById("popupOverlay");
+	    const modal = document.getElementById("vehicleDetailsModal");
+	    
+	    if (overlay) overlay.style.display = "none";
+	    if (modal) modal.classList.remove("show");
 	}
 
-	// Modify this in fetchVehicleDetails function
-	document.getElementById("vehicleDetailsModal").style.display = "block";
+	document.addEventListener("DOMContentLoaded", function () {
+	    const toggleButton = document.getElementById("toggleButton");
+	    const statusSummary = document.querySelector(".status-summary");
 
+	    if (!toggleButton || !statusSummary) return;
 
+	    // Initially hide the status summary
+	    statusSummary.style.display = "none";
+
+	    toggleButton.addEventListener("click", function () {
+	        // Toggle visibility of status summary
+	        statusSummary.style.display = 
+	            statusSummary.style.display === "none" ? "flex" : "none";
+	    });
+	});
+
+	let currentPage = 1;
+	const itemsPerPage = 10;
+
+	async function fetchDevicesByStatus(status, page = 1) {
+	    const popup = document.getElementById("deviceDetailsPopup");
+	    const title = document.getElementById("popup-title");
+	    const deviceList = document.getElementById("deviceList");
+
+	    title.textContent = `${status.toUpperCase()} Devices`;
+	    deviceList.innerHTML = "<li>Loading...</li>";
+
+	    try {
+	        console.log("Fetching data from /api/vehicle/last/latests-locations/all...");
+	        const response = await fetch("/api/vehicle/last/latests-locations/all");
+	        console.log("API Response Status:", response.status);
+	        if (!response.ok) throw new Error(`Server Error: ${response.status}`);
+
+	        const devices = await response.json();
+	        console.log("API Data Received:", devices);
+	        deviceList.innerHTML = "";
+
+	        if (!Array.isArray(devices)) {
+	            throw new Error("Invalid API response format. Expected an array.");
+	        }
+
+	        const currentTime = new Date();
+	        let filteredDevices = devices.map(device => {
+	            if (device.timestamp) {
+	                const lastUpdated = new Date(device.timestamp);
+	                const diffMinutes = (currentTime - lastUpdated) / (1000 * 60);
+	                if ((device.vehicleStatus === "PARKED" && diffMinutes > 45) ||
+	                    (device.vehicleStatus !== "PARKED" && diffMinutes > 1) ||
+	                    (device.vehicleStatus === "IDLE" && diffMinutes > 5)) {
+	                    device.vehicleStatus = "Offline";
+	                }
+	            } else {
+	                device.vehicleStatus = "Offline";
+	            }
+	            return device;
+	        });
+
+	        switch (status) {
+	            case "running":
+	                filteredDevices = filteredDevices.filter(d => d.vehicleStatus === "RUNNING");
+	                break;
+	            case "idle":
+	                filteredDevices = filteredDevices.filter(d => d.vehicleStatus === "IDLE");
+	                break;
+	            case "parked":
+	                filteredDevices = filteredDevices.filter(d => d.vehicleStatus === "PARKED");
+	                break;
+	            case "lost":
+	                filteredDevices = filteredDevices.filter(d => d.vehicleStatus === "Offline");
+	                console.log("🚨  Offline Devices:", filteredDevices);
+	                break;
+	            default:
+	                break;
+	        }
+
+	        console.log(`Devices matching status '${status}':`, filteredDevices);
+	        const totalPages = Math.ceil(filteredDevices.length / itemsPerPage);
+	        currentPage = Math.max(1, Math.min(page, totalPages));
+	        const paginatedDevices = filteredDevices.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+	        if (paginatedDevices.length > 0) {
+				paginatedDevices
+				    .filter(device => device.deviceId && device.deviceId.toLowerCase() !== 'null' && device.deviceId.trim() !== '')
+				    .forEach(device => {
+				        const li = document.createElement("li");
+				        li.innerHTML = `<strong>${device.deviceId}</strong> - ${device.vehicleStatus}`;
+				        deviceList.appendChild(li);
+				    });
+
+	        } else {
+	            deviceList.innerHTML = "<li>No devices available</li>";
+	        }
+
+	        const paginationControls = document.getElementById("paginationControls");
+	        paginationControls.innerHTML = `
+	            <button onclick="fetchDevicesByStatus('${status}', ${currentPage - 1})" ${currentPage === 1 ? "disabled" : ""}>⬅ Previous</button>
+	            <span>Page ${currentPage} of ${totalPages}</span>
+	            <button onclick="fetchDevicesByStatus('${status}', ${currentPage + 1})" ${currentPage === totalPages ? "disabled" : ""}>Next ➡</button>
+	        `;
+
+	        popup.style.display = "block";
+	    } catch (error) {
+	        console.error("🚨 Error fetching device data:", error);
+	        deviceList.innerHTML = `<li>Error: ${error.message}</li>`;
+	    }
+	}
+
+	function closeDevicePopup() {
+	    const popup = document.getElementById("deviceDetailsPopup");
+	    if (popup) {
+	        popup.style.display = "none";
+	    }
+	}
+	// Function to show speed alert popup
+	
+
+	// Function to close the alert manually
+	function closeSpeedAlert() {
+	    document.getElementById("speedAlertPopup").style.display = "none";
+	}
+
+	// Function to determine speed class based on speed range
+	
+	
+	function openSettingsSidebar() {
+	    let sidebar = document.getElementById("settingsSidebar");
+
+	    // Show sidebar when button is clicked
+	    sidebar.style.display = "block"; 
+
+	    if (window.innerWidth < 768) {
+	        // Mobile: Slide up
+	        sidebar.style.bottom = "0";
+	    } else {
+	        // Desktop: Slide in from right
+	        sidebar.style.right = "0";
+	    }
+
+	    sidebar.classList.add("active");
+	}
+
+	function closeSettingsSidebar() {
+	    let sidebar = document.getElementById("settingsSidebar");
+
+	    if (window.innerWidth < 768) {
+	        // Mobile: Slide down and hide
+	        sidebar.style.bottom = "-100%";
+	    } else {
+	        // Desktop: Slide out and hide
+	        sidebar.style.right = "-350px";
+	    }
+
+	    sidebar.classList.remove("active");
+
+	    // Hide completely after animation ends
+	    setTimeout(() => {
+	        sidebar.style.display = "none"; 
+	    }, 300); // Match transition duration
+	}
+	function centerToUserLocation() {
+	    if (navigator.geolocation) {
+	        navigator.geolocation.getCurrentPosition(position => {
+	            window.vehicleTracker.map.setView([position.coords.latitude, position.coords.longitude], 15);
+	        }, error => {
+	            alert("Unable to retrieve location. Please enable GPS.");
+	        });
+	    } else {
+	        alert("Geolocation is not supported by this browser.");
+	    }
+	}
+
+	function toggleDarkMode() {
+	    document.body.classList.toggle("dark-mode");
+
+	    let isDark = document.body.classList.contains("dark-mode");
+	    localStorage.setItem("darkMode", isDark ? "enabled" : "disabled");
+
+	    // Update map layers
+	    let darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png');
+	    let lightLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+
+	    if (isDark) {
+	        window.vehicleTracker.map.removeLayer(lightLayer);
+	        darkLayer.addTo(window.vehicleTracker.map);
+	    } else {
+	        window.vehicleTracker.map.removeLayer(darkLayer);
+	        lightLayer.addTo(window.vehicleTracker.map);
+	    }
+	}
+	function toggleFullScreen() {
+	    let mapContainer = document.getElementById('map');
+	    if (!document.fullscreenElement) {
+	        mapContainer.requestFullscreen().catch(err => {
+	            console.error(`Error attempting full-screen mode: ${err.message}`);
+	        });
+	    } else {
+	        document.exitFullscreen();
+	    }
+	}
 
 
 </script>
+<script>
+    function zoomEffect(event, deviceId, latitude, longitude) {
+        // Click effect (ripple animation)
+        let ripple = document.createElement("div");
+        ripple.classList.add("ripple");
+
+        let rect = event.target.getBoundingClientRect();
+        ripple.style.width = ripple.style.height = "50px";
+        ripple.style.left = `${event.clientX - rect.left - 25}px`;
+        ripple.style.top = `${event.clientY - rect.top - 25}px`;
+
+        event.target.parentElement.appendChild(ripple);
+
+        setTimeout(() => {
+            ripple.remove();
+        }, 600);
+
+        // Call your zoom function
+        window.vehicleTracker.zoomToVehicle(deviceId, latitude, longitude);
+    }
+	document.addEventListener("DOMContentLoaded", function () {
+	    const speedAlertToggle = document.getElementById("speedAlertToggle");
+
+	    // Load setting from localStorage
+	    const speedAlertEnabled = localStorage.getItem("speedAlertEnabled") === "true";
+	    speedAlertToggle.checked = speedAlertEnabled;
+
+	    speedAlertToggle.addEventListener("change", function () {
+	        localStorage.setItem("speedAlertEnabled", speedAlertToggle.checked);
+	        console.log(`🚀 Global Speed Alert: ${speedAlertToggle.checked ? "ENABLED" : "DISABLED"}`);
+	    });
+	});
+
+	// ✅ Function to Toggle Individual Vehicle Alerts
+	function toggleVehicleAlert(deviceId) {
+	    let alertCheckbox = document.getElementById(`alert_${deviceId}`);
+	    let isEnabled = alertCheckbox.checked;
+
+	    localStorage.setItem(`alert_${deviceId}`, isEnabled ? "enabled" : "disabled");
+
+	    console.log(`🚗 Speed Alert for ${deviceId} is now ${isEnabled ? "ENABLED" : "DISABLED"}`);
+	}
+
+	// ✅ Restore Toggle States on Page Load
+	document.addEventListener("DOMContentLoaded", function () {
+	    document.querySelectorAll("[id^=alert_]").forEach(input => {
+	        const deviceId = input.id.replace("alert_", "");
+	        input.checked = localStorage.getItem(`alert_${deviceId}`) === "enabled";
+	    });
+	});
+
+	function toggleVehicleAlert(deviceId) {
+	    let alertCheckbox = document.getElementById(`alert_${deviceId}`);
+	    let isEnabled = alertCheckbox.checked;
+
+	    localStorage.setItem(`alert_${deviceId}`, isEnabled ? "enabled" : "disabled");
+
+	    console.log(`🚗 Speed Alert for ${deviceId} is now ${isEnabled ? "ENABLED" : "DISABLED"}`);
+	}
+
+	// ✅ Ensure vehicle alert states are restored on page load
+	document.addEventListener("DOMContentLoaded", function () {
+	    document.querySelectorAll("[id^=alert_]").forEach(input => {
+	        const deviceId = input.id.replace("alert_", "");
+	        input.checked = localStorage.getItem(`alert_${deviceId}`) === "enabled";
+	    });
+	});
+	// ✅ Manage Global Speed Alert Enable/Disable
+	document.addEventListener("DOMContentLoaded", function () {
+	    const speedAlertToggle = document.getElementById("speedAlertToggle");
+
+	    // Load setting from localStorage
+	    const speedAlertEnabled = localStorage.getItem("speedAlertEnabled") === "true";
+	    speedAlertToggle.checked = speedAlertEnabled;
+
+	    speedAlertToggle.addEventListener("change", function () {
+	        localStorage.setItem("speedAlertEnabled", speedAlertToggle.checked);
+	        console.log(`🚀 Global Speed Alert: ${speedAlertToggle.checked ? "ENABLED" : "DISABLED"}`);
+	    });
+	});
+
 	
 	
 	
+</script>
+<script>
+	// ✅ Make this global (outside of any function or DOMContentLoaded)
+	function zoomEffect(event, deviceId, latitude, longitude) {
+	    const lat = parseFloat(latitude);
+	    const lng = parseFloat(longitude);
+
+	    if (isNaN(lat) || isNaN(lng)) {
+	        console.error(`❌ Invalid coordinates for ${deviceId}: ${lat}, ${lng}`);
+	        return;
+	    }
+
+	    console.log(`📍 Zooming to ${deviceId} at (${lat}, ${lng})`);
+	    window.vehicleTracker.zoomToVehicle(deviceId, lat, lng);
+	}
+	
+	
+	document.getElementById("searchBar").addEventListener("input", function() {
+	    const searchValue = this.value.toLowerCase();
+	    const rows = document.querySelectorAll("#trackerTableBody tr");
+
+	    rows.forEach(row => {
+	        const vehicleNo = row.cells[2]?.textContent.toLowerCase() || "";  // ✅ correct: column 3 = Vehicle No
+	        if (vehicleNo.includes(searchValue)) {
+	            row.style.display = "";
+	        } else {
+	            row.style.display = "none";
+	        }
+	    });
+	});
+
+</script>
+<script>
+	let currentSidebarPage = 1;
+	const sidebarRowsPerPage = 5;
+
+	function paginateSidebarTable() {
+	    const allRows = document.querySelectorAll("#trackerTableBody tr");
+	    const totalRows = allRows.length;
+	    const totalPages = Math.ceil(totalRows / sidebarRowsPerPage);
+
+	    // Hide all rows
+	    allRows.forEach(row => (row.style.display = "none"));
+
+	    // Show current page rows
+	    const start = (currentSidebarPage - 1) * sidebarRowsPerPage;
+	    const end = start + sidebarRowsPerPage;
+	    for (let i = start; i < end && i < totalRows; i++) {
+	        allRows[i].style.display = "";
+	    }
+
+	    // Create simple controls
+	    const paginationContainer = document.getElementById("sidebarPagination");
+	    paginationContainer.innerHTML = `
+	        <button onclick="goSidebarPage(-1)" ${currentSidebarPage === 1 ? "disabled" : ""}>⬅</button>
+	        <span>Page ${currentSidebarPage} of ${totalPages}</span>
+	        <button onclick="goSidebarPage(1)" ${currentSidebarPage === totalPages ? "disabled" : ""}>➡</button>
+	    `;
+	}
+
+	function goSidebarPage(direction) {
+	    const allRows = document.querySelectorAll("#trackerTableBody tr");
+	    const totalPages = Math.ceil(allRows.length / sidebarRowsPerPage);
+	    currentSidebarPage = Math.max(1, Math.min(currentSidebarPage + direction, totalPages));
+	    paginateSidebarTable();
+	}
+
+	function refreshSidebarTableWithPagination(data) {
+	    window.vehicleTracker.updateSidebarTable(data);
+	    currentSidebarPage = 1;
+	    paginateSidebarTable();
+	}
+</script>
+
+<script>
+    function showSidebarTab(tabId, btn) {
+        document.querySelectorAll('.custom-tab-content').forEach(div => div.classList.remove('active'));
+        document.querySelectorAll('.custom-tab-btn').forEach(b => b.classList.remove('active'));
+
+        document.getElementById(tabId).classList.add('active');
+        btn.classList.add('active');
+    }
+	
+	
+	
+	
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

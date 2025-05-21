@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thinture GPS </title>
+  <link rel="icon" href="/THINTURE_IMAGE/favicon.jpg">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" type="text/css" th:href="@{/css/styled.css}">
+  <link rel="stylesheet" type="text/css" th:href="@{/css/eventreportstyle.css}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <header th:replace="~{navigation :: navbar}"></header>
+
+  <div class="card">
+    <h1 class="text-center">Trip Management Report</h1>
+
+    <!-- Filters -->
+    <div class="filters row gx-3">
+      <div class="col-auto">
+        <label for="quickTime" class="form-label">Quick Time</label>
+        <select id="quickTime" class="form-select" onchange="setQuickTime()">
+          <option value="">Select…</option>
+          <option value="today">Today</option>
+		  <option value="yesterday">Yesterday</option>
+          <option value="lastWeek">Last Week</option>
+		  <option value="thisMonth">This Month</option>
+        </select>
+      </div>
+
+      <div class="col-auto">
+        <label class="form-label">From Date & Time</label>
+        <input type="datetime-local" id="fromDate" class="form-control">
+      </div>
+
+      <div class="col-auto">
+        <label class="form-label">To Date & Time</label>
+        <input type="datetime-local" id="toDate" class="form-control">
+      </div>
+	  <div class="col-auto">
+		<label class="form-label">Select Trip Mode</label>
+	  <select id="tripMode" class="form-select">
+	    <option value="each">Each Trip</option>
+	    <option value="daily">Full Day</option>
+	  </select>
+	  </div>
+      <div class="col-auto">
+        <label class="form-label">Vehicle Number</label>
+        <select id="deviceID" class="form-select">
+          <option value="">All</option>
+        </select>
+      </div>
+
+      <div class="col-auto">
+        <label class="form-label">Driver Name</label>
+        <select id="driverName" class="form-select">
+          <option value="">All</option>
+        </select>
+      </div>
+
+     
+
+      <div class="col-auto d-flex gap-2">
+        <button class="btn" onclick="searchTrips()"><i class="fas fa-search"></i></button>
+        <button class="btn" onclick="downloadPDF()"><i class="fas fa-file-pdf"></i></button>
+        <button class="btn" onclick="downloadExcel()"><i class="fas fa-file-excel"></i></button>
+      </div>
+    </div>
+	
+	
+    <!-- Status Summary -->
+	<!-- Status Summary -->
+	<div id="statusSummary" class="row text-center my-3" style="gap:10px;">
+	  <div class="col  text-white p-2 rounded">Running: <span id="runningCount">0</span></div>
+	  <div class="col  text-dark p-2 rounded">Idle: <span id="idleCount">0</span></div>
+	  <div class="col text-white p-2 rounded">Parked: <span id="parkedCount">0</span></div>
+	  <div class="col  text-white p-2 rounded">Total Trips: <span id="totalTripCount">0</span></div> <!-- 🆕 -->
+	    <div class="col  text-white p-2 rounded">Night Trips: <span id="nightTripCount">0</span></div> <!-- 🆕 -->
+	</div>
+
+
+    <!-- Table -->
+    <div class="table-container">
+      <table class="table table-striped table-hover">
+        <thead>
+			<tr>
+			          <th>Vehicle Number</th>
+			         
+			          <th>Driver Name</th>
+			          <th>Trip Start Time</th>
+			          <th>Trip End Time</th>
+			          <th>Trip Duration</th>
+			          <th>Total Rest Time</th>
+					  <th>Trip Total KM</th> <!-- 🆕 -->
+					  <th>Night/Day Drive</th>
+					  <th>Playback</th>
+					  <th>Speed Graph</th>
+			        </tr>
+        </thead>
+        <tbody id="tripTable">
+          <tr><td colspan="6" class="text-center text-danger">No data</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div id="pagination" class="d-flex justify-content-center mt-3">
+      <button onclick="changePage(-1)">⬅️ Prev</button>
+      <span id="currentPage">Page 0 of 0</span>
+      <button onclick="changePage(1)">Next ➡️</button>
+    </div>
+	
+	<!-- Speed Graph Modal -->
+	<div class="modal fade" id="speedChartModal" tabindex="-1">
+	  <div class="modal-dialog modal-lg">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title">Speed Graph</h5>
+	        <button class="btn-close" data-bs-dismiss="modal"></button>
+	      </div>
+	      <div class="modal-body">
+	        <canvas id="speedChartCanvas" height="300"></canvas>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+  </div>
+
+  <script>
+  const rowsPerPage = 10;
+  let tripDataGlobal = [];
+  let currentPage = 1;
+
+  // Fetch Device, Driver, Vehicle dropdowns
+  async function fetchDropdowns() {
+    try {
+      const [devices, drivers] = await Promise.all([
+        fetch('/api/vehicle/report/devices').then(r => r.json()),
+        fetch('/api/drivers').then(r => r.json())
+      ]);
+
+      // === Populate deviceID dropdown ===
+      const deviceDropdown = document.getElementById('deviceID');
+      deviceDropdown.innerHTML = '<option value="">All</option>'; // Reset options
+      devices.forEach(device => {
+        const id = typeof device === 'string' ? device : device.deviceID || device.id;
+        if (id) {
+          const opt = new Option(id, id);
+          deviceDropdown.add(opt);
+        }
+      });
+
+      // === Populate driverName dropdown ===
+      const driverDropdown = document.getElementById('driverName');
+      driverDropdown.innerHTML = '<option value="">All</option>';
+      drivers.forEach(d => {
+        const name = d.fullName || d;
+        if (name) {
+          driverDropdown.add(new Option(name, name));
+        }
+      });
+
+    } catch (err) {
+      console.error("🔴 fetchDropdowns error:", err);
+      Swal.fire("Error", "Unable to load dropdown options.", "error");
+    }
+  }
+
+    
+	  
+	
+
+  // Quick Time
+  function setQuickTime() {
+    const v = document.getElementById('quickTime').value;
+    let now = new Date();
+
+    const formatDateTimeLocal = (date) => {
+      const pad = n => n.toString().padStart(2, '0');
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    };
+
+    if (v === 'today') {
+      const start = new Date(now);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(now);
+      end.setHours(23, 59, 0, 0);
+      document.getElementById('fromDate').value = formatDateTimeLocal(start);
+      document.getElementById('toDate').value = formatDateTimeLocal(end);
+
+    } else if (v === 'yesterday') {
+      const start = new Date(now);
+      start.setDate(start.getDate() - 1);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(now);
+      end.setDate(end.getDate() - 1);
+      end.setHours(23, 59, 0, 0);
+      document.getElementById('fromDate').value = formatDateTimeLocal(start);
+      document.getElementById('toDate').value = formatDateTimeLocal(end);
+
+    } else if (v === 'lastWeek') {
+      const end = new Date(now);
+      end.setHours(23, 59, 0, 0);
+      const start = new Date(now);
+      start.setDate(start.getDate() - 7);
+      start.setHours(0, 0, 0, 0);
+      document.getElementById('fromDate').value = formatDateTimeLocal(start);
+      document.getElementById('toDate').value = formatDateTimeLocal(end);
+
+    } else if (v === 'thisMonth') {
+      const start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
+      const end = new Date(now);
+      end.setHours(23, 59, 0, 0);
+      document.getElementById('fromDate').value = formatDateTimeLocal(start);
+      document.getElementById('toDate').value = formatDateTimeLocal(end);
+    }
+  }
+
+  // Search Trips
+  async function searchTrips() {
+    const from = document.getElementById('fromDate').value;
+    const to = document.getElementById('toDate').value;
+    const tripMode = document.getElementById('tripMode').value;
+
+    if (!from || !to) {
+      Swal.fire({icon: "warning", title: "Missing Dates", text: "Please select From and To."});
+      return;
+    }
+
+    let url = `/api/vehicle/report?startDate=${from}&endDate=${to}`;
+    ['deviceID','driverName'].forEach(id => {
+      const v = document.getElementById(id).value;
+      if (v) url += `&${id}=${v}`;
+    });
+
+    document.getElementById('tripTable').innerHTML = '<tr><td colspan="7" class="text-center">Loading...</td></tr>';
+
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+
+      // 1. First update the status counts always
+      updateStatusSummary(data);
+
+      // 2. Then calculate trip summary
+      if (data.length > 0) {
+		let trips = calculateTripsWithRest(data);
+
+		// Sort trips so latest comes first
+		trips.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+
+
+		if (tripMode === 'daily') {
+		  trips = summarizeTripsPerDay(trips);
+		  trips.sort((a, b) => new Date(b.startTime) - new Date(a.startTime)); // latest day first
+		}
+
+
+        if (trips.length > 0) {
+          initializePagination(trips);
+        } else {
+          tripDataGlobal = [];
+          document.getElementById('tripTable').innerHTML = '<tr><td colspan="7" class="text-center text-warning">No complete trips detected</td></tr>';
+          document.getElementById('currentPage').innerText = 'Page 0 of 0';
+        }
+      } else {
+        tripDataGlobal = [];
+        document.getElementById('tripTable').innerHTML = '<tr><td colspan="7" class="text-center text-danger">No records found</td></tr>';
+        document.getElementById('currentPage').innerText = 'Page 0 of 0';
+      }
+
+    } catch (e) {
+      console.error(e);
+      document.getElementById('tripTable').innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error fetching</td></tr>';
+    }
+  }
+
+  function updateStatusSummary(data) {
+    let running = 0, idle = 0, parked = 0;
+    data.forEach(d => {
+      const status = d.vehicleStatus?.toUpperCase() || "";
+      if (status === 'RUNNING') running++;
+      if (status === 'IDLE') idle++;
+      if (status === 'PARKED') parked++;
+    });
+
+    document.getElementById('runningCount').innerText = running;
+    document.getElementById('idleCount').innerText = idle;
+    document.getElementById('parkedCount').innerText = parked;
+  }
+
+  // Trip and Rest Calculation
+  function calculateTripsWithRest(data) {
+    let trips = [];
+    let tripStart = null, lastRunning = null, currentRestStart = null;
+    let tripStartData = {};
+    let restTimes = [];
+
+    data.sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+    data.forEach(entry => {
+      const status = entry.vehicleStatus?.toUpperCase() || "";
+      const timestamp = entry.timestamp;
+      if (!timestamp) return;
+
+      if (status === 'RUNNING') {
+        if (!tripStart) {
+          tripStart = timestamp;
+          tripStartData = entry;
+        }
+        if (currentRestStart) {
+          const seconds = (new Date(timestamp) - new Date(currentRestStart))/1000;
+          if (seconds > 300) restTimes.push(seconds);
+          currentRestStart = null;
+        }
+        lastRunning = timestamp;
+      }
+
+      if (status === 'IDLE') {
+        if (lastRunning) currentRestStart = timestamp;
+      }
+
+      if (status === 'PARKED') {
+        if (tripStart) {
+          const tripEnd = timestamp;
+          trips.push({
+            deviceID: tripStartData.deviceID || '-',
+           
+            driverName: tripStartData.driverName || '-',
+            startTime: tripStart,
+            endTime: tripEnd,
+            startLat: tripStartData.latitude,      // 🆕 Start Latitude
+            startLon: tripStartData.longitude,     // 🆕 Start Longitude
+            endLat: entry.latitude,                // 🆕 End Latitude
+            endLon: entry.longitude,               // 🆕 End Longitude
+            totalRestSeconds: restTimes.reduce((a,b)=>a+b,0)
+          });
+          tripStart = null;
+          lastRunning = null;
+          currentRestStart = null;
+          restTimes = [];
+        }
+      }
+    });
+
+    return trips;
+  }
+  function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * (Math.PI / 180);
+            const dLon = (lon2 - lon1) * (Math.PI / 180);
+
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+
+
+  function initializePagination(trips) {
+    const selectedDeviceID = document.getElementById('deviceID').value;
+    if (selectedDeviceID) {
+      trips = trips.filter(t => t.deviceID === selectedDeviceID);
+    }
+    tripDataGlobal = trips;
+    currentPage = 1;
+
+    // Update Total Trip Count and Night Trip Count
+    document.getElementById('totalTripCount').innerText = tripDataGlobal.length;
+
+    const nightTrips = tripDataGlobal.filter(t => isNightDrive(t.startTime, t.endTime));
+    document.getElementById('nightTripCount').innerText = nightTrips.length;
+
+    renderPage();
+  }
+
+
+  function summarizeTripsPerDay(trips) {
+    const grouped = {};
+
+    trips.forEach(t => {
+      const day = new Date(t.startTime).toISOString().split("T")[0];
+      const key = `${t.deviceID}_${day}`;
+
+      if (!grouped[key]) {
+        grouped[key] = {
+          deviceID: t.deviceID,
+          driverName: t.driverName,
+          startTime: t.startTime,
+          endTime: t.endTime,
+          totalRestSeconds: t.totalRestSeconds,
+          tripCount: 1
+        };
+      } else {
+        // Pick earliest startTime and latest endTime
+        grouped[key].startTime = new Date(t.startTime) < new Date(grouped[key].startTime) ? t.startTime : grouped[key].startTime;
+        grouped[key].endTime = new Date(t.endTime) > new Date(grouped[key].endTime) ? t.endTime : grouped[key].endTime;
+        grouped[key].totalRestSeconds += t.totalRestSeconds;
+        grouped[key].tripCount++;
+      }
+    });
+
+    return Object.values(grouped);
+  }
+
+
+
+  function renderPage() {
+    const start = (currentPage-1) * rowsPerPage;
+    const pageData = tripDataGlobal.slice(start, start + rowsPerPage);
+    const tbl = document.getElementById('tripTable');
+    tbl.innerHTML = '';
+
+    if (!pageData.length) {
+      tbl.innerHTML = '<tr><td colspan="8" class="text-center">No records</td></tr>';
+    } else {
+      pageData.forEach(r => {
+        const isNight = isNightDrive(r.startTime, r.endTime);
+
+        // 🆕 Generate badge HTML
+		const nightBadge = isNight 
+		        ? '<span class="badge bg-dark"><i class="fas fa-moon"></i> Night Drive</span>'
+		        : '<span class="badge bg-warning text-dark"><i class="fas fa-sun"></i> Day Drive</span>';
+
+        const nightRowClass = isNight ? 'table-dark' : '';
+
+		tbl.innerHTML += `
+		  <tr class="${nightRowClass}" id="tripRow_${r.startTime.replaceAll(':', '_')}">
+		    <td>${r.deviceID}</td>
+		    <td>${r.driverName}</td>
+		    <td>${new Date(r.startTime).toLocaleString()}</td>
+		    <td>${new Date(r.endTime).toLocaleString()}</td>
+		    <td>${formatDuration(new Date(r.endTime) - new Date(r.startTime))}</td>
+		    <td>${formatDuration(r.totalRestSeconds * 1000)}</td>
+			<td id="tripKm_${r.startTime.replace(/[^a-zA-Z0-9]/g, '_')}">Calculating...</td>
+
+
+		    <td>${nightBadge}</td>
+		    <td><button class="btn btn-sm btn-outline-primary" onclick='viewTripPath(${JSON.stringify(r)})'><i class="fas fa-map-marker-alt"></i> View Trip</button></td>
+		    <td><button class="btn btn-sm btn-outline-success" onclick='showSpeedGraph(${JSON.stringify(r)})'><i class="fas fa-chart-line"></i> Speed Graph</button></td>
+		  </tr>`;
+
+		calculateAccurateTripKm(r); // Call async function to populate correct distance
+
+
+      });
+    }
+	function calculateTripKm(startLat, startLon, endLat, endLon) {
+	  if (startLat == null || startLon == null || endLat == null || endLon == null) return '-';
+	  const km = calculateDistance(startLat, startLon, endLat, endLon);
+	  return km.toFixed(2); // Rounded to 2 decimal places
+	}
+	// Haversine Formula
+	function calculateDistance(lat1, lon1, lat2, lon2) {
+	    const R = 6371;
+	    const dLat = (lat2 - lat1) * (Math.PI / 180);
+	    const dLon = (lon2 - lon1) * (Math.PI / 180);
+
+	    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+	              Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+	              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+	    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+	    return R * c;
+	}
+
+	// Total trip distance from replay points
+	function calculateTotalTripDistance(pathPoints) {
+	    let totalKm = 0;
+	    for (let i = 1; i < pathPoints.length; i++) {
+	        const prev = pathPoints[i - 1];
+	        const curr = pathPoints[i];
+	        if (prev && curr && prev.latitude && prev.longitude && curr.latitude && curr.longitude) {
+	            totalKm += calculateDistance(prev.latitude, prev.longitude, curr.latitude, curr.longitude);
+	        }
+	    }
+	    return totalKm.toFixed(2);
+	}
+
+
+	async function calculateAccurateTripKm(trip) {
+	    const format = (d) => {
+	        const pad = (n) => n.toString().padStart(2, '0');
+	        const date = new Date(d);
+	        return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+	    };
+
+	    const from = encodeURIComponent(format(trip.startTime));
+	    const to = encodeURIComponent(format(trip.endTime));
+	    const url = `/api/vehicle/history/${trip.deviceID}?from=${from}&to=${to}`;
+
+		const rowId = `tripKm_${trip.startTime.replace(/[^a-zA-Z0-9]/g, '_')}`;
+
+
+	    const cell = document.getElementById(rowId);
+	    if (!cell) {
+	        console.warn("⚠️ Could not find table cell for Trip KM with ID:", rowId);
+	        return;
+	    }
+
+	    try {
+	        const res = await fetch(url);
+	        const replayData = await res.json();
+
+	        if (!Array.isArray(replayData) || replayData.length < 2) {
+	            console.warn("⚠️ Insufficient replay data for distance:", replayData);
+	            cell.textContent = "0.00 km";
+	            return;
+	        }
+
+	        const distanceKm = calculateTotalTripDistance(replayData);
+	        cell.textContent = `${distanceKm} km`;
+	    } catch (err) {
+	        console.error("🚨 Trip KM error for", trip.deviceID, err);
+	        cell.textContent = "Error";
+	    }
+	}
+
+
+    const totalPages = Math.ceil(tripDataGlobal.length / rowsPerPage) || 1;
+    document.getElementById('currentPage').innerText = `Page ${currentPage} of ${totalPages}`;
+  }
+
+  
+  function isNightDrive(startTime, endTime) {
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+
+    const startHour = start.getHours();
+    const endHour = end.getHours();
+
+    // Night hours between 8 PM (20) to 5 AM (5)
+    return (startHour >= 20 || startHour < 5) || (endHour >= 20 || endHour < 5);
+  }
+
+  function changePage(dir) {
+    const total = Math.ceil(tripDataGlobal.length/rowsPerPage)||1;
+    if (currentPage+dir<1 || currentPage+dir>total) return;
+    currentPage += dir;
+    renderPage();
+  }
+
+  function formatDuration(ms) {
+    let seconds = Math.floor(ms/1000);
+    let h = Math.floor(seconds/3600);
+    let m = Math.floor((seconds%3600)/60);
+    let s = seconds%60;
+    return `${h}h ${m}m ${s}s`;
+  }
+
+  // Init
+  fetchDropdowns();
+  
+  
+  
+  
+  
+  
+  
+  let speedChart;
+
+  async function showSpeedGraph(trip) {
+      try {
+          // Format ISO string to "yyyy-MM-dd HH:mm:ss"
+          const formatTime = (iso) => {
+              const d = new Date(iso);
+              const pad = n => n.toString().padStart(2, '0');
+              return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+          };
+
+          const deviceID = encodeURIComponent(trip.deviceID);
+          const from = encodeURIComponent(formatTime(trip.startTime));
+          const to = encodeURIComponent(formatTime(trip.endTime));
+
+          const url = `/api/vehicle/history/${deviceID}?from=${from}&to=${to}`;
+          const res = await fetch(url);
+          const replayData = await res.json();
+
+          if (!replayData || replayData.length === 0) {
+              Swal.fire("No Data", "No speed data available for this trip.", "warning");
+              return;
+          }
+
+          const labels = replayData.map(p => new Date(p.timestamp).toLocaleTimeString());
+          const speeds = replayData.map(p => parseFloat(p.speed) || 0);
+
+          if (speedChart) speedChart.destroy();
+
+          const ctx = document.getElementById("speedChartCanvas").getContext("2d");
+
+          // 🎨 Create gradient fill
+          const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+          gradient.addColorStop(0, 'rgba(0, 153, 255, 0.5)');
+          gradient.addColorStop(1, 'rgba(0, 153, 255, 0.05)');
+
+          speedChart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                  labels,
+                  datasets: [{
+                      label: 'Speed (km/h)',
+                      data: speeds,
+                      borderColor: '#007bff',
+                      backgroundColor: gradient,
+                      tension: 0.3,
+                      fill: true,
+                      pointRadius: 2,
+                      pointHoverRadius: 4,
+                      pointBackgroundColor: '#007bff'
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  layout: { padding: 10 },
+                  scales: {
+					y: {
+					  min: 0,
+					  max: 200,
+					  ticks: {
+					    stepSize: 5, // Allows finer evaluation
+					    autoSkip: false, // Prevent Chart.js from hiding ticks
+					    callback: function (value) {
+					      const allowedTicks = [0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200];
+					      return allowedTicks.includes(value) ? value + ' km/h' : '';
+					    },
+					    color: '#333',
+					    font: {
+					      size: 13,
+					      weight: 'bold'
+					    }
+					  },
+					  grid: {
+					    color: 'rgba(0, 0, 0, 0.08)',
+					    drawTicks: true
+					  }
+					
+
+					
+
+                      },
+                      x: {
+                          ticks: {
+                              display: false
+                          },
+                          grid: {
+                              display: false
+                          }
+                      }
+                  },
+                  plugins: {
+                      legend: {
+                          labels: {
+                              font: { size: 14, weight: 'bold' },
+                              color: '#007bff'
+                          }
+                      },
+                      tooltip: {
+                          backgroundColor: '#222',
+                          titleColor: '#fff',
+                          bodyColor: '#fff',
+                          borderColor: '#007bff',
+                          borderWidth: 1,
+                          padding: 10
+                      }
+                  }
+              }
+          });
+
+          new bootstrap.Modal(document.getElementById("speedChartModal")).show();
+
+      } catch (error) {
+          console.error("Speed graph error:", error);
+          Swal.fire("Error", "Unable to load speed data.", "error");
+      }
+  }
+
+
+
+  let tripMap, tripLayer;
+
+  function viewTripPath(trip) {
+      const formatToYMDHMS = (iso) => {
+          const d = new Date(iso);
+          const pad = n => n.toString().padStart(2, '0');
+          return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+      };
+
+      const deviceID = encodeURIComponent(trip.deviceID);
+      const startTime = encodeURIComponent(formatToYMDHMS(trip.startTime));
+      const endTime = encodeURIComponent(formatToYMDHMS(trip.endTime));
+
+      const url = `/superadmin/replay?deviceId=${deviceID}&from=${startTime}&to=${endTime}`;
+      window.location.href = url;
+  }
+
+
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+  </html>

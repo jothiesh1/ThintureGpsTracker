@@ -18,6 +18,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+	<script src="https://cdn.jsdelivr.net/npm/tz-lookup@6.1.25/tz.min.js"></script>
 
     <style>
 		/* Prevent main body scroll */
@@ -763,7 +764,79 @@
 		
 
 
-		 
+		
+
+		.vehicle-popup .popup-line {
+		    display: flex;
+		    align-items: center;
+		    justify-content: space-between;
+		    padding: 8px 0;
+		    border-bottom: 1px dashed #ddd;
+		}
+
+		.vehicle-popup .popup-line i {
+		    margin-right: 10px;
+		    color: #007bff;
+		}
+
+		.vehicle-popup .popup-label {
+		    font-weight: 600;
+		    font-size: 14px;
+		    display: flex;
+		    align-items: center;
+		    color: #34495e;
+		}
+
+		.vehicle-popup .popup-value {
+		    font-weight: 500;
+		    font-size: 14px;
+		    text-align: right;
+		    color: #2c3e50;
+		}
+
+		.vehicle-popup .live-indicator {
+		    font-size: 14px;
+		    font-weight: bold;
+		    margin-bottom: 12px;
+		    color: red;
+		}
+
+		.vehicle-popup .popup-actions {
+		    display: flex;
+		    justify-content: space-between;
+		    margin-top: 16px;
+		    gap: 10px;
+		}
+
+		.vehicle-popup button {
+		    flex: 1;
+		    border: none;
+		    padding: 10px;
+		    font-size: 14px;
+		    font-weight: 600;
+		    border-radius: 8px;
+		    cursor: pointer;
+		    transition: background 0.3s ease;
+		}
+
+		.vehicle-popup .details-btn {
+		    background: #2980b9;
+		    color: white;
+		}
+
+		.vehicle-popup .details-btn:hover {
+		    background: #1f618d;
+		}
+
+		.vehicle-popup .playback-btn {
+		    background: #27ae60;
+		    color: white;
+		}
+
+		.vehicle-popup .playback-btn:hover {
+		    background: #1e8449;
+		}
+
 		
 
 		/* Status Summary - Fix Alignment */
@@ -1232,6 +1305,11 @@
   top: 160px;
   margin-right: 10px;
 }
+@media (max-width: 768px) {
+    #mobileCloseBtn {
+        display: block;
+    }
+}
 
     </style>
 </head>
@@ -1281,6 +1359,10 @@
 	<div id="paginationControls" class="pagination-controls"></div>
 </div>
 
+<div class="popup-line">
+    <div class="popup-label"><i class="fas fa-gauge"></i> Speed Limit:</div>
+    <div class="popup-value">${speedLimit} km/h</div>
+</div>
 
 <!-- Map Switcher Buttons -->
 <div id="mapSwitcher">
@@ -1309,45 +1391,23 @@
 
 </div>
 
-<!-- Status Summary -->
-<!-- Settings Sidebar -->
-<div id="settingsSidebar">
-    <div class="settings-header">
-        <h3>Settings</h3>
-        <button class="close-settings-btn" onclick="closeSettingsSidebar()">✖</button>
-    </div>
-    <div class="settings-content">
-        <label class="toggle-container">
-            <span>Enable Speed Alert</span>
-            <div class="toggle-switch">
-                <input type="checkbox" id="speedAlertToggle" >
-                <span class="slider"></span>
-            </div>
-        </label>
-        <br>
-        <label class="toggle-container">
-            <span>Enable Notifications</span>
-            <div class="toggle-switch">
-                <input type="checkbox" id="notificationToggle" checked>
-                <span class="slider"></span>
-            </div>
-        </label>
-        <br>
-       
-    </div>
-</div>
 
+<!--
 
+<audio id="overspeedAudio" src="/THINTURE_IMAGE/alertsspeed.mp3" preload="auto"></audio>
 
-
+-->
 <!-- Sidebar -->
 <!-- Sidebar -->
 <div id="sidebar">
+	<div id="mobileCloseBtn" style="text-align: right; margin: 5px 0; display: none;">
+		  <button class="btn btn-sm btn" style="font-size: 13px; color:red"; onclick="closeSidebar()">✖</button>
+		</div>
     <div class="custom-tab-bar">
         <button class="custom-tab-btn active" onclick="showSidebarTab('devicesTab', this)">Device</button>
         <button class="custom-tab-btn" onclick="showSidebarTab('alertsTab', this)">Alerts</button>
     </div>
-
+	
     <!-- Device Tab Content -->
     <div id="devicesTab" class="custom-tab-content active">
         <!--<h2>Tracker Details</h2>-->
@@ -1356,7 +1416,7 @@
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>Speed alert</th>
+                       
                         <th>Status</th>
                         <th>Vehicle No</th>
                         <th>Last Upload</th>
@@ -1389,19 +1449,20 @@
 			
 
             <tr><td><strong>Vehicle No:</strong></td><td id="popup-deviceID">Loading...</td></tr>
-			<tr><td><strong>Total KM:</strong></td><td id="popup-totalDistance">Loading...</td></tr>
+			<tr><td><strong>Serial number:</strong></td><td id="popup-serialno">Loading...</td></tr>
             <tr><td><strong>Owner:</strong></td><td id="popup-ownerName">Loading...</td></tr>
             <tr><td><strong>Model:</strong></td><td id="popup-model">Loading...</td></tr>
-			<tr><td><strong>SIM Number:</strong></td><td id="popup-simNumber">Loading...</td></tr>
+			<tr><td><strong>SIM Number:</strong></td><td id="popup-simnumber">Loading...</td></tr>
 
-            <tr><td><strong>Speed:</strong></td><td id="popup-speed">Loading...</td></tr>
-            <tr><td><strong>Ignition:</strong></td><td id="popup-ignition">Loading...</td></tr>
-            <tr><td><strong>Location:</strong></td><td id="popup-location">Loading...</td></tr>
-            <tr><td><strong>Last Update:</strong></td><td id="popup-timestamp">Loading...</td></tr>
+          
+           
         </table>
     </div>
 </div>
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<!-- Add before your main <script> -->
+<script src="https://cdn.jsdelivr.net/npm/tz-lookup@6.1.25/tz.min.js"></script>
+
 <script>
 	class VehicleTracker {
 		
@@ -1471,13 +1532,21 @@
 		                    this.createOrUpdateMarker(vehicle);
 
 		                    // 🔔 Trigger speed alert
-		                    if (speed > 80 && deviceId !== "N/A") {
+		                    if (speed > 140 && deviceId !== "N/A") {
 		                        playSpeedAlert(deviceId, speed);
 		                    }
+							
+							
+							const speedLimit = parseFloat(vehicle.speedLimit) || 140;
+							if (speed > speedLimit && deviceId !== "N/A") {
+							    playSpeedAlert(deviceId, speed);
+							}
+
 		                }
 		            });
 		        });
 		}
+	
 
 
 
@@ -1491,76 +1560,85 @@
 		        return;
 		    }
 
-		    function formatTimestamp(timestamp) {
-		        if (!timestamp) return "N/A";
+		    // ✅ Correct time formatter using tzlookup
+		    function formatTimezoneFromLatLng(timestamp, lat, lng, locale = 'en-IN') {
+		        let timeZone = "UTC";
+		        try {
+		            timeZone = tzlookup(lat, lng);
+		        } catch (err) {
+		            console.warn("⚠️ tzlookup failed, using UTC:", err);
+		        }
 
-		        let dateObj = new Date(timestamp);
-
-		        return dateObj.toLocaleString(undefined, {  
+		        const dateObj = new Date(timestamp);
+		        return dateObj.toLocaleString(locale, {
+		            timeZone,
 		            year: 'numeric',
 		            month: '2-digit',
 		            day: '2-digit',
 		            hour: '2-digit',
 		            minute: '2-digit',
 		            second: '2-digit',
-		            hour12: false  
+		            hour12: false
 		        });
 		    }
 
 		    const deviceId = vehicle.deviceId || vehicle.deviceID || "Unknown";
 		    const latitude = parseFloat(vehicle.latitude);
 		    const longitude = parseFloat(vehicle.longitude);
-		    const timestamp = vehicle.timestamp ? new Date(vehicle.timestamp) : null;
-		    const course = parseFloat(vehicle.course) || 0; 
+		    const course = parseFloat(vehicle.course) || 0;
 
-			if (
-			    !deviceId || 
-			    deviceId.toLowerCase() === "null" ||
-			    isNaN(latitude) || isNaN(longitude) || 
-			    latitude === 0 || longitude === 0
-			) {
-			    console.warn(`⛔ Skipping marker for invalid device (${deviceId}) at (${latitude}, ${longitude})`);
-			    return;
-			}
-
+		    if (!deviceId || deviceId.toLowerCase() === "null" || isNaN(latitude) || isNaN(longitude)) {
+		        console.warn(`⛔ Skipping marker for invalid device (${deviceId})`);
+		        return;
+		    }
 
 		    const speed = vehicle.speed || 0;
-		    const ignitionStatus = vehicle.ignition 
-		        ? vehicle.ignition.toUpperCase() === "IGON" 
-		            ? "ON" 
-		            : vehicle.ignition.toUpperCase() === "IGOFF" 
-		                ? "OFF" 
+		    const ignitionStatus = vehicle.ignition
+		        ? vehicle.ignition.toUpperCase() === "IGON"
+		            ? "ON"
+		            : vehicle.ignition.toUpperCase() === "IGOFF"
+		                ? "OFF"
 		                : "Unknown"
 		        : "Unknown";
+
 		    const vehicleStatus = vehicle.vehicleStatus || "Unknown";
+		    const formattedDateTime = formatTimezoneFromLatLng(vehicle.timestamp, latitude, longitude);
 
-		    let formattedDateTime = formatTimestamp(vehicle.timestamp);
+		    const isLiveNow = !!isLive;
 
-		    // ✅ Determine LIVE status based on time
-		    const currentTime = new Date();
-		    let timeDifferenceSeconds = (currentTime - timestamp) / 1000; 
-			let isLiveNow = isLive === true;
-
-
-		    let liveIndicator = isLiveNow
-		        ? `<span class="live-indicator"><span class="live-ripple"></span>  LIVE</span>`
+		    const liveIndicator = isLiveNow
+		        ? `<span class="live-indicator"><span class="live-ripple"></span> LIVE</span>`
 		        : `<span class="status-badge last-known">🔴 Last Received: ${formattedDateTime}</span>`;
 
-		    // ✅ Get Rotating Vehicle Icon (Updated Immediately)
 		    const vehicleIcon = this.getVehicleIcon(course, vehicle.ignition, vehicleStatus);
 
-		    // ✅ Generate Popup Content
 		    const popupContent = `
 		        <div class="vehicle-popup">
 		            ${liveIndicator}
-		            <p><b>Vehicle No:</b> ${deviceId}</p>
-		            <p><b>📍 Latitude:</b> ${latitude.toFixed(5)}</p>
-		            <p><b>📍 Longitude:</b> ${longitude.toFixed(5)}</p>
-		            <p><b>🚀 Speed:</b> <span class="speed ${this.getSpeedClass(speed)}">${speed} km/h</span></p>
-		            <p><b>🔑 Ignition:</b> 
-		                <span class="ignition-status ${ignitionStatus.toLowerCase()}">${ignitionStatus}</span>
-		            </p>
-		            <p><b>✅ Status:</b> <span class="status ${this.getStatusClass(vehicleStatus)}">${vehicleStatus}</span></p>
+		            <div class="popup-line">
+		                <div class="popup-label"><i class="fas fa-car"></i> Vehicle No:</div>
+		                <div class="popup-value">${deviceId}</div>
+		            </div>
+		            <div class="popup-line">
+		                <div class="popup-label"><i class="fas fa-map-pin"></i> Latitude:</div>
+		                <div class="popup-value">${latitude.toFixed(5)}</div>
+		            </div>
+		            <div class="popup-line">
+		                <div class="popup-label"><i class="fas fa-map-pin"></i> Longitude:</div>
+		                <div class="popup-value">${longitude.toFixed(5)}</div>
+		            </div>
+		            <div class="popup-line">
+		                <div class="popup-label"><i class="fas fa-rocket"></i> Speed:</div>
+		                <div class="popup-value">${speed} km/h</div>
+		            </div>
+		            <div class="popup-line">
+		                <div class="popup-label"><i class="fas fa-key"></i> Ignition:</div>
+		                <div class="popup-value" style="color:${ignitionStatus === "ON" ? "green" : "red"};">${ignitionStatus}</div>
+		            </div>
+		            <div class="popup-line">
+		                <div class="popup-label"><i class="fas fa-check-square"></i> Status:</div>
+		                <div class="popup-value">${vehicleStatus}</div>
+		            </div>
 		            <div class="popup-actions">
 		                <button class="details-btn" onclick="fetchVehicleDetails('${deviceId}')">📋 Details</button>
 		                <button class="playback-btn" onclick="navigateToReplay('${deviceId}')">⏮ Playback</button>
@@ -1568,10 +1646,9 @@
 		        </div>
 		    `;
 
-		    // ✅ Directly move marker without animation
 		    if (this.markers[deviceId]) {
 		        let marker = this.markers[deviceId];
-		        marker.setLatLng([latitude, longitude]); // Directly update position
+		        marker.setLatLng([latitude, longitude]);
 		        marker.setIcon(vehicleIcon).bindPopup(popupContent);
 		    } else {
 		        this.markers[deviceId] = L.marker([latitude, longitude], { icon: vehicleIcon })
@@ -1579,6 +1656,10 @@
 		            .addTo(this.map);
 		    }
 		}
+
+
+
+
 
 
 
@@ -1695,32 +1776,40 @@
 
 
 */
-
-updateSidebarTable(vehicles) {
+ updateSidebarTable(vehicles) {
     const tableBody = document.getElementById("trackerTableBody");
-    tableBody.innerHTML = vehicles
-        .filter(v => v.deviceId && v.deviceId.toLowerCase() !== 'null')  // 🔍 Filter out null/empty device IDs
-        .map(v => {
-            // Convert timestamp to UAE format
-            const dateObj = new Date(v.timestamp).toLocaleString('en-US', { 
-                timeZone: 'Asia/Dubai',
-                year: 'numeric', month: '2-digit', day: '2-digit',
-                hour: '2-digit', minute: '2-digit', second: '2-digit',
-                hour12: false
-            });
-            const [month, day, year, hour, minute, second] = dateObj.match(/\d+/g).map(num => num.padStart(2, '0'));
-            const formattedDate = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
 
-            const isChecked = localStorage.getItem(`alert_${v.deviceId}`) === "enabled" ? "checked" : "";
+    // ✅ Format timestamp using timezone from lat/lng
+    function formatTimezoneFromLatLng(timestamp, lat, lng, locale = 'en-IN') {
+        let timeZone = "UTC";
+        try {
+            timeZone = tzlookup(lat, lng);
+        } catch (err) {
+            console.warn("⚠️ tzlookup failed, using UTC:", err);
+        }
+
+        const dateObj = new Date(timestamp);
+        return dateObj.toLocaleString(locale, {
+            timeZone,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
+    }
+
+    tableBody.innerHTML = vehicles
+        .filter(v => v.deviceId && v.deviceId.toLowerCase() !== 'null')
+        .map(v => {
+            const lat = parseFloat(v.latitude);
+            const lng = parseFloat(v.longitude);
+            const formattedDate = formatTimezoneFromLatLng(v.timestamp, lat, lng);
 
             return `
                 <tr>
-                    <td>
-                        <label class="switch">
-                            <input type="checkbox" id="alert_${v.deviceId}" ${isChecked} onchange="toggleVehicleAlert('${v.deviceId}')">
-                            <span class="slider"></span>
-                        </label>
-                    </td>
                     <td>${v.vehicleStatus}</td>
                     <td>${v.deviceId}</td>
                     <td>${formattedDate}</td>
@@ -1737,6 +1826,11 @@ updateSidebarTable(vehicles) {
         })
         .join('');
 }
+
+
+
+
+
 
 
 
@@ -2100,15 +2194,32 @@ zoomToVehicle(deviceId, latitude, longitude) {
 	    });
 	});
 	// Speed alert popup logic
-	   function playSpeedAlert(deviceId, speed) {
-	     showSpeedAlert(deviceId, speed);
-	   }
+	function playSpeedAlert(deviceId, speed) {
+	    showSpeedAlert(deviceId, speed);
+
+	    const audio = document.getElementById("overspeedAudio");
+	    if (audio) {
+	        audio.currentTime = 0;
+	        audio.play().catch(err => {
+	            console.warn("⚠️ Audio play failed:", err);
+	        });
+	    }
+	}
+
 
 	   function showSpeedAlert(deviceId, speed) {
-	     document.getElementById("alertDeviceID").textContent = deviceId;
-	     document.getElementById("alertSpeed").textContent = speed;
-	     document.getElementById("speedAlertPopup").style.display = "block";
+	       document.getElementById("alertDeviceID").textContent = deviceId;
+	       document.getElementById("alertSpeed").textContent = speed;
+
+	       const popup = document.getElementById("speedAlertPopup");
+	       popup.style.display = "block";
+
+	       // ⏱️ Auto-close after 5 seconds
+	       setTimeout(() => {
+	           popup.style.display = "none";
+	       }, 3000);
 	   }
+
 
 	   function closeSpeedAlert() {
 	     document.getElementById("speedAlertPopup").style.display = "none";
@@ -2194,12 +2305,25 @@ zoomToVehicle(deviceId, latitude, longitude) {
 	document.addEventListener('DOMContentLoaded', () => {
 	    const sidebar = document.getElementById("sidebar");
 	    const toggleButton = document.getElementById("toggleButton");
+	    const mobileCloseBtn = document.getElementById("mobileCloseBtn");
 
-	    toggleButton.addEventListener("click", function() {
+	    toggleButton.addEventListener("click", function () {
 	        sidebar.classList.toggle("active");
 	        toggleButton.classList.toggle("active");
+
+	        // Show or hide the mobile close button
+	        if (window.innerWidth <= 768) {
+	            mobileCloseBtn.style.display = sidebar.classList.contains("active") ? "block" : "none";
+	        }
 	    });
 	});
+	function closeSidebar() {
+	    const sidebar = document.getElementById("sidebar");
+	    const toggleButton = document.getElementById("toggleButton");
+	    sidebar.classList.remove("active");
+	    toggleButton.classList.remove("active");
+	}
+
 
 	// ✅ Fetch Vehicle Details & Show Popup
 	function fetchVehicleDetails(deviceID) {
@@ -2228,15 +2352,14 @@ zoomToVehicle(deviceId, latitude, longitude) {
 	            }
 
 	            // ✅ Populate Popup Data
-	            document.getElementById("popup-deviceID").textContent = vehicle.simNumber || "N/A";
+	            document.getElementById("popup-deviceID").textContent = vehicle.deviceID || "N/A";
+				document.getElementById("popup-serialno").textContent = vehicle.serialNo || "N/A";
 	            document.getElementById("popup-ownerName").textContent = vehicle.ownerName || "N/A";
 	            document.getElementById("popup-model").textContent = vehicle.model || "N/A";
-				
-	            document.getElementById("popup-speed").textContent = vehicle.speed ? vehicle.speed + " km/h" : "N/A";
-	            document.getElementById("popup-ignition").textContent = vehicle.ignition === "IGon" ? "ON" : "OFF";
-	            document.getElementById("popup-location").textContent = vehicle.address || "Unknown";
-	            document.getElementById("popup-timestamp").textContent = new Date(vehicle.timestamp).toLocaleString();
+				document.getElementById("popup-simnumber").textContent = vehicle.simNumber || "N/A";
 
+	            
+	           
 	            // ✅ Show Popup
 	            document.getElementById("popupOverlay").style.display = "block";
 	            document.getElementById("vehicleDetailsModal").classList.add("show");
@@ -2616,6 +2739,7 @@ zoomToVehicle(deviceId, latitude, longitude) {
 	    paginateSidebarTable();
 	}
 </script>
+
 <script>
     function showSidebarTab(tabId, btn) {
         document.querySelectorAll('.custom-tab-content').forEach(div => div.classList.remove('active'));

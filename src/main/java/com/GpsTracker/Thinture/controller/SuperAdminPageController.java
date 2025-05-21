@@ -225,6 +225,11 @@ public class SuperAdminPageController {
 	        logger.info("🔹 Accessed SuperAdmin - viewdevices   ");
 	        return "superadmin/viewdevices";
 	    }
+	  @GetMapping("/superadmin/tripmanagement")
+	    public String showTrip() {
+	        logger.info("🔹 Accessed SuperAdmin - viewdevices   ");
+	        return "superadmin/tripmanagement";
+	    }
 
 		/*Original Map
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

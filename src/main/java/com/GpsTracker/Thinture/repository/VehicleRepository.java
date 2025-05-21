@@ -56,7 +56,8 @@ public interface VehicleRepository extends BaseRestrictedRepository<Vehicle, Lon
     List<Vehicle> findVehiclesBySerialQuery(@Param("query") String query);
 
     
-    
+  
+
     
     
     
@@ -106,6 +107,11 @@ public interface VehicleRepository extends BaseRestrictedRepository<Vehicle, Lon
             "AND v.installationDate IS NOT NULL " +
             "GROUP BY v.vehicleType")
      List<Object[]> countByVehicleType();
+
+
+     
+     @Query("SELECT v.serialNo FROM Vehicle v WHERE v.vehicleNumber = :vehicleNumber")
+     String findSerialNoByVehicleNumber(@Param("vehicleNumber") String vehicleNumber);
 
 
 }

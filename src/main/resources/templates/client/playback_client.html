@@ -21,7 +21,11 @@
     <script src="https://cdn.jsdelivr.net/npm/moment-timezone/builds/moment-timezone-with-data.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    
+	<!-- Add this CDN link for Marker Clustering -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.1/MarkerCluster.css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.1/MarkerCluster.Default.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.1/leaflet.markercluster.js"></script>
+
     <!-- Flatpickr DateTime Picker -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -51,18 +55,16 @@
 		#speedometer-container {
 		    position: absolute;
 		    bottom: 20px;
-		    right: 20px;
-		
+		    left: 20px;
 		    z-index: 9999;
-		    
 		    border-radius: 10px;
-		   
 		    padding: 15px;
 		    width: 250px;
 		    opacity: 1 !important;
 		    visibility: visible !important;
 		    transform: translateY(0) !important;
 		}
+
 
 
         #speedometer-container.visible {
@@ -572,17 +574,17 @@
                 drawPolyline(data);
                 
                 if (data.length > 0) {
-                    if (document.getElementById("show-start").checked) {
-                        const startIcon = L.icon({ iconUrl: '/THINTURE_IMAGE/car/start.png', iconSize: [30, 30], iconAnchor: [15, 30] });
-                        L.marker([data[0].latitude, data[0].longitude], { icon: startIcon }).addTo(map)
-                            .bindPopup(`<b>Start Point</b><br>${convertToLocalTime(data[0].timestamp, timeZone)}`);
-                    }
-                    if (document.getElementById("show-end").checked) {
-                        const endIcon = L.icon({ iconUrl: '/THINTURE_IMAGE/car/end.png', iconSize: [30, 30], iconAnchor: [15, 30] });
-                        const last = data[data.length - 1];
-                        L.marker([last.latitude, last.longitude], { icon: endIcon }).addTo(map)
-                            .bindPopup(`<b>End Point</b><br>${convertToLocalTime(last.timestamp, timeZone)}`);
-                    }
+                   // if (document.getElementById("show-start").checked) {
+                    //    const startIcon = L.icon({ iconUrl: '/THINTURE_IMAGE/car/start.png', iconSize: [30, 30], iconAnchor: [15, 30] });
+                      //  L.marker([data[0].latitude, data[0].longitude], { icon: startIcon }).addTo(map)
+                        //    .bindPopup(`<b>Start Point</b><br>${convertToLocalTime(data[0].timestamp, timeZone)}`);
+                   // }
+                  //  if (document.getElementById("show-end").checked) {
+                     //   const endIcon = L.icon({ iconUrl: '/THINTURE_IMAGE/car/end.png', iconSize: [30, 30], iconAnchor: [15, 30] });
+                     //   const last = data[data.length - 1];
+                      //  L.marker([last.latitude, last.longitude], { icon: endIcon }).addTo(map)
+                        //    .bindPopup(`<b>End Point</b><br>${convertToLocalTime(last.timestamp, timeZone)}`);
+                   // }
                     
                     // Create heatmap if data is available
                     createHeatmapLayer(data);
@@ -635,111 +637,105 @@
             animateMarker();
         }
 
-        function animateMarker() {
-            clearTimeout(replayTimeout);
-            if (!isPlaying || replayIndex >= replayData.length) {
-                isPlaying = false;
-                document.getElementById("playback-btn").innerText = "▶️ Play";
-                // Set speedometer to 0 when playback ends
-                drawSpeedometer(0);
-                return;
-            }
+		function animateMarker() {
+		    clearTimeout(replayTimeout);
+		    if (!isPlaying || replayIndex >= replayData.length) {
+		        isPlaying = false;
+		        document.getElementById("playback-btn").innerText = "▶️ Play";
+		        return;
+		    }
 
-            const point = replayData[replayIndex];
-            const timeZone = document.getElementById("time-zone").value;
-            const latlng = [point.latitude, point.longitude];
-            const rotation = point.course ? ((parseFloat(point.course) % 360) + 360) % 360 : 0;
-            const currentSpeed = parseFloat(point.speed) || 0;
-            const speedThreshold = parseInt(document.getElementById("speed-threshold").value) || 80;
+		    const point = replayData[replayIndex];
+		    const timeZone = document.getElementById("time-zone").value;
+		    const latlng = [point.latitude, point.longitude];
+		    const rotation = point.course ? ((parseFloat(point.course) % 360) + 360) % 360 : 0;
 
-            document.getElementById("progress-bar").value = replayIndex;
+		    // Update speedometer with the current speed
+		    const speed = parseFloat(point.speed) || 0;  // Get the speed from the point data
+		    drawSpeedometer(speed);  // Call the function to update the speedometer
 
-            // Get selected vehicle icon
-            const vehicleIconPath = document.getElementById("vehicle-icon").value;
+		    // Update progress bar
+		    document.getElementById("progress-bar").value = replayIndex;
 
-            const icon = L.divIcon({
-                className: '',
-                html: `<div style="transform: rotate(${rotation}deg); transition: transform 0.3s ease;"><img src="${vehicleIconPath}" style="width: 40px; height: 40px;"></div>`,
-                iconSize: [40, 40],
-                iconAnchor: [20, 20]
-            });
+		    const icon = L.divIcon({
+		        className: '',
+		        html: `<div style="transform: rotate(${rotation}deg); transition: transform 0.3s ease;"><img src="/THINTURE_IMAGE/car/green/car0.png" style="width: 40px; height: 40px;"></div>`,
+		        iconSize: [40, 40],
+		        iconAnchor: [20, 20]
+		    });
 
-            if (!carMarker) carMarker = L.marker(latlng, { icon }).addTo(map);
-            else {
-                carMarker.setLatLng(latlng);
-                carMarker.setIcon(icon);
-            }
+		    if (!carMarker) carMarker = L.marker(latlng, { icon }).addTo(map);
+		    else {
+		        carMarker.setLatLng(latlng);
+		        carMarker.setIcon(icon);
+		    }
 
-            carMarker.bindPopup(`
-                <b>🚗 Vehicle Status:</b> ${point.vehicleStatus}<br>
-                <b>⏱️ Speed:</b> ${point.speed} km/h<br>
-                <b>📅 Timestamp:</b> ${convertToLocalTime(point.timestamp, timeZone)}<br>
-                <b>📍 Latitude:</b> ${point.latitude}<br>
-                <b>📍 Longitude:</b> ${point.longitude}`);
-                
-            // Update the speedometer with the current speed
-            drawSpeedometer(currentSpeed);
+		    carMarker.bindPopup(`
+		        <b>🚗 Vehicle Status:</b> ${point.vehicleStatus}<br>
+		        <b>⏱️ Speed:</b> ${point.speed} km/h<br>
+		        <b>📅 Timestamp:</b> ${convertToLocalTime(point.timestamp, timeZone)}<br>
+		        <b>📍 Latitude:</b> ${point.latitude}<br>
+		        <b>📍 Longitude:</b> ${point.longitude}
+		    `);
 
-            // Check for speed alert
-            if (document.getElementById("show-alerts").checked && currentSpeed > speedThreshold) {
-                const alertIcon = L.icon({ 
-                    iconUrl: '/THINTURE_IMAGE/speed-alert.png', 
-                    iconSize: [32, 32], 
-                    iconAnchor: [16, 32] 
-                });
-                
-                const marker = L.marker(latlng, { icon: alertIcon }).addTo(map).bindPopup(`
-                    ⚠️ <b>SPEED ALERT</b><br>
-                    🚗 <b>Speed:</b> ${currentSpeed} km/h<br>
-                    🛑 <b>Threshold:</b> ${speedThreshold} km/h<br>
-                    🕒 <b>Time:</b> ${convertToLocalTime(point.timestamp, timeZone)}<br>
-                    📍 <b>Location:</b> ${point.latitude}, ${point.longitude}
-                `);
-                
-                speedAlertMarkers.push(marker);
-            }
+		    // ✅ IDLE marker if 2+ min
+		    if (point.vehicleStatus === "IDLE" && document.getElementById("show-idle").checked) {
+		        if (!idleStart) idleStart = point.timestamp;
 
-            if (point.vehicleStatus === "IDLE" && document.getElementById("show-idle").checked) {
-                if (!idleStart) idleStart = point.timestamp;
+		        const idleDurationSec = moment(point.timestamp).diff(moment(idleStart), 'seconds');
+		        
+		        // Show idle marker if duration is greater than or equal to 2 minutes (120 seconds)
+		        if (idleDurationSec >= 120) {
+		            const duration = formatDuration(idleStart, point.timestamp);
 
-                const duration = formatDuration(idleStart, point.timestamp);
-                const idleIcon = L.icon({ iconUrl: '/THINTURE_IMAGE/idlenew-Photo.png', iconSize: [40, 40], iconAnchor: [20, 35] });
+		            // Change the icon if idle time is greater than or equal to 2 minutes
+		            const idleIcon = L.icon({ 
+		                iconUrl: '/THINTURE_IMAGE/idlenew-Photo.png',  // Use a high idle icon (large, prominent)
+		                iconSize: [50, 50], // Adjust icon size for high idle time
+		                iconAnchor: [25, 50] 
+		            });
 
-                const marker = L.marker(latlng, { icon: idleIcon }).addTo(map).bindPopup(`
-                    🚗 <b>IDLE Start:</b> ${convertToLocalTime(idleStart, timeZone)}<br>
-                    🕒 <b>IDLE End:</b> ${convertToLocalTime(point.timestamp, timeZone)}<br>
-                    📍 <b>Latitude:</b> ${point.latitude}<br>
-                    📍 <b>Longitude:</b> ${point.longitude}<br>
-                    ⏳ <b>Total Duration:</b> ${duration}
-                `);
+		            const marker = L.marker(latlng, { icon: idleIcon }).addTo(map).bindPopup(`
+		                🚗 <b>IDLE Start:</b> ${convertToLocalTime(idleStart, timeZone)}<br>
+		                🕒 <b>IDLE End:</b> ${convertToLocalTime(point.timestamp, timeZone)}<br>
+		                📍 <b>Latitude:</b> ${point.latitude}<br>
+		                📍 <b>Longitude:</b> ${point.longitude}<br>
+		                ⏳ <b>Total Duration:</b> ${duration}
+		            `);
 
-                idleMarkers.push(marker);
-            } else {
-                idleStart = null;
-            }
+		            idleMarkers.push(marker);
+		            idleStart = null; // reset after showing
+		        }
+		    } else {
+		        idleStart = null;
+		    }
 
-            if (point.vehicleStatus === "PARKED" && document.getElementById("show-parked").checked) {
-                if (!parkedStart) parkedStart = point.timestamp;
+		    // ✅ PARKED marker (no duration check)
+		    if (point.vehicleStatus === "PARKED" && document.getElementById("show-parked").checked) {
+		        if (!parkedStart) parkedStart = point.timestamp;
 
-                const duration = formatDuration(parkedStart, point.timestamp);
-                const parkedIcon = L.icon({ iconUrl: '/THINTURE_IMAGE/parkednew-Photo.png', iconSize: [40, 40], iconAnchor: [20, 35] });
+		        const duration = formatDuration(parkedStart, point.timestamp);
+		        const parkedIcon = L.icon({ iconUrl: '/THINTURE_IMAGE/parkednew-Photo.png', iconSize: [40, 40], iconAnchor: [20, 35] });
 
-                const marker = L.marker(latlng, { icon: parkedIcon }).addTo(map).bindPopup(`
-                    🚗 <b>PARKED Start:</b> ${convertToLocalTime(parkedStart, timeZone)}<br>
-                    🕒 <b>PARKED End:</b> ${convertToLocalTime(point.timestamp, timeZone)}<br>
-                    📍 <b>Latitude:</b> ${point.latitude}<br>
-                    📍 <b>Longitude:</b> ${point.longitude}<br>
-                    ⏳ <b>Total Duration:</b> ${duration}
-                `);
+		        const marker = L.marker(latlng, { icon: parkedIcon }).addTo(map).bindPopup(`
+		            🚗 <b>PARKED Start:</b> ${convertToLocalTime(parkedStart, timeZone)}<br>
+		            🕒 <b>PARKED End:</b> ${convertToLocalTime(point.timestamp, timeZone)}<br>
+		            📍 <b>Latitude:</b> ${point.latitude}<br>
+		            📍 <b>Longitude:</b> ${point.longitude}<br>
+		            ⏳ <b>Total Duration:</b> ${duration}
+		        `);
 
-                parkedMarkers.push(marker);
-            } else {
-                parkedStart = null;
-            }
+		        parkedMarkers.push(marker);
+		    } else {
+		        parkedStart = null;
+		    }
 
-            replayIndex++;
-            replayTimeout = setTimeout(animateMarker, 1000 / replaySpeed);
-        }
+		    replayIndex++;
+		    replayTimeout = setTimeout(animateMarker, 1000 / replaySpeed);
+		}
+
+
+
 
         function toggleReplay() {
             isPlaying = !isPlaying;
@@ -1319,92 +1315,94 @@
 		
 		
 		function drawSpeedometer(speed) {
-		    if (!speedometerCtx) return;
+			    if (!speedometerCtx) return;
 
-		    const canvas = speedometerCanvas;
-		    const ctx = speedometerCtx;
+			    const canvas = speedometerCanvas;
+			    const ctx = speedometerCtx;
 
-		    ctx.clearRect(0, 0, canvas.width, canvas.height);
+			    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-		    const centerX = canvas.width / 2;
-		    const centerY = canvas.height / 2;
-		    const radius = canvas.width / 2 - 15;
-		    const maxSpeed = 180;
+			    const centerX = canvas.width / 2;
+			    const centerY = canvas.height / 2;
+			    const radius = canvas.width / 2 - 15;
+			    const maxSpeed = 180;
 
-		    // Background circle
-		    ctx.beginPath();
-		    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-		    ctx.fillStyle = '#f0f0f0';
-		    ctx.fill();
+			    // Background circle
+			    ctx.beginPath();
+			    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+			    ctx.fillStyle = '#f0f0f0';
+			    ctx.fill();
 
-		    // Tick marks
-		    for (let i = 0; i <= maxSpeed; i += 10) {
-		        const angle = (Math.PI * (i / maxSpeed)) * 1.5 + 0.75 * Math.PI;
-		        const x1 = centerX + (radius - 10) * Math.cos(angle);
-		        const y1 = centerY + (radius - 10) * Math.sin(angle);
-		        const x2 = centerX + radius * Math.cos(angle);
-		        const y2 = centerY + radius * Math.sin(angle);
+			    // Tick marks
+			    for (let i = 0; i <= maxSpeed; i += 10) {
+			        const angle = (Math.PI * (i / maxSpeed)) * 1.5 + 0.75 * Math.PI;
+			        const x1 = centerX + (radius - 10) * Math.cos(angle);
+			        const y1 = centerY + (radius - 10) * Math.sin(angle);
+			        const x2 = centerX + radius * Math.cos(angle);
+			        const y2 = centerY + radius * Math.sin(angle);
 
-		        ctx.beginPath();
-		        ctx.moveTo(x1, y1);
-		        ctx.lineTo(x2, y2);
-		        ctx.lineWidth = (i % 20 === 0) ? 2 : 1;
-		        ctx.strokeStyle = '#333';
-		        ctx.stroke();
+			        ctx.beginPath();
+			        ctx.moveTo(x1, y1);
+			        ctx.lineTo(x2, y2);
+			        ctx.lineWidth = (i % 20 === 0) ? 2 : 1;
+			        ctx.strokeStyle = '#333';
+			        ctx.stroke();
 
-		        // Speed numbers
-		        if (i % 20 === 0) {
-		            const labelX = centerX + (radius - 25) * Math.cos(angle);
-		            const labelY = centerY + (radius - 25) * Math.sin(angle);
-		            ctx.font = '10px Arial';
-		            ctx.fillStyle = '#000';
-		            ctx.textAlign = 'center';
-		            ctx.textBaseline = 'middle';
-		            ctx.fillText(i.toString(), labelX, labelY);
-		        }
-		    }
+			        // Speed numbers
+			        if (i % 20 === 0) {
+			            const labelX = centerX + (radius - 25) * Math.cos(angle);
+			            const labelY = centerY + (radius - 25) * Math.sin(angle);
+			            ctx.font = '10px Arial';
+			            ctx.fillStyle = '#000';
+			            ctx.textAlign = 'center';
+			            ctx.textBaseline = 'middle';
+			            ctx.fillText(i.toString(), labelX, labelY);
+			        }
+			    }
 
-		    // Needle
-		    const needleAngle = (Math.PI * (speed / maxSpeed)) * 1.5 + 0.75 * Math.PI;
-		    const needleX = centerX + (radius - 30) * Math.cos(needleAngle);
-		    const needleY = centerY + (radius - 30) * Math.sin(needleAngle);
+			    // Needle
+			    const needleAngle = (Math.PI * (speed / maxSpeed)) * 1.5 + 0.75 * Math.PI;
+			    const needleX = centerX + (radius - 30) * Math.cos(needleAngle);
+			    const needleY = centerY + (radius - 30) * Math.sin(needleAngle);
 
-		    ctx.beginPath();
-		    ctx.moveTo(centerX, centerY);
-		    ctx.lineTo(needleX, needleY);
-		    ctx.lineWidth = 3;
-		    ctx.strokeStyle = '#ff0000';
-		    ctx.stroke();
+			    ctx.beginPath();
+			    ctx.moveTo(centerX, centerY);
+			    ctx.lineTo(needleX, needleY);
+			    ctx.lineWidth = 3;
+			    ctx.strokeStyle = '#ff0000';
+			    ctx.stroke();
 
-		    // Center hub
-		    ctx.beginPath();
-		    ctx.arc(centerX, centerY, 6, 0, 2 * Math.PI);
-		    ctx.fillStyle = '#222';
-		    ctx.fill();
+			    // Center hub
+			    ctx.beginPath();
+			    ctx.arc(centerX, centerY, 6, 0, 2 * Math.PI);
+			    ctx.fillStyle = '#222';
+			    ctx.fill();
 
-		    // Text
-		    ctx.font = "bold 14px Arial";
-		    ctx.fillStyle = "#000";
-		    ctx.textAlign = "center";
-		    ctx.fillText(`${Math.round(speed)} km/h`, centerX, centerY + 40);
+			    // Text
+			    ctx.font = "bold 14px Arial";
+			    ctx.fillStyle = "#000";
+			    ctx.textAlign = "center";
+			    ctx.fillText(`${Math.round(speed)} km/h`, centerX, centerY + 40);
 
-		    // Update external speed text
-		    const speedDisplay = document.getElementById("speedDisplay");
-		    if (speedDisplay) {
-		        speedDisplay.innerHTML = `<b>Speed: ${Math.round(speed)} km/h</b>`;
-		    }
-		}
-		
-		document.addEventListener("DOMContentLoaded", () => {
-										    const urlParams = new URLSearchParams(window.location.search);
-										    const deviceId = urlParams.get("deviceId");
+			    // Update external speed text
+			    const speedDisplay = document.getElementById("speedDisplay");
+			    if (speedDisplay) {
+			        speedDisplay.innerHTML = `<b>Speed: ${Math.round(speed)} km/h</b>`;
+			    }
+			}
 
-										    if (deviceId) {
-										        const searchBar = document.getElementById("device-id");
-										        if (searchBar) searchBar.value = deviceId;
-										    }
-										});
+			
+			document.addEventListener("DOMContentLoaded", () => {
+											    const urlParams = new URLSearchParams(window.location.search);
+											    const deviceId = urlParams.get("deviceId");
 
+											    if (deviceId) {
+											        const searchBar = document.getElementById("device-id");
+											        if (searchBar) searchBar.value = deviceId;
+											    }
+											});
+			
+			
     </script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

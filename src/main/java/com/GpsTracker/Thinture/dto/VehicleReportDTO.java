@@ -25,6 +25,8 @@ public class VehicleReportDTO {
 	public void setTimestamp(Timestamp timestamp) {
 		this.timestamp = timestamp;
 	}
+	
+	
 	private Double latitude;
     private Double longitude;
     private Timestamp timestamp;

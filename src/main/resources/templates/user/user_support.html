@@ -159,8 +159,8 @@
         </div>
 
         <div class="col-md-6 mb-3">
-          <label>IMEI Number</label>
-          <input type="text" class="form-control" id="imeiNumber" required />
+          <label>SerialNo</label>
+          <input type="text" class="form-control" id="serialno" required />
         </div>
         <div class="col-md-6 mb-3">
           <label>Complaint Type</label>
@@ -209,106 +209,57 @@
 	      return res.json();
 	    })
 	    .then(data => {
-	      console.log("✅ [META FETCH] API Response:", data);
-	      if (!data) {
-	        console.warn("⚠️ No data received from /fetch-user-meta");
+	      if (!data || Object.keys(data).length === 0) {
+	        console.warn("⚠️ No metadata found or empty object");
 	        return;
 	      }
 
-	      document.getElementById("userName").value = data.userName || "";
-	      document.getElementById("userEmail").value = data.userEmail || "";
-	      document.getElementById("dealerClientName").value = data.dealerClientName || "";
+	      document.getElementById("userName").value = data.userName || "N/A";
+	      document.getElementById("userEmail").value = data.userEmail || "N/A";
+	      document.getElementById("dealerClientName").value = data.dealerClientName || "N/A";
 
 	      const datalist = document.getElementById("vehicleNumbersList");
 	      datalist.innerHTML = "";
 
-	      (data.vehicleNumbers || []).forEach(num => {
-	        console.log("🚗 Populating vehicle number:", num);
-	        const opt = document.createElement("option");
-	        opt.value = num;
-	        datalist.appendChild(opt);
-	      });
+	      if (Array.isArray(data.vehicleNumbers) && data.vehicleNumbers.length > 0) {
+	        data.vehicleNumbers.forEach(deviceId => {
+	          console.log("🚗 Adding device ID:", deviceId);
+	          const opt = document.createElement("option");
+	          opt.value = deviceId;
+	          datalist.appendChild(opt);
+	        });
+	      } else {
+	        console.warn("⚠️ No vehicle/device IDs found in user meta");
+	      }
 	    })
 	    .catch(err => {
-	      console.error("❌ Failed to fetch user meta:", err);
+	      console.error("❌ Error fetching user meta:", err);
 	    });
 
-		document.getElementById("vehicleNumber").addEventListener("change", () => {
-		    const vehicleNo = document.getElementById("vehicleNumber").value;
-		    if (vehicleNo.trim() === "") return;
+	  // ✅ Automatically fetch serial number when device ID is entered
+	  document.getElementById("vehicleNumber").addEventListener("change", () => {
+	    const deviceId = document.getElementById("vehicleNumber").value.trim();
+	    if (deviceId === "") return;
 
-		    console.log("🔎 Vehicle selected:", vehicleNo);
+	    console.log("🔍 Fetching serial number for device ID:", deviceId);
 
-		    fetch(`/api/support/imei-by-number/${vehicleNo}`)
-		      .then(res => {
-		        if (!res.ok) throw new Error("IMEI fetch failed");
-		        return res.text();
-		      })
-		      .then(imei => {
-		        console.log("✅ IMEI fetched:", imei);
-		        document.getElementById('imeiNumber').value = imei;
-		      })
-		      .catch(err => {
-		        console.error("❌ IMEI fetch error", err);
-		        document.getElementById('imeiNumber').value = "IMEI not found";
-		      });
-		});
-
+	    fetch(`/api/support/serialno-by-deviceid/${deviceId}`)
+	      .then(res => {
+	        if (!res.ok) throw new Error("Serial number not found");
+	        return res.text();
+	      })
+	      .then(serial => {
+	        console.log("✅ Serial number received:", serial);
+	        document.getElementById("serialno").value = serial;
+	      })
+	      .catch(err => {
+	        console.error("❌ Failed to fetch serial number:", err);
+	        document.getElementById("serialno").value = "Serial number not found";
+	      });
+	  });
 	});
 
-
-    document.getElementById("complaintForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const form = this;
-
-      if (!form.checkValidity()) {
-        form.classList.add("was-validated");
-        Swal.fire({
-          icon: "warning",
-          title: "Incomplete Form",
-          text: "Please fill in all required fields.",
-        });
-        return;
-      }
-
-      const formData = new FormData();
-
-      const ticket = {
-        type: "Complaint",
-        subject: `Complaint from ${form.userName.value}`,
-        message: form.message.value,
-        priority: form.priority.value,
-        issueType: form.issueType.value,
-        vehicleNumber: form.vehicleNumber.value,
-        imeiNumber: form.imeiNumber.value,
-        userName: form.userName.value,
-        userEmail: form.userEmail.value,
-        dealerClientName: form.dealerClientName.value
-      };
-
-      formData.append("ticket", new Blob([JSON.stringify(ticket)], { type: "application/json" }));
-      if (form.snapshot.files.length > 0) {
-        formData.append("snapshot", form.snapshot.files[0]);
-      }
-
-      fetch("/api/support/submit-snapshot", {
-        method: "POST",
-        body: formData
-      })
-        .then(res => {
-          if (!res.ok) throw new Error("Submission failed");
-          return res.text();
-        })
-        .then(msg => {
-          Swal.fire("✅ Complaint Submitted", msg || "Your complaint has been submitted.", "success");
-          form.reset();
-          form.classList.remove("was-validated");
-        })
-        .catch(err => {
-          Swal.fire("❌ Error", err.message, "error");
-          console.error(err);
-        });
-    });
+  
   </script>
 
 

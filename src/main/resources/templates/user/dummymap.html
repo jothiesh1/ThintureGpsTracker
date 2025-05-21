@@ -1,0 +1,3489 @@
+const deviceId = device.deviceId;
+                
+                // Look for existing row
+                let existingRow = null;
+                const rows = tableBody.querySelectorAll('tr');
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i];
+                    const cells = row.getElementsByTagName('td');
+                    if (cells.length > 1 && cells[1].textContent === deviceId) {
+                        existingRow = row;
+                        break;
+                    }
+                }
+                
+                // Get status class and text
+                const status = getStatusText(device);
+                const timeDisplay = formatTimestamp(device.timestamp);
+                
+                if (existingRow) {
+                    // Update existing row
+                    existingRow.innerHTML = `
+                        <td><span class="status-${status.toLowerCase()}">${status}</span></td>
+                        <td>${deviceId}</td>
+                        <td>${device.speed} km/h</td>
+                        <td>${timeDisplay}</td>
+                    `;
+                    
+                    // Re-add click event
+                    existingRow.addEventListener('click', () => {
+                        zoomToDevice(deviceId);
+                        getSpeedLimitForDevice(device);
+                    });
+                    
+                    // Move to top
+                    if (tableBody.firstChild !== existingRow) {
+                        tableBody.insertBefore(existingRow, tableBody.firstChild);
+                    }
+                } else {
+                    // Create new row
+                    const row = document.createElement('tr');
+                    
+                    // Create row HTML
+                    row.innerHTML = `
+                        <td><span class="status-${status.toLowerCase()}">${status}</span></td>
+                        <td>${deviceId}</td>
+                        <td>${device.speed} km/h</td>
+                        <td>${timeDisplay}</td>
+                    `;
+                    
+                    // Add click event to zoom to device and show speed limit
+                    row.addEventListener('click', () => {
+                        zoomToDevice(deviceId);
+                        getSpeedLimitForDevice(device);
+                    });
+                    
+                    // Add row to top of table
+                    tableBody.insertBefore(row, tableBody.firstChild);
+                }
+                
+                // Remove "No devices available" row if it exists
+                const noDevicesRow = tableBody.querySelector('tr td[colspan="4"]');
+                if (noDevicesRow) {
+                    noDevicesRow.parentElement.remove();
+                }
+                
+            } catch (error) {
+                console.error('Error updating device table:', error);
+            }
+        }
+        
+        // Load last known positions of devices
+        function loadLastKnownPositions() {
+            addLogEntry('Loading last known device positions...');
+            fetch('/api/vehicles/last-known')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch data: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (Array.isArray(data) && data.length > 0) {
+                        addLogEntry(`Loaded ${data.length} device positions`);
+                        data.forEach(vehicle => processVehicleData(vehicle, false));
+                    } else if (typeof data === 'object' && data !== null) {
+                        addLogEntry('Loaded single device position');
+                        processVehicleData(data, false);
+                    } else {
+                        addLogEntry('No device positions available');
+                        showNoDevicesMessage();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching vehicle data:', error);
+                    showError('Failed to load device positions: ' + error.message);
+                    loadSampleData();
+                });
+        }
+        
+        // Show message when no devices are available
+        function showNoDevicesMessage() {
+            const tableBody = document.getElementById('devicesTableBody');
+            if (tableBody) {
+                tableBody.innerHTML = '<tr><td colspan="4">No devices available</td></tr>';
+            }
+        }
+        
+        // Get status text based on device status and ignition
+        function getStatusText(device) {
+            const status = (device.vehicleStatus || '').toUpperCase();
+            const ignition = (device.ignition || '').toUpperCase();
+            
+            if (status === 'IDLE' && ignition === 'IGON') {
+                return 'Idle';
+            } else if (status === 'RUNNING' || ignition === 'IGON') {
+                return 'Running';
+            } else if (status === 'PARKED') {
+                return 'Parked';
+            } else if (ignition === 'IGOFF') {
+                return 'Off';
+            } else {
+                return 'Unknown';
+            }
+        }
+        
+        // Format timestamp for display
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return 'N/A';
+            
+            const now = new Date();
+            const diffMinutes = Math.floor((now - new Date(timestamp)) / (1000 * 60));
+            
+            if (diffMinutes < 1) return 'Just now';
+            if (diffMinutes < 60) return `${diffMinutes} min ago`;
+            if (diffMinutes < 1440) return `${Math.floor(diffMinutes / 60)} hours ago`;
+            return new Date(timestamp).toLocaleString();
+        }
+        
+        // Show live update alert
+        function showLiveAlert(device) {
+            try {
+                const deviceId = device.deviceId;
+                
+                // Don't show alerts for the same device too frequently
+                if (activeAlerts.has(deviceId)) return;
+                
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'live-alert';
+                
+                // Use appropriate icon based on status
+                let icon = '🚗';
+                const status = getStatusText(device);
+                if (status === 'Parked') {
+                    icon = '🅿️';
+                } else if (status === 'Off') {
+                    icon = '⛔';
+                } else if (status === 'Idle') {
+                    icon = '🔵';
+                }
+                
+                alertDiv.innerHTML = `
+                    <div class="live-icon">${icon}</div>
+                    <div class="live-info">
+                        <strong>Live Update: ${status}</strong>
+                        <span>Device ID: ${deviceId}</span>
+                        <span>Speed: ${device.speed} km/h</span>
+                    </div>
+                    <button class="alert-close" onclick="removeAlert('${deviceId}')">×</button>
+                `;
+                
+                // Add to DOM
+                alertContainer.appendChild(alertDiv);
+                activeAlerts.add(deviceId);
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.classList.add('slide-out');
+                        setTimeout(() => {
+                            if (alertDiv.parentNode) {
+                                alertDiv.remove();
+                            }
+                            activeAlerts.delete(deviceId);
+                        }, 500);
+                    }
+                }, 5000);
+            } catch (error) {
+                console.error('Error showing live alert:', error);
+            }
+        }
+        
+        // Remove alert
+        function removeAlert(deviceId) {
+            try {
+                // Find the alert for this device
+                const alerts = document.querySelectorAll('.live-alert');
+                for (let i = 0; i < alerts.length; i++) {
+                    const alert = alerts[i];
+                    if (alert.querySelector('.live-info span').textContent.includes(deviceId)) {
+                        alert.classList.add('slide-out');
+                        setTimeout(() => {
+                            if (alert.parentNode) {
+                                alert.remove();
+                            }
+                        }, 500);
+                        break;
+                    }
+                }
+                
+                // Remove from active alerts
+                activeAlerts.delete(deviceId);
+            } catch (error) {
+                console.error('Error removing alert:', error);
+            }
+        }
+        
+        // Zoom to device on map
+        function zoomToDevice(deviceId) {
+            try {
+                const device = devices[deviceId];
+                if (!device) {
+                    console.warn('Device not found:', deviceId);
+                    return;
+                }
+                
+                const marker = markers[deviceId];
+                if (!marker) {
+                    console.warn('Marker not found for device:', deviceId);
+                    return;
+                }
+                
+                // Set current device ID
+                currentDeviceId = deviceId;
+                
+                // Center map on position
+                map.setCenter({ lat: device.latitude, lng: device.longitude });
+                map.setZoom(15);
+                
+                addLogEntry(`Zoomed to device ${deviceId}`);
+                
+                // Return the device data
+                return device;
+                
+            } catch (error) {
+                console.error('Error zooming to device:', error);
+            }
+        }
+        
+        // Function to update position on map (for manual coordinates)
+        function updatePosition(lat, lng) {
+            try {
+                // Store current coordinates
+                currentLat = lat;
+                currentLng = lng;
+                
+                // Update marker
+                if (positionMarker && map) {
+                    map.removeObject(positionMarker);
+                }
+                
+                if (map) {
+                    positionMarker = new H.map.Marker({ lat, lng });
+                    map.addObject(positionMarker);
+                    
+                    // Center map on position
+                    map.setCenter({ lat, lng });
+                }
+                
+                // Update location info
+                document.getElementById('location-info').textContent = 
+                    `Latitude: ${lat.toFixed(6)}, Longitude: ${lng.toFixed(6)}`;
+                
+                // Show the speed info panel
+                document.getElementById('speed-info').style.display = 'block';
+                
+                // Get speed limit
+                getSpeedLimit(lat, lng);
+            } catch (e) {
+                showError("Error updating position: " + e.message);
+            }
+        }
+        
+        // Get speed limit for a device
+        function getSpeedLimitForDevice(device) {
+            currentDeviceId = device.deviceId;
+            getSpeedLimit(device.latitude, device.longitude, device);
+        }
+        
+        // Get speed limit for coordinates
+        function getSpeedLimit(lat, lng, device = null) {
+            try {
+                // Show loading state
+                document.getElementById('speed-circle').textContent = '...';
+                document.getElementById('speed-limit-text').textContent = 'Loading...';
+                document.getElementById('road-name').textContent = 'Please wait';
+                document.getElementById('speed-note').textContent = '';
+                document.getElementById('try-alternate').style.display = 'none';
+                
+                addLogEntry(`Requesting speed limit for ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                
+                // Make API request
+                fetch(`/speed-limit/api/data?lat=${lat}&lng=${lng}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Server error: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.speedLimit) {
+                            document.getElementById('speed-circle').textContent = data.speedLimit;
+                            document.getElementById('speed-limit-text').textContent = 
+                                `Speed Limit (${data.unit || 'km/h'})`;
+                            
+                            // Display note if available
+                            if (data.note) {
+                                document.getElementById('speed-note').textContent = data.note;
+                            } else {
+                                document.getElementById('speed-note').textContent = '';
+                            }
+                            
+                            if (data.road) {
+                                document.getElementById('road-name').textContent = data.road;
+                                addLogEntry(`Found speed limit: ${data.speedLimit} ${data.unit || 'km/h'} on ${data.road}`);
+                            } else {
+                                document.getElementById('road-name').textContent = 'Unknown Road';
+                                addLogEntry(`Found speed limit: ${data.speedLimit} ${data.unit || 'km/h'} on unknown road`);
+                            }
+                            
+                            // Compare with device speed if available
+                            if (device && device.speed) {
+                                compareSpeed(device.speed, data.speedLimit);
+                            }
+                            
+                            // Hide alternate option
+                            document.getElementById('try-alternate').style.display = 'none';
+                        } else {
+                            document.getElementById('speed-circle').textContent = '--';
+                            document.getElementById('speed-limit-text').textContent = 'No Speed Limit Data';
+                            document.getElementById('road-name').textContent = 'Unknown Road';
+                            document.getElementById('speed-note').textContent = '';
+                            addLogEntry('No speed limit data available for this location');
+                            // Show alternate option
+                            document.getElementById('try-alternate').style.display = 'block';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching speed limit:', error);
+                        document.getElementById('speed-circle').textContent = '--';
+                        document.getElementById('speed-limit-text').textContent = 'Error';
+                        document.getElementById('road-name').textContent = 'Could not get speed limit';
+                        document.getElementById('speed-note').textContent = '';
+                        showError("Error fetching speed limit: " + error.message);
+                        // Show alternate option
+                        document.getElementById('try-alternate').style.display = 'block';
+                    });
+            } catch (e) {
+                showError("Error getting speed limit: " + e.message);
+            }
+        }
+        
+        // Compare device speed with speed limit
+        function compareSpeed(deviceSpeed, speedLimit) {
+            try {
+                const speedContainer = document.getElementById('current-speed-container');
+                speedContainer.style.display = 'block';
+                
+                document.getElementById('current-speed').textContent = deviceSpeed;
+                
+                const deviceSpeedNum = parseFloat(deviceSpeed);
+                const speedLimitNum = parseFloat(speedLimit);
+                
+                if (!isNaN(deviceSpeedNum) && !isNaN(speedLimitNum)) {
+                    let message = '';
+                    let className = '';
+                    
+                    if (deviceSpeedNum > speedLimitNum) {
+                        const diff = (deviceSpeedNum - speedLimitNum).toFixed(1);
+                        message = `Over speed limit by ${diff} km/h`;
+                        className = 'speed-over';
+                    } else {
+                        const diff = (speedLimitNum - deviceSpeedNum).toFixed(1);
+                        message = `Under speed limit by ${diff} km/h`;
+                        className = 'speed-under';
+                    }
+                    
+                    const comparison = document.createElement('div');
+                    comparison.textContent = message;
+                    comparison.className = className;
+                    
+                    // Remove old comparison if exists
+                    const oldComparison = speedContainer.querySelector('.speed-over, .speed-under');
+                    if (oldComparison) {
+                        oldComparison.remove();
+                    }
+                    
+                    speedContainer.appendChild(comparison);
+                }
+            } catch (error) {
+                console.error('Error comparing speeds:', error);
+            }
+        }
+        
+        // Function to get speed limit using alternate API
+        function getSpeedLimitAlternate() {
+            if (!currentLat || !currentLng) return;
+            
+            try {
+                // Show loading state
+                document.getElementById('speed-circle').textContent = '...';
+                document.getElementById('speed-limit-text').textContent = 'Loading (Alt)...';
+                document.getElementById('road-name').textContent = 'Please wait';
+                document.getElementById('speed-note').textContent = '';
+                
+                addLogEntry(`Requesting speed limit (alternate method) for ${currentLat.toFixed(6)}, ${currentLng.toFixed(6)}`);
+                
+                // Make API request to alternate endpoint
+                fetch(`/speed-limit/api/data/alternate?lat=${currentLat}&lng=${currentLng}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Server error: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.speedLimit) {
+                            document.getElementById('speed-circle').textContent = data.speedLimit;
+                            document.getElementById('speed-limit-text').textContent = 
+                                `Speed Limit (${data.unit || 'km/h'})`;
+                            
+                            // Display note if available
+                            if (data.note) {
+                                document.getElementById('speed-note').textContent = data.note;
+                            } else {
+                                document.getElementById('speed-note').textContent = '';
+                            }
+                            
+                            if (data.road) {
+                                document.getElementById('road-name').textContent = data.road;
+                                addLogEntry(`Found speed limit (alt): ${data.speedLimit} ${data.unit || 'km/h'} on ${data.road}`);
+                            } else {
+                                document.getElementById('road-name').textContent = 'Unknown Road';
+                                addLogEntry(`Found speed limit (alt): ${data.speedLimit} ${data.unit || 'km/h'} on unknown road`);
+                            }
+                            
+                            // Compare with device speed if available
+                            if (currentDeviceId && devices[currentDeviceId]) {
+                                compareSpeed(devices[currentDeviceId].speed, data.speedLimit);
+                            }
+                        } else {
+                            document.getElementById('speed-circle').textContent = '--';
+                            document.getElementById('speed-limit-text').textContent = 'No Speed Limit Data';
+                            document.getElementById('road-name').textContent = 'Unknown Road';
+                            document.getElementById('speed-note').textContent = '';
+                            addLogEntry('No speed limit data available (alternate method)');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching speed limit (alt):', error);
+                        document.getElementById('speed-circle').textContent = '--';
+                        document.getElementById('speed-limit-text').textContent = 'Error';
+                        document.getElementById('road-name').textContent = 'Could not get speed limit';
+                        document.getElementById('speed-note').textContent = '';
+                        showError("Error fetching speed limit (alt): " + error.message);
+                    });
+            } catch (e) {
+                showError("Error getting speed limit (alt): " + e.message);
+            }
+        }
+        
+        // Function to calculate distance between two points in km (Haversine formula)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the earth in km
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1); 
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2); 
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+            const distance = R * c; // Distance in km
+            return distance;
+        }
+        
+        function deg2rad(deg) {
+            return deg * (Math.PI/180);
+        }
+        
+        // Function to update current speed display (for geolocation tracking)
+        function updateCurrentSpeed(speed, heading) {
+            const speedKmh = speed >= 0 ? (speed).toFixed(1) : 0;
+            document.getElementById('current-speed').textContent = speedKmh;
+            
+            // Show speed container
+            document.getElementById('current-speed-container').style.display = 'block';
+            
+            // Update direction if available
+            if (heading !== null && heading !== undefined) {
+                const direction = getCardinalDirection(heading);
+                document.getElementById('current-direction').textContent = direction;
+            } else {
+                document.getElementById('current-direction').textContent = 'N/A';
+            }
+        }
+        
+        // Function to convert heading in degrees to cardinal direction
+        function getCardinalDirection(heading) {
+            const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+            const index = Math.round(heading / 45) % 8;
+            return directions[index];
+        }
+        
+        // Function to update the route line on map (for geolocation tracking)
+        function updateRouteLine() {
+            if (map && previousPositions.length > 1) {
+                // Remove old line
+                if (routeLine) {
+                    map.removeObject(routeLine);
+                }
+                
+                // Create line string geometry
+                const lineString = new H.geo.LineString();
+                
+                // Add points to line string
+                previousPositions.forEach(pos => {
+                    lineString.pushPoint({lat: pos.lat, lng: pos.lng});
+                });
+                
+                // Create line
+                routeLine = new H.map.Polyline(
+                    lineString,
+                    { 
+                        style: { 
+                            lineWidth: 4,
+                            strokeColor: '#4285f4',
+                            lineCap: 'round'
+                        }
+                    }
+                );
+                
+                // Add line to map
+                map.addObject(routeLine);
+            }
+        }
+        
+        // Load sample data for testing
+        function loadSampleData() {
+            addLogEntry('Loading sample data for testing...');
+            
+            const sampleDevices = [
+                {
+                    deviceID: "DEMO-01",
+                    timestamp: new Date().toISOString(),
+                    latitude: 12.9716,
+                    longitude: 77.5946,
+                    speed: 0,
+                    course: 0,
+                    ignition: "IGon",
+                    vehicleStatus: "IDLE"
+                },
+                {
+                    deviceID: "DEMO-02",
+                    timestamp: new Date().toISOString(),
+                    latitude: 12.9816,
+                    longitude: 77.6046,
+                    speed: 45,
+                    course: 90,
+                    ignition: "IGon",
+                    vehicleStatus: "RUNNING"
+                },
+                {
+                    deviceID: "DEMO-03",
+                    timestamp: new Date().toISOString(),
+                    latitude: 12.9616,
+                    longitude: 77.5846,
+                    speed: 0,
+                    course: 0,
+                    ignition: "IGoff",
+                    vehicleStatus: "PARKED"
+                }
+            ];
+            
+            // Process each sample device
+            sampleDevices.forEach(device => processVehicleData(device, false));
+        }
+        
+        // EVENT LISTENERS
+        
+        // Get Speed Limit button
+        document.getElementById('get-speed-limit').addEventListener('click', function() {
+            try {
+                const latInput = document.getElementById('latitude').value;
+                const lngInput = document.getElementById('longitude').value;
+                
+                if (!latInput || !lngInput) {
+                    showError("Please enter both latitude and longitude");
+                    return;
+                }
+                
+                const lat = parseFloat(latInput);
+                const lng = parseFloat(lngInput);
+                
+                if (isNaN(lat) || isNaN(lng)) {
+                    showError("Invalid coordinates. Please enter valid numbers.");
+                    return;
+                }
+                
+                if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+                    showError("Coordinates out of range. Latitude must be between -90 and 90, longitude between -180 and 180.");
+                    return;
+                }
+                
+                addLogEntry(`Getting speed limit for manual coordinates: ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                updatePosition(lat, lng);
+            } catch (e) {
+                showError("Error getting speed limit: " + e.message);
+            }
+        });
+        
+        // Locate Me button
+        document.getElementById('locate-me').addEventListener('click', function() {
+            try {
+                addLogEntry('Locating user...');
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+                            
+                            addLogEntry(`Located at: ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                            updatePosition(lat, lng);
+                            
+                            // Update input fields
+                            document.getElementById('latitude').value = lat.toFixed(6);
+                            document.getElementById('longitude').value = lng.toFixed(6);
+                            
+                            // Store timestamp for speed calculation
+                            lastLocation = {lat, lng};
+                            lastTimestamp = position.timestamp;
+                            
+                            // Show current speed if available
+                            if (position.coords.speed !== null && position.coords.speed !== undefined) {
+                                updateCurrentSpeed(position.coords.speed * 3.6, position.coords.heading); // m/s to km/h
+                            }
+                        },
+                        function(error) {
+                            showError("Geolocation error: " + error.message);
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 0
+                        }
+                    );
+                } else {
+                    showError("Geolocation is not supported by your browser");
+                }
+            } catch (e) {
+                showError("Error locating user: " + e.message);
+            }
+        });
+        
+        // Start/Stop Tracking button
+        document.getElementById('start-tracking').addEventListener('click', function() {
+            try {
+                if (isTracking) {
+                    // Stop tracking
+                    if (watchId !== null) {
+                        navigator.geolocation.clearWatch(watchId);
+                        watchId = null;
+                    }
+                    isTracking = false;
+                    document.getElementById('start-tracking').textContent = 'Start Tracking';
+                    document.getElementById('current-speed-container').style.display = 'none';
+                    addLogEntry('Tracking stopped');
+                } else {
+                    // Clear previous positions
+                    previousPositions = [];
+                    if (routeLine) {
+                        map.removeObject(routeLine);
+                        routeLine = null;
+                    }
+                    
+                    // Start tracking
+                    if (navigator.geolocation) {
+                        addLogEntry('Starting location tracking...');
+                        watchId = navigator.geolocation.watchPosition(
+                            function(position) {
+                                const lat = position.coords.latitude;
+                                const lng = position.coords.longitude;
+                                
+                                // Only log position changes that are significant
+                                const lastPos = previousPositions.length > 0 ? previousPositions[previousPositions.length - 1] : null;
+                                if (!lastPos || calculateDistance(lastPos.lat, lastPos.lng, lat, lng) > 0.0001) {
+                                    addLogEntry(`Tracking update: ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                                    
+                                    // Add to previous positions
+                                    previousPositions.push({lat, lng, timestamp: position.timestamp});
+                                    
+                                    // Keep only the last 100 positions to avoid memory issues
+                                    if (previousPositions.length > 100) {
+                                        previousPositions.shift();
+                                    }
+                                    
+                                    // Update the route line on the map
+                                    updateRouteLine();
+                                    
+                                    // Calculate and update current speed
+                                    if (lastLocation && lastTimestamp) {
+                                        const distance = calculateDistance(
+                                            lastLocation.lat, lastLocation.lng, 
+                                            lat, lng
+                                        );
+                                        const timeInHours = (position.timestamp - lastTimestamp) / 3600000; // ms to hours
+                                        
+                                        if (timeInHours > 0) {
+                                            const speed = position.coords.speed !== null && position.coords.speed !== undefined 
+                                                ? position.coords.speed * 3.6 // m/s to km/h
+                                                : (distance / timeInHours);
+                                            
+                                            updateCurrentSpeed(speed, position.coords.heading);
+                                        }
+                                    }
+                                    
+                                    // Update last location and timestamp
+                                    lastLocation = {lat, lng};
+                                    lastTimestamp = position.timestamp;
+                                    
+                                    // Update position on map
+                                    updatePosition(lat, lng);
+                                    
+                                    // Update input fields
+                                    document.getElementById('latitude').value = lat.toFixed(6);
+                                    document.getElementById('longitude').value = lng.toFixed(6);
+                                }
+                            },
+                            function(error) {
+                                showError("Tracking error: " + error.message);
+                                // Turn off tracking on error
+                                if (watchId !== null) {
+                                    navigator.geolocation.clearWatch(watchId);
+                                    watchId = null;
+                                }
+                                isTracking = false;
+                                document.getElementById('start-tracking').textContent = 'Start Tracking';
+                                document.getElementById('current-speed-container').style.display = 'none';
+                            },
+                            {
+                                enableHighAccuracy: true,
+                                timeout: 5000,
+                                maximumAge: 0
+                            }
+                        );
+                        isTracking = true;
+                        document.getElementById('start-tracking').textContent = 'Stop Tracking';
+                        document.getElementById('current-speed-container').style.display = 'block';
+                    } else {
+                        showError("Geolocation is not supported by your browser");
+                    }
+                }
+            } catch (e) {
+                showError("Tracking error: " + e.message);
+            }
+        });
+        
+        // Traffic buttons
+        document.getElementById('show-traffic').addEventListener('click', function() {
+            try {
+                addLogEntry('Showing traffic layer');
+                if (!trafficLayer && platform) {
+                    trafficLayer = platform.createDefaultLayers().vector.normal.traffic;
+                    map.addLayer(trafficLayer);
+                }
+            } catch (e) {
+                showError("Error showing traffic: " + e.message);
+            }
+        });
+        
+        document.getElementById('hide-traffic').addEventListener('click', function() {
+            try {
+                addLogEntry('Hiding traffic layer');
+                if (trafficLayer) {
+                    map.removeLayer(trafficLayer);
+                    trafficLayer = null;
+                }
+            } catch (e) {
+                showError("Error hiding traffic: " + e.message);
+            }
+        });
+        
+        // Toggle logs button
+        document.getElementById('toggle-logs').addEventListener('click', function() {
+            const logPanel = document.getElementById('log-panel');
+            if (logPanel.style.display === 'none' || !logPanel.style.display) {
+                logPanel.style.display = 'block';
+                document.getElementById('toggle-logs').textContent = 'Hide Logs';
+            } else {
+                logPanel.style.display = 'none';
+                document.getElementById('toggle-logs').textContent = 'Show Logs';
+            }
+        });
+        
+        // Toggle Devices Sidebar
+        document.getElementById('toggleDevicesButton').addEventListener('click', function() {
+            const sidebar = document.getElementById('devices-sidebar');
+            const toggleButton = document.getElementById('toggleDevicesButton');
+            
+            sidebar.classList.toggle('active');
+            toggleButton.classList.toggle('active');
+            
+            if (sidebar.classList.contains('active')) {
+                toggleButton.textContent = 'Hide Devices';
+            } else {
+                toggleButton.textContent = 'Show Devices';
+            }
+        });
+        
+        // Search Devices functionality
+        document.getElementById('searchDevices').addEventListener('input', function() {
+            const searchText = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#devicesTableBody tr');
+            
+            rows.forEach(row => {
+                // Skip if it's a "no devices" row
+                if (row.cells.length === 1) return;
+                
+                const deviceId = row.cells[1].textContent.toLowerCase();
+                const status = row.cells[0].textContent.toLowerCase();
+                
+                if (deviceId.includes(searchText) || status.includes(searchText)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+        
+        // Try alternate API button
+        document.getElementById('try-alternate').addEventListener('click', getSpeedLimitAlternate);
+        
+        // Make functions available globally for event handlers
+        window.removeAlert = removeAlert;
+        
+        // Test WebSocket message function
+        window.testWebSocketMessage = function(data) {
+            if (!data) {
+                // Use sample data if none provided
+                data = {
+                    deviceID: "TEST-DEVICE", 
+                    timestamp: new Date().toISOString(),
+                    latitude: 12.9716 + (Math.random() * 0.02 - 0.01),
+                    longitude: 77.5946 + (Math.random() * 0.02 - 0.01),
+                    speed: Math.floor(Math.random() * 80),
+                    course: Math.floor(Math.random() * 360),
+                    ignition: Math.random() > 0.3 ? "IGon" : "IGoff",
+                    vehicleStatus: ["RUNNING", "IDLE", "PARKED"][Math.floor(Math.random() * 3)]
+                };
+            }
+            
+            // Process as if it came from WebSocket
+            processVehicleData(data, true);
+            
+            // Return success message
+            return `Processed test data for device ${data.deviceID || data.deviceId}`;
+        };
+        
+        // Initialize the map when page loads
+        window.onload = function() {
+            initMap();
+        };
+    </script>
+</body>
+</html>                return device;
+            } catch (error) {
+                console.error('Error processing vehicle data:', error, data);
+                return null;
+            }
+        }
+        
+        // Update device marker on map
+        function updateDeviceMarker(device, isLive = false) {
+            try {
+                // Create position object
+                const position = {
+                    lat: device.latitude,
+                    lng: device.longitude
+                };
+                
+                // Calculate rotation for smooth transition
+                let rotation = device.course;
+                if (previousCourses[device.deviceId]) {
+                    const prevCourse = previousCourses[device.deviceId];
+                    const diff = device.course - prevCourse;
+                    if (Math.abs(diff) > 180) {
+                        rotation = diff > 0 ? device.course - 360 : device.course + 360;
+                    }
+                }
+                previousCourses[device.deviceId] = device.course;
+                
+                // Create the SVG for rotated vehicle marker
+                const status = device.vehicleStatus?.toUpperCase() || '';
+                const ignition = device.ignition?.toUpperCase() || '';
+                
+                let color;
+                if (status === 'PARKED' && ignition === 'IGOFF') {
+                    color = 'orange';
+                } else if (ignition === 'IGON') {
+                    if (status === 'IDLE') {
+                        color = 'blue';
+                    } else {
+                    // Clear previous positions
+                    previousPositions = [];
+                    if (routeLine) {
+                        map.removeObject(routeLine);
+                        routeLine = null;
+                    }
+                    
+                    // Start tracking
+                    if (navigator.geolocation) {
+                        addLogEntry('Starting location tracking...');
+                        watchId = navigator.geolocation.watchPosition(
+                            function(position) {
+                                const lat = position.coords.latitude;
+                                const lng = position.coords.longitude;
+                                
+                                // Only log position changes that are significant
+                                const lastPos = previousPositions.length > 0 ? previousPositions[previousPositions.length - 1] : null;
+                                if (!lastPos || calculateDistance(lastPos.lat, lastPos.lng, lat, lng) > 0.0001) {
+                                    addLogEntry(`Tracking update: ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                                    
+                                    // Add to previous positions
+                                    previousPositions.push({lat, lng, timestamp: position.timestamp});
+                                    
+                                    // Keep only the last 100 positions to avoid memory issues
+                                    if (previousPositions.length > 100) {
+                                        previousPositions.shift();
+                                    }
+                                    
+                                    // Update the route line on the map
+                                    updateRouteLine();
+                                    
+                                    // Update position marker
+                                    if (positionMarker && map) {
+                                        map.removeObject(positionMarker);
+                                    }
+                                    
+                                    if (map) {
+                                        positionMarker = new H.map.Marker({ lat, lng });
+                                        map.addObject(positionMarker);
+                                        
+                                        // Center map on position
+                                        map.setCenter({ lat, lng });
+                                    }
+                                    
+                                    // Update input fields
+                                    document.getElementById('latitude').value = lat.toFixed(6);
+                                    document.getElementById('longitude').value = lng.toFixed(6);
+                                }
+                            },
+                            function(error) {
+                                showError("Tracking error: " + error.message);
+                                // Turn off tracking on error
+                                if (watchId !== null) {
+                                    navigator.geolocation.clearWatch(watchId);
+                                    watchId = null;
+                                }
+                                isTracking = false;
+                                document.getElementById('start-tracking').innerHTML = '<i class="fas fa-location-arrow"></i> Start Tracking';
+                            },
+                            {
+                                enableHighAccuracy: true,
+                                timeout: 5000,
+                                maximumAge: 0
+                            }
+                        );
+                        isTracking = true;
+                        document.getElementById('start-tracking').innerHTML = '<i class="fas fa-stop"></i> Stop Tracking';
+                    } else {
+                        showError("Geolocation is not supported by your browser");
+                    }
+                }
+            } catch (e) {
+                showError("Tracking error: " + e.message);
+            }
+        });
+        
+        // Traffic buttons
+        document.getElementById('show-traffic').addEventListener('click', function() {
+            try {
+                addLogEntry('Showing traffic layer');
+                if (!trafficLayer && platform) {
+                    trafficLayer = platform.createDefaultLayers().vector.normal.traffic;
+                    map.addLayer(trafficLayer);
+                }
+            } catch (e) {
+                showError("Error showing traffic: " + e.message);
+            }
+        });
+        
+        document.getElementById('hide-traffic').addEventListener('click', function() {
+            try {
+                addLogEntry('Hiding traffic layer');
+                if (trafficLayer) {
+                    map.removeLayer(trafficLayer);
+                    trafficLayer = null;
+                }
+            } catch (e) {
+                showError("Error hiding traffic: " + e.message);
+            }
+        });
+        
+        // Toggle logs button
+        document.getElementById('toggle-logs').addEventListener('click', function() {
+            const logPanel = document.getElementById('log-panel');
+            if (logPanel.style.display === 'none' || !logPanel.style.display) {
+                logPanel.style.display = 'block';
+                document.getElementById('toggle-logs').innerHTML = '<i class="fas fa-times"></i> Hide Logs';
+            } else {
+                logPanel.style.display = 'none';
+                document.getElementById('toggle-logs').innerHTML = '<i class="fas fa-list"></i> Show Logs';
+            }
+        });
+        
+        // Toggle Devices Sidebar
+        document.getElementById('toggleDevicesButton').addEventListener('click', function() {
+            const sidebar = document.getElementById('devices-sidebar');
+            const toggleButton = document.getElementById('toggleDevicesButton');
+            
+            sidebar.classList.toggle('active');
+            toggleButton.classList.toggle('active');
+            
+            if (sidebar.classList.contains('active')) {
+                toggleButton.innerHTML = '<i class="fas fa-times"></i> Close';
+            } else {
+                toggleButton.innerHTML = '<i class="fas fa-car"></i> Devices';
+            }
+        });
+        
+        // Search functionality for devices table
+        document.getElementById('searchDevices').addEventListener('input', function() {
+            const searchText = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#devicesTableBody tr');
+            
+            rows.forEach(row => {
+                // Skip if it's a "no devices" row
+                if (row.cells.length === 1) return;
+                
+                const deviceId = row.cells[1].textContent.toLowerCase();
+                const status = row.cells[0].textContent.toLowerCase();
+                
+                if (deviceId.includes(searchText) || status.includes(searchText)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+        
+        // Make functions available globally for event handlers
+        window.removeAlert = removeAlert;
+        window.closeSpeedLimitPopup = closeSpeedLimitPopup;
+        window.showVehicleDetails = showVehicleDetails;
+        window.closeVehicleDetails = closeVehicleDetails;
+        window.navigateToReplay = navigateToReplay;
+        
+        // Initialize the map when page loads
+        window.onload = function() {
+            initMap();
+        };
+        
+        // Test WebSocket function - for development only
+        window.testWebSocketMessage = function(data) {
+            // Create sample data if none provided
+            if (!data) {
+                data = {
+                    deviceID: "TEST-" + Math.floor(Math.random() * 1000), 
+                    timestamp: new Date().toISOString(),
+                    latitude: (12.9716 + (Math.random() * 0.05)).toString(),
+                    longitude: (77.5946 + (Math.random() * 0.05)).toString(),
+                    speed: (Math.random() * 60).toFixed(1),
+                    course: (Math.random() * 360).toFixed(0),
+                    ignition: Math.random() > 0.3 ? "IGon" : "IGoff",
+                    vehicleStatus: ["RUNNING", "IDLE", "PARKED"][Math.floor(Math.random() * 3)]
+                };
+            }
+            
+            // Process as if it came from WebSocket
+            processVehicleData(data, true);
+            
+            return `Processed test data for device ${data.deviceID || data.deviceId}`;
+        };
+    </script>
+</body>
+</html>    color = 'green';
+                    }
+                } else {
+                    color = 'red';
+                }
+                
+                // Create a rotated car SVG icon
+                const svgIcon = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 38 38">
+                        <g transform="rotate(${rotation} 19 19)">
+                            <path d="M27,19l-2.8-8.3C23.7,9.6,22.7,9,21.5,9h-5.1c-1.1,0-2.2,0.6-2.6,1.7L11,19v9.9c0,1.2,0.9,2.1,2.1,2.1
+                            h1.7C16,31,17,30,17,28.9V28h4v0.9c0,1.2,0.9,2.1,2.1,2.1h1.7c1.2,0,2.1-0.9,2.1-2.1V19z" fill="${color}"/>
+                            <path d="M14,22c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S15.1,22,14,22z" fill="black"/>
+                            <path d="M24,22c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S25.1,22,24,22z" fill="black"/>
+                        </g>
+                    </svg>
+                `;
+                
+                // Create the icon for the marker
+                const icon = new H.map.Icon(svgIcon);
+                
+                if (markers[device.deviceId]) {
+                    try {
+                        // Update existing marker
+                        markers[device.deviceId].setGeometry(position);
+                        
+                        // Update icon - need to recreate the marker in HERE Maps to change the icon
+                        map.removeObject(markers[device.deviceId]);
+                        
+                        const marker = new H.map.Marker(position, {
+                            icon: icon
+                        });
+                        
+                        // Add click event to show info bubble and speed limit
+                        marker.addEventListener('tap', () => {
+                            // Get speed limit for this location
+                            getSpeedLimit(device);
+                        });
+                        
+                        // Add marker to map
+                        map.addObject(marker);
+                        markers[device.deviceId] = marker;
+                        
+                    } catch (error) {
+                        console.error('Error updating marker:', error);
+                    }
+                } else {
+                    // Create a new marker
+                    try {
+                        const marker = new H.map.Marker(position, {
+                            icon: icon
+                        });
+                        
+                        // Add click event to show info bubble and speed limit
+                        marker.addEventListener('tap', () => {
+                            // Get speed limit for this location
+                            getSpeedLimit(device);
+                        });
+                        
+                        // Add marker to map
+                        map.addObject(marker);
+                        markers[device.deviceId] = marker;
+                    } catch (error) {
+                        console.error('Error creating marker:', error);
+                    }
+                }
+                
+                // If this is a live update for the currently viewed device, update the view
+                if (isLive && currentDeviceId === device.deviceId) {
+                    zoomToDevice(device.deviceId, false);
+                }
+                
+            } catch (error) {
+                console.error('Error updating device marker:', error, device);
+            }
+        }
+        
+        // Show alert for live updates
+        function showLiveAlert(device) {
+            try {
+                const deviceId = device.deviceId;
+                
+                // Don't show alerts for the same device too frequently
+                if (activeAlerts.has(deviceId)) return;
+                
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'live-alert';
+                
+                alertDiv.innerHTML = `
+                    <div class="live-icon" style="font-size: 24px;">🚗</div>
+                    <div class="live-info">
+                        <strong>Live Update</strong>
+                        <span>Device ID: ${deviceId}</span>
+                        <span>Speed: ${device.speed} km/h</span>
+                    </div>
+                    <button class="alert-close" onclick="removeAlert('${deviceId}')">×</button>`;
+                
+                // Add to DOM
+                alertContainer.appendChild(alertDiv);
+                activeAlerts.add(deviceId);
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.classList.add('slide-out');
+                        setTimeout(() => {
+                            if (alertDiv.parentNode) {
+                                alertDiv.remove();
+                            }
+                            activeAlerts.delete(deviceId);
+                        }, 500);
+                    }
+                }, 5000);
+            } catch (error) {
+                console.error('Error showing live alert:', error);
+            }
+        }
+        
+        // Show parking alert
+        function showParkingAlert(device) {
+            try {
+                const deviceId = device.deviceId;
+                
+                // Don't show alerts for the same device too frequently
+                if (activeAlerts.has(deviceId+"_parking")) return;
+                
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'parking-alert';
+                
+                alertDiv.innerHTML = `
+                    <div class="parking-icon" style="font-size: 24px;">🅿️</div>
+                    <div class="parking-info">
+                        <strong>Vehicle Parked</strong>
+                        <span>Device ID: ${deviceId}</span>
+                        <span>Time: ${new Date().toLocaleTimeString()}</span>
+                    </div>
+                    <button class="alert-close" onclick="removeAlert('${deviceId}_parking')">×</button>`;
+                
+                // Add to DOM
+                alertContainer.appendChild(alertDiv);
+                activeAlerts.add(deviceId+"_parking");
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.classList.add('slide-out');
+                        setTimeout(() => {
+                            if (alertDiv.parentNode) {
+                                alertDiv.remove();
+                            }
+                            activeAlerts.delete(deviceId+"_parking");
+                        }, 500);
+                    }
+                }, 5000);
+            } catch (error) {
+                console.error('Error showing parking alert:', error);
+            }
+        }
+        
+        // Remove alert
+        function removeAlert(deviceId) {
+            try {
+                // Find the alert for this device
+                const alerts = document.querySelectorAll('.live-alert, .parking-alert');
+                for (let i = 0; i < alerts.length; i++) {
+                    const alert = alerts[i];
+                    if (alert.querySelector('.live-info span, .parking-info span').textContent.includes(deviceId)) {
+                        alert.classList.add('slide-out');
+                        setTimeout(() => {
+                            if (alert.parentNode) {
+                                alert.remove();
+                            }
+                        }, 500);
+                        break;
+                    }
+                }
+                
+                // Remove from active alerts
+                activeAlerts.delete(deviceId);
+            } catch (error) {
+                console.error('Error removing alert:', error);
+            }
+        }
+        
+        // Update the devices table
+        function updateDevicesTable() {
+            try {
+                const tableBody = document.getElementById('devicesTableBody');
+                if (!tableBody) return;
+                
+                // Clear existing rows
+                tableBody.innerHTML = '';
+                
+                // Sort devices by timestamp (most recent first)
+                const sortedDevices = Object.values(devices).sort((a, b) => {
+                    const timeA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+                    const timeB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+                    return timeB - timeA;
+                });
+                
+                if (sortedDevices.length === 0) {
+                    // No devices available
+                    const row = document.createElement('tr');
+                    row.innerHTML = '<td colspan="4">No devices available</td>';
+                    tableBody.appendChild(row);
+                    return;
+                }
+                
+                // Add rows for each device
+                sortedDevices.forEach(device => {
+                    const row = document.createElement('tr');
+                    
+                    // Get status class and text
+                    const status = getStatusText(device);
+                    const timeDisplay = formatTimestamp(device.timestamp);
+                    
+                    // Create row HTML
+                    row.innerHTML = `
+                        <td><span class="status-${status.toLowerCase()}">${status}</span></td>
+                        <td>${device.deviceId}</td>
+                        <td>${device.speed} km/h</td>
+                        <td>${timeDisplay}</td>
+                    `;
+                    
+                    // Add click event to zoom to device and show speed limit
+                    row.addEventListener('click', () => {
+                        zoomToDevice(device.deviceId);
+                        getSpeedLimit(device);
+                    });
+                    
+                    // Highlight the current device
+                    if (currentDeviceId === device.deviceId) {
+                        row.style.backgroundColor = '#f0f8ff';
+                    }
+                    
+                    // Add row to table
+                    tableBody.appendChild(row);
+                });
+                
+            } catch (error) {
+                console.error('Error updating devices table:', error);
+            }
+        }
+        
+        // Get status text based on device status and ignition
+        function getStatusText(device) {
+            const status = (device.vehicleStatus || '').toUpperCase();
+            const ignition = (device.ignition || '').toUpperCase();
+            
+            if (status === 'IDLE' && ignition === 'IGON') {
+                return 'Idle';
+            } else if (status === 'RUNNING' || ignition === 'IGON') {
+                return 'Running';
+            } else if (status === 'PARKED') {
+                return 'Parked';
+            } else if (ignition === 'IGOFF') {
+                return 'Off';
+            } else {
+                return 'Unknown';
+            }
+        }
+        
+        // Format timestamp for display
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return 'N/A';
+            
+            const now = new Date();
+            const diffMinutes = Math.floor((now - new Date(timestamp)) / (1000 * 60));
+            
+            if (diffMinutes < 1) return 'Just now';
+            if (diffMinutes < 60) return `${diffMinutes} min ago`;
+            if (diffMinutes < 1440) return `${Math.floor(diffMinutes / 60)} hours ago`;
+            return new Date(timestamp).toLocaleString();
+        }
+        
+        // Zoom to device on map
+        function zoomToDevice(deviceId, centering = true) {
+            try {
+                const device = devices[deviceId];
+                if (!device) {
+                    console.warn('Device not found:', deviceId);
+                    return;
+                }
+                
+                const marker = markers[deviceId];
+                if (!marker) {
+                    console.warn('Marker not found for device:', deviceId);
+                    return;
+                }
+                
+                // Set current device ID
+                currentDeviceId = deviceId;
+                
+                // Update the devices table to highlight current device
+                updateDevicesTable();
+                
+                // Set center and zoom if centering is true
+                if (centering) {
+                    map.setCenter({ lat: device.latitude, lng: device.longitude });
+                    map.setZoom(15);
+                }
+                
+                // Return the device data
+                return device;
+                
+            } catch (error) {
+                console.error('Error zooming to device:', error);
+            }
+        }
+        
+        // Get speed limit for a location
+        function getSpeedLimit(device) {
+            try {
+                const deviceId = device.deviceId;
+                const lat = device.latitude;
+                const lng = device.longitude;
+                
+                // Set current device
+                currentDeviceId = deviceId;
+                
+                // Update speed limit popup with device info
+                document.getElementById('speedLimitDevice').textContent = deviceId;
+                document.getElementById('deviceLat').textContent = lat.toFixed(6);
+                document.getElementById('deviceLng').textContent = lng.toFixed(6);
+                document.getElementById('deviceStatus').textContent = getStatusText(device);
+                document.getElementById('deviceSpeed').textContent = device.speed;
+                
+                // Update playback button
+                document.getElementById('playbackButton').onclick = function() {
+                    navigateToReplay(deviceId);
+                };
+                
+                // Update details button
+                document.getElementById('detailsButton').setAttribute('data-deviceid', deviceId);
+                
+                // Show loading state
+                document.getElementById('speedCircle').textContent = '...';
+                document.getElementById('speedRoad').textContent = 'Loading...';
+                document.getElementById('speedDetails').textContent = 'Checking speed limit...';
+                
+                // Show the popup with animation
+                const popup = document.getElementById('speedLimitPopup');
+                popup.style.display = 'block';
+                setTimeout(() => {
+                    popup.classList.add('active');
+                }, 10);
+                
+                // Make API request to get speed limit
+                fetch(`/speed-limit/api/data?lat=${lat}&lng=${lng}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Server error: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Only update if this is still the active device
+                        if (currentDeviceId === deviceId) {
+                            updateSpeedLimitDisplay(data, device);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching speed limit:', error);
+                        
+                        // Show error state
+                        document.getElementById('speedCircle').textContent = '--';
+                        document.getElementById('speedRoad').textContent = 'Error';
+                        document.getElementById('speedDetails').textContent = 'Could not get speed limit data';
+                        
+                        // Try alternate method
+                        getSpeedLimitAlternate(device);
+                    });
+                
+            } catch (error) {
+                console.error('Error getting speed limit:', error);
+                
+                // Show error state
+                document.getElementById('speedCircle').textContent = '--';
+                document.getElementById('speedRoad').textContent = 'Error';
+                document.getElementById('speedDetails').textContent = 'Could not get speed limit data';
+            }
+        }
+        
+        // Try alternate API for speed limit
+        function getSpeedLimitAlternate(device) {
+            try {
+                const deviceId = device.deviceId;
+                const lat = device.latitude;
+                const lng = device.longitude;
+                
+                // Show loading state for alternate method
+                document.getElementById('speedCircle').textContent = '...';
+                document.getElementById('speedRoad').textContent = 'Trying alternate method...';
+                document.getElementById('speedDetails').textContent = 'Please wait';
+                
+                // Make API request to alternate endpoint
+                fetch(`/speed-limit/api/data/alternate?lat=${lat}&lng=${lng}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Server error: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Only update if this is still the active device
+                        if (currentDeviceId === deviceId) {
+                            updateSpeedLimitDisplay(data, device);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching alternate speed limit:', error);
+                        
+                        // Show final error state
+                        document.getElementById('speedCircle').textContent = '--';
+                        document.getElementById('speedRoad').textContent = 'Not Available';
+                        document.getElementById('speedDetails').textContent = 'Speed limit data could not be retrieved';
+                    });
+                
+            } catch (error) {
+                console.error('Error getting alternate speed limit:', error);
+            }
+        }
+        
+        // Update speed limit display with data
+        function updateSpeedLimitDisplay(data, device) {
+            try {
+                if (data.speedLimit) {
+                    // Update circle with speed limit
+                    document.getElementById('speedCircle').textContent = data.speedLimit;
+                    
+                    // Update road info
+                    if (data.road) {
+                        document.getElementById('speedRoad').textContent = data.road;
+                    } else {
+                        document.getElementById('speedRoad').textContent = 'Speed Limit';
+                    }
+                    
+                    // Update details
+                    let details = `Speed limit: ${data.speedLimit} ${data.unit || 'km/h'}`;
+                    if (data.note) {
+                        details += ` (${data.note})`;
+                    }
+                    document.getElementById('speedDetails').textContent = details;
+                    
+                    // Compare with device speed
+                    const deviceSpeed = parseFloat(device.speed) || 0;
+                    const speedLimit = parseFloat(data.speedLimit) || 0;
+                    const speedComparison = document.getElementById('speedComparison');
+                    
+                    if (deviceSpeed > speedLimit) {
+                        speedComparison.textContent = `Over speed limit by ${(deviceSpeed - speedLimit).toFixed(1)} km/h`;
+                        speedComparison.className = 'speed-over';
+                    } else {
+                        speedComparison.textContent = `Under speed limit by ${(speedLimit - deviceSpeed).toFixed(1)} km/h`;
+                        speedComparison.className = 'speed-under';
+                    }
+                } else {
+                    // No speed limit data available
+                    document.getElementById('speedCircle').textContent = '--';
+                    document.getElementById('speedRoad').textContent = 'Unknown';
+                    document.getElementById('speedDetails').textContent = 'No speed limit data available for this location';
+                    document.getElementById('speedComparison').textContent = 'Speed limit unknown';
+                    document.getElementById('speedComparison').className = '';
+                }
+            } catch (error) {
+                console.error('Error updating speed limit display:', error);
+            }
+        }
+        
+        // Get speed limit for coordinates (for direct map clicks)
+        function getSpeedLimitForCoordinates(lat, lng) {
+            try {
+                // Create a temporary device object
+                const tempDevice = {
+                    deviceId: "TEMP_" + Math.floor(Math.random() * 10000),
+                    latitude: lat,
+                    longitude: lng,
+                    speed: 0,
+                    course: 0,
+                    timestamp: new Date().toISOString(),
+                    ignition: "IGoff",
+                    vehicleStatus: "UNKNOWN"
+                };
+                
+                // Call the regular getSpeedLimit function
+                getSpeedLimit(tempDevice);
+            } catch (error) {
+                console.error('Error getting speed limit for coordinates:', error);
+                showError('Error getting speed limit: ' + error.message);
+            }
+        }
+        
+        // Close speed limit popup
+        function closeSpeedLimitPopup() {
+            const popup = document.getElementById('speedLimitPopup');
+            popup.classList.remove('active');
+            
+            // Hide after animation
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 300);
+            
+            currentDeviceId = null;
+            
+            // Update devices table to remove highlight
+            updateDevicesTable();
+        }
+        
+        // Show vehicle details modal
+        function showVehicleDetails() {
+            try {
+                const deviceId = currentDeviceId;
+                if (!deviceId) return;
+                
+                console.log("Fetching details for Device ID:", deviceId);
+                
+                fetch(`/api/details/${deviceId}`)
+                    .then(response => {
+                        console.log("Response Status:", response.status);
+                        if (!response.ok) {
+                            throw new Error("Server returned error " + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(vehicle => {
+                        console.log("Vehicle Details Received:", vehicle);
+                        
+                        if (!vehicle || Object.keys(vehicle).length === 0) {
+                            // Use device data from memory if API fails
+                            const deviceData = devices[deviceId];
+                            if (deviceData) {
+                                // Create minimal details
+                                let tableContent = `
+                                    <tr><td>Device ID:</td><td>${deviceId}</td></tr>
+                                    <tr><td>Status:</td><td>${getStatusText(deviceData)}</td></tr>
+                                    <tr><td>Speed:</td><td>${deviceData.speed} km/h</td></tr>
+                                    <tr><td>Last Update:</td><td>${formatTimestamp(deviceData.timestamp)}</td></tr>
+                                    <tr><td>Latitude:</td><td>${deviceData.latitude}</td></tr>
+                                    <tr><td>Longitude:</td><td>${deviceData.longitude}</td></tr>
+                                `;
+                                
+                                document.getElementById("vehicleDetailsTable").innerHTML = tableContent;
+                                document.getElementById("vehicleDetailsModal").style.display = "block";
+                            } else {
+                                showError("No data found for this vehicle!");
+                            }
+                            return;
+                        }
+                        
+                        // Populate Table Data Inside Popup
+                        let tableContent = `
+                            <tr><td>Device ID:</td><td>${vehicle.deviceID || deviceId || "N/A"}</td></tr>
+                            <tr><td>Vehicle Number:</td><td>${vehicle.vehicleNumber || "N/A"}</td></tr>
+                            <tr><td>IMEI:</td><td>${vehicle.imei || "N/A"}</td></tr>
+                            <tr><td>Engine Number:</td><td>${vehicle.engineNumber || "N/A"}</td></tr>
+                            <tr><td>Model:</td><td>${vehicle.model || "N/A"}</td></tr>
+                            <tr><td>Owner Name:</td><td>${vehicle.ownerName || "N/A"}</td></tr>
+                            <tr><td>Vehicle Type:</td><td>${vehicle.vehicleType || "N/A"}</td></tr>
+                        `;
+                        
+                        document.getElementById("vehicleDetailsTable").innerHTML = tableContent;
+                        
+                        // Show Modal
+                        document.getElementById("vehicleDetailsModal").style.display = "block";
+                        console.log("Table Populated & Modal Opened!");
+                    })
+                    .catch(error => {
+                        console.error("Error fetching vehicle details:", error);
+                        
+                        // Use device data from memory if API fails
+                        const deviceData = devices[deviceId];
+                        if (deviceData) {
+                            // Create minimal details
+                            let tableContent = `
+                                <tr><td>Device ID:</td><td>${deviceId}</td></tr>
+                                <tr><td>Status:</td><td>${getStatusText(deviceData)}</td></tr>
+                                <tr><td>Speed:</td><td>${deviceData.speed} km/h</td></tr>
+                                <tr><td>Last Update:</td><td>${formatTimestamp(deviceData.timestamp)}</td></tr>
+                                <tr><td>Latitude:</td><td>${deviceData.latitude}</td></tr>
+                                <tr><td>Longitude:</td><td>${deviceData.longitude}</td></tr>
+                            `;
+                            
+                            document.getElementById("vehicleDetailsTable").innerHTML = tableContent;
+                            document.getElementById("vehicleDetailsModal").style.display = "block";
+                        } else {
+                            showError("Error fetching data. Check console for details.");
+                        }
+                    });
+            } catch (error) {
+                console.error('Error showing vehicle details:', error);
+            }
+        }
+        
+        // Close vehicle details modal
+        function closeVehicleDetails() {
+            document.getElementById("vehicleDetailsModal").style.display = "none";
+        }
+        
+        // Navigate to replay page
+        function navigateToReplay(deviceId) {
+            console.log("Navigating with Device ID:", deviceId);
+            if (!deviceId) {
+                deviceId = currentDeviceId;
+                if (!deviceId) {
+                    alert("Device ID is required to navigate to the replay page.");
+                    return;
+                }
+            }
+            window.location.href = `/admin/playback?deviceId=${encodeURIComponent(deviceId)}`;
+        }
+        
+        // Function to calculate distance between two points in km (Haversine formula)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the earth in km
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1); 
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2); 
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+            const distance = R * c; // Distance in km
+            return distance;
+        }
+        
+        function deg2rad(deg) {
+            return deg * (Math.PI/180);
+        }
+        
+        // Function to update the route line on map
+        function updateRouteLine() {
+            if (map && previousPositions.length > 1) {
+                // Remove old line
+                if (routeLine) {
+                    map.removeObject(routeLine);
+                }
+                
+                // Create line string geometry
+                const lineString = new H.geo.LineString();
+                
+                // Add points to line string
+                previousPositions.forEach(pos => {
+                    lineString.pushPoint({lat: pos.lat, lng: pos.lng});
+                });
+                
+                // Create line
+                routeLine = new H.map.Polyline(
+                    lineString,
+                    { 
+                        style: { 
+                            lineWidth: 4,
+                            strokeColor: '#4285f4',
+                            lineCap: 'round'
+                        }
+                    }
+                );
+                
+                // Add line to map
+                map.addObject(routeLine);
+            }
+        }
+        
+        // Event Listeners
+        
+        // Get Speed Limit button
+        document.getElementById('get-speed-limit').addEventListener('click', function() {
+            try {
+                const latInput = document.getElementById('latitude').value;
+                const lngInput = document.getElementById('longitude').value;
+                
+                if (!latInput || !lngInput) {
+                    showError("Please enter both latitude and longitude");
+                    return;
+                }
+                
+                const lat = parseFloat(latInput);
+                const lng = parseFloat(lngInput);
+                
+                if (isNaN(lat) || isNaN(lng)) {
+                    showError("Invalid coordinates. Please enter valid numbers.");
+                    return;
+                }
+                
+                if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+                    showError("Coordinates out of range. Latitude must be between -90 and 90, longitude between -180 and 180.");
+                    return;
+                }
+                
+                addLogEntry(`Getting speed limit for manual coordinates: ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                getSpeedLimitForCoordinates(lat, lng);
+            } catch (e) {
+                showError("Error getting speed limit: " + e.message);
+            }
+        });
+        
+        // Locate Me button
+        document.getElementById('locate-me').addEventListener('click', function() {
+            try {
+                addLogEntry('Locating user...');
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+                            
+                            addLogEntry(`Located at: ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                            
+                            // Update input fields
+                            document.getElementById('latitude').value = lat.toFixed(6);
+                            document.getElementById('longitude').value = lng.toFixed(6);
+                            
+                            // Create a marker for the user's location
+                            if (positionMarker && map) {
+                                map.removeObject(positionMarker);
+                            }
+                            
+                            if (map) {
+                                positionMarker = new H.map.Marker({ lat, lng });
+                                map.addObject(positionMarker);
+                                
+                                // Center map on position
+                                map.setCenter({ lat, lng });
+                                map.setZoom(14);
+                            }
+                            
+                            // Get speed limit for the location
+                            getSpeedLimitForCoordinates(lat, lng);
+                        },
+                        function(error) {
+                            showError("Geolocation error: " + error.message);
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 0
+                        }
+                    );
+                } else {
+                    showError("Geolocation is not supported by your browser");
+                }
+            } catch (e) {
+                showError("Error locating user: " + e.message);
+            }
+        });
+        
+        // Start/Stop Tracking button
+        document.getElementById('start-tracking').addEventListener('click', function() {
+            try {
+                if (isTracking) {
+                    // Stop tracking
+                    if (watchId !== null) {
+                        navigator.geolocation.clearWatch(watchId);
+                        watchId = null;
+                    }
+                    isTracking = false;
+                    document.getElementById('start-tracking').innerHTML = '<i class="fas fa-location-arrow"></i> Start Tracking';
+                    addLogEntry('Tracking stopped');
+                } else {
+                            }
+        
+        // Close vehicle details modal
+        function closeVehicleDetails() {
+            document.getElementById("vehicleDetailsModal").style.display = "none";
+        }
+        
+        // Navigate to replay page
+        function navigateToReplay(deviceId) {
+            console.log("Navigating with Device ID:", deviceId);
+            if (!deviceId) {
+                deviceId = currentDeviceId;
+                if (!deviceId) {
+                    alert("Device ID is required to navigate to the replay page.");
+                    return;
+                }
+            }
+            window.location.href = `/admin/playback?deviceId=${encodeURIComponent(deviceId)}`;
+        }
+        
+        // Load devices
+        function loadDevices() {
+            try {
+                console.log('Loading existing devices...');
+                addLogEntry('Loading existing devices...');
+                
+                // Example API call to get devices
+                fetch('/api/vehicles/last-known')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Failed to fetch data: ${response.statusText}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (Array.isArray(data) && data.length > 0) {
+                            console.log(`Loaded ${data.length} devices`);
+                            addLogEntry(`Loaded ${data.length} devices`);
+                            data.forEach(device => processVehicleData(device, false));
+                        } else if (typeof data === 'object' && data !== null) {
+                            console.log('Loaded single device');
+                            addLogEntry('Loaded single device');
+                            processVehicleData(data, false);
+                        } else {
+                            console.log('No devices available');
+                            addLogEntry('No devices available');
+                            
+                            // Load sample data if no devices are available
+                            loadSampleData();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading devices:', error);
+                        addLogEntry('Error loading devices: ' + error.message, 'error');
+                        
+                        // If API fails, load some sample data for testing
+                        loadSampleData();
+                    });
+            } catch (error) {
+                console.error('Error in loadDevices:', error);
+                addLogEntry('Error in loadDevices: ' + error.message, 'error');
+                
+                // Load sample data if there's an error
+                loadSampleData();
+            }
+        }
+        
+        // Load sample data for testing
+        function loadSampleData() {
+            console.log('Loading sample data...');
+            addLogEntry('Loading sample data for testing...');
+            
+            // Sample device data
+            const sampleDevices = [
+                {
+                    deviceID: "THDH000105",
+                    IMEI: "868651062766549",
+                    timestamp: new Date().toISOString(),
+                    latitude: "13.0777880",
+                    longitude: "77.5593472",
+                    speed: "0",
+                    course: "0",
+                    ignition: "IGon",
+                    vehicleStatus: "IDLE"
+                },
+                {
+                    deviceID: "THDH000106",
+                    IMEI: "868651062766550",
+                    timestamp: new Date().toISOString(),
+                    latitude: "13.0877880",
+                    longitude: "77.5693472",
+                    speed: "45",
+                    course: "90",
+                    ignition: "IGon",
+                    vehicleStatus: "RUNNING"
+                },
+                {
+                    deviceID: "THDH000107",
+                    IMEI: "868651062766551",
+                    timestamp: new Date().toISOString(),
+                    latitude: "13.0677880",
+                    longitude: "77.5493472",
+                    speed: "0",
+                    course: "0",
+                    ignition: "IGoff",
+                    vehicleStatus: "PARKED"
+                }<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Tracking System</title>
+    
+    <!-- HERE Maps CSS -->
+    <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
+    
+    <!-- Add SockJS and STOMP client libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        // Try alternate API for speed limit
+        function getSpeedLimitAlternate(device) {
+            try {
+                const deviceId = device.deviceId;
+                const lat = device.latitude;
+                const lng = device.longitude;
+                
+                // Show loading state for alternate method
+                document.getElementById('speedCircle').textContent = '...';
+                document.getElementById('speedRoad').textContent = 'Trying alternate method...';
+                document.getElementById('speedDetails').textContent = 'Please wait';
+                
+                // Make API request to alternate endpoint
+                fetch(`/speed-limit/api/data/alternate?lat=${lat}&lng=${lng}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Server error: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Only update if this is still the active device
+                        if (currentDeviceId === deviceId) {
+                            updateSpeedLimitDisplay(data, device);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching alternate speed limit:', error);
+                        
+                        // Show final error state
+                        document.getElementById('speedCircle').textContent = '--';
+                        document.getElementById('speedRoad').textContent = 'Not Available';
+                        document.getElementById('speedDetails').textContent = 'Speed limit data could not be retrieved';
+                    });
+                
+            } catch (error) {
+                console.error('Error getting alternate speed limit:', error);
+            }
+        }
+        
+        // Update speed limit display with data
+        function updateSpeedLimitDisplay(data, device) {
+            try {
+                if (data.speedLimit) {
+                    // Update circle with speed limit
+                    document.getElementById('speedCircle').textContent = data.speedLimit;
+                    
+                    // Update road info
+                    if (data.road) {
+                        document.getElementById('speedRoad').textContent = data.road;
+                    } else {
+                        document.getElementById('speedRoad').textContent = 'Speed Limit';
+                    }
+                    
+                    // Update details
+                    let details = `Speed limit: ${data.speedLimit} ${data.unit || 'km/h'}`;
+                    if (data.note) {
+                        details += ` (${data.note})`;
+                    }
+                    document.getElementById('speedDetails').textContent = details;
+                    
+                    // Compare with device speed
+                    const deviceSpeed = parseFloat(device.speed) || 0;
+                    const speedLimit = parseFloat(data.speedLimit) || 0;
+                    const speedComparison = document.getElementById('speedComparison');
+                    
+                    if (deviceSpeed > speedLimit) {
+                        speedComparison.textContent = `Over speed limit by ${(deviceSpeed - speedLimit).toFixed(1)} km/h`;
+                        speedComparison.className = 'speed-over';
+                    } else {
+                        speedComparison.textContent = `Under speed limit by ${(speedLimit - deviceSpeed).toFixed(1)} km/h`;
+                        speedComparison.className = 'speed-under';
+                    }
+                } else {
+                    // No speed limit data available
+                    document.getElementById('speedCircle').textContent = '--';
+                    document.getElementById('speedRoad').textContent = 'Unknown';
+                    document.getElementById('speedDetails').textContent = 'No speed limit data available for this location';
+                    document.getElementById('speedComparison').textContent = 'Speed limit unknown';
+                    document.getElementById('speedComparison').className = '';
+                }
+            } catch (error) {
+                console.error('Error updating speed limit display:', error);
+            }
+        }
+        
+        // Close speed limit popup
+        function closeSpeedLimitPopup() {
+            const popup = document.getElementById('speedLimitPopup');
+            popup.classList.remove('active');
+            
+            // Hide after animation
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 300);
+            
+            currentDeviceId = null;
+            
+            // Update devices table to remove highlight
+            updateDevicesTable();
+        }
+        
+        // Show vehicle details modal
+        function showVehicleDetails() {
+            try {
+                const deviceId = currentDeviceId;
+                if (!deviceId) return;
+                
+                console.log("Fetching details for Device ID:", deviceId);
+                
+                fetch(`/api/details/${deviceId}`)
+                    .then(response => {
+                        console.log("Response Status:", response.status);
+                        if (!response.ok) {
+                            throw new Error("Server returned error " + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(vehicle => {
+                        console.log("Vehicle Details Received:", vehicle);
+                        
+                        if (!vehicle || Object.keys(vehicle).length === 0) {
+                            // Use device data from memory if API fails
+                            const deviceData = devices[deviceId];
+                            if (deviceData) {
+                                // Create minimal details
+                                let tableContent = `
+                                    <tr><td>Device ID:</td><td>${deviceId}</td></tr>
+                                    <tr><td>Status:</td><td>${getStatusText(deviceData)}</td></tr>
+                                    <tr><td>Speed:</td><td>${deviceData.speed} km/h</td></tr>
+                                    <tr><td>Last Update:</td><td>${formatTimestamp(deviceData.timestamp)}</td></tr>
+                                    <tr><td>Latitude:</td><td>${deviceData.latitude}</td></tr>
+                                    <tr><td>Longitude:</td><td>${deviceData.longitude}</td></tr>
+                                `;
+                                
+                                document.getElementById("vehicleDetailsTable").innerHTML = tableContent;
+                                document.getElementById("vehicleDetailsModal").style.display = "block";
+                            } else {
+                                showError("No data found for this vehicle!");
+                            }
+                            return;
+                        }
+                        
+                        // Populate Table Data Inside Popup
+                        let tableContent = `
+                            <tr><td>Device ID:</td><td>${vehicle.deviceID || deviceId || "N/A"}</td></tr>
+                            <tr><td>Vehicle Number:</td><td>${vehicle.vehicleNumber || "N/A"}</td></tr>
+                            <tr><td>IMEI:</td><td>${vehicle.imei || "N/A"}</td></tr>
+                            <tr><td>Engine Number:</td><td>${vehicle.engineNumber || "N/A"}</td></tr>
+                            <tr><td>Model:</td><td>${vehicle.model || "N/A"}</td></tr>
+                            <tr><td>Owner Name:</td><td>${vehicle.ownerName || "N/A"}</td></tr>
+                            <tr><td>Vehicle Type:</td><td>${vehicle.vehicleType || "N/A"}</td></tr>
+                        `;
+                        
+                        document.getElementById("vehicleDetailsTable").innerHTML = tableContent;
+                        
+                        // Show Modal
+                        document.getElementById("vehicleDetailsModal").style.display = "block";
+                        console.log("Table Populated & Modal Opened!");
+                    })
+                    .catch(error => {
+                        console.error("Error fetching vehicle details:", error);
+                        
+                        // Use device data from memory if API fails
+                        const deviceData = devices[deviceId];
+                        if (deviceData) {
+                            // Create minimal details
+                            let tableContent = `
+                                <tr><td>Device ID:</td><td>${deviceId}</td></tr>
+                                <tr><td>Status:</td><td>${getStatusText(deviceData)}</td></tr>
+                                <tr><td>Speed:</td><td>${deviceData.speed} km/h</td></tr>
+                                <tr><td>Last Update:</td><td>${formatTimestamp(deviceData.timestamp)}</td></tr>
+                                <tr><td>Latitude:</td><td>${deviceData.latitude}</td></tr>
+                                <tr><td>Longitude:</td><td>${deviceData.longitude}</td></tr>
+                            `;
+                            
+                            document.getElementById("vehicleDetailsTable").innerHTML = tableContent;
+                            document.getElementById("vehicleDetailsModal").style.display = "block";
+                        } else {
+                            showError("Error fetching data. Check console for details.");
+                        }
+                    });
+            } catch (error) {
+                console.error('Error showing vehicle details:', error);
+            }
+        }
+        
+        // Remove alert
+        function removeAlert(deviceId) {
+            try {
+                // Find the alert for this device
+                const alerts = document.querySelectorAll('.live-alert, .parking-alert');
+                for (let i = 0; i < alerts.length; i++) {
+                    const alert = alerts[i];
+                    if (alert.querySelector('.live-info span, .parking-info span').textContent.includes(deviceId)) {
+                        alert.classList.add('slide-out');
+                        setTimeout(() => {
+                            if (alert.parentNode) {
+                                alert.remove();
+                            }
+                        }, 500);
+                        break;
+                    }
+                }
+                
+                // Remove from active alerts
+                activeAlerts.delete(deviceId);
+            } catch (error) {
+                console.error('Error removing alert:', error);
+            }
+        }
+        
+        // Update the devices table
+        function updateDevicesTable() {
+            try {
+                const tableBody = document.getElementById('devicesTableBody');
+                if (!tableBody) return;
+                
+                // Clear existing rows
+                tableBody.innerHTML = '';
+                
+                // Sort devices by timestamp (most recent first)
+                const sortedDevices = Object.values(devices).sort((a, b) => {
+                    const timeA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+                    const timeB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+                    return timeB - timeA;
+                });
+                
+                if (sortedDevices.length === 0) {
+                    // No devices available
+                    const row = document.createElement('tr');
+                    row.innerHTML = '<td colspan="4">No devices available</td>';
+                    tableBody.appendChild(row);
+                    return;
+                }
+                
+                // Add rows for each device
+                sortedDevices.forEach(device => {
+                    const row = document.createElement('tr');
+                    
+                    // Get status class and text
+                    const status = getStatusText(device);
+                    const timeDisplay = formatTimestamp(device.timestamp);
+                    
+                    // Create row HTML
+                    row.innerHTML = `
+                        <td><span class="status-${status.toLowerCase()}">${status}</span></td>
+                        <td>${device.deviceId}</td>
+                        <td>${device.speed} km/h</td>
+                        <td>${timeDisplay}</td>
+                    `;
+                    
+                    // Add click event to zoom to device and show speed limit
+                    row.addEventListener('click', () => {
+                        zoomToDevice(device.deviceId);
+                        getSpeedLimit(device);
+                    });
+                    
+                    // Highlight the current device
+                    if (currentDeviceId === device.deviceId) {
+                        row.style.backgroundColor = '#f0f8ff';
+                    }
+                    
+                    // Add row to table
+                    tableBody.appendChild(row);
+                });
+                
+            } catch (error) {
+                console.error('Error updating devices table:', error);
+            }
+        }
+        
+        // Get status text based on device status and ignition
+        function getStatusText(device) {
+            const status = (device.vehicleStatus || '').toUpperCase();
+            const ignition = (device.ignition || '').toUpperCase();
+            
+            if (status === 'IDLE' && ignition === 'IGON') {
+                return 'Idle';
+            } else if (status === 'RUNNING' || ignition === 'IGON') {
+                return 'Running';
+            } else if (status === 'PARKED') {
+                return 'Parked';
+            } else if (ignition === 'IGOFF') {
+                return 'Off';
+            } else {
+                return 'Unknown';
+            }
+        }
+        
+        // Format timestamp for display
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return 'N/A';
+            
+            const now = new Date();
+            const diffMinutes = Math.floor((now - new Date(timestamp)) / (1000 * 60));
+            
+            if (diffMinutes < 1) return 'Just now';
+            if (diffMinutes < 60) return `${diffMinutes} min ago`;
+            if (diffMinutes < 1440) return `${Math.floor(diffMinutes / 60)} hours ago`;
+            return new Date(timestamp).toLocaleString();
+        }
+        
+        // Zoom to device on map
+        function zoomToDevice(deviceId, centering = true) {
+            try {
+                const device = devices[deviceId];
+                if (!device) {
+                    console.warn('Device not found:', deviceId);
+                    return;
+                }
+                
+                const marker = markers[deviceId];
+                if (!marker) {
+                    console.warn('Marker not found for device:', deviceId);
+                    return;
+                }
+                
+                // Set current device ID
+                currentDeviceId = deviceId;
+                
+                // Update the devices table to highlight current device
+                updateDevicesTable();
+                
+                // Set center and zoom if centering is true
+                if (centering) {
+                    map.setCenter({ lat: device.latitude, lng: device.longitude });
+                    map.setZoom(15);
+                }
+                
+                // Return the device data
+                return device;
+                
+            } catch (error) {
+                console.error('Error zooming to device:', error);
+            }
+        }
+        
+        // Get speed limit for a location
+        function getSpeedLimit(device) {
+            try {
+                const deviceId = device.deviceId;
+                const lat = device.latitude;
+                const lng = device.longitude;
+                
+                // Set current device
+                currentDeviceId = deviceId;
+                
+                // Update speed limit popup with device info
+                document.getElementById('speedLimitDevice').textContent = deviceId;
+                document.getElementById('deviceLat').textContent = lat.toFixed(6);
+                document.getElementById('deviceLng').textContent = lng.toFixed(6);
+                document.getElementById('deviceStatus').textContent = getStatusText(device);
+                document.getElementById('deviceSpeed').textContent = device.speed;
+                
+                // Update playback button
+                document.getElementById('playbackButton').onclick = function() {
+                    navigateToReplay(deviceId);
+                };
+                
+                // Update details button
+                document.getElementById('detailsButton').setAttribute('data-deviceid', deviceId);
+                
+                // Show loading state
+                document.getElementById('speedCircle').textContent = '...';
+                document.getElementById('speedRoad').textContent = 'Loading...';
+                document.getElementById('speedDetails').textContent = 'Checking speed limit...';
+                
+                // Show the popup with animation
+                const popup = document.getElementById('speedLimitPopup');
+                popup.style.display = 'block';
+                setTimeout(() => {
+                    popup.classList.add('active');
+                }, 10);
+                
+                // Make API request to get speed limit
+                fetch(`/speed-limit/api/data?lat=${lat}&lng=${lng}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Server error: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Only update if this is still the active device
+                        if (currentDeviceId === deviceId) {
+                            updateSpeedLimitDisplay(data, device);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching speed limit:', error);
+                        
+                        // Show error state
+                        document.getElementById('speedCircle').textContent = '--';
+                        document.getElementById('speedRoad').textContent = 'Error';
+                        document.getElementById('speedDetails').textContent = 'Could not get speed limit data';
+                        
+                        // Try alternate method
+                        getSpeedLimitAlternate(device);
+                    });
+                
+            } catch (error) {
+                console.error('Error getting speed limit:', error);
+                
+                // Show error state
+                document.getElementById('speedCircle').textContent = '--';
+                document.getElementById('speedRoad').textContent = 'Error';
+                document.getElementById('speedDetails').textContent = 'Could not get speed limit data';
+            }
+        }
+        
+        .header {
+            background-color: #4285f4;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #f8f9fa;
+        }
+        
+        #map-container {
+            width: 100%;
+            height: 70vh;
+            background-color: #f2f2f2;
+        }
+        
+        .coord-input {
+            display: flex;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #ddd;
+        }
+        
+        .coord-input input {
+            padding: 5px;
+            margin-right: 5px;
+            width: 120px;
+        }
+        
+        button {
+            padding: 8px 16px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        
+        button:hover {
+            background-color: #3367d6;
+        }
+        
+        #error-message {
+            background-color: #ffdddd;
+            color: #cc0000;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            display: none;
+        }
+        
+        .log-panel {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 300px;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 4px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-size: 12px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        /* Speed Limit Popup */
+        #speedLimitPopup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: white;
+            width: 320px;
+            border-radius: 12px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1100;
+            opacity: 0;
+            transition: all 0.3s ease;
+            display: none;
+            overflow: hidden;
+        }
+        
+        #speedLimitPopup.active {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+        
+        #speedLimitPopup .popup-header {
+            background: #4285f4;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #speedLimitPopup .popup-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+        
+        #speedLimitPopup .popup-header .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+        }
+        
+        #speedLimitPopup .popup-content {
+            padding: 20px;
+        }
+        
+        #speedLimitPopup .device-info {
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        #speedLimitPopup .device-info p {
+            margin: 5px 0;
+        }
+        
+        #speedCircle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid #e53935;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            font-weight: bold;
+            margin: 0 auto 20px;
+        }
+        
+        #speedRoad {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        #speedDetails {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        #speedComparison {
+            text-align: center;
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .speed-over {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        .speed-under {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        #speedLimitPopup .action-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        #speedLimitPopup .action-buttons button {
+            flex: 1;
+            margin: 0 5px;
+            padding: 10px;
+        }
+        
+        /* Vehicle Details Modal */
+        #vehicleDetailsModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 2000;
+        }
+        
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            color: #4285f4;
+            font-size: 20px;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .vehicle-details-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .vehicle-details-table td {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .vehicle-details-table td:first-child {
+            font-weight: bold;
+            width: 40%;
+        }
+        
+        /* Add styles for device tracking table */
+        #devices-sidebar {
+            position: fixed;
+            right: -350px;
+            top: 150px;
+            width: 330px;
+            max-height: 500px;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border-left: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        #devices-sidebar.active {
+            right: 0;
+        }
+        
+        #toggleDevicesButton {
+            position: fixed;
+            top: 150px;
+            right: 20px;
+            z-index: 1001;
+            background: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        #toggleDevicesButton:hover {
+            background: #3367d6;
+            transform: scale(1.05);
+        }
+        
+        #toggleDevicesButton.active {
+            right: 350px;
+        }
+        
+        #devices-sidebar h2 {
+            color: #4285f4;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4285f4;
+        }
+        
+        #devices-sidebar table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        #devices-sidebar th {
+            background: #4285f4;
+            color: white;
+            padding: 8px;
+            font-size: 14px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        #devices-sidebar td {
+            padding: 8px;
+            font-size: 13px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        #searchDevices {
+            width: calc(100% - 16px);
+            padding: 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .status-running {
+            background-color: #27ae60;
+            color: white;
+            border-radius: 4px;
+            padding: 3px 6px;
+            font-size: 12px;
+        }
+        
+        .status-idle {
+            background-color: #3498db;
+            color: white;
+            border-radius: 4px;
+            padding: 3px 6px;
+            font-size: 12px;
+        }
+        
+        .status-off {
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 4px;
+            padding: 3px 6px;
+            font-size: 12px;
+        }
+        
+        .status-parked {
+            background-color: #f39c12;
+            color: white;
+            border-radius: 4px;
+            padding: 3px 6px;
+            font-size: 12px;
+        }
+        
+        .status-unknown {
+            background-color: #95a5a6;
+            color: white;
+            border-radius: 4px;
+            padding: 3px 6px;
+            font-size: 12px;
+        }
+        
+        /* Live update notification */
+        .live-alert-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+        }
+        
+        .live-alert, .parking-alert {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            width: 100%;
+            box-sizing: border-box;
+            opacity: 0;
+            transform: translateX(100%);
+            position: relative;
+        }
+        
+        .live-alert {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            animation: slideIn 0.5s ease-out forwards;
+        }
+        
+        .parking-alert {
+            background: linear-gradient(135deg, #f39c12, #f1c40f);
+            animation: slideIn 0.5s ease-out forwards;
+        }
+        
+        @keyframes slideIn {
+            0% { transform: translateX(100%); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            0% { transform: translateX(0); opacity: 1; }
+            100% { transform: translateX(100%); opacity: 0; }
+        }
+        
+        .live-icon, .parking-icon {
+            width: 32px;
+            height: 32px;
+            animation: pulse 2s infinite;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+            flex-shrink: 0;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .live-info, .parking-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+        
+        .live-info strong, .parking-info strong {
+            font-size: 16px;
+            margin-bottom: 2px;
+        }
+        
+        .live-info span, .parking-info span {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .alert-close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .alert-close:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.1);
+        }
+        
+        .slide-out {
+            animation: slideOut 0.5s ease-out forwards;
+        }
+        
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .loading-spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+    
+    <div class="header">
+        <h2>Vehicle Tracking System</h2>
+    </div>
+    
+    <div class="controls">
+        <div>
+            <button id="locate-me">Locate Me</button>
+            <button id="start-tracking">Start Tracking</button>
+        </div>
+        <div>
+            <button id="show-traffic">Show Traffic</button>
+            <button id="hide-traffic">Hide Traffic</button>
+            <button id="toggle-logs">Show Logs</button>
+        </div>
+    </div>
+    
+    <div class="coord-input">
+        <input type="text" id="latitude" placeholder="Latitude (e.g. 12.9716)">
+        <input type="text" id="longitude" placeholder="Longitude (e.g. 77.5946)">
+        <button id="get-speed-limit">Get Speed Limit</button>
+    </div>
+    
+    <div id="error-message"></div>
+    
+    <div id="map-container"></div>
+    
+    <div id="log-panel" class="log-panel">
+        <h4>Activity Log</h4>
+        <div id="log-entries"></div>
+    </div>
+    
+    <!-- Speed Limit Popup -->
+    <div id="speedLimitPopup">
+        <div class="popup-header">
+            <h3>Vehicle Information</h3>
+            <button class="close-btn" onclick="closeSpeedLimitPopup()">&times;</button>
+        </div>
+        <div class="popup-content">
+            <div class="device-info">
+                <p><strong>Device ID:</strong> <span id="speedLimitDevice">DEVICE-ID</span></p>
+                <p><strong>Location:</strong> <span id="deviceLat">0.000000</span>, <span id="deviceLng">0.000000</span></p>
+                <p><strong>Status:</strong> <span id="deviceStatus">Unknown</span></p>
+                <p><strong>Current Speed:</strong> <span id="deviceSpeed">0</span> km/h</p>
+            </div>
+            
+            <div id="speedCircle">--</div>
+            <div id="speedRoad">Speed Limit</div>
+            <div id="speedDetails">Checking speed limit...</div>
+            <div id="speedComparison"></div>
+            
+            <div class="action-buttons">
+                <button id="detailsButton" onclick="showVehicleDetails()">Vehicle Details</button>
+                <button id="playbackButton">View Playback</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Vehicle Details Modal -->
+    <div id="vehicleDetailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Vehicle Details</h2>
+                <button class="modal-close" onclick="closeVehicleDetails()">&times;</button>
+            </div>
+            <table id="vehicleDetailsTable" class="vehicle-details-table">
+                <!-- Vehicle details will be populated here -->
+            </table>
+        </div>
+    </div>
+    
+    <!-- Add the devices sidebar -->
+    <button id="toggleDevicesButton"><i class="fas fa-car me-2"></i> Devices</button>
+    
+    <div id="devices-sidebar">
+        <h2>Connected Devices</h2>
+        <input type="text" id="searchDevices" placeholder="Search by Device ID">
+        <table>
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Device ID</th>
+                    <th>Speed</th>
+                    <th>Last Update</th>
+                </tr>
+            </thead>
+            <tbody id="devicesTableBody">
+                <!-- Rows will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Create alert container for live updates -->
+    <div class="live-alert-container" id="liveAlertContainer"></div>
+    
+    <!-- Load HERE Maps JavaScript APIs -->
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
+    
+    <script th:inline="javascript">
+        // Get the HERE credentials from the backend
+        const apiKey = '19cJwlsY5xkdO13O_869LM29OScg30J1TCstjWfPSF8';
+    </script>
+    
+    <script>
+        // Global variables
+        let map, platform, defaultLayers, positionMarker, trafficLayer, routeLine, ui;
+        let isTracking = false;
+        let watchId = null;
+        let currentLat = null;
+        let currentLng = null;
+        let previousPositions = [];
+        let lastLocation = null;
+        let lastTimestamp = null;
+        let devices = {};
+        let markers = {};
+        let currentDeviceId = null;
+        let previousCourses = {};
+        let activeAlerts = new Set();
+        let alertContainer = document.getElementById('liveAlertContainer');
+        
+        // Logging system
+        const logEntries = document.getElementById('log-entries');
+        
+        function addLogEntry(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            
+            const time = document.createElement('span');
+            time.className = 'log-time';
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+            time.textContent = `${timeStr} - `;
+            
+            const text = document.createElement('span');
+            text.textContent = message;
+            
+            entry.appendChild(time);
+            entry.appendChild(text);
+            
+            if (logEntries) {
+                logEntries.appendChild(entry);
+                logEntries.scrollTop = logEntries.scrollHeight;
+            }
+            
+            // Also log to console
+            console.log(`${type.toUpperCase()}: ${message}`);
+        }
+        
+        // Error handling
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            if (errorDiv) {
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+                addLogEntry(message, 'error');
+                
+                // Hide error after 5 seconds
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                }, 5000);
+            } else {
+                console.error("Error element not found:", message);
+            }
+        }
+        
+        // Initialize map and tracking components
+        function initMap() {
+            try {
+                // Initialize HERE platform with API key
+                platform = new H.service.Platform({
+                    apikey: apiKey
+                });
+                
+                // Get default map layers
+                defaultLayers = platform.createDefaultLayers();
+                
+                // Initialize the map
+                map = new H.Map(
+                    document.getElementById('map-container'),
+                    defaultLayers.vector.normal.map,
+                    {
+                        zoom: 14,
+                        center: { lat: 12.9716, lng: 77.5946 } // Default to Bengaluru
+                    }
+                );
+                
+                // Make the map responsive
+                window.addEventListener('resize', () => {
+                    map.getViewPort().resize();
+                });
+                
+                // Add map interaction
+                const behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+                
+                // Add UI components
+                ui = H.ui.UI.createDefault(map, defaultLayers);
+                
+                // Hide loading overlay
+                document.getElementById('loading-overlay').style.display = 'none';
+                
+                addLogEntry('Map initialized successfully');
+                
+                // Set up map click handler
+                setupMapClickHandler();
+                
+                // Initialize WebSocket connection
+                initWebSocket();
+                
+                // Load existing devices
+                loadDevices();
+                
+            } catch (e) {
+                showError("Error initializing map: " + e.message);
+                console.error("Map initialization error:", e);
+            }
+        }
+        
+        function setupMapClickHandler() {
+            if (map) {
+                map.addEventListener('tap', function(evt) {
+                    try {
+                        const coord = map.screenToGeo(
+                            evt.currentPointer.viewportX,
+                            evt.currentPointer.viewportY
+                        );
+                        
+                        const lat = coord.lat;
+                        const lng = coord.lng;
+                        
+                        addLogEntry(`Map clicked at: ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                        
+                        // Update input fields
+                        document.getElementById('latitude').value = lat.toFixed(6);
+                        document.getElementById('longitude').value = lng.toFixed(6);
+                        
+                        // Get speed limit for clicked location
+                        getSpeedLimitForCoordinates(lat, lng);
+                    } catch (e) {
+                        showError("Error handling map click: " + e.message);
+                    }
+                });
+                addLogEntry('Map click handler set up');
+            }
+        }
+        
+        // Initialize WebSocket connection
+        function initWebSocket() {
+            try {
+                console.log('Initializing WebSocket connection...');
+                addLogEntry('Initializing WebSocket connection...');
+                
+                // Create a WebSocket connection
+                const socket = new SockJS('/gs-guide-websocket');
+                const stompClient = Stomp.over(socket);
+                
+                // Disable debug logs
+                stompClient.debug = null;
+                
+                stompClient.connect({}, frame => {
+                    console.log('WebSocket connected successfully');
+                    addLogEntry('WebSocket connected successfully');
+                    
+                    // Subscribe to the vehicle updates topic
+                    stompClient.subscribe('/topic/location-updates', message => {
+                        try {
+                            const vehicleData = JSON.parse(message.body);
+                            processVehicleData(vehicleData, true);
+                        } catch (error) {
+                            console.error('Error processing WebSocket message:', error);
+                            addLogEntry('Error processing WebSocket message: ' + error.message, 'error');
+                        }
+                    });
+                }, error => {
+                    console.error('WebSocket connection error:', error);
+                    addLogEntry('WebSocket connection error: ' + error.message, 'error');
+                    
+                    // Retry connection after delay
+                    setTimeout(() => initWebSocket(), 5000);
+                });
+            } catch (error) {
+                console.error('Error initializing WebSocket:', error);
+                addLogEntry('Error initializing WebSocket: ' + error.message, 'error');
+            }
+        }
+        
+        // Process vehicle data from WebSocket or API
+        function processVehicleData(data, isLive = false) {
+            try {
+                // Standardize data format
+                const device = {
+                    deviceId: data.deviceId || data.deviceID || 'Unknown',
+                    latitude: parseFloat(data.latitude) || 0,
+                    longitude: parseFloat(data.longitude) || 0,
+                    speed: parseFloat(data.speed) || 0,
+                    course: parseFloat(data.course) || 0,
+                    timestamp: data.timestamp || new Date().toISOString(),
+                    ignition: data.ignition || 'IGoff',
+                    vehicleStatus: data.vehicleStatus || data.VehicleStatus || 'UNKNOWN'
+                };
+                
+                // Store device data
+                devices[device.deviceId] = device;
+                
+                // Update marker on map
+                updateDeviceMarker(device, isLive);
+                
+                // Update devices table
+                updateDevicesTable();
+                
+                // Show alerts for live updates or status changes
+                if (isLive) {
+                    showLiveAlert(device);
+                    
+                    // Check for parking status to show specific alert
+                    if (device.vehicleStatus?.toUpperCase() === 'PARKED') {
+                        showParkingAlert(device);
+                    }
+                }
+                
+                return device;
+            } catch (error) {
+                console.error('Error processing vehicle data:', error, data);
+                return null;
+            }
+        }
+        
+        // Update device marker on map
+        function updateDeviceMarker(device, isLive = false) {
+            try {
+                // Create position object
+                const position = {
+                    lat: device.latitude,
+                    lng: device.longitude
+                };
+                
+                // Calculate rotation for smooth transition
+                let rotation = device.course;
+                if (previousCourses[device.deviceId]) {
+                    const prevCourse = previousCourses[device.deviceId];
+                    const diff = device.course - prevCourse;
+                    if (Math.abs(diff) > 180) {
+                        rotation = diff > 0 ? device.course - 360 : device.course + 360;
+                    }
+                }
+                previousCourses[device.deviceId] = device.course;
+                
+                // Create the SVG for rotated vehicle marker
+                const status = device.vehicleStatus?.toUpperCase() || '';
+                const ignition = device.ignition?.toUpperCase() || '';
+                
+                let color;
+                if (status === 'PARKED' && ignition === 'IGOFF') {
+                    color = 'orange';
+                } else if (ignition === 'IGON') {
+                    if (status === 'IDLE') {
+                        color = 'blue';
+                    } else {
+                        color = 'green';
+                    }
+                } else {
+                    color = 'red';
+                }
+                
+                // Create a rotated car SVG icon
+                const svgIcon = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 38 38">
+                        <g transform="rotate(${rotation} 19 19)">
+                            <path d="M27,19l-2.8-8.3C23.7,9.6,22.7,9,21.5,9h-5.1c-1.1,0-2.2,0.6-2.6,1.7L11,19v9.9c0,1.2,0.9,2.1,2.1,2.1
+                            h1.7C16,31,17,30,17,28.9V28h4v0.9c0,1.2,0.9,2.1,2.1,2.1h1.7c1.2,0,2.1-0.9,2.1-2.1V19z" fill="${color}"/>
+                            <path d="M14,22c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S15.1,22,14,22z" fill="black"/>
+                            <path d="M24,22c-1.1,0-2-0.9-2-2s0.9-2,2-2s2,0.9,2,2S25.1,22,24,22z" fill="black"/>
+                        </g>
+                    </svg>
+                `;
+                
+                // Create the icon for the marker
+                const icon = new H.map.Icon(svgIcon);
+                
+                if (markers[device.deviceId]) {
+                    try {
+                        // Update existing marker
+                        markers[device.deviceId].setGeometry(position);
+                        
+                        // Update icon - need to recreate the marker in HERE Maps to change the icon
+                        map.removeObject(markers[device.deviceId]);
+                        
+                        const marker = new H.map.Marker(position, {
+                            icon: icon
+                        });
+                        
+                        // Add click event to show info bubble and speed limit
+                        marker.addEventListener('tap', () => {
+                            // Get speed limit for this location
+                            getSpeedLimit(device);
+                        });
+                        
+                        // Add marker to map
+                        map.addObject(marker);
+                        markers[device.deviceId] = marker;
+                        
+                    } catch (error) {
+                        console.error('Error updating marker:', error);
+                    }
+                } else {
+                    // Create a new marker
+                    try {
+                        const marker = new H.map.Marker(position, {
+                            icon: icon
+                        });
+                        
+                        // Add click event to show info bubble and speed limit
+                        marker.addEventListener('tap', () => {
+                            // Get speed limit for this location
+                            getSpeedLimit(device);
+                        });
+                        
+                        // Add marker to map
+                        map.addObject(marker);
+                        markers[device.deviceId] = marker;
+                    } catch (error) {
+                        console.error('Error creating marker:', error);
+                    }
+                }
+                
+                // If this is a live update for the currently viewed device, update the view
+                if (isLive && currentDeviceId === device.deviceId) {
+                    zoomToDevice(device.deviceId, false);
+                }
+                
+            } catch (error) {
+                console.error('Error updating device marker:', error, device);
+            }
+        }
+        
+        // Show alert for live updates
+        function showLiveAlert(device) {
+            try {
+                const deviceId = device.deviceId;
+                
+                // Don't show alerts for the same device too frequently
+                if (activeAlerts.has(deviceId)) return;
+                
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'live-alert';
+                
+                // Use appropriate icon based on status (local path or URL)
+                let iconSrc;
+                try {
+                    iconSrc = "/THINTURE_IMAGE/car/car_icon4.png";
+                    // Test if the image exists by creating a temporary Image object
+                    const img = new Image();
+                    img.onerror = () => {
+                        // Fallback to a Unicode icon if the image fails to load
+                        const iconElement = alertDiv.querySelector('.live-icon');
+                        if (iconElement) {
+                            iconElement.innerHTML = '🚗';
+                            iconElement.style.fontSize = '24px';
+                        }
+                    };
+                    img.src = iconSrc;
+                } catch (e) {
+                    // Fallback to Unicode icon
+                    iconSrc = null;
+                }
+                
+                alertDiv.innerHTML = iconSrc ? 
+                    `<img src="${iconSrc}" class="live-icon" alt="live">
+                    <div class="live-info">
+                        <strong>Live Update</strong>
+                        <span>Device ID: ${deviceId}</span>
+                        <span>Speed: ${device.speed} km/h</span>
+                    </div>
+                    <button class="alert-close" onclick="removeAlert('${deviceId}')">×</button>` :
+                    `<div class="live-icon" style="font-size: 24px;">🚗</div>
+                    <div class="live-info">
+                        <strong>Live Update</strong>
+                        <span>Device ID: ${deviceId}</span>
+                        <span>Speed: ${device.speed} km/h</span>
+                    </div>
+                    <button class="alert-close" onclick="removeAlert('${deviceId}')">×</button>`;
+                
+                // Add to DOM
+                alertContainer.appendChild(alertDiv);
+                activeAlerts.add(deviceId);
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.classList.add('slide-out');
+                        setTimeout(() => {
+                            if (alertDiv.parentNode) {
+                                alertDiv.remove();
+                            }
+                            activeAlerts.delete(deviceId);
+                        }, 500);
+                    }
+                }, 5000);
+            } catch (error) {
+                console.error('Error showing live alert:', error);
+            }
+        }
+        
+        // Show parking alert
+        function showParkingAlert(device) {
+            try {
+                const deviceId = device.deviceId;
+                
+                // Don't show alerts for the same device too frequently
+                if (activeAlerts.has(deviceId)) return;
+                
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'parking-alert';
+                
+                // Use appropriate icon based on status (local path or URL)
+                let iconSrc;
+                try {
+                    iconSrc = "/THINTURE_IMAGE/car/parking-area.png";
+                    // Test if the image exists by creating a temporary Image object
+                    const img = new Image();
+                    img.onerror = () => {
+                        // Fallback to a Unicode icon if the image fails to load
+                        const iconElement = alertDiv.querySelector('.parking-icon');
+                        if (iconElement) {
+                            iconElement.innerHTML = '🅿️';
+                            iconElement.style.fontSize = '24px';
+                        }
+                    };
+                    img.src = iconSrc;
+                } catch (e) {
+                    // Fallback to Unicode icon
+                    iconSrc = null;
+                }
+                
+                alertDiv.innerHTML = iconSrc ? 
+                    `<img src="${iconSrc}" class="parking-icon" alt="parking">
+                    <div class="parking-info">
+                        <strong>Vehicle Parked</strong>
+                        <span>Device ID: ${deviceId}</span>
+                        <span>Time: ${new Date().toLocaleTimeString()}</span>
+                    </div>
+                    <button class="alert-close" onclick="removeAlert('${deviceId}')">×</button>` :
+                    `<div class="parking-icon" style="font-size: 24px;">🅿️</div>
+                    <div class="parking-info">
+                        <strong>Vehicle Parked</strong>
+                        <span>Device ID: ${deviceId}</span>
+                        <span>Time: ${new Date().toLocaleTimeString()}</span>
+                    </div>
+                    <button class="alert-close" onclick="removeAlert('${deviceId}')">×</button>`;
+                
+                // Add to DOM
+                alertContainer.appendChild(alertDiv);
+                activeAlerts.add(deviceId);
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.classList.add('slide-out');
+                        setTimeout(() => {
+                            if (alertDiv.parentNode) {
+                                alertDiv.remove();
+                            }
+                            activeAlerts.delete(deviceId);
+                        }, 500);
+                    }
+                }, 5000);
+            } catch (error) {
+                console.error('Error showing parking alert:', error);
+            }
+        }

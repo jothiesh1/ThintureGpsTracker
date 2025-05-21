@@ -85,5 +85,21 @@ public class userPageController {
         logger.info("🔹 Displaying user/vehicle_violation_user.html");
         return "error";
     }
+    
+    /*
+
+    @GetMapping("/user/user_map2")
+    public String userLiveMap2(Model model) {
+        logger.info("🔹 Displaying user/user_map.html");
+        return "user/user_map2";
+    }
+    
+    @GetMapping("/user/user_map3")
+    public String userLiveMap3(Model model) {
+        logger.info("🔹 Displaying user/user_map.html");
+        return "user/user_map3";
+    }
+    
+    */
 }
 

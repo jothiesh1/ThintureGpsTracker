@@ -83,7 +83,11 @@ public void setUser(User user) {
     private String additionalData;
     private String sequenceNumber;
     private String ignition ;
+    
+    @Column(name = "vehicleStatus")
     private String vehicleStatus;
+
+    
     private String status;
     
 private String timeIntervals ;
@@ -315,7 +319,9 @@ public void setPanic(Integer panic) {
 
 private String serialNo;
 private String imei;
-private String dealerId;
+@Column(name = "dealer_id")  // ✅ matches the column
+private Long dealerId;       // ✅ use Long, not String
+
 public String getSerialNo() {
 	return serialNo;
 }
@@ -333,13 +339,6 @@ public void setImei(String imei) {
 }
 
 
-public String getDealerId() {
-	return dealerId;
-}
-
-public void setDealerId(String dealerId) {
-	this.dealerId = dealerId;
-}
 
 public String getDealerName() {
 	return dealerName;

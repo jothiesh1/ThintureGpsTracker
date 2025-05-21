@@ -31,9 +31,13 @@
 
     <div id="use-normal" class="report-grid">
         <div class="report-card" id="event">
-            <img src="/THINTURE_IMAGE/event.jpg" alt="Event Report">
-            <span>Events Report</span>
+            <img src="/THINTURE_IMAGE/events1.jpg" alt="Event Report">
+            <span>Event status Report</span>
         </div>
+		<div class="report-card" id="trip">
+		           <img src="/THINTURE_IMAGE/trip.jpg" class="install" alt="Historical Data">
+		           <span>Trip management Report</span>
+		       </div>
 		
         <div class="report-card" id="install">
             <img src="/THINTURE_IMAGE/installation.jpg" class="install" alt="Historical Data">
@@ -95,7 +99,10 @@
         document.getElementById('driver').addEventListener('click', function() {
             window.location.href = '/superadmin/driver-violation';
         });
-
+		document.getElementById('trip').addEventListener('click', function() {
+		           window.location.href = '/superadmin/tripmanagement';
+		       });
+		
         // Only attach if the element exists (your video is commented out in HTML)
         const videoCard = document.getElementById('video');
         if (videoCard) {

@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Location Tracker</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    
+    <style>
+        /* Base Styles */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        
+        /* App Container */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(90deg, #0f1e41, #1e3a6e);
+            color: white;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        /* Control Panel */
+        .control-panel {
+            background-color: #f8f9fa;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 900;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            position: relative;
+        }
+        
+        /* Map Container */
+        #map-container {
+            flex: 1;
+            background-color: #f5f5f5;
+            position: relative;
+        }
+        
+        /* Custom Button Styles */
+        .btn {
+            padding: 8px 16px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn-primary {
+            background-color: #0f1e41;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        /* Status indicator */
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            margin-left: 15px;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .status-connected {
+            background-color: #28a745;
+            box-shadow: 0 0 8px #28a745;
+        }
+        
+        .status-disconnected {
+            background-color: #dc3545;
+            box-shadow: 0 0 8px #dc3545;
+        }
+        
+        /* Info Panel */
+        .info-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            min-width: 250px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .info-panel h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 8px;
+        }
+        
+        .info-item {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .info-value {
+            font-weight: bold;
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            margin-left: 10px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            border-radius: 24px;
+            transition: 0.4s;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.4s;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #2196F3;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(15, 30, 65, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 2000;
+            display: none;
+        }
+        
+        /* Speed Display */
+        .speed-display {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 10px 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        
+        .speed-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #0f1e41;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .speed-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .speed-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .direction-label {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0f1e41;
+        }
+        
+        /* User Controls */
+        .user-controls {
+            display: flex;
+        }
+        
+        /* Map Controls */
+        .map-controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .map-control-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .map-control-btn:hover {
+            background-color: #f0f0f0;
+        }
+        
+        /* Sharing Section */
+        .sharing-section {
+            padding: 8px 15px;
+            background-color: #f0f4f8;
+            border-top: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+        }
+        
+        .sharing-section span {
+            margin-right: 10px;
+        }
+        
+        .share-link {
+            flex: 1;
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+            font-size: 14px;
+            color: #444;
+        }
+        
+        .copy-btn {
+            margin-left: 10px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #0f1e41;
+            color: white;
+            cursor: pointer;
+        }
+        
+        /* Path Line */
+        .path-line {
+            stroke: #0f1e41;
+            stroke-width: 4px;
+            stroke-opacity: 0.7;
+        }
+        
+        /* Marker Pulse Animation */
+        .marker-pulse {
+            border-radius: 50%;
+            height: 14px;
+            width: 14px;
+            position: absolute;
+            background: rgba(15, 30, 65, 0.4);
+            box-shadow: 0 0 0 rgba(15, 30, 65, 0.4);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(15, 30, 65, 0.7);
+            }
+            
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 10px rgba(15, 30, 65, 0);
+            }
+            
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(15, 30, 65, 0);
+            }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.2rem;
+            }
+            
+            .control-panel {
+                flex-direction: column;
+                padding: 10px;
+            }
+            
+            .user-controls {
+                margin-bottom: 10px;
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .btn {
+                padding: 6px 10px;
+                font-size: 0.9rem;
+            }
+            
+            .info-panel {
+                top: auto;
+                bottom: 20px;
+                right: 20px;
+                left: 20px;
+                width: auto;
+            }
+            
+            .sharing-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .share-link {
+                width: 100%;
+                margin: 5px 0;
+            }
+            
+            .copy-btn {
+                margin-left: 0;
+                width: 100%;
+                margin-top: 5px;
+            }
+            
+            .speed-display {
+                left: 50%;
+                transform: translateX(-50%);
+                width: 90%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <h1><i class="fas fa-map-marker-alt"></i> Live Location Tracker</h1>
+            <div class="connection-status">
+                <div class="status-indicator">
+                    <div class="status-dot status-disconnected" id="status-indicator"></div>
+                    <span id="connection-status">Disconnected</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="user-controls">
+                <button id="locate-btn" class="btn btn-primary">
+                    <i class="fas fa-location-crosshairs"></i> Locate Me
+                </button>
+                <button id="track-btn" class="btn btn-success">
+                    <i class="fas fa-play"></i> Start Tracking
+                </button>
+                <button id="clear-btn" class="btn btn-secondary">
+                    <i class="fas fa-broom"></i> Clear Path
+                </button>
+            </div>
+            
+            <div class="map-options">
+                <span>Show Path</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="path-toggle" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+                
+                <span>Auto Center</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="center-toggle" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div id="map-container"></div>
+            
+            <!-- Map Controls -->
+            <div class="map-controls">
+                <div class="map-control-btn" id="zoom-in-btn">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div class="map-control-btn" id="zoom-out-btn">
+                    <i class="fas fa-minus"></i>
+                </div>
+                <div class="map-control-btn" id="layer-btn">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+            </div>
+            
+            <!-- Info Panel -->
+            <div class="info-panel">
+                <h3>Location Details</h3>
+                <div class="info-content">
+                    <div class="info-item">
+                        <span>Latitude:</span>
+                        <span id="latitude-value" class="info-value">--</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Longitude:</span>
+                        <span id="longitude-value" class="info-value">--</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Accuracy:</span>
+                        <span id="accuracy-value" class="info-value">--</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Altitude:</span>
+                        <span id="altitude-value" class="info-value">--</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Speed:</span>
+                        <span id="speed-value" class="info-value">--</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Last Update:</span>
+                        <span id="time-value" class="info-value">--</span>
+                    </div>
+                </div>
+                
+                <!-- Sharing Section -->
+                <div class="sharing-section">
+                    <span>Share Location:</span>
+                    <input type="text" id="share-link" class="share-link" readonly>
+                    <button id="copy-btn" class="copy-btn">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Speed Display -->
+            <div class="speed-display" id="speed-display" style="display: none;">
+                <div class="speed-circle" id="speed-circle">0</div>
+                <div class="speed-info">
+                    <div class="speed-label">km/h</div>
+                    <div class="direction-label" id="direction-label">N/A</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">Message here</div>
+    
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Map initialization
+            let map, userMarker, pathLine, layerControl;
+            let currentPosition = null;
+            let isTracking = false;
+            let watchId = null;
+            let positionHistory = [];
+            let stompClient = null;
+            let isConnected = false;
+            
+            // Map layers
+            const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            });
+            
+            const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+            });
+            
+            const streetLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 19
+            });
+            
+            // UI Elements
+            const locateBtn = document.getElementById('locate-btn');
+            const trackBtn = document.getElementById('track-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const pathToggle = document.getElementById('path-toggle');
+            const centerToggle = document.getElementById('center-toggle');
+            const zoomInBtn = document.getElementById('zoom-in-btn');
+            const zoomOutBtn = document.getElementById('zoom-out-btn');
+            const layerBtn = document.getElementById('layer-btn');
+            const copyBtn = document.getElementById('copy-btn');
+            const statusDot = document.getElementById('status-indicator');
+            const connectionStatus = document.getElementById('connection-status');
+            
+            // Info panel elements
+            const latValue = document.getElementById('latitude-value');
+            const lngValue = document.getElementById('longitude-value');
+            const accuracyValue = document.getElementById('accuracy-value');
+            const altitudeValue = document.getElementById('altitude-value');
+            const speedValue = document.getElementById('speed-value');
+            const timeValue = document.getElementById('time-value');
+            const shareLink = document.getElementById('share-link');
+            
+            // Speed display elements
+            const speedDisplay = document.getElementById('speed-display');
+            const speedCircle = document.getElementById('speed-circle');
+            const directionLabel = document.getElementById('direction-label');
+            
+            // Initialize the map
+            function initMap() {
+                // Create map
+                map = L.map('map-container', {
+                    zoomControl: false,
+                    center: [0, 0],
+                    zoom: 2,
+                    layers: [osmLayer]
+                });
+                
+                // Add layer control
+                const baseLayers = {
+                    "OpenStreetMap": osmLayer,
+                    "Satellite": satelliteLayer,
+                    "Street": streetLayer
+                };
+                
+                layerControl = L.control.layers(baseLayers).addTo(map);
+                
+                // Initialize path line
+                pathLine = L.polyline([], {
+                    className: 'path-line',
+                    lineJoin: 'round'
+                }).addTo(map);
+                
+                // Setup custom map controls
+                zoomInBtn.addEventListener('click', () => map.zoomIn());
+                zoomOutBtn.addEventListener('click', () => map.zoomOut());
+                layerBtn.addEventListener('click', toggleLayerControl);
+                
+                // Setup initial state
+                shareLink.value = window.location.href;
+            }
+            
+            // Toggle layer control visibility
+            function toggleLayerControl() {
+                const layerControlElement = document.querySelector('.leaflet-control-layers');
+                if (layerControlElement.classList.contains('leaflet-control-layers-expanded')) {
+                    layerControlElement.classList.remove('leaflet-control-layers-expanded');
+                } else {
+                    layerControlElement.classList.add('leaflet-control-layers-expanded');
+                }
+            }
+            
+            // Create custom marker
+            function createMarker(latlng) {
+                const markerIcon = L.divIcon({
+                    className: 'custom-marker',
+                    html: `
+                        <div class="marker-pulse"></div>
+                        <div style="position: absolute; top: -25px; left: -12px;">
+                            <i class="fas fa-map-marker-alt" style="font-size: 30px; color: #0f1e41;"></i>
+                        </div>
+                    `,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
+                });
+                
+                return L.marker(latlng, { icon: markerIcon });
+            }
+            
+            // Update marker position
+            function updateMarkerPosition(lat, lng, accuracy = null) {
+                if (!map) return;
+                
+                const latlng = L.latLng(lat, lng);
+                
+                if (!userMarker) {
+                    userMarker = createMarker(latlng).addTo(map);
+                    map.setView(latlng, 16);
+                } else {
+                    userMarker.setLatLng(latlng);
+                }
+                
+                // Update accuracy circle if provided
+                if (accuracy) {
+                    if (window.accuracyCircle) {
+                        window.accuracyCircle.setLatLng(latlng).setRadius(accuracy);
+                    } else {
+                        window.accuracyCircle = L.circle(latlng, {
+                            radius: accuracy,
+                            color: '#0f1e41',
+                            fillColor: '#0f1e41',
+                            fillOpacity: 0.1,
+                            weight: 1
+                        }).addTo(map);
+                    }
+                }
+                
+                // Center map if auto-center is enabled
+                if (centerToggle.checked) {
+                    map.setView(latlng);
+                }
+                
+                currentPosition = { lat, lng };
+                
+                // Update share link
+                shareLink.value = `${window.location.origin}${window.location.pathname}?lat=${lat}&lng=${lng}`;
+            }
+            
+            // Update path line
+            function updatePathLine(lat, lng) {
+                if (!pathLine || !pathToggle.checked) return;
+                
+                const latlng = L.latLng(lat, lng);
+                const currentPath = pathLine.getLatLngs();
+                
+                // Only add point if it's significantly different from the last one
+                const lastPoint = currentPath.length > 0 ? currentPath[currentPath.length - 1] : null;
+                
+                if (!lastPoint || calculateDistance(lastPoint.lat, lastPoint.lng, lat, lng) > 0.00001) {
+                    currentPath.push(latlng);
+                    pathLine.setLatLngs(currentPath);
+                    
+                    // Add to position history
+                    positionHistory.push({
+                        lat, 
+                        lng, 
+                        timestamp: new Date().getTime()
+                    });
+                }
+            }
+            
+            // Clear path line
+            function clearPath() {
+                if (pathLine) {
+                    pathLine.setLatLngs([]);
+                }
+                positionHistory = [];
+                showToast("Path cleared");
+            }
+            
+            // Get current position
+            function getCurrentPosition() {
+                if (navigator.geolocation) {
+                    showToast("Getting your location...");
+                    
+                    navigator.geolocation.getCurrentPosition(
+                        position => {
+                            const { latitude, longitude, accuracy, altitude, speed, heading } = position.coords;
+                            const timestamp = position.timestamp;
+                            
+                            // Update UI with position details
+                            updatePositionInfo(latitude, longitude, accuracy, altitude, speed, heading, timestamp);
+                            
+                            // Update marker on map
+                            updateMarkerPosition(latitude, longitude, accuracy);
+                            
+                            showToast("Location updated");
+                            
+                            // Send position to server
+                            if (isConnected) {
+                                sendPositionToServer(latitude, longitude, accuracy, speed, heading);
+                            }
+                        },
+                        error => {
+                            handleLocationError(error);
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 0
+                        }
+                    );
+                } else {
+                    showToast("Geolocation is not supported by this browser", true);
+                }
+            }
+            
+            // Start tracking position
+            function startTracking() {
+                if (navigator.geolocation) {
+                    isTracking = true;
+                    trackBtn.innerHTML = '<i class="fas fa-stop"></i> Stop Tracking';
+                    trackBtn.classList.replace('btn-success', 'btn-danger');
+                    speedDisplay.style.display = 'flex';
+                    
+                    showToast("Location tracking started");
+                    
+                    watchId = navigator.geolocation.watchPosition(
+                        position => {
+                            const { latitude, longitude, accuracy, altitude, speed, heading } = position.coords;
+                            const timestamp = position.timestamp;
+                            
+                            // Update UI with position details
+                            updatePositionInfo(latitude, longitude, accuracy, altitude, speed, heading, timestamp);
+                            
+                            // Update marker on map
+                            updateMarkerPosition(latitude, longitude, accuracy);
+                            
+                            // Update path line
+                            updatePathLine(latitude, longitude);
+                            
+                            // Send position to server
+                            if (isConnected) {
+                                sendPositionToServer(latitude, longitude, accuracy, speed, heading);
+                            }
+                        },
+                        error => {
+                            handleLocationError(error);
+                            stopTracking();
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 5000,
+                            maximumAge: 0
+                        }
+                    );
+                } else {
+                    showToast("Geolocation is not supported by this browser", true);
+                }
+            }
+            
+            // Stop tracking position
+            function stopTracking() {
+                if (watchId !== null) {
+                    navigator.geolocation.clearWatch(watchId);
+                    watchId = null;
+                }
+                
+                isTracking = false;
+                trackBtn.innerHTML = '<i class="fas fa-play"></i> Start Tracking';
+                trackBtn.classList.replace('btn-danger', 'btn-success');
+                speedDisplay.style.display = 'none';
+                
+                showToast("Location tracking stopped");
+            }
+            
+            // Update position info in UI
+            function updatePositionInfo(lat, lng, accuracy, altitude, speed, heading, timestamp) {
+                latValue.textContent = lat.toFixed(6);
+                lngValue.textContent = lng.toFixed(6);
+                accuracyValue.textContent = accuracy ? `${accuracy.toFixed(1)} m` : '--';
+                altitudeValue.textContent = altitude ? `${altitude.toFixed(1)} m` : '--';
+                
+                // Update speed display
+                const speedKmh = speed ? (speed * 3.6).toFixed(1) : '0';
+                speedValue.textContent = speedKmh + ' km/h';
+                speedCircle.textContent = speedKmh;
+                
+                // Update direction
+                if (heading !== null && heading !== undefined) {
+                    const direction = getCardinalDirection(heading);
+                    directionLabel.textContent = direction;
+                } else {
+                    directionLabel.textContent = 'N/A';
+                }
+                
+                // Update time
+                const date = new Date(timestamp);
+                timeValue.textContent = date.toLocaleTimeString();
+            }
+            
+            // Get cardinal direction from heading
+            function getCardinalDirection(heading) {
+                const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+                const index = Math.round(heading / 45) % 8;
+                return directions[index];
+            }
+            
+            // Handle location errors
+            function handleLocationError(error) {
+                let message;
+                
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        message = "User denied the request for geolocation.";
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        message = "Location information is unavailable.";
+                        break;
+                    case error.TIMEOUT:
+                        message = "The request to get user location timed out.";
+                        break;
+                    case error.UNKNOWN_ERROR:
+                        message = "An unknown error occurred.";
+                        break;
+                }
+                
+                showToast(message, true);
+            }
+            
+            // WebSocket connection
+            function connectWebSocket() {
+                try {
+                    // Use SockJS for WebSocket connection (compatible with most browsers)
+                    const socket = new SockJS('/location-websocket');
+                    stompClient = Stomp.over(socket);
+                    
+                    // Connect without logging
+                    stompClient.debug = null;
+                    
+                    stompClient.connect(
+                        {},
+                        frame => {
+                            isConnected = true;
+                            updateConnectionStatus(true);
+                            
+                            // Subscribe to location updates topic
+                            stompClient.subscribe('/topic/location-updates', message => {
+                                handleLocationUpdate(JSON.parse(message.body));
+                            });
+                            
+                            showToast("Connected to server");
+                            
+                            // Send initial position if available
+                            if (currentPosition) {
+                                sendPositionToServer(
+                                    currentPosition.lat,
+                                    currentPosition.lng
+                                );
+                            }
+                        },
+                        error => {
+                            isConnected = false;
+                            updateConnectionStatus(false);
+                            console.error("WebSocket connection error:", error);
+                            showToast("Connection to server failed", true);
+                            
+                            // Try to reconnect after 5 seconds
+                            setTimeout(connectWebSocket, 5000);
+                        }
+                    );
+                } catch (e) {
+                    console.error("WebSocket initialization error:", e);
+                    showToast("Error initializing connection", true);
+                }
+            }
+            
+            // Send position to server via WebSocket
+            function sendPositionToServer(lat, lng, accuracy, speed, heading) {
+                if (!stompClient || !isConnected) return;
+                
+                const locationData = {
+                    latitude: lat,
+                    longitude: lng,
+                    accuracy: accuracy || 0,
+                    speed: speed || 0,
+                    heading: heading || 0,
+                    timestamp: new Date().getTime(),
+                    deviceId: getDeviceId() // Get or generate device ID
+                };
+                
+                stompClient.send("/app/location", {}, JSON.stringify(locationData));
+            }
+            
+            // Handle incoming location updates
+            function handleLocationUpdate(data) {
+                // Handle location updates from other users or devices
+                if (data.deviceId !== getDeviceId()) {
+                    // Implementation for handling other users' locations would go here
+                    console.log("Received location update from another device:", data);
+                }
+            }
+            
+            // Update connection status UI
+            function updateConnectionStatus(connected) {
+                if (connected) {
+                    statusDot.className = "status-dot status-connected";
+                    connectionStatus.textContent = "Connected";
+                } else {
+                    statusDot.className = "status-dot status-disconnected";
+                    connectionStatus.textContent = "Disconnected";
+                }
+            }
+            
+            // Get or generate device ID
+            function getDeviceId() {
+                let deviceId = localStorage.getItem('device_id');
+                
+                if (!deviceId) {
+                    deviceId = 'device_' + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem('device_id', deviceId);
+                }
+                
+                return deviceId;
+            }
+            
+            // Calculate distance between two points using Haversine formula
+            function calculateDistance(lat1, lon1, lat2, lon2) {
+                const R = 6371; // Radius of the earth in km
+                const dLat = deg2rad(lat2 - lat1);
+                const dLon = deg2rad(lon2 - lon1);
+                const a = 
+                    Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+                    Math.sin(dLon/2) * Math.sin(dLon/2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                const distance = R * c; // Distance in km
+                return distance;
+            }
+            
+            function deg2rad(deg) {
+                return deg * (Math.PI/180);
+            }
+            
+            // Show toast notification
+            function showToast(message, isError = false) {
+                const toast = document.getElementById('toast');
+                toast.textContent = message;
+                toast.style.backgroundColor = isError ? 'rgba(220, 53, 69, 0.9)' : 'rgba(15, 30, 65, 0.9)';
+                toast.style.display = 'block';
+                
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 3000);
+            }
+            
+            // Copy share link to clipboard
+            function copyShareLink() {
+                shareLink.select();
+                document.execCommand('copy');
+                
+                showToast("Link copied to clipboard!");
+            }
+            
+            // Check URL parameters for shared location
+            function checkUrlParams() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const lat = parseFloat(urlParams.get('lat'));
+                const lng = parseFloat(urlParams.get('lng'));
+                
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    // If coordinates are in URL, show them on map
+                    updateMarkerPosition(lat, lng);
+                    showToast("Showing shared location");
+                } else {
+                    // Otherwise try to get user's current location
+                    getCurrentPosition();
+                }
+            }
+            
+            // Event Listeners
+            function setupEventListeners() {
+                // Locate button
+                locateBtn.addEventListener('click', getCurrentPosition);
+                
+                // Track button
+                trackBtn.addEventListener('click', () => {
+                    if (isTracking) {
+                        stopTracking();
+                    } else {
+                        startTracking();
+                    }
+                });
+                
+                // Clear button
+                clearBtn.addEventListener('click', clearPath);
+                
+                // Path toggle
+                pathToggle.addEventListener('change', () => {
+                    pathLine.setStyle({ opacity: pathToggle.checked ? 0.7 : 0 });
+                });
+                
+                // Copy button
+                copyBtn.addEventListener('click', copyShareLink);
+            }
+            
+            // Initialize app
+            function init() {
+                initMap();
+                setupEventListeners();
+                connectWebSocket();
+                checkUrlParams();
+            }
+            
+            // Start the app
+            init();
+        });
+    </script>
+</body>
+</html>

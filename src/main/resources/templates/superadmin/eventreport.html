@@ -39,7 +39,7 @@
         <input type="date" id="toDate" class="form-control">
       </div>
       <div class="col-auto">
-        <label class="form-label">Device ID</label>
+        <label class="form-label">Vehicle Number</label>
         <select id="deviceID" class="form-select">
          
         </select>
@@ -69,8 +69,7 @@
         <thead>
           <tr>
             <th>Device ID</th>
-            <th>Start Time</th>
-            <th>End Time</th>
+            <th>Date & Time</th>
             <th>Latitude</th>
             <th>Longitude</th>
             <th>Speed</th>
@@ -150,6 +149,21 @@
       currentPage = 1;
       renderPage();
     }
+	function formatDateTimeToLocal(isoDateString) {
+	  if (!isoDateString) return '–';
+
+	  const d = new Date(isoDateString);
+	  const yyyy = d.getFullYear();
+	  const mm = String(d.getMonth() + 1).padStart(2, '0');
+	  const dd = String(d.getDate()).padStart(2, '0');
+	  const hh = String(d.getHours()).padStart(2, '0');
+	  const min = String(d.getMinutes()).padStart(2, '0');
+	  const sec = String(d.getSeconds()).padStart(2, '0');
+
+	  return `${yyyy}-${mm}-${dd} ${hh}:${min}:${sec}`;
+	}
+
+
 
     function renderPage(){
       const totalPages = Math.ceil(reportDataGlobal.length / rowsPerPage) || 1;
@@ -167,12 +181,15 @@
           let endTime   = new Date(r.endTime   || r.timestamp).toLocaleString();
           tr.innerHTML = `
             <td>${r.deviceID||'–'}</td>
-            <td>${startTime}</td>
-            <td>${endTime}</td>
+			<td>${formatDateTimeToLocal(r.timestamp)}</td>
+
+
             <td>${(+r.latitude||0).toFixed(5)}</td>
             <td>${(+r.longitude||0).toFixed(5)}</td>
             <td>${r.vehicleSpeed||0} km/h</td>
-            <td style="color:${r.ignition==='IGon'?'lime':'red'}">${r.ignition||'–'}</td>
+			<td style="color:${r.ignition==='IGon' ? 'lime' : 'red'}">
+						  ${r.ignition === 'IGon' ? 'ON' : r.ignition === 'IGoff' ? 'OFF' : '–'}
+						</td>
             <td>${r.vehicleStatus||'–'}</td>
 			<td>
 			  <button class="btn btn-sm btn-primary" onclick="viewAddress(${r.latitude}, ${r.longitude})">
@@ -347,13 +364,17 @@
 	  document.getElementById('statusTotalSummary').innerHTML = summaryHTML;
 	}
 
-
 	function initializePagination(data){
+	  // Sort globally by latest timestamp first for pagination
+	  data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
 	  reportDataGlobal = data;
 	  currentPage = 1;
-	  renderPage(); // Existing table render
-	  renderStatusTotals(data); // New total summary
+	  renderPage();              // Shows latest records first
+	  renderStatusTotals([...data].reverse());  // Copy & reverse for duration calc (oldest first)
 	}
+
+
 
 	
 	async function viewAddress(lat, lng) {

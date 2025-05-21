@@ -44,7 +44,7 @@
 					               required 
 					               autocomplete="off"> <!-- 💡 Prevents Chrome suggestions -->
 
-					        <button type="button" class="add" onclick="window.location.href='/adduser_admin'">Add User+</button>
+					        <button type="button" class="add" onclick="window.location.href='/dealer/adduser'">Add User+</button>
 
 					        <!-- Datalist Options -->
 					        <datalist id="user-list"></datalist>
@@ -116,20 +116,20 @@
 					    }
 					</script>
 
-
+<!--
 	           
 					<div class="form-row">
 					    <div class="form-group">
 					        <label for="driver-selection">Select Driver:</label>
 
-					        <!-- Autocomplete Input -->
+					       
 					        <input type="text" list="driver-list" id="driver-selection" name="driver-selection" placeholder="Select a Driver" required>
-					        <button type="add" class="addd" onclick="window.location.href='/adddriver_admin'">Add Driver+</button>
+					        <button type="add" class="addd" onclick="window.location.href='/dealer/adddriver'">Add Driver+</button>
 
-					        <!-- Datalist Options -->
+					      
 					        <datalist id="driver-list"></datalist>
 
-					        <!-- Hidden field to store selected driver ID -->
+					      
 					        <input type="hidden" id="driver-id" name="driver-id">
 
 					        <span id="driver-selection-error" class="error"></span>
@@ -140,6 +140,7 @@
 					    <strong>Selected Driver:</strong> <span id="preview-drivername">None</span><br>
 					    <strong>Driver ID:</strong> <span id="preview-driverid">N/A</span>
 					</div>
+					-->
 					<script>
 					    let driverMap = {}; // name → id
 
@@ -635,20 +636,7 @@
 	</script>
 	
 		<script>
-		    // Open the Add Driver Modal
-		   
-		    // JavaScript to load the navigation HTML
-		    fetch('navigation.html')
-		        .then(response => response.text())
-		        .then(data => {
-		            const navbarContainer = document.getElementById('navbar-container');
-		            if (navbarContainer) {
-		                navbarContainer.innerHTML = data;
-		            } else {
-		                console.error("Element with ID 'navbar-container' not found.");
-		            }
-		        })
-		        .catch(error => console.error('Error loading navigation:', error));
+
 
 		    // Function to submit the form
 		    function submitForm(event) {
@@ -688,7 +676,7 @@
 			
 			function openAddDriverModal() {
 					    // Show the modal
-					    window.location.href = '/user/adddriver_user';
+					    window.location.href = '/dealer/adddriver';
 					    
 					 
 					}
@@ -827,61 +815,84 @@
 		
 		<script>
 			function addDevice() {
-			    const userId = parseInt(document.getElementById("user-id").value.trim());
-			    const driverId = parseInt(document.getElementById("driver-id").value.trim()); // ✅ Add this line
+			    const required = [
+			        { id: "user-id",           name: "User"               },
+			        { id: "owner-name",        name: "Owner Name"         },
+			        { id: "vehiclenumber",     name: "Vehicle Number"     },
+			        { id: "vehicle-type",      name: "Vehicle Type"       },
+			        { id: "engine-number",     name: "Engine Number"      },
+			        { id: "manufacturer",      name: "Manufacturer"       },
+			        { id: "model",             name: "Model"              },
+			        { id: "installation-date", name: "Installation Date"  },
+			        { id: "serialNoInput",     name: "Serial No"          },
+			        { id: "installer-name",    name: "Technician Name"    },
+			        { id: "imei",              name: "IMEI"               },
+			        { id: "sim-number",        name: "SIM Number"         },
+			        { id: "dealer-name",       name: "Dealer Name"        },
+			        { id: "dealer-phone",      name: "Dealer Phone"       },
+			        { id: "country",           name: "Country"            }
+			    ];
+
+			    const missing = required
+			        .filter(f => !document.getElementById(f.id).value.trim())
+			        .map(f => f.name);
+
+			    if (missing.length) {
+			        Swal.fire({
+			            icon: 'error',
+			            title: 'Missing Fields',
+			            html: `Please fill out the following:<br><strong>${missing.join('</strong>, <strong>')}</strong>`
+			        });
+			        return;
+			    }
+
+			    const userId = parseInt(document.getElementById("user-id").value, 10);
 
 			    const vehicleDetails = {
-			        serialNo: document.getElementById("serialNoInput").value.trim(),
-			        imei: document.getElementById("imei").value.trim(),
-			        vehicleNumber: document.getElementById("vehiclenumber").value.trim(),
-			        ownerName: document.getElementById("owner-name").value.trim(),
-			        vehicleType: document.getElementById("vehicle-type").value.trim(),
-			        engineNumber: document.getElementById("engine-number").value.trim(),
-			        manufacturer: document.getElementById("manufacturer").value.trim(),
-			        model: document.getElementById("model").value.trim(),
-			        installationDate: document.getElementById("installation-date").value.trim(),
-			        technicianName: document.getElementById("installer-name").value.trim(),
-			        simNumber: document.getElementById("sim-number").value.trim(),
-			        dealerName: document.getElementById("dealer-name").value.trim(),
-			        addressPhone: document.getElementById("dealer-phone").value.trim(),
-			        country: document.getElementById("country").value.trim(),
-
-			        // ✅ Include user and driver in the request body
-			        user: userId ? { id: userId } : null,
-			        driver_id: driverId || null
+			        user:            { id: userId },
+			        ownerName:       document.getElementById("owner-name").value.trim(),
+			        vehicleNumber:   document.getElementById("vehiclenumber").value.trim(),
+			        vehicleType:     document.getElementById("vehicle-type").value.trim(),
+			        engineNumber:    document.getElementById("engine-number").value.trim(),
+			        manufacturer:    document.getElementById("manufacturer").value.trim(),
+			        model:           document.getElementById("model").value.trim(),
+			        installationDate:document.getElementById("installation-date").value.trim(),
+			        serialNo:        document.getElementById("serialNoInput").value.trim(),
+			        technicianName:  document.getElementById("installer-name").value.trim(),
+			        imei:            document.getElementById("imei").value.trim(),
+			        simNumber:       document.getElementById("sim-number").value.trim(),
+			        dealerName:      document.getElementById("dealer-name").value.trim(),
+			        addressPhone:    document.getElementById("dealer-phone").value.trim(),
+			        country:         document.getElementById("country").value.trim()
+			        // No driver_id here anymore
 			    };
 
 			    fetch("/total_vehicles/add-vehicle-and-device", {
 			        method: "POST",
-			        headers: {
-			            "Content-Type": "application/json"
-			        },
+			        headers: { "Content-Type": "application/json" },
 			        body: JSON.stringify(vehicleDetails)
 			    })
-				.then(response => {
-												    if (response.ok) {
-												        Swal.fire({
-												            icon: 'success',
-												            title: 'Success!',
-												            text: '✅ Vehicle and device added successfully!',
-												            timer: 2000,
-												            showConfirmButton: false
-												        });
-												    } else {
-												        return response.text().then(text => {
-												            throw new Error(text);
-												        });
-												    }
-												})
-												.catch(error => {
-												    Swal.fire({
-												        icon: 'error',
-												        title: 'Error!',
-												        text: error.message || 'Something went wrong while adding the vehicle/device.',
-												    });
-												});
-
-											}
+			    .then(resp => {
+			        if (resp.ok) {
+			            Swal.fire({
+			                icon: 'success',
+			                title: 'Success',
+			                text: 'Vehicle and device added successfully!',
+			                timer: 2000,
+			                showConfirmButton: false
+			            });
+			        } else {
+			            return resp.text().then(txt => { throw new Error(txt) });
+			        }
+			    })
+			    .catch(err => {
+			        Swal.fire({
+			            icon: 'error',
+			            title: 'Error',
+			            text: err.message || 'Something went wrong.'
+			        });
+			    });
+			}
 
 		</script>
 		<script>
