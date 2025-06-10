@@ -9,4 +9,10 @@ public class DailyKmMvcController {
 	    public String dailyShow(Model model) {
 	        return "daily_km_chart"; 
 	    }
+	 
+	 @GetMapping("/testmap")
+	    public String testShow(Model model) {
+	        return "testmap"; 
+	    }
+	 
 }

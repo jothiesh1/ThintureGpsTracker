@@ -318,7 +318,11 @@ public void setPanic(Integer panic) {
 
 
 private String serialNo;
-private String imei;
+
+
+
+
+
 @Column(name = "dealer_id")  // ✅ matches the column
 private Long dealerId;       // ✅ use Long, not String
 
@@ -330,13 +334,7 @@ public void setSerialNo(String serialNo) {
 	this.serialNo = serialNo;
 }
 
-public String getImei() {
-	return imei;
-}
 
-public void setImei(String imei) {
-	this.imei = imei;
-}
 
 
 
@@ -348,4 +346,19 @@ public void setDealerName(String dealerName) {
 	this.dealerName = dealerName;
 }
 private String dealerName;
+
+
+
+@Column(name = "imei")
+private String imei;
+
+public String getImei() {
+    return imei;
+}
+
+public void setImei(String imei) {
+    this.imei = imei;
+}
+
+
 }

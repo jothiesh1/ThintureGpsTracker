@@ -51,7 +51,7 @@ public class CookieValidationFilter extends OncePerRequestFilter {
 
         String roleRequired = null;
 
-        // ✅ ONLY block page URLs (example: /dealer/page/**)
+        // ✅ Specific page-based route patterns
         if (path.startsWith("/superadmin/page/")) {
             roleRequired = "SUPERADMIN";
         } else if (path.startsWith("/admin/page/")) {
@@ -64,6 +64,19 @@ public class CookieValidationFilter extends OncePerRequestFilter {
             roleRequired = "USER";
         }
 
+        // ✅ Added fallback to catch dashboard-level role URLs (e.g. /dealer/dashboard)
+        else if (path.startsWith("/superadmin/")) {
+            roleRequired = "SUPERADMIN";
+        } else if (path.startsWith("/admin/")) {
+            roleRequired = "ADMIN";
+        } else if (path.startsWith("/dealer/")) {
+            roleRequired = "DEALER";
+        } else if (path.startsWith("/client/")) {
+            roleRequired = "CLIENT";
+        } else if (path.startsWith("/user/")) {
+            roleRequired = "USER";
+        }
+
         if (roleRequired != null) {
             String cookieUserType = getUserTypeFromCookie(request);
             logger.info("🔎 Path: {}, Required Role: {}, Cookie userType: {}", path, roleRequired, cookieUserType);
@@ -71,10 +84,18 @@ public class CookieValidationFilter extends OncePerRequestFilter {
             boolean allowed = false;
 
             if (cookieUserType != null) {
-                if (cookieUserType.equalsIgnoreCase(roleRequired)) {
-                    allowed = true;
-                    logger.info("✅ Access GRANTED: Exact match between cookie and required role.");
+
+                // ✅ Strict one-role-only logic: must match exactly
+                if (!cookieUserType.equalsIgnoreCase(roleRequired)) {
+                    logger.warn("🚫 STRICT BLOCK: Logged-in role '{}' tried to access '{}'", cookieUserType, roleRequired);
+                    response.sendRedirect("/access-denied");
+                    return;
                 }
+
+                // ✅ Passed strict match
+                allowed = true;
+                logger.info("✅ Access GRANTED: {} accessing {} path", cookieUserType, path);
+
             } else {
                 logger.warn("⚠️ Cookie 'userType' NOT FOUND.");
             }
@@ -94,7 +115,6 @@ public class CookieValidationFilter extends OncePerRequestFilter {
     }
 
     private boolean isApiRequest(String path) {
-        // ✅ Skip filter for APIs, static files, and any non-page URLs
         return path.startsWith("/api/")
                 || path.endsWith(".js")
                 || path.endsWith(".css")
@@ -108,7 +128,6 @@ public class CookieValidationFilter extends OncePerRequestFilter {
                 || path.endsWith(".woff2")
                 || path.endsWith(".ttf")
                 || path.endsWith(".eot")
-                // ✅ Skip filter for these API patterns (POSTs etc.)
                 || path.contains("/add")
                 || path.contains("/save")
                 || path.contains("/update")

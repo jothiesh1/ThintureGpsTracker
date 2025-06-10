@@ -18,6 +18,16 @@ public class Vehicle extends BaseEntity {
     @Column( nullable = true, name = "deviceID")
     private String deviceID;
 
+    
+
+    public String getDeviceID() {
+        return deviceID;
+    }
+
+    public void setDeviceID(String deviceID) {
+        this.deviceID = deviceID;
+    }
+
 /*
     @JsonIgnore // Prevent serialization of the history field
     @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -30,7 +40,7 @@ public class Vehicle extends BaseEntity {
 //18/09/2024 10am joins for report  
     
     
-    
+   
     //new change 07/01/2025  nullable = false
     // ✅ Read-only reference to Admin entity (mapped by BaseEntity.admin_id)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -189,14 +199,6 @@ public class Vehicle extends BaseEntity {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getDeviceID() {
-        return deviceID;
-    }
-
-    public void setDeviceID(String deviceID) {
-        this.deviceID = deviceID;
     }
 
     public List<VehicleHistory> getHistory() {

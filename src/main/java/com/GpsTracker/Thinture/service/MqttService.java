@@ -422,174 +422,122 @@ public class MqttService implements MqttCallbackExtended {
         }
     }
 
-    // Add your processGpsData method here without changes
-    
     private void processGpsData(GpsData gpsData) {
         try {
-            // ✅ Step 1: Validate essential data
             if (gpsData == null ||
                 gpsData.getDeviceID() == null ||
                 gpsData.getLatitude() == null ||
                 gpsData.getLongitude() == null ||
                 gpsData.getTimestamp() == null ||
                 gpsData.getStatus() == null) {
-                logger.error("\u001B[31m[ERROR] Invalid GPS data received: {}\u001B[0m", gpsData);
+                logger.error("[ERROR] Invalid GPS data received: {}", gpsData);
                 return;
             }
 
-            String deviceID = gpsData.getDeviceID();
-            String imei = gpsData.getImei();
+            String deviceID = gpsData.getDeviceID().trim();
+            String imei = gpsData.getImei() != null ? gpsData.getImei().trim() : "";
 
             logger.info("[INFO] Processing GPS Data: deviceID={}, IMEI={}", deviceID, imei);
 
-            // ✅ Step 2: Check if IMEI is present AND deviceID is valid
-            if (imei != null && !imei.trim().isEmpty() && deviceID != null && !deviceID.trim().isEmpty()) {
-                Optional<Vehicle> imeiVehicleOpt = vehicleService.getVehicleByImei(imei.trim());
-
-                if (imeiVehicleOpt.isPresent()) {
-                    Vehicle vehicle = imeiVehicleOpt.get();
-                    String existingDeviceID = vehicle.getDeviceID();
-
-                    if (existingDeviceID == null || existingDeviceID.trim().isEmpty()) {
-                        // 👉 IMEI found but deviceID is empty ➔ store deviceID
-                        vehicle.setDeviceID(deviceID.trim());
-                        vehicleService.save(vehicle);
-                        logger.info("\u001B[32m[UPDATE] Vehicle IMEI {}: set new deviceID to {}\u001B[0m", imei, deviceID);
-                    } else if (!existingDeviceID.equalsIgnoreCase(deviceID.trim())) {
-                        // ⚠️ Conflict case: IMEI has a different deviceID already
-                        logger.warn("\u001B[33m[WARN] IMEI {} already linked to deviceID {} (incoming deviceID: {})\u001B[0m",
-                                imei, existingDeviceID, deviceID);
-                    } else {
-                        // ✅ Already correct
-                        logger.info("\u001B[34m[INFO] IMEI {} already linked to deviceID {} - no update needed\u001B[0m", imei, existingDeviceID);
-                    }
-                } else {
-                    // 🚩 No vehicle found with this IMEI
-                    logger.error("\u001B[31m[ERROR] No vehicle found with IMEI {} (cannot update deviceID)\u001B[0m", imei);
-                }
-            } else {
-                logger.info("\u001B[33m[INFO] Skipping IMEI check: IMEI or deviceID missing (IMEI={}, deviceID={})\u001B[0m", imei, deviceID);
+            Optional<Vehicle> vehicleOpt = vehicleService.getVehicleByImei(imei);
+            if (vehicleOpt.isEmpty()) {
+                logger.error("[ERROR] No vehicle found with IMEI={} (cannot save GPS data)", imei);
+                return;
             }
 
-            // ✅ Step 3: Lookup by deviceID to process history + last location
-            Optional<Vehicle> vehicleOpt = vehicleService.getVehicleByDeviceID(deviceID.trim());
+            Vehicle vehicle = vehicleOpt.get();
+            String dbDeviceID = vehicle.getDeviceID() != null ? vehicle.getDeviceID().trim() : "";
 
-            if (vehicleOpt.isPresent()) {
-                Vehicle vehicle = vehicleOpt.get();
-                double latitude = Double.parseDouble(gpsData.getLatitude());
-                double longitude = Double.parseDouble(gpsData.getLongitude());
-
-                // Save history
-                VehicleHistory history = new VehicleHistory();
-                history.setVehicle(vehicle);
-                history.setTimestamp(Timestamp.valueOf(gpsData.getTimestamp()));
-                history.setLatitude(latitude);
-                history.setLongitude(longitude);
-                history.setSpeed(Double.valueOf(gpsData.getSpeed()));
-                history.setCourse(gpsData.getCourse());
-                history.setSequenceNumber(gpsData.getSequenceNumber());
-                history.setIgnition(gpsData.getIgnition());
-                history.setVehicleStatus(gpsData.getVehicleStatus());
-                history.setStatus(gpsData.getStatus());
-                history.setTimeIntervals(gpsData.getTimeIntervals());
-                history.setDistanceItervals(gpsData.getDistanceItervals());
-                history.setGsmStrength(gpsData.getGsmStrength());
-
-                // Decode additional data
-                if (gpsData.getAdditionalData() != null && !gpsData.getAdditionalData().isEmpty()) {
-                    try {
-                        int additionalDataValue = Integer.parseInt(gpsData.getAdditionalData(), 2);
-                        Map<String, Boolean> flags = decodeAdditionalData(additionalDataValue);
-                        String decodedAdditionalData = flags.entrySet().stream()
-                                .filter(Map.Entry::getValue)
-                                .map(Map.Entry::getKey)
-                                .collect(Collectors.joining(", "));
-                        logger.info("\u001B[34m[INFO] Decoded Additional Data for {}: {}\u001B[0m",
-                                deviceID, flags);
-                        history.setAdditionalData(decodedAdditionalData);
-                    } catch (NumberFormatException e) {
-                        logger.warn("\u001B[33m[WARN] Could not parse additional data: {}\u001B[0m",
-                                gpsData.getAdditionalData());
-                    }
-                }
-
-                synchronized (historyBatch) {
-                    if (historyBatch.isEmpty()) {
-                        logger.info("\u001B[32m[SAVE] Saving single GPS record immediately for {}\u001B[0m", deviceID);
-                        vehicleHistoryService.save(history);
-                    } else {
-                        historyBatch.add(history);
-                        if (historyBatch.size() >= BATCH_SIZE) {
-                            saveBatches();
-                        }
-                    }
-                }
-
-                // ✅ Save last known location (IMEI-first, fallback to DeviceID)
-                VehicleLastLocation lastLocation = null;
-
-                // 1️⃣ Try to find by IMEI if available
-                if (imei != null && !imei.trim().isEmpty()) {
-                    lastLocation = vehicleLastLocationRepository.findByImei(imei.trim()).orElse(null);
-                    logger.info("🔍 Searched by IMEI: {}", imei);
-                }
-
-                // 2️⃣ If IMEI is missing or no record found, fallback to DeviceID
-                if (lastLocation == null) {
-                    lastLocation = vehicleLastLocationRepository.findByDeviceId(deviceID.trim()).orElse(null);
-                    logger.info("🔍 Searched by DeviceID: {}", deviceID);
-                }
-
-                // 3️⃣ If still not found ➔ create new record
-                if (lastLocation == null) {
-                    lastLocation = new VehicleLastLocation();
-                    logger.info("🆕 No existing record found ➔ creating new VehicleLastLocation for DeviceID: {}", deviceID);
-                }
-
-                // ✅ Always set Device ID
-                lastLocation.setDeviceId(deviceID);
-
-                // ✅ Set IMEI (if available)
-                if (imei != null && !imei.trim().isEmpty()) {
-                    lastLocation.setImei(imei.trim());
-                    logger.info("✅ [IMEI SET] IMEI {} saved for Device ID: {}", imei, deviceID);
-                } else {
-                    logger.warn("⚠️ [WARN] IMEI is missing or empty for Device ID: {}", deviceID);
-                }
-
-                // ✅ Set all other live data fields
-                lastLocation.setLatitude(latitude);
-                lastLocation.setLongitude(longitude);
-                lastLocation.setTimestamp(Timestamp.valueOf(gpsData.getTimestamp()));
-                lastLocation.setStatus(gpsData.getStatus());
-                lastLocation.setIgnition(gpsData.getIgnition());
-                lastLocation.setCourse(gpsData.getCourse());
-                lastLocation.setVehicleStatus(gpsData.getVehicleStatus());
-                lastLocation.setSpeed(gpsData.getSpeed());
-
-                // ✅ Save to DB
-                vehicleLastLocationRepository.save(lastLocation);
-                logger.info("\u001B[32m[GPS] Updated last known location for {}\u001B[0m", deviceID);
-
-                logger.info("[WebSocket] Sending location update for device {}", deviceID);
-                messagingTemplate.convertAndSend("/topic/location-updates",
-                        new LocationUpdate(latitude, longitude, deviceID, gpsData.getTimestamp(),
-                                gpsData.getSpeed(),
-                                gpsData.getIgnition(),
-                                gpsData.getCourse(),
-                                gpsData.getVehicleStatus(),
-                                gpsData.getAdditionalData(),
-                                gpsData.getTimeIntervals()));
-
+            if (dbDeviceID.isEmpty()) {
+                // ✅ First time: Save device ID into DB
+                vehicle.setDeviceID(deviceID);
+                vehicleService.save(vehicle);
+                logger.info("🆕 First-time deviceID registered: {} for IMEI={}", deviceID, imei);
             } else {
-                logger.error("\u001B[31m[ERROR] No vehicle found with deviceID {} and IMEI {} (cannot save GPS data)\u001B[0m",
-                        deviceID, imei != null ? imei : "null");
+                // ✅ Enforce strict match after first time
+                if (!deviceID.equalsIgnoreCase(dbDeviceID)) {
+                    logger.warn("❌ DeviceID mismatch. Incoming={}, DB={}. Skipping save.", deviceID, dbDeviceID);
+                    return;
+                }
             }
 
+            // ✅ Save history (same logic as before)
+            double latitude = Double.parseDouble(gpsData.getLatitude());
+            double longitude = Double.parseDouble(gpsData.getLongitude());
+
+            VehicleHistory history = new VehicleHistory();
+            history.setVehicle(vehicle);
+            history.setTimestamp(Timestamp.valueOf(gpsData.getTimestamp()));
+            history.setLatitude(latitude);
+            history.setLongitude(longitude);
+            history.setSpeed(Double.valueOf(gpsData.getSpeed()));
+            history.setCourse(gpsData.getCourse());
+            history.setSequenceNumber(gpsData.getSequenceNumber());
+            history.setIgnition(gpsData.getIgnition());
+            history.setVehicleStatus(gpsData.getVehicleStatus());
+            history.setStatus(gpsData.getStatus());
+            history.setTimeIntervals(gpsData.getTimeIntervals());
+            history.setDistanceItervals(gpsData.getDistanceItervals());
+            history.setGsmStrength(gpsData.getGsmStrength());
+            history.setImei(imei);
+
+            if (gpsData.getAdditionalData() != null && !gpsData.getAdditionalData().isEmpty()) {
+                try {
+                    int additionalDataValue = Integer.parseInt(gpsData.getAdditionalData(), 2);
+                    Map<String, Boolean> flags = decodeAdditionalData(additionalDataValue);
+                    String decoded = flags.entrySet().stream()
+                            .filter(Map.Entry::getValue)
+                            .map(Map.Entry::getKey)
+                            .collect(Collectors.joining(", "));
+                    logger.info("[INFO] Decoded Additional Data for {}: {}", deviceID, flags);
+                    history.setAdditionalData(decoded);
+                } catch (NumberFormatException e) {
+                    logger.warn("[WARN] Could not parse additional data: {}", gpsData.getAdditionalData());
+                }
+            }
+
+            synchronized (historyBatch) {
+                if (historyBatch.isEmpty()) {
+                    logger.info("[SAVE] Saving single GPS record immediately for {}", deviceID);
+                    vehicleHistoryService.save(history);
+                } else {
+                    historyBatch.add(history);
+                    if (historyBatch.size() >= BATCH_SIZE) {
+                        saveBatches();
+                    }
+                }
+            }
+
+            // ✅ Save/update last location
+            VehicleLastLocation lastLocation = vehicleLastLocationRepository
+                    .findByImei(imei).orElse(vehicleLastLocationRepository.findByDeviceId(deviceID).orElse(new VehicleLastLocation()));
+
+            lastLocation.setDeviceId(deviceID);
+            lastLocation.setImei(imei);
+            lastLocation.setLatitude(latitude);
+            lastLocation.setLongitude(longitude);
+            lastLocation.setTimestamp(Timestamp.valueOf(gpsData.getTimestamp()));
+            lastLocation.setStatus(gpsData.getStatus());
+            lastLocation.setIgnition(gpsData.getIgnition());
+            lastLocation.setCourse(gpsData.getCourse());
+            lastLocation.setVehicleStatus(gpsData.getVehicleStatus());
+            lastLocation.setSpeed(gpsData.getSpeed());
+
+            vehicleLastLocationRepository.save(lastLocation);
+            logger.info("[GPS] Updated last known location for {}", deviceID);
+
+            messagingTemplate.convertAndSend("/topic/location-updates",
+                    new LocationUpdate(latitude, longitude, deviceID, gpsData.getTimestamp(),
+                            gpsData.getSpeed(), gpsData.getIgnition(),
+                            gpsData.getCourse(), gpsData.getVehicleStatus(),
+                            gpsData.getAdditionalData(), gpsData.getTimeIntervals()));
         } catch (Exception e) {
-            logger.error("\u001B[31m[ERROR] Exception while processing GPS Data: {}\u001B[0m", gpsData, e);
+            logger.error("[ERROR] Exception while processing GPS Data: {}", gpsData, e);
         }
     }
+
+    
+    
 
     /**
      * Decodes Additional Data flags using bitwise operations.

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thinture GPS</title>
     <link rel="icon" type="image/x-icon" href="/THINTURE_IMAGE/favicon.jpg">
-
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -111,7 +111,7 @@
 				    top: 120px;
 				    right: -450px;
 				    width: 380px;
-				    height: 75vh;
+				    height: 85vh;
 				    background: rgba(15, 32, 65, 0.8);
 				   
 				    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.6);
@@ -124,7 +124,19 @@
 				    overflow: hidden;
 				    animation: slideIn 0.5s ease;
 				}
+				
 
+				/* ✅ More responsive for small laptops (width <= 1200px) */
+				@media screen and (max-width: 1200px) {
+				    #sidebar {
+						position: absolute;
+						top:140px;
+				        width: 280px;
+				        right: -350px;
+				        font-size: 0.9rem;
+						height: 65vh;
+				    }
+				}
 				#sidebar.active {
 				    right: 0;
 				}
@@ -1310,7 +1322,10 @@
         display: block;
     }
 }
-
+.refresh{
+	position: absolute;
+	top: 150px;
+}
     </style>
 </head>
 <body>
@@ -1359,10 +1374,7 @@
 	<div id="paginationControls" class="pagination-controls"></div>
 </div>
 
-<div class="popup-line">
-    <div class="popup-label"><i class="fas fa-gauge"></i> Speed Limit:</div>
-    <div class="popup-value">${speedLimit} km/h</div>
-</div>
+
 
 <!-- Map Switcher Buttons -->
 <div id="mapSwitcher">
@@ -1392,11 +1404,11 @@
 </div>
 
 
+
 <!--
-
 <audio id="overspeedAudio" src="/THINTURE_IMAGE/alertsspeed.mp3" preload="auto"></audio>
-
 -->
+
 <!-- Sidebar -->
 <!-- Sidebar -->
 <div id="sidebar">
@@ -1429,11 +1441,25 @@
         </div>
     </div>
 
-    <!-- Alerts Tab Content -->
+    <!-- Alerts Tab Content 
     <div id="alertsTab" class="custom-tab-content">
-        <p style="color: white; padding: 10px;">Alerts data will appear here...</p>
-    </div>
-</div>
+		<div class="position-fixed top-150px end-0 m-3 z-3 text-end">
+		  <label for="muteToggleBtn" class="me-2 fw-bold text-white">🔊 Alert Sound</label>
+		  <button id="muteToggleBtn" class="btn btn-sm btn-outline-light">
+		    🔇 Mute
+		  </button>
+		</div>
+		<div class="refresh  end-0 m-3 z-3 text-end">
+		  <label for="RefershToggleBtn" class="me-2 fw-bold text-white">🔄 Refresh</label>
+		  				  
+		  				  <button class="btn btn-sm btn-outline-light" onclick="refreshAll()">🔄 Refresh</button>
+		</div>
+		
+				  
+
+				</div>
+
+				-->
 
 <!-- Popup Overlay -->
 <div id="popupOverlay" class="popup-overlay" onclick="closePopup()"></div>
@@ -1559,28 +1585,43 @@
 		        console.error("❌ Map object is NULL. Cannot create marker.");
 		        return;
 		    }
+			console.log("🕐 Raw:", vehicle.timestamp);
+			console.log("🕐 Formatted:", formatTimezoneFromLatLng(vehicle.timestamp, vehicle.latitude, vehicle.longitude));
 
-		    // ✅ Correct time formatter using tzlookup
-		    function formatTimezoneFromLatLng(timestamp, lat, lng, locale = 'en-IN') {
-		        let timeZone = "UTC";
-		        try {
-		            timeZone = tzlookup(lat, lng);
-		        } catch (err) {
-		            console.warn("⚠️ tzlookup failed, using UTC:", err);
-		        }
+			function formatTimezoneFromLatLng(timestamp, lat, lng, locale = 'en-IN') {
+			    let timeZone = 'Asia/Dubai'; // Fallback default
 
-		        const dateObj = new Date(timestamp);
-		        return dateObj.toLocaleString(locale, {
-		            timeZone,
-		            year: 'numeric',
-		            month: '2-digit',
-		            day: '2-digit',
-		            hour: '2-digit',
-		            minute: '2-digit',
-		            second: '2-digit',
-		            hour12: false
-		        });
-		    }
+			    try {
+			        // Try to get timezone from coordinates
+			        timeZone = tzlookup(lat, lng);
+			    } catch (err) {
+			        console.warn("⚠️ tzlookup failed, falling back to Asia/Dubai:", err);
+			    }
+
+			    // ✅ Expecting timestamp in ISO 8601 format (e.g., 2025-06-04T05:58:28Z)
+			    const dateObj = new Date(timestamp);
+
+			    if (isNaN(dateObj)) {
+			        console.error("❌ Invalid timestamp received:", timestamp);
+			        return "Invalid Date";
+			    }
+
+			    return dateObj.toLocaleString(locale, {
+			        timeZone,
+			        year: 'numeric',
+			        month: '2-digit',
+			        day: '2-digit',
+			        hour: '2-digit',
+			        minute: '2-digit',
+			        second: '2-digit',
+			        hour12: false
+			    });
+			}
+
+
+
+
+
 
 		    const deviceId = vehicle.deviceId || vehicle.deviceID || "Unknown";
 		    const latitude = parseFloat(vehicle.latitude);
@@ -2739,6 +2780,139 @@ zoomToVehicle(deviceId, latitude, longitude) {
 	    paginateSidebarTable();
 	}
 </script>
+<script>
+	const latestTimestampMap = new Map();
+	const lastStatusMap = new Map();
+	const idleStartTimeMap = new Map();
+	const alertedIdleDevices = new Set();
+	const offlineAlertedDevices = new Map();
+
+	function checkIdleAndOfflineVehicles() {
+	    fetch('/api/vehicle/last/latests-locations/all')
+	        .then(res => res.json())
+	        .then(data => {
+	            const now = Date.now();
+
+	            data.forEach(vehicle => {
+	                const deviceId = vehicle.deviceId;
+	                const status = (vehicle.vehicleStatus || "").toUpperCase();
+	                const timestamp = new Date(vehicle.timestamp).getTime();
+
+	                // ✅ Skip outdated data
+	                const previous = latestTimestampMap.get(deviceId) || 0;
+	                if (timestamp < previous) return;
+	                latestTimestampMap.set(deviceId, timestamp);
+
+	                const minutesOffline = (now - timestamp) / (1000 * 60);
+	                const lastStatus = lastStatusMap.get(deviceId);
+
+	                // ✅ OFFLINE
+	                if (minutesOffline >= 1 && minutesOffline <= 60 * 24 && !offlineAlertedDevices.has(deviceId)) {
+	                    const durationStr = formatDuration(now - timestamp);
+	                    triggerOfflineAlert(deviceId, durationStr);
+	                    offlineAlertedDevices.set(deviceId, true);
+	                } else if (minutesOffline < 1) {
+	                    offlineAlertedDevices.delete(deviceId); // Reset
+	                }
+
+	                // ✅ IDLE
+	                if (status === "IDLE") {
+	                    if (lastStatus === "RUNNING" || !idleStartTimeMap.has(deviceId)) {
+	                        idleStartTimeMap.set(deviceId, now);
+	                        alertedIdleDevices.delete(deviceId);
+	                    }
+
+	                    const idleStart = idleStartTimeMap.get(deviceId) || now;
+	                    const idleDurationMinutes = (now - idleStart) / (1000 * 60);
+
+	                    if (idleDurationMinutes >= 1 && !alertedIdleDevices.has(deviceId)) {
+	                        triggerIdleAlert(deviceId, idleDurationMinutes);
+	                        alertedIdleDevices.add(deviceId);
+	                    }
+	                } else {
+	                    idleStartTimeMap.delete(deviceId);
+	                    alertedIdleDevices.delete(deviceId);
+	                }
+
+	                lastStatusMap.set(deviceId, status);
+	            });
+	        })
+	        .catch(err => console.error("❌ Idle/Offline check failed:", err));
+	}
+
+
+	// ⏰ Run every 30 seconds
+	setInterval(checkIdleAndOfflineVehicles, 30000);
+
+	// 🔔 Idle Alert
+	function triggerIdleAlert(deviceId, minutesIdle) {
+	    const now = new Date().toLocaleString("en-IN");
+	    Swal.fire({
+	        title: '🛑 Idle Alert',
+	        html: `<strong>Device:</strong> ${deviceId}<br>
+	               <strong>Idle Time:</strong> ${minutesIdle.toFixed(1)} minutes<br>
+	               <strong>Time:</strong> ${now}`,
+	        icon: 'warning',
+	        timer: 6000,
+	        showConfirmButton: false
+	    });
+	    playAlertSound();
+	}
+
+	// 🔔 Offline Alert
+	function triggerOfflineAlert(deviceId, durationStr) {
+	    Swal.fire({
+	        title: '🔌 Vehicle Offline',
+	        html: `<strong>Device:</strong> ${deviceId}<br><strong>Last Signal:</strong> ${durationStr}`,
+	        icon: 'error',
+	        timer: 6000,
+	        showConfirmButton: false
+	    });
+	    playAlertSound();
+	}
+
+	// 🔊 Alert Sound
+	function playAlertSound() {
+	    const audio = document.getElementById("overspeedAudio");
+	    if (audio) {
+	        audio.currentTime = 0;
+	        audio.play().catch(err => console.warn("🔇 Alert sound failed:", err));
+	    }
+	}
+
+	// ⏱️ Format duration like "2 min 43 sec ago"
+	function formatDuration(ms) {
+	    const totalSeconds = Math.floor(ms / 1000);
+	    const minutes = Math.floor(totalSeconds / 60);
+	    const seconds = totalSeconds % 60;
+
+	    if (minutes === 0) return `${seconds} sec ago`;
+	    if (seconds === 0) return `${minutes} min ago`;
+	    return `${minutes} min ${seconds} sec ago`;
+	}
+
+</script>
+
+
+<script>
+let isMuted = false;
+
+document.getElementById("muteToggleBtn").addEventListener("click", () => {
+    isMuted = !isMuted;
+    const btn = document.getElementById("muteToggleBtn");
+    btn.textContent = isMuted ? "🔈 Unmute" : "🔇 Mute";
+});
+
+function playAlertSound() {
+    if (isMuted) return;
+
+    const audio = document.getElementById("overspeedAudio");
+    if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(err => console.warn("🔇 Alert sound failed:", err));
+    }
+}
+</script>
 
 <script>
     function showSidebarTab(tabId, btn) {
@@ -2749,7 +2923,31 @@ zoomToVehicle(deviceId, latitude, longitude) {
         btn.classList.add('active');
     }
 	
-	
+	async function fetchOSMSpeedLimit(lat, lon) {
+	    const query = `
+	        [out:json];
+	        way(around:20,${lat},${lon})["highway"];
+	        out tags;`;
+
+	    const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+	    const res = await fetch(url);
+	    const json = await res.json();
+
+	    for (let element of json.elements) {
+	        if (element.tags && element.tags.maxspeed) {
+	            console.log(`📏 Speed limit found: ${element.tags.maxspeed}`);
+	            return element.tags.maxspeed;
+	        }
+	    }
+	    return "N/A";
+	}
+	function refreshAll() {
+	    console.log("🔄 Refreshing all GPS data...");
+	    autoRefreshData();              // Updates vehicle markers and status count
+	    autoRefreshSidebar();           // Updates sidebar table
+	    checkIdleAndOfflineVehicles();  // Triggers offline/idle alerts
+	}
+
 	
 	
 </script>
