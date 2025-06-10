@@ -13,6 +13,8 @@ import java.util.Map;
 
 @Service
 public class HereOAuthTokenService {
+	
+	/*
     private static final Logger logger = LoggerFactory.getLogger(HereOAuthTokenService.class);
     
     // API KEY approach - doesn't require token authentication
@@ -27,7 +29,7 @@ public class HereOAuthTokenService {
      * Returns an access token for HERE API
      * Since we have an API key, we can return it directly instead of
      * going through the OAuth2 flow which is causing 401 errors
-     */
+     
     public String fetchAccessToken() {
         // Using API key directly since OAuth is failing with 401
         logger.info("📡 Using HERE API key (bypassing OAuth token)...");
@@ -73,5 +75,5 @@ public class HereOAuthTokenService {
             throw new RuntimeException("Failed to obtain HERE API token: " + e.getMessage(), e);
         }
         */
-    }
+    
 }

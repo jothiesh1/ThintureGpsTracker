@@ -114,6 +114,22 @@ public interface VehicleRepository extends BaseRestrictedRepository<Vehicle, Lon
      String findSerialNoByVehicleNumber(@Param("vehicleNumber") String vehicleNumber);
 
 
+     
+     
+     
+     
+  // Role-based vehicle ownership queries
+     List<Vehicle> findByAdminId(Long adminId);
+
+     List<Vehicle> findByDealerId(Long dealerId);
+
+     List<Vehicle> findByClientId(Long clientId);
+
+     List<Vehicle> findByUserId(Long userId);
+
+     List<Vehicle> findByDriverId(Long driverId);
+
+     
 }
   
 

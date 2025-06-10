@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Live Vehicle WebSocket Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+  <style>
+    html, body, #map { height: 100%; margin: 0; }
+    .custom-icon img { transition: transform 0.2s ease; }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+
+<script>
+  const userId = 1;
+  const userType = "admin";
+
+  const map = L.map("map").setView([20.5937, 78.9629], 5); // Center of India
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; OpenStreetMap contributors"
+  }).addTo(map);
+
+  const markers = {};
+
+  function getVehicleIcon(course, ignition, vehicleStatus) {
+    const basePath = '/THINTURE_IMAGE/car';
+    let color = 'green';
+
+    switch ((vehicleStatus || '').toUpperCase()) {
+      case 'PARKED':
+      case 'IDLE':
+        color = 'orange';
+        break;
+      case 'OFFLINE':
+      case 'CONNECTION LOST':
+        color = 'red';
+        break;
+      default:
+        color = 'green';
+    }
+
+    const imagePath = `${basePath}/${color}/car0.png`;
+
+    return L.divIcon({
+      html: `<img src="${imagePath}" 
+                   onerror="this.src='/default-icon.png'" 
+                   style="transform: rotate(${course || 0}deg); width: 35px; height: 35px;">`,
+      className: 'custom-icon',
+      iconSize: [35, 35],
+      iconAnchor: [17, 17]
+    });
+  }
+
+  function createOrUpdateMarker(data) {
+    try {
+      const key = data.deviceId;
+      const latLng = [parseFloat(data.latitude), parseFloat(data.longitude)];
+
+      if (!latLng[0] || !latLng[1]) return;
+
+      const icon = getVehicleIcon(data.course, data.ignition, data.vehicleStatus);
+
+      if (markers[key]) {
+        markers[key].setLatLng(latLng);
+      } else {
+        markers[key] = L.marker(latLng, { icon }).addTo(map).bindPopup(`Device: ${key}`);
+      }
+
+      console.log(`📍 Updated: ${key} → [${latLng}]`);
+
+    } catch (e) {
+      console.error("❌ Failed to update marker:", e);
+    }
+  }
+
+  function connectWebSocket() {
+    const socket = new SockJS("/gs-guide-websocket");
+    const stompClient = Stomp.over(socket);
+    stompClient.connect({}, () => {
+      console.log("🔌 WebSocket connected.");
+
+      stompClient.subscribe("/topic/location-updates", (message) => {
+        const data = JSON.parse(message.body);
+        createOrUpdateMarker(data);
+      });
+
+      stompClient.send("/app/fetch-my-vehicles", {}, JSON.stringify({ userId, userType }));
+    }, (err) => {
+      console.error("❌ WebSocket connection failed:", err);
+    });
+  }
+
+  connectWebSocket();
+</script>
+</body>
+</html>
