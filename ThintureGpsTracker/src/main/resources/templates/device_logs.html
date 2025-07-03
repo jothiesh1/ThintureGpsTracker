@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>📋 Device Logs Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+</head>
+<body class="container py-4">
+
+  <h2 class="mb-4">📅 View Device Logs by Date</h2>
+
+  <!-- Input Group with Device ID + Date Picker -->
+  <div class="row g-2 mb-3">
+    <div class="col-md-4">
+      <input type="text" id="deviceIDInput" class="form-control" placeholder="Enter Device ID (e.g. BGNW000002)">
+    </div>
+    <div class="col-md-3">
+      <input type="date" id="dateInput" class="form-control" value="">
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-primary w-100" onclick="loadDeviceLogs()">🔍 Fetch Logs</button>
+    </div>
+    <div class="col-md-3">
+      <button class="btn btn-success w-100" onclick="downloadDeviceLog()">⬇ Export to Excel</button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped" id="deviceLogTable">
+      <thead class="table-light">
+        <tr>
+          <th>Device ID</th>
+          <th>IMEI</th>
+          <th>Timestamp</th>
+          <th>Speed</th>
+          <th>Latitude</th>
+          <th>Longitude</th>
+          <th>Ignition</th>
+          <th>Status</th>
+          <th>Additional</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    // Auto-set today's date on page load
+    document.addEventListener("DOMContentLoaded", () => {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById("dateInput").value = today;
+    });
+
+    function loadDeviceLogs() {
+      const deviceID = document.getElementById("deviceIDInput").value.trim();
+      const selectedDate = document.getElementById("dateInput").value;
+
+      if (!deviceID) {
+        alert("Please enter a Device ID.");
+        return;
+      }
+
+      if (!selectedDate) {
+        alert("Please select a date.");
+        return;
+      }
+
+      fetch(`/device-logs-data?deviceID=${encodeURIComponent(deviceID)}&date=${selectedDate}`)
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.querySelector("#deviceLogTable tbody");
+          tbody.innerHTML = "";
+
+          if (data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="9" class="text-center text-muted">No logs found for selected date</td></tr>`;
+            return;
+          }
+
+          data.forEach(log => {
+            const row = `<tr>
+              <td>${log.deviceID}</td>
+              <td>${log.imei}</td>
+              <td>${log.timestamp}</td>
+              <td>${log.speed}</td>
+              <td>${log.latitude}</td>
+              <td>${log.longitude}</td>
+              <td>${log.ignition}</td>
+              <td>${log.vehicleStatus}</td>
+              <td>${log.additionalData}</td>
+            </tr>`;
+            tbody.insertAdjacentHTML("beforeend", row);
+          });
+        })
+        .catch(err => {
+          alert("Failed to fetch logs.");
+          console.error(err);
+        });
+    }
+
+    function downloadDeviceLog() {
+      const table = document.getElementById("deviceLogTable");
+      const wb = XLSX.utils.table_to_book(table, { sheet: "Logs" });
+      XLSX.writeFile(wb, "Device_Logs_Selected_Date.xlsx");
+    }
+  </script>
+
+</body>
+</html>

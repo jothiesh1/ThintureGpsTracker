@@ -1,0 +1,2401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#0f1e41">
+
+    <title>Thinture GPS</title>
+    <link rel="icon" type="image/x-icon" href="/THINTURE_IMAGE/favicon.jpg">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js"></script>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <!-- WebSocket Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+	<script src="https://cdn.jsdelivr.net/npm/tz-lookup@6.1.25/tz.min.js"></script>
+<style>
+	/* === Global === */
+	html, body {
+	    overflow: hidden;
+	    margin: 0;
+	    padding: 0;
+	}
+	.mobile-header {
+	  display: none;
+	  background-color: #0f1e41;
+	  color: white;
+	  text-align: center;
+	  font-size: 20px;
+	  padding: 12px;
+	  font-weight: bold;
+	}
+	@media (max-width: 768px) {
+	  .mobile-header {
+	    display: block;
+	  }
+	}
+	@media (max-width: 768px) {
+	  #map {
+	    height: calc(100vh - 70px); /* Adjust if header height changes */
+	  }
+	}
+	@media (max-width: 768px) {
+	  #sidebar.active {
+	    right: 0 !important;
+	    top: 70px !important;
+	    height: calc(100vh - 70px);
+	    border-radius: 0;
+	  }
+	}
+	
+	
+	button, .custom-tab-btn {
+	  min-height: 42px;
+	}
+	@media (max-width: 576px) {
+	  .speed-alert-popup {
+	    width: 95vw;
+	    bottom: 15px;
+	    right: 2.5vw;
+	    left: auto;
+	    font-size: 14px;
+	  }
+	}
+	@media (max-width: 576px) {
+	  .vehicle-popup .label, .vehicle-popup .value {
+	    font-size: 12px;
+	  }
+	  .popup-header {
+	    font-size: 14px;
+	  }
+	  .custom-tab-btn {
+	    font-size: 12px;
+	    padding: 6px;
+	  }
+	}
+
+	/* === Toggle Button === */
+	#toggleButton {
+	    position: fixed;
+	    top: 190px;
+	    right: 15px;
+	    z-index: 1100;
+	    background-color: #0f1e41;
+	    color: white;
+	    font-size: 18px;
+	    padding: 10px 14px;
+	    border-radius: 30px;
+	    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+	}
+	@media (max-width: 768px) {
+	    #toggleButton {
+	        top: 150px;
+	        right: 10px;
+	        font-size: 16px;
+	        padding: 8px 12px;
+	    }
+	}
+
+	/* === Sidebar === */
+	#sidebar {
+	    position: fixed;
+	    top: 120px;
+	    right: -450px;
+	    width: 380px;
+	    height: 85vh;
+	    background: white;
+	    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.6);
+	    border-radius: 12px 0 0 12px;
+	    backdrop-filter: blur(1px);
+	    padding: 20px;
+	    color: #000;
+	    z-index: 1000;
+	    overflow-y: auto;
+	    overflow-x: hidden;
+	    transition: right 0.4s ease;
+	}
+	#sidebar.active {
+	    right: 0;
+	}
+	@media (max-width: 1200px) {
+	    #sidebar {
+	        top: 140px;
+	        right: -350px;
+	        height: 65vh;
+	        font-size: 0.9rem;
+	    }
+	}
+	@media (max-width: 768px) {
+	    #sidebar {
+	        width: 90vw;
+	        right: -100vw;
+	        top: 180px !important;
+	    }
+	}
+	#sidebar h2 {
+	    font-size: 24px;
+	    font-weight: bold;
+	    color: #00f7ff;
+	    margin-bottom: 20px;
+	    border-bottom: 2px solid #00f7ff;
+	    padding-bottom: 10px;
+	    text-shadow: 0 0 4px #00f7ff;
+	}
+	/* === Icon Click + Ripple Animation for SVG in Popups === */
+	.clickable-icon {
+	    cursor: pointer;
+	    fill: darkblue;
+	    stroke: white;
+	    transition: transform 0.2s ease-in-out, fill 0.2s ease-in-out;
+	}
+	.clickable-icon:active {
+	    transform: scale(0.9);
+	    fill: #ff5733;
+	}
+
+	/* Ripple Effect Circle */
+	.ripple {
+	    position: absolute;
+	    border-radius: 50%;
+	    background: rgba(255, 87, 51, 0.4);
+	    transform: scale(0);
+	    animation: ripple-animation 0.6s linear;
+	    pointer-events: none;
+	}
+	@keyframes ripple-animation {
+	    to {
+	        transform: scale(2);
+	        opacity: 0;
+	    }
+	}
+
+	/* === Search Bar === */
+	#searchBar {
+	    background: rgba(255, 255, 255, 0.3);
+	    border: 1px solid darkslategrey;
+	    border-radius: 8px;
+	    padding: 8px;
+	    color: black;
+	    font-size: 10px;
+	    margin-bottom: 20px;
+	    width: 60%;
+	    box-shadow: 0 0 8px rgba(0, 219, 178, 0.2);
+	}
+	#searchBar::placeholder {
+	    color: #aaa;
+	}
+
+	/* === Table === */
+	.table {
+	    font-size: 12px;
+	    border-radius: 10px;
+	    overflow: hidden;
+	    background-color: #fefefe;
+	}
+	.table th {
+	    background: #0f2041;
+	    color: white;
+	    text-align: center;
+	    padding: 2px;
+	}
+	.table td {
+	    background: white;
+	    text-align: center;
+	    padding: 2px;
+	}
+
+	/* === Map === */
+	#map {
+	    margin-top: 10px;
+	    height: calc(120vh - 150px);
+	    position: relative;
+	}
+
+	/* === Popup === */
+	
+	.popup-header {
+	    display: flex;
+	    justify-content: space-between;
+	    align-items: center;
+	    font-size: 16px;
+	    font-weight: bold;
+	    color: #2c3e50;
+	    border-bottom: 2px solid #3498db;
+	    padding-bottom: 8px;
+	}
+	.close-btn {
+	    color: red;
+	    font-size: 18px;
+	    cursor: pointer;
+	    font-weight: bold;
+	    transition: transform 0.2s ease;
+	}
+	.close-btn:hover {
+	    transform: scale(1.3);
+	}
+	.popup-content {
+	    font-size: 14px;
+	    color: #333;
+	    line-height: 1.6;
+	}
+	.popup-content strong {
+	    color: #555;
+	}
+	.popup-buttons {
+	    display: flex;
+	    gap: 10px;
+	    margin-top: 10px;
+	}
+	.popup-btn {
+	    flex: 1;
+	    border: none;
+	    padding: 8px;
+	    font-size: 14px;
+	    cursor: pointer;
+	    border-radius: 6px;
+	    transition: all 0.3s ease;
+	    color: white;
+	}
+	.popup-btn.replay { background: #3498db; }
+	.popup-btn.details { background: #2ecc71; }
+	.popup-btn:hover { opacity: 0.8; }
+
+	/* === Live Indicator === */
+	.live-indicator {
+	    display: inline-flex;
+	    align-items: center;
+	    gap: 5px;
+	    font-size: 14px;
+	    font-weight: bold;
+	    color: green;
+	}
+	.live-ripple {
+	    width: 12px;
+	    height: 12px;
+	    border-radius: 50%;
+	    background: rgba(0, 255, 0, 0.4);
+	    animation: rippleEffect 1.5s infinite;
+	}
+	.live-ripple::after {
+	    animation-delay: 0.75s;
+	}
+
+	/* === Ripple Animation === */
+	@keyframes rippleEffect {
+	    0% { transform: scale(0.5); opacity: 1; }
+	    100% { transform: scale(2.5); opacity: 0; }
+	}
+	@keyframes fadeIn {
+	    from { opacity: 0; transform: scale(0.95); }
+	    to { opacity: 1; transform: scale(1); }
+	}
+	@keyframes blink {
+	    0% { opacity: 1; }
+	    100% { opacity: 0.5; }
+	}
+
+	/* === Speed Alert Popup === */
+	.speed-alert-popup {
+	    position: fixed;
+	    top: 355px;
+	    right: 608px;
+	    background: rgba(255, 0, 0, 0.9);
+	    color: white;
+	    padding: 15px;
+	    border-radius: 8px;
+	    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+	    z-index: 1000;
+	    display: none;
+	    animation: blink 1s infinite alternate;
+	}
+	@media (max-width: 768px) {
+	    .speed-alert-popup {
+	        top: auto;
+	        bottom: 80px;
+	        right: 10px;
+	        width: 90%;
+	        font-size: 14px;
+	        padding: 12px;
+	    }
+	}
+
+	/* === Map Switcher === */
+	#mapSwitcher {
+	    position: fixed;
+	    top: 280px;
+	    right: 5px;
+	    z-index: 1000;
+	    padding: 5px;
+	    border-radius: 10px;
+	    display: flex;
+	    flex-direction: column;
+	    gap: 5px;
+	}
+	.map-button {
+	    background: transparent;
+	    border: none;
+	    color: #0f2041;
+	    padding: 10px 15px;
+	    border-radius: 8px;
+	    font-weight: bold;
+	    cursor: pointer;
+	    width: 50px;
+	    transition: 0.3s ease;
+	}
+	.map-button:hover,
+	.map-button.active {
+	    background-color: #0f2041;
+	    color: white;
+	}
+
+	/* === Tab Bar === */
+	.custom-tab-bar {
+	    display: flex;
+	    background-color: #f0f0f0;
+	    border-bottom: 1px solid #ccc;
+	    border-radius: 8px 8px 0 0;
+	}
+	.custom-tab-btn {
+	    flex: 1;
+	    padding: 8px 12px;
+	    border: none;
+	    background-color: #f0f0f0;
+	    color: black;
+	    font-weight: bold;
+	    cursor: pointer;
+	    transition: background-color 0.3s;
+	}
+	.custom-tab-btn.active {
+	    background-color: #0f1e41;
+	    color: white;
+	}
+	.custom-tab-content {
+	    display: none;
+	    padding: 10px 0;
+	}
+	.custom-tab-content.active {
+	    display: block;
+	}
+
+	/* === Status Summary === */
+	.status-summary {
+	    background-color: #f1f1f1;
+	    border-radius: 8px;
+	    padding: 10px 15px;
+	    margin-top: 10px;
+	    font-size: 14px;
+	}
+	.status-summary p {
+	    display: flex;
+	    justify-content: space-between;
+	    margin: 4px 0;
+	}
+	.status-summary span {
+	    cursor: pointer;
+	    color: #007bff;
+	}
+	.status-summary span:hover {
+	    text-decoration: underline;
+	}
+	@media (max-width: 768px) {
+	    .status-summary {
+	        position: fixed;
+	        bottom: 0;
+	        left: 0;
+	        width: 100%;
+	        background: rgba(255, 255, 255, 0.95);
+	        padding: 10px 0;
+	    }
+	}
+
+	/* === Status Colors === */
+	#totalCount { color: black; font-weight: bold; }
+	#runningCount { color: #2ecc71; font-weight: bold; }
+	#idleCount { color: #f39c12; font-weight: bold; }
+	#parkedCount { color: #3498db; font-weight: bold; }
+	#lostCount { color: #e74c3c; font-weight: bold; }
+
+@media (max-width: 768px) {
+    #mobileCloseBtn {
+        display: block;
+    }
+}
+.refresh{
+	position: absolute;
+	top: 150px;
+}
+.gsm-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.gsm-icon {
+    display: flex;
+    gap: 2px;
+}
+
+.gsm-icon .bar {
+    width: 4px;
+    height: 12px;
+    background: #ccc;
+    border-radius: 2px;
+}
+
+.gsm-icon .bar.filled {
+    background: green;
+}
+
+.gsm-icon.low .bar.filled {
+    background: red;
+}
+
+.gsm-icon.medium .bar.filled {
+    background: orange;
+}
+
+.gsm-icon.high .bar.filled {
+    background: green;
+}
+
+.gsm-strength-text {
+    font-weight: bold;
+    font-size: 13px;
+}
+.vehicle-popup .content {
+    padding: 12px 16px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    row-gap: 8px;
+    column-gap: 12px;
+    font-size: 13px;
+}
+
+.vehicle-popup .label {
+    font-weight: 600;
+    color: #444;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.vehicle-popup .value {
+    text-align: left;
+    font-weight: 500;
+    color: #222;
+    word-break: break-word;
+}
+
+.vehicle-popup .popup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: bold;
+    background: #f8f8f8;
+    padding: 8px 12px;
+    border-bottom: 2px solid #dc3545;
+    color: #dc3545;
+}
+
+.vehicle-popup .popup-actions {
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px;
+}
+
+.vehicle-popup .btn {
+    flex: 1;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 0;
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.vehicle-popup .btn.details {
+    background: #007bff;
+}
+.vehicle-popup .btn.playback {
+    background: #28a745;
+}
+.vehicle-popup .btn:hover {
+    opacity: 0.9;
+}
+
+.gsm-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.gsm-icon {
+    display: flex;
+    gap: 2px;
+}
+.gsm-icon .bar {
+    width: 4px;
+    height: 12px;
+    border-radius: 2px;
+    background: #ccc;
+}
+.gsm-icon .bar.filled {
+    background: green;
+}
+.gsm-strength-text {
+    font-weight: 600;
+    font-size: 12px;
+    color: #555;
+}
+.popup-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 12px;
+    padding: 0 10px 10px;
+}
+
+.popup-actions .btn {
+    flex: 1;
+    padding: 8px 0;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #fff;
+    transition: background 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-details {
+    background-color: #007bff; /* Blue */
+}
+
+.btn-playback {
+    background-color: #28a745; /* Green */
+}
+
+.popup-actions .btn:hover {
+    opacity: 0.9;
+}
+/*popup vehicle detals*/
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1050;
+    display: none;
+}
+
+.popup-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    z-index: 1060;
+    display: none;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.popup-container.show {
+    display: block;
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #2196f3;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.popup-table {
+    width: 100%;
+    font-size: 14px;
+}
+#vehicle-details-popup {
+    position: absolute;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    max-width: 90vw;
+    width: 300px;
+    font-size: 13px;
+    display: none;
+    transition: opacity 0.2s ease;
+    border: 1px solid #ccc;
+}
+
+#vehicle-details-popup .popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    font-size: 15px;
+    margin-bottom: 10px;
+    color: #0f1e41;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 6px;
+}
+
+#vehicle-details-popup .popup-content {
+    color: #333;
+    line-height: 1.5;
+}
+
+#vehicle-details-popup .close-btn {
+    color: red;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    padding-left: 12px;
+    transition: transform 0.2s ease;
+}
+
+#vehicle-details-popup .close-btn:hover {
+    transform: scale(1.2);
+}
+
+/* Mobile optimization */
+@media (max-width: 576px) {
+    #vehicle-details-popup {
+        left: 50% !important;
+        top: 20% !important;
+        transform: translateX(-50%);
+        width: 90vw;
+    }
+}
+.map-layer-toggle {
+  position: fixed;
+  bottom: 105px;
+  right: 15px;
+  z-index: 9999;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+  padding: 12px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+#layerOptions {
+  display: none;
+  margin-top: 10px;
+}
+
+#layerToggleBtn {
+  background-color: #0f1e41;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+#layerToggleBtn:hover {
+  background-color: #1b2e63;
+}
+
+@media (max-width: 576px) {
+  .map-layer-toggle {
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90vw;
+    font-size: 13px;
+  }
+}
+.last-received{
+	font-size: 11px;
+}
+
+@media (max-width: 768px) {
+    #toggleButton {
+        transition: opacity 0.3s ease;
+    }
+}
+.alertstatus{
+	top: 190px !important;
+}
+.menu-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@media (max-width: 500px) {
+  #searchInput {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  .menu-button {
+    margin-left: auto;
+    margin-top: 0.5rem;
+  }
+}
+.swal2-offline-toast {
+  width: 320px;
+  font-size: 14px;
+}
+
+    </style>
+</head>
+<body>
+	<header th:insert="navigation :: navbar"></header>
+	<!-- REMOVE THIS -->
+	<button id="toggleButton" class="btn btn-primary" style="position: fixed; top: 190px;width: 50px; right: 10px; z-index: 9999;">
+	    ☰
+	</button>
+
+
+
+
+<div id="mobileCloseBtn" style="text-align: right; margin: 5px 0; display: none;">
+    <button class="btn btn-sm btn" style="font-size: 13px; color:red;" onclick="closeSidebar()">✖</button>
+</div>
+
+<!-- Map Container -->
+<div id="map"></div>
+
+
+<div id="speedAlertPopup" class="speed-alert-popup">
+    <span class="close-btn" onclick="closeSpeedAlert()">×</span>
+    <h4>🚨 Overspeed Alert</h4>
+    <p><strong>Vehicle No:</strong> <span id="alertDeviceID"></span></p>
+    <p><strong>Speed:</strong> <span id="alertSpeed"></span> km/h</p>
+</div>
+
+
+
+
+<!-- Device Details Popup -->
+
+
+
+
+<!-- Map Switcher Buttons 
+<div id="mapLayerToggle" class="map-layer-toggle">
+  <button id="layerToggleBtn" onclick="toggleMapLayers()">🗺️</button>
+  <div id="layerOptions" class="layer-options">
+    <label><input type="radio" name="mapLayer" value="osm" checked> OpenStreetMap</label><br>
+    <label><input type="radio" name="mapLayer" value="carto"> Carto Light</label><br>
+    <label><input type="radio" name="mapLayer" value="googleSatellite"> Google Satellite</label><br>
+    <label><input type="radio" name="mapLayer" value="googleRoadMap"> Google Road Map</label><br>
+    <label><input type="radio" name="mapLayer" value="googleHybrid"> Google Hybrid</label>
+  </div>
+</div>
+
+-->
+
+
+
+
+<audio id="overspeedAudio" src="/THINTURE_IMAGE/alertsspeed.mp3" preload="auto"></audio>
+
+<!-- Overlay for Modal -->
+
+
+<!-- Vehicle Details Modal -->
+<div id="vehicleDetailsModal" class="popup-container">
+    <div class="popup-header">
+        <strong>Vehicle Details</strong>
+        <span class="close-btn" onclick="closePopup()">×</span>
+    </div>
+    <div class="popup-content">
+        <table id="vehicleDetailsTable" class="popup-table">
+            <tr><td><strong>Vehicle No:</strong></td><td id="popup-deviceID">Loading...</td></tr>
+            <tr><td><strong>Serial number:</strong></td><td id="popup-serialno">Loading...</td></tr>
+            <tr><td><strong>Owner:</strong></td><td id="popup-ownerName">Loading...</td></tr>
+            <tr><td><strong>Model:</strong></td><td id="popup-model">Loading...</td></tr>
+            <tr><td><strong>SIM Number:</strong></td><td id="popup-simnumber">Loading...</td></tr>
+			<tr><td><strong>Time Interval:</strong></td><td id="popup-timeinterval">Loading...</td></tr>
+        </table>
+    </div>
+</div>
+
+<!-- Sidebar -->
+
+<div class="col-md-6 col-12" id="sidebar">
+	<div id="mobileCloseBtn" style="text-align: right; margin: 5px 0; display: none;">
+		  <button class="btn btn-sm btn" style="font-size: 13px; color:red"; onclick="closeSidebar()">✖</button>
+		</div>
+    <div class="custom-tab-bar">
+        <button class="custom-tab-btn active" onclick="showSidebarTab('devicesTab', this)">Device</button>
+        <button class="custom-tab-btn" onclick="showSidebarTab('alertsTab', this)">Alerts</button>
+		<button class="custom-tab-btn" onclick="showSidebarTab('activeTab', this)">Active/Inactive</button>
+    </div>
+	
+    <!-- Device Tab Content -->
+    <div id="devicesTab" class="custom-tab-content active">
+        <!--<h2>Tracker Details</h2>-->
+		<div class="d-flex flex-column p-2" style="gap: 10px;">
+		  <div class="d-flex justify-content-between align-items-center flex-wrap">
+		    <input type="text" id="searchBar" placeholder="Search by Device ID" class="form-control mb-2">
+		    
+		  </div>
+
+		  <div class="table-responsive">
+		    <table class="table table-bordered table-sm text-center mb-0">
+		      <thead class="table-dark">
+		        <tr>
+		          <th>Status</th>
+		          <th>Vehicle No</th>
+				  <th>Time Interval</th>
+		          <th>Last Upload</th>
+		          <th>Select Device</th>
+		        </tr>
+		      </thead>
+		      <tbody id="trackerTableBody">
+		        <!-- dynamically injected -->
+		      </tbody>
+		    </table>
+			<div id="sidebarPagination" class="pagination-controls mt-2"></div>
+		  </div>
+		</div>
+
+    <!-- Alerts Tab Content -->
+	<!-- Alerts Tab Content -->
+	<div id="alertsTab" class="custom-tab-content">
+	    <div class="position-fixed top-150px end-0 m-3 z-3 text-end">
+	        <label for="muteToggleBtn" class="me-2 fw-bold text-black">🔊 Alert Sound</label>
+	        <button id="muteToggleBtn" class="btn btn-sm btn-outline-black">🔇 Mute</button>
+	    </div>
+
+	    <div class="refresh end-0 m-3 z-3 text-end">
+	        <label for="RefershToggleBtn" class="me-2 fw-bold text-black">🔄 Refresh</label>
+	        <button class="btn btn-sm btn-outline-black" onclick="refreshAll()">🔄 Refresh</button>
+	    </div>
+	</div>
+
+					  
+
+					<div id="activeTab" class="custom-tab-content">
+						<div class="status-summary">
+						    <p><strong>Total Vehicles:</strong> 
+						        <span id="totalCount" onclick="fetchDevicesByStatus('total')">0</span>
+						    </p>
+						    <p><strong>Running:</strong> 
+						        <span id="runningCount" onclick="fetchDevicesByStatus('running')">0</span>
+						    </p>
+						    <p><strong>Idle:</strong> 
+						        <span id="idleCount" onclick="fetchDevicesByStatus('idle')">0</span>
+						    </p>
+						    <p><strong>Parked:</strong> 
+						        <span id="parkedCount" onclick="fetchDevicesByStatus('parked')">0</span>
+						    </p>
+						    <p><strong>Offline:</strong> 
+						        <span id="lostCount" onclick="fetchDevicesByStatus('lost')">0</span>
+						    </p>
+						</div>
+						<ul id="offlineAlertList"></ul>
+			
+					</div>
+					
+				
+
+<!-- Popup Overlay -->
+<div id="popupOverlay" class="popup-overlay" onclick="closePopup()"></div>
+
+<!-- Vehicle Details Modal -->
+
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<!-- Add before your main <script> -->
+<script src="https://cdn.jsdelivr.net/npm/tz-lookup@6.1.25/tz.min.js"></script>
+<script>
+	class VehicleTracker {
+		
+		constructor(mapElementId) {
+			
+		    const mapElement = document.getElementById(mapElementId);
+		    if (!mapElement) {
+		        console.error("❌ Map element not found! Make sure the ID is correct.");
+		        return;
+		    }
+
+		    this.map = L.map(mapElementId, {
+		        zoomControl: false
+		    }).setView([13.07757, 77.55928], 15);
+
+		    if (!this.map) {
+		        console.error("❌ Map failed to initialize.");
+		        return;
+		    }
+
+		    // OSM English layer
+		    const osmEnglish = L.tileLayer('https://{s}.tile.openstreetmap.fr/osm-en/{z}/{x}/{y}.png', {
+		        maxZoom: 15,
+		        attribution: '&copy; OpenStreetMap contributors'
+		    });
+
+		    // Carto Light layer
+		    const cartoLight = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+		        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+		        subdomains: 'abcd',
+		        maxZoom: 19
+		    });
+
+		    // Add default layer to map
+		    osmEnglish.addTo(this.map);
+
+		    // Add layer switcher with position bottomright
+		   
+
+		    this.markers = {};
+
+		    // Load vehicle data after map initializes
+		    setTimeout(() => this.fetchVehicleData(), 1000);
+		    this.initWebSocket();
+		}
+
+		
+
+
+		fetchVehicleData() {
+		    fetch('/api/vehicle/last/latests-locations/all')
+		        .then(res => res.json())
+		        .then(data => {
+		            data.forEach(vehicle => {
+		                const lat = parseFloat(vehicle.latitude);
+		                const lng = parseFloat(vehicle.longitude);
+		                const speed = parseFloat(vehicle.speed);
+		                const deviceId = vehicle.deviceId || vehicle.deviceID || "N/A";
+
+		                if (!isNaN(lat) && !isNaN(lng)) {
+		                    // 🔄 Call the existing marker creation method
+		                    this.createOrUpdateMarker(vehicle);
+
+		                    // 🔔 Trigger speed alert
+		                    if (speed > 140 && deviceId !== "N/A") {
+		                        playSpeedAlert(deviceId, speed);
+		                    }
+							
+							
+							const speedLimit = parseFloat(vehicle.speedLimit) || 140;
+							if (speed > speedLimit && deviceId !== "N/A") {
+							    playSpeedAlert(deviceId, speed);
+							}
+
+		                }
+		            });
+		        });
+		}
+	
+
+
+
+        updateMapMarkers(vehicles) {
+            vehicles.forEach(vehicle => this.createOrUpdateMarker(vehicle));
+        }
+		
+		
+
+		createOrUpdateMarker(vehicle, isLive) {
+		    if (!this.map) {
+		        console.error("❌ Map object is NULL. Cannot create marker.");
+		        return;
+		    }
+
+		    function formatUtcTime(timestamp) {
+		        const dateObj = new Date(timestamp);
+		        return dateObj.toISOString().replace("T", " ").substring(0, 19);
+		    }
+
+		    const deviceId = vehicle.deviceId || vehicle.deviceID || "Unknown";
+		    const latitude = parseFloat(vehicle.latitude);
+		    const longitude = parseFloat(vehicle.longitude);
+		    const course = parseFloat(vehicle.course) || 0;
+
+		    if (!deviceId || deviceId.toLowerCase() === "null" || isNaN(latitude) || isNaN(longitude)) {
+		        console.warn(`⛔ Skipping marker for invalid device (${deviceId})`);
+		        return;
+		    }
+
+		    const speed = vehicle.speed || 0;
+		    const ignitionStatus = vehicle.ignition
+		        ? vehicle.ignition.toUpperCase() === "IGON"
+		            ? "ON"
+		            : vehicle.ignition.toUpperCase() === "IGOFF"
+		                ? "OFF"
+		                : "Unknown"
+		        : "Unknown";
+
+		    let vehicleStatus = (vehicle.vehicleStatus || "Unknown").toUpperCase();
+
+		    // ✅ If live data, TRUST the status
+			if (!isLive) {
+			  const [run, park, idle] = (vehicle.timeIntervals || "0,0,0")
+			    .split(',').map(x => +x || 0);
+			  const timestamp = new Date(vehicle.timestamp).getTime();
+			  const elapsedSec = (Date.now() - timestamp) / 1000;
+			  const slack = 50;  // give an extra 10 seconds
+
+			  if ((vehicleStatus === "RUNNING" || vehicleStatus === "MOVING") && run > 0) {
+			    if (elapsedSec > run + slack) vehicleStatus = "OFFLINE";
+			  } else if (vehicleStatus === "PARKED" && park > 0) {
+			    if (elapsedSec > park + slack) vehicleStatus = "OFFLINE";
+			  } else if (vehicleStatus === "IDLE" && idle > 0) {
+			    if (elapsedSec > idle + slack) vehicleStatus = "OFFLINE";
+			  } else {
+			    vehicleStatus = "OFFLINE";
+			  }
+			}
+
+		    const formattedDateTime = formatUtcTime(vehicle.timestamp);
+		    const isLiveNow = !!isLive;
+
+		    const vehicleIcon = this.getVehicleIcon(course, vehicle.ignition, vehicleStatus);
+
+		    const gsmStrength = parseInt(vehicle.gsmStrength) || 0;
+		    let gsmLevel = "Unknown", gsmColor = "gray";
+
+		    if (gsmStrength === 0) {
+		        gsmLevel = "No Signal";
+		        gsmColor = "darkgray";
+		    } else if (gsmStrength >= 1 && gsmStrength <= 9) {
+		        gsmLevel = "Poor";
+		        gsmColor = "red";
+		    } else if (gsmStrength >= 10 && gsmStrength <= 14) {
+		        gsmLevel = "Moderate";
+		        gsmColor = "orange";
+		    } else if (gsmStrength >= 15 && gsmStrength <= 19) {
+		        gsmLevel = "Good";
+		        gsmColor = "yellowgreen";
+		    } else if (gsmStrength >= 20 && gsmStrength <= 30) {
+		        gsmLevel = "Excellent";
+		        gsmColor = "green";
+		    } else if (gsmStrength >= 31 && gsmStrength <= 99) {
+		        gsmLevel = "Perfect";
+		        gsmColor = "limegreen";
+		    }
+
+		    const popupContent = `
+		        <div class="vehicle-popup">
+		            <div class="popup-header">
+		                ${isLiveNow
+		                    ? '<span class="live-indicator"><span class="live-ripple"></span> LIVE</span>'
+		                    : `<span class="last-received">🔴 Last Received: ${formattedDateTime}</span>`}
+		            </div>
+		            <div class="content">
+		                <div class="label"><i class="fas fa-car"></i>Vehicle No</div>
+		                <div class="value">${deviceId}</div>
+		                <div class="label"><i class="fas fa-clock"></i>Time Interval</div>
+		                <div class="value">${vehicle.timeIntervals}</div>
+		                <div class="label"><i class="fas fa-map-pin"></i>Latitude</div>
+		                <div class="value">${latitude.toFixed(5)}</div>
+		                <div class="label"><i class="fas fa-map-pin"></i>Longitude</div>
+		                <div class="value">${longitude.toFixed(5)}</div>
+		                <div class="label"><i class="fas fa-rocket"></i>Speed</div>
+		                <div class="value">${speed} km/h</div>
+		                <div class="label"><i class="fas fa-key"></i>Ignition</div>
+		                <div class="value" style="color:${ignitionStatus === 'ON' ? '#28a745' : '#e54d4d'}">${ignitionStatus}</div>
+		                <div class="label"><i class="fas fa-check-square"></i>Status</div>
+		                <div class="value">${vehicleStatus}</div>
+		                <div class="label"><i class="fas fa-signal"></i>GSM</div>
+		                <div class="value gsm-bar">
+		                    <span class="gsm-icon ${gsmLevel.toLowerCase()}">
+		                        ${generateGSMBars(gsmStrength)}
+		                    </span>
+		                    <span class="gsm-strength-text" style="color:${gsmColor}">
+		                        ${gsmLevel} (${gsmStrength})
+		                    </span>
+		                </div>
+		            </div>
+		            <div class="popup-actions">
+		                <button class="btn btn-details" onclick="showVehicleDetails('${deviceId}', event)">Details</button>
+		                <button class="btn btn-playback" onclick="navigateToReplay('${deviceId}')">
+		                    <i class="fas fa-backward"></i> Playback
+		                </button>
+		            </div>
+		        </div>
+		    `;
+
+			if (this.markers[deviceId]) {
+				        let marker = this.markers[deviceId];
+				        marker.setLatLng([latitude, longitude]);
+				        marker.setIcon(vehicleIcon).bindPopup(popupContent);
+				    } else {
+				        this.markers[deviceId] = L.marker([latitude, longitude], { icon: vehicleIcon })
+				            .bindPopup(popupContent)
+				            .addTo(this.map);
+				    }
+				}
+
+
+
+
+
+
+
+		// Helper function for speed color classes
+		getSpeedClass(speed) {
+		    if (speed < 2) return "speed-low";
+		    if (speed < 30) return "speed-medium";
+		    return "speed-high";
+		}
+
+		// Helper function for vehicle status classes
+		getStatusClass(status) {
+		    switch (status.toLowerCase()) {
+		        case "online": return "status-online";
+		        case "offline": return "status-offline";
+		        case "idle": return "status-idle";
+		        case "moving": return "status-moving";
+		        default: return "status-unknown";
+		    }
+		}
+
+
+
+
+		getVehicleIcon(course, ignition, vehicleStatus) {
+		    const basePath = '/THINTURE_IMAGE/car';
+		    let color = 'green'; // Default color
+
+		    // ✅ Change color based on vehicle status
+		    switch (vehicleStatus.toUpperCase()) {
+		        case 'PARKED': case 'IDLE': color = 'orange'; break;
+		        case 'RUNNING': color = 'green'; break;
+		        case 'OFFLINE': case 'CONNECTION LOST': color = 'red'; break;
+		    }
+
+		    console.log(`🚗 Vehicle Status: ${vehicleStatus}, Color Set To: ${color}`);
+
+		    const imagePath = `${basePath}/${color}/car0.png`;
+
+		    return L.divIcon({
+		        html: `<img src="${imagePath}" 
+		                    style="transform: rotate(${course}deg); width: 35px; height: 35px;">`,  // ✅ Instantly Rotates
+		        className: 'custom-icon',
+		        iconSize: [35, 35],
+		        iconAnchor: [17, 17],  // Center the icon
+		        popupAnchor: [0, -15]
+		    });
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+zoomToVehicle(deviceId, latitude, longitude) {
+  if (!this.map) {
+    console.error("❌ Map not initialized.");
+    return;
+  }
+  if (latitude == null || longitude == null) {
+    console.error(`❌ Missing coordinates for device ${deviceId}`);
+    return;
+  }
+
+  const maxZoom = this.map.getMaxZoom() || 20;
+  this.map.setView([latitude, longitude], maxZoom);
+
+  // 🔍 Temporarily hide other markers
+  Object.entries(this.markers).forEach(([id, marker]) => {
+    if (id !== deviceId && marker._icon) marker._icon.style.display = "none";
+  });
+
+  const marker = this.markers[deviceId];
+  if (marker) {
+    marker.openPopup();
+    const icon = marker._icon;
+    if (icon) {
+      icon.classList.add("highlight-marker");
+      setTimeout(() => {
+        icon.classList.remove("highlight-marker");
+        Object.values(this.markers).forEach(m => {
+          if (m._icon) m._icon.style.display = "";
+        });
+      }, 8000);
+    }
+  }
+
+  // 🔒 Close sidebar
+  const sidebar = document.getElementById("sidebar");
+  const toggleButton = document.getElementById("toggleButton");
+
+  if (sidebar) sidebar.classList.remove("active");
+  if (toggleButton) toggleButton.classList.remove("active");
+
+  // ✅ Fix toggle visibility after sidebar is closed
+  updateToggleVisibility();
+}
+
+
+
+
+
+		
+
+
+initWebSocket() {
+  const socket = new SockJS('/gs-guide-websocket');
+  const stompClient = Stomp.over(socket);
+
+  stompClient.connect({}, () => {
+    console.log('✅ WebSocket connected.');
+    stompClient.subscribe('/topic/location-updates', ({ body }) => {
+      const v = JSON.parse(body);
+      v.deviceId = v.deviceId || v.deviceID;
+
+    
+
+      // update map
+      this.createOrUpdateMarker(v, true);
+
+      // update sidebar (will read HH:mm:ss from v.timestamp)
+      updateSidebarRow(v, true);
+    });
+  }, err => {
+    console.error('❌ WebSocket error:', err);
+    setTimeout(() => this.initWebSocket(), 5000);
+  });
+}
+
+
+}
+
+			function navigateToReplay(deviceId) {
+			        
+					window.location.href = `/superadmin/replay?deviceId=${encodeURIComponent(deviceId)}`;
+			    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+		window.vehicleTracker = new VehicleTracker('map');
+
+		  // Start initial data loading + auto-refresh
+		 
+
+		  // Toggle button setup
+		  document.getElementById("toggleButton").addEventListener("click", () => {});
+  
+
+    
+	    fetch('/api/vehicle/last/latests-locations/all')
+	        .then(res => res.json())
+	        .then(data => {
+	            if (data.length > 0) {
+	                window.updateSidebarTable(data);
+	            } else {
+	                document.getElementById("trackerTableBody").innerHTML = `
+	                    <tr>
+	                        <td colspan="4" class="text-center text-muted">No data</td>
+	                    </tr>
+	                `;
+	            }
+	        })
+	        .catch(err => {
+	            console.error('Failed to fetch vehicle data:', err);
+	        });
+	});
+	// ———————————————————————————————————————
+	// Helpers (only defined once)
+	function formatUtcTime(ts) {
+	  const d = new Date(ts);
+	  return d.toISOString().replace('T',' ').substr(0,19);
+	}
+
+	function computeStatus(raw, run, park, idle, elapsed, slack = 5) {
+	  const status = (raw||'').toUpperCase();
+	  if ((status==='RUNNING'||status==='MOVING') && run>0)   return elapsed<=run+slack ? status : 'OFFLINE';
+	  if (status==='PARKED' && park>0)                       return elapsed<=park+slack ? 'PARKED' : 'OFFLINE';
+	  if (status==='IDLE'   && idle>0)                       return elapsed<=idle+slack ? 'IDLE'   : 'OFFLINE';
+	  return 'OFFLINE';
+	}
+
+	window.updateSidebarTable = function(vehicles) {
+	  const now = Date.now();
+	  const rows = vehicles.map(v => {
+	    const [run, park, idle] = (v.timeIntervals||'0,0,0').split(',').map(n=>+n||0);
+	    const ts = new Date(v.timestamp).getTime(), elapsed=(now - ts)/1000;
+	    const status = computeStatus(v.vehicleStatus, run, park, idle, elapsed);
+	    return `
+	      <tr data-device="${v.deviceId}">
+	        <td>${status}</td>
+	        <td>${v.deviceId}</td>
+	        <td>${v.timeIntervals}</td>
+	        <td>${formatUtcTime(v.timestamp)}</td>
+	        <td><button onclick="zoomEffect(event,'${v.deviceId}',${+v.latitude},${+v.longitude})">Zoom</button></td>
+	      </tr>`;
+	  }).join('');
+	  document.getElementById('trackerTableBody').innerHTML = rows;
+	  paginateSidebarTable();  // if you’re using pagination
+	};
+
+	// ——————— GLOBAL HELPER ———————
+	function updateSidebarRow(v, isLive = false) {
+	  const tr = document.querySelector(`tr[data-device="${v.deviceId}"]`);
+	  if (!tr) return;
+
+	  // 1) Decide what text to show
+	  const statusText = isLive
+	    ? 'LIVE'
+	    : computeStatusForRow(v);
+
+	  // 2) Update the status cell
+	  const statusCell = tr.cells[0];
+	  statusCell.textContent = statusText;
+
+	  // 3) Color-code row + text
+	  tr.classList.remove('table-success','table-warning','table-info','table-danger');
+	  statusCell.className = '';
+	  if (statusText === 'LIVE' || statusText === 'RUNNING') {
+	    tr.classList.add('table-success');
+	    statusCell.classList.add('text-success');
+	  } else if (statusText === 'IDLE') {
+	    tr.classList.add('table-warning');
+	    statusCell.classList.add('text-warning');
+	  } else if (statusText === 'PARKED') {
+	    tr.classList.add('table-info');
+	    statusCell.classList.add('text-info');
+	  } else {
+	    tr.classList.add('table-danger');
+	    statusCell.classList.add('text-danger');
+	  }
+
+	  // 4) Refresh timestamp — always the server-sent string
+	  const timeCell = tr.cells[3];
+	  timeCell.textContent = v.timestamp;
+
+	  // 5) If newly OFFLINE (and not live), update the offlineAlertList inline
+	  if (!isLive && statusText === 'OFFLINE') {
+	    const list = document.getElementById("offlineAlertList");
+	    if (list) {
+	      const liId = `offline-${v.deviceId}`;
+	      let li = document.getElementById(liId);
+	      const text = `Device ${v.deviceId} → Intervals: ${v.timeIntervals}`;
+
+	      if (li) {
+	        li.textContent = text;
+	      } else {
+	        li = document.createElement("li");
+	        li.id = liId;
+	        li.className = "list-group-item list-group-item-danger";
+	        li.textContent = text;
+	        list.appendChild(li);
+	      }
+	    }
+	  }
+
+	  // 6) Flash effect
+	  tr.classList.add('bg-opacity-25');
+	  setTimeout(() => tr.classList.remove('bg-opacity-25'), 200);
+	}
+
+
+	// ———————————————————————————————————————
+
+
+
+	function autoRefreshData() {
+	  fetch('/api/vehicle/last/latests-locations/all')
+	    .then(res => res.json())
+	    .then(data => {
+	      const now = Date.now();
+
+	      // 1) Filter out invalid and compute statuses
+	      const validVehicles = data
+	        .filter(v => {
+	          const lat = parseFloat(v.latitude),
+	                lng = parseFloat(v.longitude);
+	          return !isNaN(lat) && !isNaN(lng)
+	              && v.deviceId && v.deviceId.trim().toLowerCase() !== 'null';
+	        })
+	        .map(v => {
+	          // parse intervals
+	          const [run=0, park=0, idle=0] = (v.timeIntervals || '0,0,0')
+	            .split(',').map(n => parseInt(n, 10) || 0);
+
+	          // elapsed seconds
+	          const elapsed = (now - new Date(v.timestamp).getTime()) / 1000;
+
+	          // recompute status
+	          v.vehicleStatus = computeStatus(v.vehicleStatus, run, park, idle, elapsed, 5);
+	          return v;
+	        });
+
+	      // 2) Update your dashboard
+	      document.getElementById("totalCount").textContent   = validVehicles.length;
+	      document.getElementById("runningCount").textContent = validVehicles.filter(v => v.vehicleStatus==='RUNNING').length;
+	      document.getElementById("idleCount").textContent    = validVehicles.filter(v => v.vehicleStatus==='IDLE').length;
+	      document.getElementById("parkedCount").textContent  = validVehicles.filter(v => v.vehicleStatus==='PARKED').length;
+	      document.getElementById("lostCount").textContent    = validVehicles.filter(v => v.vehicleStatus==='OFFLINE').length;
+
+	      window.vehicleTracker.updateMapMarkers(validVehicles);
+	      window.updateSidebarTable(validVehicles);
+
+	      // 3) Build list of OFFLINE devices showing only seconds
+	      const offlineList = validVehicles
+	        .filter(v => v.vehicleStatus === 'OFFLINE')
+	        .map(v => {
+	          const [run=0, park=0, idle=0] = (v.timeIntervals || '0,0,0')
+	            .split(',').map(n => parseInt(n,10) || 0);
+	          return `• ${v.deviceId} — ${run}s, ${park}s, ${idle}s`;
+	        });
+
+	      // 4) If any offline, show a single alert
+	      if (offlineList.length) {
+	        Swal.fire({
+	          title: '🚨 Offline Devices',
+	          html: offlineList.join('<br>'),
+	          icon: 'error',
+	          confirmButtonText: 'OK'
+	        });
+	      }
+	    })
+	    .catch(err => console.error('🚨 Error fetching vehicle data:', err));
+	}
+
+
+</script>
+
+<script>
+	function navigateToReplay(deviceId) {
+	    if (!deviceId) {
+	        alert("Device ID is required to navigate to the replay page.");
+	        return;
+	    }
+	    window.location.href = `/superadmin/replay?deviceId=${encodeURIComponent(deviceId)}`;
+	}
+
+</script>
+
+
+<script>
+	
+
+
+	// ✅ Function to fetch and display vehicle details in a popup
+	async function showVehicleDetails(deviceID, event) {
+	    if (!deviceID) {
+	        console.error("❌ Device ID is missing!");
+	        alert("❌ No Device ID found!");
+	        return;
+	    }
+
+	    console.log("🚀 Fetching details for Device ID:", deviceID);
+
+	    try {
+	        const response = await fetch(`/api/details/${deviceID}`);
+	        if (!response.ok) {
+	            throw new Error("❌ Server returned error " + response.status);
+	        }
+
+	        const vehicle = await response.json();
+	        console.log("📡 Vehicle Details Received:", vehicle);
+
+	        if (!vehicle || Object.keys(vehicle).length === 0) {
+	            alert("❌ No data found for this vehicle!");
+	            return;
+	        }
+
+	        // Check if popup exists, create if not
+	        let detailsPopup = document.getElementById("vehicle-details-popup");
+	        if (!detailsPopup) {
+	            detailsPopup = document.createElement("div");
+	            detailsPopup.id = "vehicle-details-popup";
+	            document.body.appendChild(detailsPopup);
+	        }
+
+	        // Populate popup with vehicle details
+	        detailsPopup.innerHTML = `
+	            <div class="popup-header">
+	                <strong>Vehicle Details</strong>
+	                <span class="close-btn" onclick="closeVehiclePopup()">×</span>
+	            </div>
+	            <div class="popup-content">
+	               
+	                <strong>Vehicle Number:</strong> ${vehicle.deviceID || "N/A"} <br>
+					<strong>Owner:</strong> ${vehicle.ownerName || "N/A"} <br>
+					<strong>Total Distance:</strong> ${vehicle.totalDistance || "N/A"} km <br>
+	               
+	                <strong>Driver RFID:</strong> ${vehicle.driverRFID || "N/A"} <br>
+	                <strong>GSM Strength:</strong> ${vehicle.gsmStrength || "N/A"} <br>
+	                <strong>IMEI:</strong> ${vehicle.imei || "N/A"} <br>
+	                <strong>Vehicle Model:</strong> ${vehicle.model || "N/A"} <br>
+	            </div>
+	        `;
+
+	        // Show popup near clicked button
+	        detailsPopup.style.display = "block";
+	        const button = event.target;
+	        const rect = button.getBoundingClientRect();
+	        detailsPopup.style.top = `${rect.top + window.scrollY + 40}px`;
+	        detailsPopup.style.left = `${rect.left + window.scrollX}px`;
+
+	        // Add event listener to close when clicking outside
+	        setTimeout(() => {
+	            document.addEventListener("click", outsideClickListener);
+	        }, 100);
+
+	    } catch (error) {
+	        console.error("🚨 Error fetching vehicle details:", error);
+	        alert("⚠️ Error fetching data. Check console for details.");
+	    }
+	}
+
+	// Function to close the popup
+	function closeVehiclePopup() {
+	    let detailsPopup = document.getElementById("vehicle-details-popup");
+	    if (detailsPopup) {
+	        detailsPopup.style.display = "none";
+	    }
+	}
+
+	// Click outside listener to close popup
+	function outsideClickListener(event) {
+	    let detailsPopup = document.getElementById("vehicle-details-popup");
+	    if (detailsPopup && !detailsPopup.contains(event.target)) {
+	        closeVehiclePopup();
+	        document.removeEventListener("click", outsideClickListener);
+	    }
+	}
+
+	// Function to close the popup
+	function closeVehiclePopup() {
+	    const popup = document.getElementById("vehicle-details-popup");
+	    if (popup) {
+	        popup.style.display = "none";
+	        document.removeEventListener("click", outsideClickListener); // Remove event listener
+	    }
+	}
+
+	// Function to detect outside click
+	function outsideClickListener(event) {
+	    const popup = document.getElementById("vehicle-details-popup");
+	    if (popup && event.target !== popup && !popup.contains(event.target)) {
+	        closeVehiclePopup();
+	    }
+	}
+
+
+	
+	document.getElementById("searchBar").addEventListener("input", function() {
+	    const searchValue = this.value.toLowerCase();
+	    const rows = document.querySelectorAll("#trackerTableBody tr");
+
+	    rows.forEach(row => {
+	        const deviceId = row.cells[1]?.textContent.toLowerCase() || ""; // Assuming device ID is in the 2nd column (index 1)
+	        if (deviceId.includes(searchValue)) {
+	            row.style.display = "";
+	        } else {
+	            row.style.display = "none";
+	        }
+	    });
+	});
+	// Speed alert popup logic
+	function playSpeedAlert(deviceId, speed) {
+	    showSpeedAlert(deviceId, speed);
+
+	    const audio = document.getElementById("overspeedAudio");
+	    if (audio) {
+	        audio.currentTime = 0;
+	        audio.play().catch(err => {
+	            console.warn("⚠️ Audio play failed:", err);
+	        });
+	    }
+	}
+
+
+	   function showSpeedAlert(deviceId, speed) {
+	       document.getElementById("alertDeviceID").textContent = deviceId;
+	       document.getElementById("alertSpeed").textContent = speed;
+
+	       const popup = document.getElementById("speedAlertPopup");
+	       popup.style.display = "block";
+
+	       // ⏱️ Auto-close after 5 seconds
+	       setTimeout(() => {
+	           popup.style.display = "none";
+	       }, 3000);
+	   }
+
+
+	   function closeSpeedAlert() {
+	     document.getElementById("speedAlertPopup").style.display = "none";
+	   }
+
+	  
+	
+	
+	   function autoRefreshSidebar() {
+		fetch('/api/vehicle/last/latests-locations/all')
+		  .then(res => res.json())
+		  .then(data => {
+		      if (Array.isArray(data) && data.length > 0) {
+		          window.updateSidebarTable(data);
+		      } else {
+		          document.getElementById("trackerTableBody").innerHTML = `
+		              <tr><td colspan="4" class="text-center text-muted">No devices found</td></tr>
+		          `;
+		      }
+		  });
+
+
+
+	}
+	
+	
+	
+	
+	
+	
+	
+</script>
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+	    let currentLayer;
+	    let mapLayers = {
+	        "osm": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	            attribution: '&copy; OpenStreetMap contributors'
+	        }),
+	        "googleSatellite": L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+	            attribution: '&copy; Google Satellite'
+	        }),
+	        "googleRoadMap": L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+	            attribution: '&copy; Google '
+	        }),
+	        "googleHybrid": L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+	            attribution: '&copy; Google Hybrid'
+	        })
+	    };
+
+		function switchLiveMap(mapType) {
+		    const nextLayer = mapLayers[mapType];
+
+		    if (!nextLayer || typeof nextLayer.addTo !== "function") {
+		        console.error("❌ Invalid map layer:", mapType, nextLayer);
+		        return;
+		    }
+
+		    if (currentLayer && typeof currentLayer.remove === "function") {
+		        window.vehicleTracker.map.removeLayer(currentLayer);
+		    }
+
+		    currentLayer = nextLayer;
+		    currentLayer.addTo(window.vehicleTracker.map);
+
+		    // Update button UI
+		    document.querySelectorAll(".map-button").forEach(btn => btn.classList.remove("active"));
+		    document.querySelector(`.map-button[data-map="${mapType}"]`).classList.add("active");
+		}
+
+
+	    // Initialize map with OSM by default
+	    currentLayer = mapLayers["osm"];
+	    currentLayer.addTo(window.vehicleTracker.map);
+
+	    // Assign switching function globally
+	    window.switchLiveMap = switchLiveMap;
+	});
+
+	
+	
+
+	function closeSidebar() {
+	    const sidebar = document.getElementById("sidebar");
+	    const toggleButton = document.getElementById("toggleButton");
+	    const mobileCloseBtn = document.getElementById("mobileCloseBtn");
+
+	    sidebar.classList.remove("active");
+	    toggleButton.classList.remove("active");
+
+	    if (window.innerWidth <= 768) {
+	        toggleButton.style.display = "block";  // ✅ Show toggle again
+	        mobileCloseBtn.style.display = "none"; // ✅ Hide close button
+	    }
+	}
+
+
+
+	// ✅ Fetch Vehicle Details & Show Popup
+	function fetchVehicleDetails(deviceID) {
+	    if (!deviceID) {
+	        console.error("❌ Device ID is missing!");
+	        alert("❌ No Device ID found!");
+	        return;
+	    }
+
+	    console.log("🚀 Fetching details for Device ID:", deviceID);
+
+	    fetch(`/api/details/${deviceID}`)
+	        .then(response => {
+	            console.log("📡 Response Status:", response.status);
+	            if (!response.ok) {
+	                throw new Error("❌ Server returned error " + response.status);
+	            }
+	            return response.json();
+	        })
+	        .then(vehicle => {
+	            console.log("📡 Vehicle Details Received:", vehicle);
+
+	            if (!vehicle || Object.keys(vehicle).length === 0) {
+	                alert("❌ No data found for this vehicle!");
+	                return;
+	            }
+
+	            // ✅ Populate Popup Data
+	            document.getElementById("popup-deviceID").textContent = vehicle.deviceID || "N/A";
+				document.getElementById("popup-serialno").textContent = vehicle.serialNo || "N/A";
+	            document.getElementById("popup-ownerName").textContent = vehicle.ownerName || "N/A";
+	            document.getElementById("popup-model").textContent = vehicle.model || "N/A";
+				document.getElementById("popup-simnumber").textContent = vehicle.simNumber || "N/A";
+				  document.getElementById("popup-timeinterval").innerText = vehicle.timeIntervals || "N/A";
+
+	            
+	           
+	            // ✅ Show Popup
+	            document.getElementById("popupOverlay").style.display = "block";
+	            document.getElementById("vehicleDetailsModal").classList.add("show");
+	            console.log("✅ Popup Opened!");
+	        })
+	        .catch(error => {
+	            console.error("🚨 Error fetching vehicle details:", error);
+	            alert("⚠️ Error fetching data. Check console for details.");
+	        });
+	}
+
+	// ✅ Function to Close Popup
+	function closePopup() {
+	    const overlay = document.getElementById("popupOverlay");
+	    const modal = document.getElementById("vehicleDetailsModal");
+	    
+	    if (overlay) overlay.style.display = "none";
+	    if (modal) modal.classList.remove("show");
+	}
+
+	document.addEventListener("DOMContentLoaded", function () {
+	    const toggleButton = document.getElementById("toggleButton");
+	    const statusSummary = document.querySelector(".status-summary");
+
+	    if (!toggleButton || !statusSummary) return;
+
+	    // Initially hide the status summary
+	    statusSummary.style.display = "none";
+
+	    toggleButton.addEventListener("click", function () {
+	        // Toggle visibility of status summary
+	        statusSummary.style.display = 
+	            statusSummary.style.display === "none" ? "flex" : "none";
+	    });
+	});
+
+	let currentPage = 1;
+	const itemsPerPage = 10;
+
+	async function fetchDevicesByStatus(status, page = 1) {
+	    const popup = document.getElementById("deviceDetailsPopup");
+	    const title = document.getElementById("popup-title");
+	    const deviceList = document.getElementById("deviceList");
+
+	    title.textContent = `${status.toUpperCase()} Devices`;
+	    deviceList.innerHTML = "<li>Loading...</li>";
+
+	    try {
+	        const response = await fetch("/api/vehicle/last/latests-locations/all");
+	        if (!response.ok) throw new Error(`Server Error: ${response.status}`);
+
+	        const devices = await response.json();
+	        if (!Array.isArray(devices)) throw new Error("Invalid API response format.");
+
+	        const now = Date.now();
+
+	        // Recompute statuses
+	        const processedDevices = devices.map(device => {
+	            const statusRaw = (device.vehicleStatus || "").toUpperCase();
+	            const timestamp = new Date(device.timestamp).getTime();
+	            const elapsedSec = (now - timestamp) / 1000;
+
+	            const [run, park, idle] = (device.timeIntervals || "0,0,0").split(',').map(x => +x || 0);
+
+	            let isOffline = false;
+
+	            if ((statusRaw === "RUNNING" || statusRaw === "MOVING") && run > 0) {
+	                if (elapsedSec > run) isOffline = true;
+	            }
+	            else if (statusRaw === "PARKED" && park > 0) {
+	                if (elapsedSec > park) isOffline = true;
+	            }
+	            else if (statusRaw === "IDLE" && idle > 0) {
+	                if (elapsedSec > idle) isOffline = true;
+	            }
+	            else {
+	                isOffline = true;
+	            }
+
+	            return {
+	                ...device,
+	                computedStatus: isOffline ? "OFFLINE" : statusRaw
+	            };
+	        });
+
+	        // Filter by computed status
+	        let filteredDevices = [];
+	        switch (status) {
+	            case "running":
+	                filteredDevices = processedDevices.filter(d => d.computedStatus === "RUNNING");
+	                break;
+	            case "idle":
+	                filteredDevices = processedDevices.filter(d => d.computedStatus === "IDLE");
+	                break;
+	            case "parked":
+	                filteredDevices = processedDevices.filter(d => d.computedStatus === "PARKED");
+	                break;
+	            case "lost":
+	                filteredDevices = processedDevices.filter(d => d.computedStatus === "OFFLINE");
+	                break;
+	            default:
+	                filteredDevices = processedDevices;
+	        }
+
+	        // Pagination
+	        const totalPages = Math.max(1, Math.ceil(filteredDevices.length / itemsPerPage));
+	        currentPage = Math.max(1, Math.min(page, totalPages));
+	        const startIdx = (currentPage - 1) * itemsPerPage;
+	        const endIdx = startIdx + itemsPerPage;
+	        const pageDevices = filteredDevices.slice(startIdx, endIdx);
+
+	        // Render
+	        deviceList.innerHTML = "";
+	        if (pageDevices.length === 0) {
+	            deviceList.innerHTML = "<li>No devices available</li>";
+	        } else {
+	            pageDevices.forEach(device => {
+	                const li = document.createElement("li");
+	                li.innerHTML = `<strong>${device.deviceId}</strong> - ${device.computedStatus}`;
+	                deviceList.appendChild(li);
+	            });
+	        }
+
+	        // Pagination controls
+	        const paginationControls = document.getElementById("paginationControls");
+	        paginationControls.innerHTML = `
+	            <button onclick="fetchDevicesByStatus('${status}', ${currentPage - 1})" ${currentPage === 1 ? "disabled" : ""}>⬅ Previous</button>
+	            <span>Page ${currentPage} of ${totalPages}</span>
+	            <button onclick="fetchDevicesByStatus('${status}', ${currentPage + 1})" ${currentPage === totalPages ? "disabled" : ""}>Next ➡</button>
+	        `;
+
+	        popup.style.display = "block";
+	    } catch (error) {
+	        console.error("🚨 Error fetching device data:", error);
+	        deviceList.innerHTML = `<li>Error: ${error.message}</li>`;
+	    }
+	}
+
+	function renderSidebarPage() {
+	  const tbody = document.getElementById('trackerTableBody');
+	  const allRows = window._sidebarAllRows || [];
+	  const totalPages = Math.ceil(allRows.length / sidebarRowsPerPage);
+	  const start = (currentSidebarPage - 1) * sidebarRowsPerPage;
+	  const end   = start + sidebarRowsPerPage;
+
+	  // show only that slice
+	  tbody.innerHTML = allRows.slice(start, end).join('');
+
+	  // render controls
+	  const pg = document.getElementById('sidebarPagination');
+	  pg.innerHTML = `
+	    <button ${currentSidebarPage===1?'disabled':''}
+	            onclick="changeSidebarPage(-1)">⬅ Previous</button>
+	    <span>Page ${currentSidebarPage} of ${totalPages}</span>
+	    <button ${currentSidebarPage===totalPages?'disabled':''}
+	            onclick="changeSidebarPage(1)">Next ➡</button>
+	  `;
+	}
+
+	function changeSidebarPage(delta) {
+	  const allRows = window._sidebarAllRows || [];
+	  const totalPages = Math.ceil(allRows.length / sidebarRowsPerPage);
+	  currentSidebarPage = Math.min(
+	    totalPages,
+	    Math.max(1, currentSidebarPage + delta)
+	  );
+	  renderSidebarPage();
+	}
+
+	function closeDevicePopup() {
+	    const popup = document.getElementById("deviceDetailsPopup");
+	    if (popup) {
+	        popup.style.display = "none";
+	    }
+	}
+	// Function to show speed alert popup
+	
+
+	// Function to close the alert manually
+	function closeSpeedAlert() {
+	    document.getElementById("speedAlertPopup").style.display = "none";
+	}
+
+	// Function to determine speed class based on speed range
+	
+	
+	
+	function closeSettingsSidebar() {
+	    let sidebar = document.getElementById("settingsSidebar");
+
+	    if (window.innerWidth < 768) {
+	        // Mobile: Slide down and hide
+	        sidebar.style.bottom = "-100%";
+	    } else {
+	        // Desktop: Slide out and hide
+	        sidebar.style.right = "-350px";
+	    }
+
+	    sidebar.classList.remove("active");
+
+	    // Hide completely after animation ends
+	    setTimeout(() => {
+	        sidebar.style.display = "none"; 
+	    }, 300); // Match transition duration
+	}
+	
+
+	
+</script>
+
+<script>
+	
+	function zoomEffect(event, deviceId, latitude, longitude) {
+	    const lat = parseFloat(latitude);
+	    const lng = parseFloat(longitude);
+
+	    if (isNaN(lat) || isNaN(lng)) {
+	        console.error(`❌ Invalid coordinates for ${deviceId}: ${lat}, ${lng}`);
+	        return;
+	    }
+
+	    console.log(`📍 Zooming to ${deviceId} at (${lat}, ${lng})`);
+	    window.vehicleTracker.zoomToVehicle(deviceId, lat, lng);
+	}
+	
+	
+	document.getElementById("searchBar").addEventListener("input", function () {
+	    const searchValue = this.value.toLowerCase();
+	    const rows = document.querySelectorAll("#trackerTableBody tr");
+
+	    rows.forEach(row => {
+	        const deviceId = row.cells[1]?.textContent.toLowerCase() || ""; // ✅ 2nd column = Device ID
+	        row.style.display = deviceId.includes(searchValue) ? "" : "none";
+	    });
+	});
+
+
+</script>
+<script>
+	let currentSidebarPage = 1;
+	const sidebarRowsPerPage = 10;
+
+	function paginateSidebarTable() {
+	    const allRows = document.querySelectorAll("#trackerTableBody tr");
+	    const totalRows = allRows.length;
+	    const totalPages = Math.ceil(totalRows / sidebarRowsPerPage);
+
+	    // Hide all rows
+	    allRows.forEach(row => (row.style.display = "none"));
+
+	    // Show current page rows
+	    const start = (currentSidebarPage - 1) * sidebarRowsPerPage;
+	    const end = start + sidebarRowsPerPage;
+	    for (let i = start; i < end && i < totalRows; i++) {
+	        allRows[i].style.display = "";
+	    }
+
+	    // Create simple controls
+	    const paginationContainer = document.getElementById("sidebarPagination");
+	    paginationContainer.innerHTML = `
+	        <button onclick="goSidebarPage(-1)" ${currentSidebarPage === 1 ? "disabled" : ""}>⬅</button>
+	        <span>Page ${currentSidebarPage} of ${totalPages}</span>
+	        <button onclick="goSidebarPage(1)" ${currentSidebarPage === totalPages ? "disabled" : ""}>➡</button>
+	    `;
+	}
+
+	function goSidebarPage(direction) {
+	    const allRows = document.querySelectorAll("#trackerTableBody tr");
+	    const totalPages = Math.ceil(allRows.length / sidebarRowsPerPage);
+	    currentSidebarPage = Math.max(1, Math.min(currentSidebarPage + direction, totalPages));
+	    paginateSidebarTable();
+	}
+
+	function refreshSidebarTableWithPagination(data) {
+	    window.vehicleTracker.updateSidebarTable(data);
+	    currentSidebarPage = 1;
+	    paginateSidebarTable();
+	}
+	
+
+
+</script>
+<script>
+	// 1) define your milestones:
+	const milestones = [
+	  { seconds: 70,       label: "70 sec" },
+	  { seconds: 1*86400,  label: "1 day"  },
+	  { seconds: 2*86400,  label: "2 days" },
+	  { seconds: 3*86400,  label: "3 days" }
+	];
+
+	// 2) per‐device state:
+	const lastStatusByDevice = new Map();          // tracks last “OFFLINE” vs anything else
+	const alertedMilestones = new Map();           // tracks which milestones fired
+	function checkVehicleAlerts() {
+	  fetch('/api/vehicle/last/latests-locations/all')
+	    .then(r => r.json())
+	    .then(data => {
+	      const now = Date.now();
+	      data.forEach(v => {
+	        const id = v.deviceId;
+	        if (!id) return;
+
+	        const ts = new Date(v.timestamp).getTime();
+	        const elapsedSec = (now - ts) / 1000;
+
+	        const [run, park, idle] = (v.timeIntervals||"0,0,0")
+	          .split(',').map(n=>+n||0);
+
+	        const current = computeStatus(v.vehicleStatus, run, park, idle, elapsedSec, 5);
+
+	        const prev = lastStatusByDevice.get(id) || "UNKNOWN";
+	        if (current === "OFFLINE" && prev !== "OFFLINE") {
+	          showOfflineToast(id, ts);
+	        }
+	        lastStatusByDevice.set(id, current);
+
+	        if (current === "OFFLINE") {
+	          let msSet = alertedMilestones.get(id);
+	          if (!msSet) {
+	            msSet = new Set();
+	            alertedMilestones.set(id, msSet);
+	          }
+
+	          milestones.forEach(m => {
+	            if (elapsedSec >= m.seconds && !msSet.has(m.seconds)) {
+	              showOfflineToast(id, ts);
+	              msSet.add(m.seconds);
+	            }
+	          });
+	        }
+	      });
+	    });
+	}
+
+	// helper to show a toast
+	function showOfflineToast(id, ts) {
+	  const since = formatUtc(ts);
+	  const dur = formatDuration(Date.now() - ts);
+	  Swal.fire({
+	    toast: true,
+	    position: 'bottom-start',
+	    icon: 'error',
+	    title: `🔌 Offline`,
+	    html: `<strong>${id}</strong><br>
+	           <small>Since: ${since}</small><br>
+	           <small>Duration: ${dur}</small>`,
+	    showConfirmButton: false,
+	    timer: 8000,
+	    timerProgressBar: true,
+	    customClass: { popup: 'swal2-offline-toast' }
+	  });
+	}
+
+
+	// kick it off:
+	checkVehicleAlerts();
+	setInterval(checkVehicleAlerts, 1000);
+
+
+function triggerIdleAlert(deviceId, durationStr, timestamp, vehicle = {}) {
+  const time = formatUtc(timestamp);
+  const flag = vehicle.countryCode ? `<img src="https://flagcdn.com/24x18/${vehicle.countryCode.toLowerCase()}.png">` : '';
+  const vehicleNumber = vehicle.deviceId || "N/A";
+  const driver = vehicle.driverName || "N/A";
+
+  Swal.fire({
+    title: '🛑 Idle Alert',
+    html: `${flag} <strong>${deviceId}</strong><br><strong>Idle Duration:</strong> ${durationStr}`,
+    icon: 'warning',
+    timer: 10000,
+    showConfirmButton: false
+  });
+  playAlertSound();
+}
+
+function updateOfflineAlertSidebar(deviceId, milestone) {
+  const list = document.getElementById("offlineAlertList");
+  if (!list) return;
+
+  const liId = `offline-${deviceId}`;
+  const existing = document.getElementById(liId);
+  const text = `Device: ${deviceId} – Offline ≥ ${milestone} min`;
+
+  if (existing) {
+    existing.textContent = text;
+  } else {
+    const li = document.createElement("li");
+    li.id = liId;
+    li.className = "list-group-item list-group-item-danger";
+    li.textContent = text;
+    list.appendChild(li);
+  }
+}
+function triggerBackOnlineAlert(deviceId, vehicle) {
+  Swal.fire({
+    title: "✅ Vehicle Back Online",
+    html: `<strong>${deviceId}</strong> is now reporting.`,
+    icon: "success",
+    timer: 5000,
+    showConfirmButton: false
+  });
+}
+
+function updateIdleAlertSidebar(deviceId, milestone) {
+  const list = document.getElementById("idleAlertList");
+  if (!list) return;
+
+  const liId = `idle-${deviceId}`;
+  const existing = document.getElementById(liId);
+  const text = `Device: ${deviceId} – IDLE ≥ ${milestone} min`;
+
+  if (existing) {
+    existing.textContent = text;
+  } else {
+    const li = document.createElement("li");
+    li.id = liId;
+    li.className = "list-group-item list-group-item-warning";
+    li.textContent = text;
+    list.appendChild(li);
+  }
+}
+
+function formatDuration(ms) {
+  const totalSec = Math.floor(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  if (h > 0) return `${h} hr ${m} min ${s} sec`;
+  if (m > 0) return `${m} min ${s} sec`;
+  return `${s} sec`;
+}
+
+function formatUtc(ts) {
+  const d = new Date(ts);
+  return d.toISOString().replace('T', ' ').substring(0, 19);
+}
+
+
+function playAlertSound() {
+  const audio = document.getElementById("overspeedAudio");
+  if (audio) {
+    audio.currentTime = 0;
+    audio.play().catch(err => console.warn("🔇 Sound error:", err));
+  }
+}
+</script>
+
+
+
+<script>
+let isMuted = false;
+
+document.getElementById("muteToggleBtn").addEventListener("click", () => {
+    isMuted = !isMuted;
+    const btn = document.getElementById("muteToggleBtn");
+    btn.textContent = isMuted ? "🔈 Unmute" : "🔇 Mute";
+});
+
+function playAlertSound() {
+    if (isMuted) return;
+
+    const audio = document.getElementById("overspeedAudio");
+    if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(err => console.warn("🔇 Alert sound failed:", err));
+    }
+}
+</script>
+
+<script>
+    function showSidebarTab(tabId, btn) {
+        document.querySelectorAll('.custom-tab-content').forEach(div => div.classList.remove('active'));
+        document.querySelectorAll('.custom-tab-btn').forEach(b => b.classList.remove('active'));
+
+        document.getElementById(tabId).classList.add('active');
+        btn.classList.add('active');
+    }
+	
+	
+
+
+	
+	function generateGSMBars(strength) {
+	    const level = strength <= 30 ? 1 : strength <= 70 ? 2 : 3;
+	    let bars = "";
+
+	    for (let i = 1; i <= 3; i++) {
+	        bars += `<span class="bar ${i <= level ? 'filled' : ''}"></span>`;
+	    }
+	    return bars;
+	}
+
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const sidebar = document.getElementById("sidebar");
+    const toggleButton = document.getElementById("toggleButton");
+    const mobileCloseBtn = document.getElementById("mobileCloseBtn");
+
+    // ✅ Global visibility manager
+    window.updateToggleVisibility = function () {
+        const isSidebarOpen = sidebar.classList.contains("active");
+        const isMobile = window.innerWidth <= 768;
+
+        if (isMobile) {
+            toggleButton.style.display = isSidebarOpen ? "none" : "block";
+            mobileCloseBtn.style.display = isSidebarOpen ? "block" : "none";
+        } else {
+            toggleButton.style.display = "block";
+            mobileCloseBtn.style.display = "none";
+        }
+    };
+
+    toggleButton.addEventListener("click", function () {
+        sidebar.classList.toggle("active");
+        toggleButton.classList.toggle("active");
+        updateToggleVisibility();
+    });
+
+    // ✅ Global sidebar close handler
+    window.closeSidebar = function () {
+        sidebar.classList.remove("active");
+        toggleButton.classList.remove("active");
+        updateToggleVisibility();
+    };		
+
+
+    window.addEventListener("resize", updateToggleVisibility);
+
+    // Initial run
+    updateToggleVisibility();
+});
+
+function formatTimeIntervals(intervalStr) {
+  if (!intervalStr || typeof intervalStr !== 'string') return 'N/A';
+  const [run, park, idle] = intervalStr.split(',').map(val => parseInt(val,10) || 0);
+
+  function fmt(sec) {
+    const h = Math.floor(sec/3600),
+          m = Math.floor((sec%3600)/60),
+          s = sec%60;
+    if (h) return `${h}h ${m}m ${s}s`;
+    if (m) return `${m}m ${s}s`;
+    return `${s}s`;
+  }
+
+  return `Run ${fmt(run)}, Park ${fmt(park)}, Idle ${fmt(idle)}`;
+}
+
+
+
+</script>
+<script>
+  const lastStatusByDevice = new Map();
+  const milestones = [{ seconds: 70, label: "70 sec" }, /* … */];
+
+  function checkVehicleAlerts() {
+    fetch('/api/vehicle/last/latests-locations/all')
+      .then(r => r.json())
+      .then(data => {
+        const now = Date.now();
+        data.forEach(v => {
+          const id = v.deviceId;
+          if (!id) return;
+          const ts = new Date(v.timestamp).getTime();
+          const elapsed = (now - ts)/1000;
+          const [run=0, park=0, idle=0] = (v.timeIntervals||"0,0,0").split(',').map(n=>+n||0);
+          const current = computeStatus(v.vehicleStatus, run, park, idle, elapsed, 5);
+          const prev = lastStatusByDevice.get(id) || "UNKNOWN";
+          if (current==="OFFLINE" && prev!=="OFFLINE") {
+            showOfflineToast(id, ts);
+          }
+          lastStatusByDevice.set(id, current);
+          // optional milestone toasts…
+        });
+      });
+  }
+  function showOfflineToast(id, ts) {
+    const since = formatUtc(ts);
+    const dur = Math.floor((Date.now() - ts)/1000) + 's';
+    Swal.fire({
+      toast: true,
+      position: 'bottom-start',
+      icon: 'error',
+      title: `🔌 ${id} offline`,
+      html: `Since: ${since}<br>Duration: ${dur}`,
+      showConfirmButton: false,
+      timer: 8000,
+      timerProgressBar: true,
+      customClass: { popup: 'swal2-offline-toast' }
+    });
+  }
+  checkVehicleAlerts();
+  setInterval(checkVehicleAlerts, 10000);  // every 10s
+  
+  
+  function refreshOfflineList(vehicles) {
+     const list = document.getElementById('offlineAlertList');
+     list.innerHTML = '';
+     vehicles
+       .filter(v => v.vehicleStatus === 'OFFLINE')
+       .forEach(v => {
+         const li = document.createElement('li');
+         li.className = 'list-group-item list-group-item-danger';
+         li.textContent = `Device ${v.deviceId} — ${v.timeIntervals}`;
+         list.appendChild(li);
+       });
+   }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

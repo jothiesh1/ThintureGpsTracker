@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<title>Thinture GPS</title>
+			    <link rel="icon" type="image/x-icon" href="THINTURE_IMAGE/favicon.jpg">
+				
+				
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+		<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	
+
+		   <!-- ✅ Include jQuery FIRST -->
+		   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+		   <!-- ✅ Bootstrap CSS & JS --> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+		   <!-- ✅ Include SweetAlert2 -->
+		  
+		  
+		  
+    <style>
+		body::before {
+				    content: "";
+				    position: fixed;
+				    top: 0;
+				    left: 0;
+				    width: 100%;
+				    height: 100%;
+
+				    background: linear-gradient(
+				        rgba(10, 25, 47, 0.95),
+				        rgba(15, 32, 65, 0.95)
+				      ),
+				      url('/THINTURE_IMAGE/add_new.jpg') no-repeat center center/cover;
+
+				    filter: blur(2px);
+				    z-index: -1;
+				}
+				@media only screen and (max-width: 768px) {
+				    body {
+				        background-attachment: fixed;
+				        min-height: 100vh;
+				        font-size: 14px;
+				        background-color: #0a192f; /* fallback for small screens if image fails */
+				        background-size: cover;
+				        color: #f0f0f0;
+				    }
+				}
+				.card {
+				    position: absolute;
+				    top: 190px;
+				    left: 50%;  /* Move the element to 50% from the left */
+				    transform: translateX(-50%); /* Center it exactly */
+				    background-color: rgba(0, 0, 0, 0.3);
+				    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+				    border-radius: 10px;
+				    width: 30%;
+				    padding: 20px 30px;
+				}
+
+				h2 {
+				    text-align: center;
+				    font-size: 24px;
+				    margin-bottom: 20px;
+				    color: white;
+				    border: none; /* Remove any line */
+				    padding-top: 10px;
+				}
+.SerialInput lable{
+	display: block;
+				          margin-bottom: 5px;
+						  color:white;
+}
+
+			     label,h3 {
+			         
+			          display: block;
+			          margin-bottom: 5px;
+					  color:white;
+			      }
+
+				  select, input[type="text"] {
+				      position: relative;
+				      width: 50%;
+				      left: 38%;
+				      padding: 10px;
+				      margin: 10px 0;
+				      border: none;
+				      outline: none;
+				      border-radius: 6px;
+				      background: white;
+				      font-size: 14px;
+				      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+				  }
+
+
+			      .addb {
+					position: relative;
+			          padding: 10px 20px;
+					  width: 40%;
+					  left: 40%; 
+			          font-size: 14px;
+			          color: white;
+					  background: linear-gradient( rgba(10, 25, 47, 0.9));
+					  							  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.8);
+			          border: none;
+			          border-radius: 4px;
+			          cursor: pointer;
+			          transition: background 0.3s;
+			          display: inline-block;
+			          margin-top: 10px;
+			      }
+
+			     
+
+			      .tab-container {
+			          display: flex;
+			          justify-content: center;
+			          margin-bottom: 20px;
+			      }
+
+			      .tab-link {
+			          padding: 10px 20px;
+			          cursor: pointer;
+			          background: #f1f1f1;
+			          border: none;
+			          border-radius: 4px;
+			          margin: 0 5px;
+			          transition: background 0.3s;
+			      }
+
+			      .tab-link.active {
+			          background: #0072ff;
+			          color: white;
+			      }
+
+			      .tab-content {
+			          display: none;
+			          margin-top: 20px;
+			      }
+
+			      .tab-content.active {
+			          display: block;
+			      }
+
+			      table {
+			          width: 100%;
+			          border-collapse: collapse;
+			          margin-top: 20px;
+			      }
+
+			      th, td {
+			          border: 1px solid #ddd;
+			          padding: 10px;
+			          text-align: left;
+			      }
+
+			      th {
+			          background: #0072ff;
+			          color: white;
+			      }
+
+			      td input {
+			          width: 30%;
+					  border-radius: 6px;
+					  			      border: 1px solid #ccc;
+			          padding: 5px;
+			          font-size: 14px;
+			      }
+				  
+				  .autocomplete-wrapper {
+				      position: relative;
+				      width: 100%;
+				      max-width: 400px;
+				      margin: 0 auto 20px auto;
+				  }
+
+				  #SerialInput {
+				      width: 50%;
+					  left:38%;
+				      padding: 10px 12px;
+				      border-radius: 6px;
+				      border: 1px solid #ccc;
+				      font-size: 14px;
+				      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+				  }
+
+				  .autocomplete-suggestions {
+				      position: absolute;
+				      top: 100%;
+				      left: 0;
+				      right: 0;
+				      background: #fff;
+				      border: 1px solid #ddd;
+				      border-top: none;
+				      border-radius: 0 0 6px 6px;
+				      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+				      z-index: 1000;
+				      max-height: 220px;
+				      overflow-y: auto;
+				      font-size: 14px;
+				  }
+
+				  .autocomplete-suggestions div {
+				      padding: 10px 15px;
+				      cursor: pointer;
+				      border-bottom: 1px solid #eee;
+				      transition: background 0.2s ease;
+				  }
+
+				  .autocomplete-suggestions div:last-child {
+				      border-bottom: none;
+				  }
+
+				  .autocomplete-suggestions div:hover {
+				      background-color: #f7f7f7;
+				  }
+
+				  
+				  
+				  
+				  
+				  .autocomplete-suggestions {
+				      position: absolute;
+				      background: #fff;
+				      border: 1px solid #ccc;
+				      border-radius: 6px;
+				      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+				      max-height: 200px;
+				      overflow-y: auto;
+				      z-index: 1000;
+				      width: auto;
+				      min-width: 300px;
+				      font-size: 14px;
+				      margin-top: 4px;
+				  }
+
+				  .autocomplete-suggestions div {
+				      padding: 10px 14px;
+				      cursor: pointer;
+				      transition: background 0.2s ease;
+				  }
+
+				  .autocomplete-suggestions div:hover {
+				      background-color: #f2f2f2;
+				  }
+
+    </style>
+</head>
+
+
+<body>
+	<header th:replace="~{navigation_dealer :: navbar_dealer}"></header>
+
+	<div class="card">
+		
+		
+	    <h2>ADD DEVICE TO CLIENT</h2>
+<br>
+<br>
+		<div class="autocomplete-wrapper">
+		<label for="ClientInput">Enter Client Name:</label>
+			    <input type="text" id="ClientInput" placeholder=" search client..." autocomplete="off">
+			    <div id="ClientSuggestions" class="autocomplete-suggestions"></div>
+		</div>
+				<div class="autocomplete-wrapper">
+				    <label for="SerialInput">Enter Serial No:</label>
+				    <input type="text" id="SerialInput" placeholder="search serial..." autocomplete="off" class="form-control">
+				    <div id="SerialSuggestions" class="autocomplete-suggestions"></div>
+				</div>
+
+
+	    
+
+	    <button class="addb" onclick="updateClientIdForVehicle()">Add Device</button>
+	</div>
+
+
+
+
+	<script>
+		$(document).ready(function () {
+		    console.log("✅ jQuery is loaded and document is ready!");
+
+		    // ✅ Trigger search when typing in Serial Number field
+		    $("#SerialInput").on("input", function () {
+		        let query = $(this).val().trim();
+		        if (query.length > 1) searchSerialNumbers(query);
+		    });
+
+		    // ✅ Trigger search when typing in Client Name field
+		    $("#ClientInput").on("input", function () {
+		        let query = $(this).val().trim();
+		        if (query.length > 1) searchClients(query);
+		    });
+
+		    // ✅ Select Serial Number from Suggestions
+		    $("#SerialSuggestions").on("click", "div", function () {
+		        let serialNo = $(this).data("serial");
+		        let dealerId = $(this).data("dealer");
+
+		        $("#SerialInput").val(serialNo);
+		        $("#SerialSuggestions").empty().hide();
+
+		        console.log(`🔹 Selected Serial No: ${serialNo}, Fetching Dealer ID: ${dealerId}`);
+
+		        // ✅ Fetch Client for Dealer ID (Auto-select client based on Dealer ID)
+		        fetchClientForDealer(dealerId);
+		    });
+
+		    // ✅ Select Client Name from Suggestions
+		    $("#ClientSuggestions").on("click", "div", function () {
+		        let clientId = $(this).data("client-id");
+		        let clientName = $(this).text();
+
+		        $("#ClientInput").val(clientName);
+		        $("#ClientInput").attr("data-client-id", clientId);
+		        $("#ClientSuggestions").empty().hide();
+		    });
+
+		    // ✅ Hide suggestions when clicking outside input fields
+		    $(document).on("click", function (event) {
+		        if (!$(event.target).closest("#SerialInput, #SerialSuggestions").length) {
+		            $("#SerialSuggestions").empty().hide();
+		        }
+		        if (!$(event.target).closest("#ClientInput, #ClientSuggestions").length) {
+		            $("#ClientSuggestions").empty().hide();
+		        }
+		    });
+		});
+
+		// ✅ Search Serial Numbers (Fetch Dealer ID)
+		function searchSerialNumbers(query) {
+		    $.ajax({
+		        url: `/vehicless/search-serials?query=${query}`,
+		        method: "GET",
+		        dataType: "json",
+		        success: function (data) {
+		            let suggestions = data.map(item =>
+		                `<div data-serial="${item.serialNo}" data-dealer="${item.dealerId}">
+		                    ${item.serialNo} (Dealer: ${item.dealerId ? item.dealerId : "N/A"})
+		                </div>`
+		            ).join("");
+		            $("#SerialSuggestions").html(suggestions).show();
+		        },
+		        error: function () {
+		            console.error("❌ Error fetching serial numbers.");
+		        }
+		    });
+		}
+
+		// ✅ Fetch Clients for Auto-Complete
+		function searchClients(query) {
+		    $.ajax({
+		        url: `/vehicless/search-clients?query=${query}`,
+		        method: "GET",
+		        dataType: "json",
+		        success: function (data) {
+		            if (data.length === 0) {
+		                $("#ClientSuggestions").empty().hide();
+		                return;
+		            }
+
+		            let suggestions = data.map(client =>
+		                `<div data-client-id="${client.id}">${client.name} (ID: ${client.id})</div>`
+		            ).join("");
+		            $("#ClientSuggestions").html(suggestions).show();
+		        },
+		        error: function () {
+		            console.error("❌ Error fetching clients.");
+		        }
+		    });
+		}
+
+		// ✅ Select Client Name from Suggestions
+		$("#ClientSuggestions").on("click", "div", function () {
+		    let clientId = $(this).data("client-id");
+		    let clientName = $(this).text();
+
+		    $("#ClientInput").val(clientName);
+		    $("#ClientInput").attr("data-client-id", clientId);
+		    $("#ClientSuggestions").empty().hide();
+		});
+
+		// ✅ Update Client in Vehicle Table
+		function updateClientIdForVehicle() {
+		    let serialNo = $("#SerialInput").val();
+		    let clientId = $("#ClientInput").attr("data-client-id");
+
+		    if (!serialNo || !clientId) {
+		        Swal.fire("Error", "Please select both Serial No and Client.", "error");
+		        return;
+		    }
+
+		    $.ajax({
+		        url: `/vehicless/update-client?serialNo=${encodeURIComponent(serialNo)}&clientId=${clientId}`,
+		        method: "PUT",
+		        success: function (response) {
+		            Swal.fire("Success", response, "success");
+		        },
+		        error: function () {
+		            Swal.fire("Error", "❌ Failed to update client. Please try again.", "error");
+		        }
+		    });
+		}
+
+
+	</script>
+
+
+	</body>
+</html>

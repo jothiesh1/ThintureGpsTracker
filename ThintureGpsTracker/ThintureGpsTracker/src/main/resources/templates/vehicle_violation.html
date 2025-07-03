@@ -1,0 +1,347 @@
+
+<!-- @Controller class ViolationController -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Thinture GPS - Vehicle Violation Report</title>
+	<link rel="icon" type="image/x-icon" href="THINTURE_IMAGE/favicon.jpg">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			background-image: url('/THINTURE_IMAGE/add_new.jpg');
+			background-size: cover;
+			background-repeat: no-repeat;
+			margin: 0;
+			padding: 0;
+		}
+
+		.card {
+			position: absolute;
+			top: 170px;
+			left: 20%;
+			width: 1050px;
+			max-height: 80vh;
+			background-color: rgba(255, 255, 255, 1);
+			padding: 10px;
+			border-radius: 10px;
+			overflow-y: auto;
+			overflow-x: hidden;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+		}
+
+		table th {
+			background-color: #007bff;
+			color: white;
+		}
+
+		table td {
+			color: black;
+		}
+
+		h1 {
+			color: black;
+		}
+
+		#loading {
+			display: none;
+			font-weight: bold;
+			color: red;
+		}
+		.table-container {
+		    background-color: rgb(255, 255, 255);
+		    padding: 15px;
+		    border-radius: 10px;
+		    max-height: 400px; /* Adjust as needed */
+		    overflow-y: auto; /* Enables vertical scrolling */
+		    position: relative;
+		}
+
+		/* Make the table take full width */
+		.table {
+		    width: 100%;
+		    border-collapse: collapse;
+		    background-color: rgb(255, 255, 255);
+		    color: black;
+		}
+
+		/* Fix the table header */
+		thead {
+		    position: sticky;
+		    top: 0;
+		    background-color: rgb(0, 0, 255); /* Keep the blue header */
+		    color: white;
+		    z-index: 10;
+		}
+
+		/* Header styling */
+		th {
+		    padding: 10px;
+		    font-weight: bold;
+		    text-align: center;
+		    background-color: rgb(255, 0, 0); /* Red header */
+		}
+
+		/* Table body */
+		td {
+		    padding: 10px;
+		    text-align: center;
+		    background-color: rgb(255, 128, 192); /* Pink rows */
+		}
+
+		/* Alternate row colors */
+		tbody tr:nth-child(even) {
+		    background-color: rgb(255, 255, 255);
+		}
+
+		/* Row hover effect */
+		tbody tr:hover {
+		    background-color: rgb(255, 0, 0);
+		}
+
+		/* Style for 'No Data' message */
+		.no-data {
+		    color: red;
+		    font-weight: bold;
+		    text-align: center;
+		}
+
+	</style>
+	
+	
+</head>
+
+<body>
+	<header th:replace="navigation :: navbar"></header>
+
+	<div class="card">
+		<h1 class="text-center">Vehicle Violation Report</h1>
+
+		<div class="filters row g-3 mb-4">
+			<!-- Quick Time Filter -->
+			<div class="col-md-3">
+				<label for="quickTime" class="form-label">Quick Time:</label>
+				<select id="quickTime" class="form-select" onchange="setQuickTime()">
+					<option value="">Select</option>
+					<option value="today">Today</option>
+					<option value="lastWeek">Last Week</option>
+				</select>
+			</div>
+
+			<!-- From Date and Time -->
+			<div class="col-md-3">
+				<label for="fromDate" class="form-label">From Date:</label>
+				<input type="date" id="fromDate" class="form-control">
+			</div>
+			<div class="col-md-3">
+				<label for="fromTime" class="form-label">From Time:</label>
+				<input type="time" id="fromTime" class="form-control" value="00:00">
+			</div>
+
+			<!-- To Date and Time -->
+			<div class="col-md-3">
+				<label for="toDate" class="form-label">To Date:</label>
+				<input type="date" id="toDate" class="form-control">
+			</div>
+			<div class="col-md-3">
+				<label for="toTime" class="form-label">To Time:</label>
+				<input type="time" id="toTime" class="form-control" value="23:59">
+			</div>
+
+			<!-- Device ID Filter -->
+			<div class="col-md-3">
+				<label for="deviceID" class="form-label">Device ID:</label>
+				<select id="deviceID" class="form-select"></select>
+			</div>
+
+			<!-- Additional Data Filter -->
+			<div class="col-md-3">
+				<label for="additionalData" class="form-label">Violation Type:</label>
+				<select id="additionalData" class="form-select"></select>
+			</div>
+
+			<!-- Buttons -->
+			<div class="col-md-3">
+				<button class="btn btn-primary w-100" onclick="searchReports()">Search</button>
+			</div>
+			<div class="col-md-3">
+			<button class="btn btn-success w-100" onclick="downloadPDF()">Download PDF</button>
+			</div>
+			<div class="col-md-3">
+				<button class="btn btn-success w-100" onclick="downloadExcel()">Download Excel</button>
+			</div>
+		</div>
+
+		<!-- Data Table -->
+		<div class="table-container">
+		    <table class="table table-bordered">
+		        <thead>
+		            <tr>
+		                <th>Device ID</th>
+		           <!--    <th>Vehicle Number</th> -->  
+		                <th>Vehicle </th>
+		                <th>Violation Type</th>
+		                <th>Event Latitude</th>
+		                <th>Event Longitude</th>
+		                <th>Event Speed</th>
+		                <!-- <th>Event Status</th>  -->  
+		                <th>Event Time</th>
+		                <!-- <th>Dealer Name</th>  -->  
+		                <th>Driver Name</th>
+		            </tr>
+		        </thead>
+		        <tbody id="reportTable">
+		            <tr>
+		                <td colspan="11" class="no-data">No data available</td>
+		            </tr>
+		        </tbody>
+		    </table>
+		</div>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+		
+
+	<script>
+		async function loadDropdown(url, elementId, defaultText) {
+			const dropdown = document.getElementById(elementId);
+			const response = await fetch(url);
+			const data = await response.json();
+			dropdown.innerHTML = `<option value="">${defaultText}</option>`;
+			data.forEach(item => {
+				dropdown.innerHTML += `<option value="${item}">${item}</option>`;
+			});
+		}
+
+		document.addEventListener("DOMContentLoaded", () => {
+			loadDropdown('/vehicle/violation/report/additional-data', 'additionalData', 'Select Violation');
+			loadDropdown('/vehicle/violation/report/devices', 'deviceID', 'Select Device ID');
+		});
+
+		async function searchReports() {
+			const params = new URLSearchParams({
+				deviceId: document.getElementById("deviceID").value,
+				additionalData: document.getElementById("additionalData").value,
+				fromDate: document.getElementById("fromDate").value,
+				fromTime: document.getElementById("fromTime").value,
+				toDate: document.getElementById("toDate").value,
+				toTime: document.getElementById("toTime").value
+			});
+
+			document.getElementById("reportTable").innerHTML = "<tr><td colspan='11' class='text-center'>Loading...</td></tr>";
+
+			try {
+				const response = await fetch(`/vehicle/violation/report/violations/filter?${params}`);
+				const data = await response.json();
+				let rows = '';
+				data.forEach(v => {
+					rows += `<tr>
+						<td>${v.deviceId}</td>
+					
+						<td>${v.vehicleType}</td>
+						<td>${v.additionalData}</td>
+						<td>${v.latitude}</td>
+						<td>${v.longitude}</td>
+						<td>${v.speed}</td>
+						
+						<td>${v.timestamp}</td>
+						
+						<td>${v.ownerName}</td>
+					</tr>`;
+				});
+				document.getElementById("reportTable").innerHTML = rows || "<tr><td colspan='11' class='text-center'>No data found</td></tr>";
+			} catch (e) {
+				document.getElementById("reportTable").innerHTML = "<tr><td colspan='11' class='text-center'>Failed to load data</td></tr>";
+			}
+		}
+	</script>
+	
+	<script>
+			
+			
+			function setQuickTime() {
+			    const quickTime = document.getElementById("quickTime").value;
+			    const today = new Date();
+			    const todayStr = today.toISOString().split("T")[0]; // Format: YYYY-MM-DD
+
+			    if (quickTime === "today") {
+			        document.getElementById("fromDate").value = todayStr;
+			        document.getElementById("toDate").value = todayStr;
+			    } else if (quickTime === "lastWeek") {
+			        let lastWeek = new Date();
+			        lastWeek.setDate(today.getDate() - 7);
+			        const lastWeekStr = lastWeek.toISOString().split("T")[0];
+
+			        document.getElementById("fromDate").value = lastWeekStr;
+			        document.getElementById("toDate").value = todayStr;
+			    } else {
+			        // Reset if "Select" is chosen
+			        document.getElementById("fromDate").value = "";
+			        document.getElementById("toDate").value = "";
+			    }
+			}
+
+		</script>
+		<!-- Include Required Libraries -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+
+		<script>
+		    // ✅ Function to Download Excel
+		    function downloadExcel() {
+		        let table = document.querySelector(".table"); // Selects the table with class "table"
+		        let wb = XLSX.utils.table_to_book(table, {sheet: "Report"});
+		        XLSX.writeFile(wb, "Vehicle_Violation_Report.xlsx");
+		    }
+
+		    // ✅ Function to Download PDF
+		    function downloadPDF() {
+		        const { jsPDF } = window.jspdf;
+		        const doc = new jsPDF('p', 'mm', 'a4'); // Set page size
+
+		        doc.text("Vehicle Violation Report", 14, 10);
+
+		        const table = document.querySelector(".table");
+		        const rows = [];
+		        const headers = [];
+
+		        // ✅ Extract Table Headers
+		        table.querySelectorAll("thead tr th").forEach(th => {
+		            headers.push(th.innerText);
+		        });
+
+		        rows.push(headers); // Add headers to rows
+
+		        // ✅ Extract Table Rows
+		        table.querySelectorAll("tbody tr").forEach(tr => {
+		            const row = [];
+		            tr.querySelectorAll("td").forEach(td => {
+		                row.push(td.innerText);
+		            });
+		            rows.push(row);
+		        });
+
+		        // ✅ Convert Table Data into PDF
+		        doc.autoTable({
+		            head: [headers],
+		            body: rows.slice(1),
+		            startY: 20,
+		            styles: { fontSize: 9 }
+		        });
+
+		        // ✅ Save PDF File
+		        doc.save("Vehicle_Violation_Report.pdf");
+		    }
+		</script>
+
+</body>
+</html>

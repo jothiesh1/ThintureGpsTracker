@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+	 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	</head>
+    <title>THINTURE</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('THINTURE_IMAGE/background4.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 0;
+        }
+		
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border: 1px solid gray;
+            border-radius: 15px;
+            position: relative;
+            top: 150px;
+        }
+
+        h2 {
+			text-align: center;
+								    font-size: 2em; /* Adjust size as needed */
+									font-weight: 400;
+								    color:black; /* Text color */
+								    text-shadow: 
+									1px 1px 2px rgba(0, 0, 0, 0.4), /* First shadow for initial depth */
+									        3px 3px 5px rgba(0, 0, 0, 0.3), /* Slightly darker shadow for increased depth */
+									        6px 6px 8px rgba(0, 0, 0, 0.2); /* Darker shadow for stronger 3D effect */
+			        }
+
+        .search-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .search {
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid black;
+            border-radius: 5px;
+            width: 150px;
+        }
+
+        .search-button {
+            padding: 8px 12px;
+            background-color: darkblue;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        table {
+            width: 90%;
+            border-collapse: collapse;
+            margin: 20px auto;
+            font-size: 12px;
+            text-align: left;
+            background-color: white;
+            border-radius: 5px;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: darkblue;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .action-btn, .delete-btn, .edit-btn {
+            padding: 8px 12px;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .action-btn {
+            background-color: darkblue;
+        }
+
+        .delete-btn {
+            background-color:darkblue;
+        }
+
+        .edit-btn {
+            background-color:darkblue;
+        }
+
+        #viewContainer {
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            display: none;
+            width: 50%;
+            margin: 180px auto;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            color: white;
+            background-color: darkblue;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+	<div th:insert="navigation :: navbar"></div>
+    <div class="container">
+        <h2><strong>USER DETAILS</strong></h2>
+
+        <div class="search-container">
+            <input type="text" class="search" id="search" placeholder="Search for vehicles...">
+            <button type="button" class="search-button" onclick="searchTable()">Search</button>
+        </div>
+
+        <div id="tableContainer">
+            <table id="dataTable">
+                <tr>
+					<th>DEVICE ID</th>
+                    <th>NAME</th>
+                    <th>ADDRESS</th>
+                    <th>MAIL</th>
+                    <th>PHONE</th>
+					<th>VEHICLE NO.</th>
+                    <th>COUNTRY</th>
+                    <th>LOGIN-STATUS</th>
+                    <th>EDIT</th>
+                    <th>DELETE</th>
+                </tr>
+                <tr>
+					<td>TH/15A/0001</td>
+                    <td>Jestin George</td>
+                    <td>Thinture</td>
+                  
+                    <td>jestingeorge1994@gmail.com</td>
+                    <td>8943451597</td>
+					<td>KL.58.N.6082</td>
+                    <td>India</td>
+					<td>
+						<button id="toggleButton" onclick="toggleButton(this)">
+						            <i class="fas fa-check" style="color: green;"></i>
+						        </button>
+					   </td>
+                    <td><button class="edit-btn" onclick="editRow(this)">Edit</button></td>
+                    <td><button class="delete-btn" onclick="deleteRow(this)">Delete</button></td>
+                </tr>
+				<tr>
+					<td>TH/15A/0002</td>
+					                    <td>Jestin George</td>
+					                    <td>Thinture</td>
+					                  
+					                    <td>jestingeorge1994@gmail.com</td>
+					                    <td>8943451597</td>
+										<td>KL.58.N.6082</td>
+					                    <td>India</td>
+									<td>
+										<button id="toggleButton" onclick="toggleButton(this)">
+										            <i class="fas fa-check" style="color: green;"></i>
+										        </button>
+									       
+									   </td>
+				                    <td><button class="edit-btn" onclick="editRow(this)">Edit</button></td>
+				                    <td><button class="delete-btn" onclick="deleteRow(this)">Delete</button></td>
+				                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div id="viewContainer">
+        <button class="back-btn" onclick="goBack()">Back to Table</button>
+        <h3>Details</h3>
+        <p id="viewDetails"></p>
+    </div>
+
+    <script>
+        // Simulate login status
+        var loggedIn = false; // Change this to true when the user logs in
+
+        // Enable or disable buttons based on login status
+        function setButtonState() {
+            const actionButtons = document.querySelectorAll('.action-btn');
+            actionButtons.forEach(button => {
+                button.disabled = !loggedIn;
+            });
+        }
+
+        // Call setButtonState on page load
+        window.onload = function() {
+            setButtonState();
+        };
+
+        function viewDetails(button) {
+            const row = button.closest('tr');
+            const name = row.cells[0].innerText;
+            const address = row.cells[1].innerText;
+            const license = row.cells[2].innerText;
+            const mail = row.cells[3].innerText;
+            const phone = row.cells[4].innerText;
+            const country = row.cells[5].innerText;
+
+            const details = `
+                <strong>Name:</strong> ${name}<br>
+                <strong>Address:</strong> ${address}<br>
+                <strong>License Number:</strong> ${license}<br>
+                <strong>Email:</strong> ${mail}<br>
+                <strong>Phone:</strong> ${phone}<br>
+                <strong>Country:</strong> ${country}
+            `;
+
+            document.getElementById('tableContainer').style.display = 'none';
+            document.getElementById('viewContainer').style.display = 'block';
+            document.getElementById('viewDetails').innerHTML = details;
+        }
+
+        function goBack() {
+            document.getElementById('tableContainer').style.display = 'block';
+            document.getElementById('viewContainer').style.display = 'none';
+        }
+
+        function deleteRow(button) {
+            if (confirm('Are you sure you want to delete this row?')) {
+                const row = button.closest('tr');
+                row.remove();
+            }
+        }
+		function toggleButton(btn) {
+		    const icon = btn.querySelector('i');
+		    if (icon.classList.contains('fa-check')) {
+		        // Change to Disable state
+		        icon.classList.remove('fa-check');
+		        icon.classList.add('fa-times');
+		        icon.style.color = 'red';
+		    } else {
+		        // Change to Enable state
+		        icon.classList.remove('fa-times');
+		        icon.classList.add('fa-check');
+		        icon.style.color = 'green';
+		    }
+		}
+
+
+
+    </script>
+
+</body>
+</html>

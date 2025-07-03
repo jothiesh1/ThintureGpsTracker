@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Thinture GPS</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+	<link rel="icon" type="image/x-icon" href="THINTURE_IMAGE/favicon.jpg">
+    <!-- Leaflet MarkerCluster CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+	<link rel="stylesheet" type="text/css" th:href="@{/css/styled.css}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Custom styles -->
+    <style>
+    
+        
+		html, body {
+		    height: 100%;
+		    margin: 0;
+		    padding: 0;
+		}
+
+		.card {
+			top:120px;
+		    height: 100%;
+		}
+
+		.main-content {
+		    height: 100%;
+		    position: relative;
+		}
+
+        
+		.sidebar {
+		    position: absolute;
+		    top: 150px;
+		    right: 10px;
+		    width: 300px;
+		    height: calc(100vh - 160px); /* adjust for header/footer if needed */
+		    background-color: #fff;
+		    z-index: 999; /* on top of map */
+		    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+		    padding: 20px;
+		    overflow-y: auto;
+		}
+
+        
+      
+        
+        #map {
+			position: absolute;
+			top:1px;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .vehicle-popup {
+            min-width: 250px;
+        }
+        
+        .popup-header {
+            padding: 8px;
+            color: white;
+            border-radius: 4px 4px 0 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .live-update {
+            background-color: #4CAF50;
+        }
+        
+        .last-known {
+            background-color: #2196F3;
+        }
+        
+        .popup-content {
+            padding: 10px;
+        }
+        
+        .popup-label {
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .status-indicator {
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        
+        .status-parked {
+            background-color: #FFC107;
+            color: #000;
+        }
+        
+        .status-running {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .ignition-on {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .ignition-off {
+            color: #F44336;
+        }
+        
+        .connection-status {
+            position: fixed;
+            top: 190px;
+            left: 10px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .connected {
+			
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .disconnected {
+            background-color: #F44336;
+            color: white;
+        }
+        
+        .filter-panel {
+            background: white;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .control-panel {
+            padding: 15px;
+            background-color: white;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        button {
+            padding: 8px 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .btn-blue {
+            background-color: #2196F3;
+        }
+        
+        .btn-blue:hover {
+            background-color: #0b7dda;
+        }
+        
+        .btn-red {
+            background-color: #F44336;
+        }
+        
+        .btn-red:hover {
+            background-color: #d32f2f;
+        }
+        
+        .vehicle-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        .vehicle-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        
+        .vehicle-item:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .vehicle-item.active {
+            background-color: #e3f2fd;
+        }
+        
+        .vehicle-status {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .status-online {
+            background-color: #4CAF50;
+        }
+        
+        .status-offline {
+            background-color: #F44336;
+        }
+        
+        .status-idle {
+            background-color: #FFC107;
+        }
+        
+        .alert-container {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            max-width: 300px;
+        }
+        
+        .parking-alert, .live-alert {
+            background-color: white;
+            border-left: 4px solid #ff9800;
+            margin-bottom: 10px;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            border-radius: 4px;
+            transition: opacity 0.3s, transform 0.3s;
+            opacity: 0;
+        }
+        
+        .live-alert {
+            border-left-color: #4CAF50;
+        }
+        
+        .parking-icon, .live-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+        
+        .parking-info, .live-info {
+            flex: 1;
+        }
+        
+        .parking-info strong, .live-info strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .parking-info span, .live-info span {
+            display: block;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .alert-close {
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .alert-close:hover {
+            color: #333;
+        }
+        
+        .slide-out {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+        
+        /* User Info Panel */
+        .user-info {
+            background-color: #2196F3;
+            color: white;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .user-info h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+        
+        .user-info p {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        /* Role badge styles */
+        .role-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+      
+        
+        /* Data Source Toggle Button */
+        .data-source-toggle {
+            position: fixed;
+            top: 230px;
+            left: 10px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            background-color: #2196F3;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .data-source-toggle.api {
+            background-color: #FF9800;
+        }
+		.sidebar {
+		    transition: transform 0.3s ease;
+		}
+
+		.sidebar.hidden {
+		    transform: translateX(320px); /* slides it out of view */
+		}
+
+		.sidebar-toggle {
+		    transition: right 0.3s ease;
+		}
+
+		.sidebar.hidden + .sidebar-toggle {
+		    right: 10px !important;
+		}
+		#sidebar-toggle {
+		    position: fixed;
+		    top: 120px;
+		left:1350px;
+		    width: 70px;
+		    transition: right 0.3s ease;
+		    z-index: 1000;
+		}
+		
+		
+		
+		#speedometer-toggle-wrapper {
+		    position: absolute;
+		    top: 20px;
+		    left: 20px;
+		    z-index: 10001;
+		}
+
+
+		#speedometer-container {
+		    position: absolute;
+		    top: 60px;
+		    left: 20px;
+		    z-index: 9999;
+		    pointer-events: none;
+		    transform: scale(0.75);
+		    transform-origin: top left;
+		    opacity: 0;
+		    visibility: hidden;
+		    transition: opacity 0.3s ease-in-out;
+		}
+
+		#speedometer-container.visible {
+		    opacity: 1;
+		    visibility: visible;
+		    pointer-events: auto;
+		}
+
+		#speedDisplay {
+		    font-size: 1.4rem;
+		    font-weight: bold;
+		    color: rgb(0, 0, 64);
+		    margin-top: 20px;
+		    text-align: center;
+		    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+		}
+
+		canvas {
+		    background-color: white;
+		    display: block;
+		    height: 200px;
+		    align-items: center;
+		    border-radius: 8px;
+		}
+
+		#toggleSpeedometer {
+		    font-size: 24px;
+		    margin: 5px;
+		    color: rgb(0,0,64);
+		    cursor: pointer;
+		}
+
+	</style>
+	</head>
+	
+	<!-- Include the ThinTureSpeedLimiter script -->
+	<script src="ThinTureSpeedLimiter.js"></script>
+	
+<body>
+		<header th:insert="navigation :: navbar"></header>
+		
+		
+	    <!-- Hidden fields for user info (these would be populated by your server) -->
+	    <input type="hidden" id="userRole" value="ROLE_ADMIN">
+	    <input type="hidden" id="userId" value="101">
+		<button id="sidebar-toggle" class="data-source-toggle">
+		    ☰ Toggle Sidebar
+		</button>
+
+		
+	    <!-- FontAwesome icon for toggle -->
+	    <div id="speedometer-toggle-wrapper">
+	        <i class="fa-solid fa-gauge" id="toggleSpeedometer"></i>
+	    </div>
+	    
+		
+		
+	    <!-- Speedometer container -->
+	    <div id="speedometer-container">
+	        <canvas id="speedometer" width="500" height="300"></canvas>
+	        <div id="speedDisplay"><b>Speed: 0 km/h</b></div>
+	    </div>
+
+	    <div class="card">
+			<script>
+			    let speedometerCanvas, speedometerCtx, centerX, centerY, radius, maxSpeed;
+
+			    document.addEventListener("DOMContentLoaded", function () {
+			        initSpeedometer();
+			        setupSpeedometerToggle();
+			    });
+
+			    function initSpeedometer() {
+			        speedometerCanvas = document.getElementById("speedometer");
+			        if (!speedometerCanvas) return;
+			        speedometerCtx = speedometerCanvas.getContext("2d");
+			        centerX = speedometerCanvas.width / 2;
+			        centerY = speedometerCanvas.height;
+			        radius = 200;
+			        maxSpeed = 240;
+			        drawSpeedometer(0);
+			    }
+
+			    function drawSpeedometer(speed) {
+			        if (!speedometerCtx) return;
+			        speedometerCtx.clearRect(0, 0, speedometerCanvas.width, speedometerCanvas.height);
+
+			        const grad = speedometerCtx.createLinearGradient(0, 0, speedometerCanvas.width, 0);
+			        grad.addColorStop(0, "#4caf50");
+			        grad.addColorStop(0.5, "#ffeb3b");
+			        grad.addColorStop(1, "#f44336");
+
+			        speedometerCtx.lineWidth = 14;
+			        speedometerCtx.strokeStyle = grad;
+			        speedometerCtx.beginPath();
+			        speedometerCtx.arc(centerX, centerY, radius, Math.PI, 2 * Math.PI);
+			        speedometerCtx.stroke();
+
+			        speedometerCtx.font = "bold 18px sans-serif";
+			        speedometerCtx.textAlign = "center";
+			        speedometerCtx.textBaseline = "middle";
+
+			        for (let i = 0; i <= maxSpeed; i += 20) {
+			            const angle = Math.PI + (i / maxSpeed) * Math.PI;
+			            const outerX = centerX + radius * Math.cos(angle);
+			            const outerY = centerY + radius * Math.sin(angle);
+			            const innerX = centerX + (radius - 10) * Math.cos(angle);
+			            const innerY = centerY + (radius - 10) * Math.sin(angle);
+
+			            speedometerCtx.strokeStyle = "#888";
+			            speedometerCtx.lineWidth = 1.5;
+			            speedometerCtx.beginPath();
+			            speedometerCtx.moveTo(innerX, innerY);
+			            speedometerCtx.lineTo(outerX, outerY);
+			            speedometerCtx.stroke();
+
+			            const textX = centerX + (radius - 25) * Math.cos(angle);
+			            const textY = centerY + (radius - 25) * Math.sin(angle);
+			            speedometerCtx.fillStyle = "black";
+			            speedometerCtx.fillText(i.toString(), textX, textY);
+			        }
+
+			        const needleAngle = Math.PI + (speed / maxSpeed) * Math.PI;
+			        const needleLength = radius - 40;
+			        const needleX = centerX + needleLength * Math.cos(needleAngle);
+			        const needleY = centerY + needleLength * Math.sin(needleAngle);
+
+			        speedometerCtx.strokeStyle = "#e53935";
+			        speedometerCtx.lineWidth = 3;
+			        speedometerCtx.beginPath();
+			        speedometerCtx.moveTo(centerX, centerY);
+			        speedometerCtx.lineTo(needleX, needleY);
+			        speedometerCtx.stroke();
+
+			        speedometerCtx.beginPath();
+			        speedometerCtx.arc(centerX, centerY, 6, 0, 2 * Math.PI);
+			        speedometerCtx.fillStyle = "#ddd";
+			        speedometerCtx.fill();
+
+			        document.getElementById("speedDisplay").innerHTML = `<b>Speed: ${Math.round(speed)} km/h</b>`;
+			    }
+
+			    function setupSpeedometerToggle() {
+			        const toggleIcon = document.getElementById("toggleSpeedometer");
+			        const container = document.getElementById("speedometer-container");
+			        toggleIcon.addEventListener("click", () => {
+			            container.classList.toggle("visible");
+			        });
+			    }
+
+			    // Expose update function for external use
+			    function updateSpeedometer(speed) {
+			        drawSpeedometer(speed);
+			    }
+				
+				
+				document.addEventListener("DOMContentLoaded", function() {
+				    const el = document.getElementById("speedometer-toggle-wrapper");
+				    if (el) {
+				        el.style.border = "2px solid red";
+				        el.style.background = "yellow";
+				    }
+				});
+
+			    // Example: Call this when you receive new speed from GPS data
+			    // updateSpeedometer(vehicleData.speed);
+			</script>
+			
+			
+			
+			
+        <div class="sidebar">
+            <div class="user-info">
+              
+            </div>
+            
+            <div class="form-group">
+                <label for="vehicle-filter">Filter Vehicles:</label>
+                <input type="text" id="vehicle-filter" placeholder="Search by device ID or status">
+            </div>
+            
+            <div class="form-group">
+                <label for="status-filter">Filter by Status:</label>
+                <select id="status-filter">
+                    <option value="">All Statuses</option>
+                    <option value="RUNNING">Running</option>
+                    <option value="PARKED">Parked</option>
+                    <option value="IDLE">Idle</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <button id="show-all-btn" class="btn-blue">Show All Vehicles</button>
+                <button id="refresh-btn">Refresh Data</button>
+            </div>
+            
+            <h3>Your Vehicles</h3>
+            <div id="vehicle-list" class="vehicle-list">
+                <!-- Vehicle list will be populated dynamically -->
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div id="map"></div>
+            <div id="connection-status" class="connection-status disconnected">Disconnected</div>
+            <div id="data-source-toggle" class="data-source-toggle">Data Source: WebSocket</div>
+        </div>
+    </div>
+	
+    <!-- Alert container for notifications -->
+    <div id="alert-container" class="alert-container"></div>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    
+    <!-- Leaflet MarkerCluster JS -->
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    
+    <!-- SockJS and STOMP for WebSocket -->
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stomp-websocket@2.3.4-next/lib/stomp.min.js"></script>
+    
+    <script>
+        /**
+         * VehicleTracker class - Handles vehicle tracking with role-based permissions
+         * and supports both WebSocket and API data sources
+         */
+        class VehicleTracker {
+            constructor(mapElementId) {
+                // Initialize map and data structures
+                this.map = L.map(mapElementId).setView([13.07757, 77.55928], 5);
+                this.markers = {};
+                this.liveDevices = new Set();
+                this.deviceLastUpdate = {};
+                this.previousCourses = {};
+                this.vehicleData = {};
+                this.inactivityThreshold = 30000;
+                this.activeAlerts = new Set();
+                this.filterTimeout = null;
+                this.isUsingWebSocket = true;
+                this.apiRefreshInterval = null;
+                
+                // Get user info from hidden fields
+                this.userRole = document.getElementById('userRole').value;
+                this.userId = document.getElementById('userId').value;
+                
+                // Setup UI with user info
+                this.setupUserInfo();
+                
+                // Initialize map components
+                this.initializeMapLayers();
+                this.initializeControls();
+                
+                // Initialize WebSocket
+                this.initWebSocket();
+                
+                // Load initial data
+                this.loadLastKnownPositions();
+                
+                // Start polling for updates
+                this.pollOfflineDevices();
+                this.checkInactiveDevices();
+                
+                console.log(`VehicleTracker initialized for ${this.userRole} (User ID: ${this.userId})`);
+            }
+            
+            setupUserInfo() {
+                // Display user role badge
+                const roleBadge = document.getElementById('role-badge');
+                if (roleBadge) {
+                    let roleText = this.userRole.replace('ROLE_', '');
+                    roleBadge.textContent = roleText;
+                    
+                    // Remove all role classes
+                    roleBadge.classList.remove('role-superadmin', 'role-admin', 'role-dealer', 'role-client', 'role-user');
+                    
+                    // Add appropriate role class
+                    switch (this.userRole) {
+                        case 'ROLE_SUPERADMIN':
+                            roleBadge.classList.add('role-superadmin');
+                            break;
+                        case 'ROLE_ADMIN':
+                            roleBadge.classList.add('role-admin');
+                            break;
+                        case 'ROLE_DEALER':
+                            roleBadge.classList.add('role-dealer');
+                            break;
+                        case 'ROLE_CLIENT':
+                            roleBadge.classList.add('role-client');
+                            break;
+                        case 'ROLE_USER':
+                            roleBadge.classList.add('role-user');
+                            break;
+                    }
+                }
+            }
+            
+            initializeMapLayers() {
+                // Add OpenStreetMap tile layer
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                    maxZoom: 19
+                }).addTo(this.map);
+                
+                // Initialize marker cluster group
+                this.markerClusterGroup = L.markerClusterGroup({
+                    iconCreateFunction: function(cluster) {
+                        const count = cluster.getChildCount();
+                        let className = 'marker-cluster-small';
+                        
+                        if (count > 10) {
+                            className = 'marker-cluster-medium';
+                        } else if (count > 50) {
+                            className = 'marker-cluster-large';
+                        }
+                        
+                        return L.divIcon({
+                            html: `<div><span>${count}</span></div>`,
+                            className: className,
+                            iconSize: L.point(40, 40)
+                        });
+                    }
+                });
+                
+                this.map.addLayer(this.markerClusterGroup);
+            }
+            
+            initializeControls() {
+                // Set up vehicle filter input
+                const filterInput = document.getElementById('vehicle-filter');
+                if (filterInput) {
+                    filterInput.addEventListener('input', () => {
+                        // Debounce filter to avoid excessive filtering
+                        clearTimeout(this.filterTimeout);
+                        this.filterTimeout = setTimeout(() => {
+                            this.filterVehicles();
+                        }, 300);
+                    });
+                }
+                
+                // Set up status filter dropdown
+                const statusFilter = document.getElementById('status-filter');
+                if (statusFilter) {
+                    statusFilter.addEventListener('change', () => {
+                        this.filterVehicles();
+                    });
+                }
+                
+                // Set up show all vehicles button
+                const showAllBtn = document.getElementById('show-all-btn');
+                if (showAllBtn) {
+                    showAllBtn.addEventListener('click', () => {
+                        this.showAllVehicles();
+                    });
+                }
+                
+                // Set up refresh button
+                const refreshBtn = document.getElementById('refresh-btn');
+                if (refreshBtn) {
+                    refreshBtn.addEventListener('click', () => {
+                        this.refreshData();
+                    });
+                }
+                
+                // Set up data source toggle button
+                const dataSourceToggle = document.getElementById('data-source-toggle');
+                if (dataSourceToggle) {
+                    dataSourceToggle.addEventListener('click', () => {
+                        this.toggleDataSource();
+                    });
+                }
+            }
+            
+            refreshData() {
+                if (this.isUsingWebSocket) {
+                    // If using WebSocket, just reload last known positions
+                    this.loadLastKnownPositions();
+                    // Also trigger a broadcast via API
+                    fetch('/api/live/broadcast', { method: 'POST' })
+                        .then(response => response.text())
+                        .then(result => console.log('Broadcast result:', result))
+                        .catch(error => console.error('Error triggering broadcast:', error));
+                } else {
+                    // If using API, fetch from API endpoint
+                    this.fetchLocationsFromAPI();
+                }
+            }
+            
+            toggleDataSource() {
+                this.isUsingWebSocket = !this.isUsingWebSocket;
+                const toggleBtn = document.getElementById('data-source-toggle');
+                
+                if (this.isUsingWebSocket) {
+                    // Switch to WebSocket
+                    toggleBtn.textContent = "Data Source: WebSocket";
+                    toggleBtn.classList.remove('api');
+                    this.initWebSocket();
+                    
+                    // Clear API polling interval
+                    if (this.apiRefreshInterval) {
+                        clearInterval(this.apiRefreshInterval);
+                        this.apiRefreshInterval = null;
+                    }
+                } else {
+                    // Switch to API
+                    toggleBtn.textContent = "Data Source: API";
+                    toggleBtn.classList.add('api');
+                    
+                    // Disconnect WebSocket
+                    if (this.stompClient) {
+                        this.stompClient.disconnect();
+                        this.displayConnectionStatus('Switched to API', true);
+                    }
+                    
+                    // Fetch data from API and set up polling
+                    this.fetchLocationsFromAPI();
+                    this.apiRefreshInterval = setInterval(() => {
+                        this.fetchLocationsFromAPI();
+                    }, 10000);
+                }
+            }
+            
+            initWebSocket() {
+                // Skip if not using WebSocket
+                if (!this.isUsingWebSocket) return;
+                
+                const socket = new SockJS('/gs-guide-websocket');
+                const stompClient = Stomp.over(socket);
+                
+                // Disable STOMP debug logging in production
+                stompClient.debug = null;
+                
+                // Display connecting status
+                this.displayConnectionStatus('Connecting to WebSocket...', false);
+                
+                stompClient.connect({}, (frame) => {
+                    console.log('WebSocket connected.');
+                    this.displayConnectionStatus('Connected (WebSocket)', true);
+                    
+                    // Subscribe to global topic (server filters based on user permissions)
+                    stompClient.subscribe('/topic/location-updates', (message) => {
+                        try {
+                            const vehicleData = JSON.parse(message.body);
+                            const standardizedData = {
+                                ...vehicleData,
+                                vehicleStatus: vehicleData.vehicleStatus || vehicleData.VehicleStatus || 'Unknown',
+                                deviceID: vehicleData.deviceId || vehicleData.deviceID || 'Unknown'
+                            };
+                            
+                            // Store vehicle data for reference
+                            this.vehicleData[standardizedData.deviceID] = standardizedData;
+                            
+                            // Update marker on map
+                            this.createOrUpdateMarker(standardizedData, true);
+                            
+                            // Update vehicle list
+                            this.updateVehicleList();
+                        } catch (error) {
+                            console.error('Error processing WebSocket message:', error);
+                            console.error('Message body:', message.body);
+                        }
+                    });
+                    
+                    // Also subscribe to user-specific queue (for more targeted updates)
+                    stompClient.subscribe('/user/queue/location-updates', (message) => {
+                        try {
+                            const vehicleData = JSON.parse(message.body);
+                            const standardizedData = {
+                                ...vehicleData,
+                                vehicleStatus: vehicleData.vehicleStatus || vehicleData.VehicleStatus || 'Unknown',
+                                deviceID: vehicleData.deviceId || vehicleData.deviceID || 'Unknown'
+                            };
+                            
+                            // Store vehicle data for reference
+                            this.vehicleData[standardizedData.deviceID] = standardizedData;
+                            
+                            // Update marker on map
+                            this.createOrUpdateMarker(standardizedData, true);
+                            
+                            // Update vehicle list
+                            this.updateVehicleList();
+                        } catch (error) {
+                            console.error('Error processing user-specific WebSocket message:', error);
+                            console.error('Message body:', message.body);
+                        }
+                    });
+                    
+                    // Request initial data through WebSocket
+                    stompClient.send("/app/fetch-all-locations", {}, {});
+                }, (error) => {
+                    console.error('WebSocket connection error:', error);
+                    this.displayConnectionStatus('Connection failed - retrying...', false);
+                    
+                    // Attempt to reconnect after delay
+                    setTimeout(() => this.initWebSocket(), 5000);
+                });
+                
+                // Store client for potential future use
+                this.stompClient = stompClient;
+            }
+            
+			
+			
+			
+            fetchLocationsFromAPI() {
+                this.displayConnectionStatus('Fetching from API...', true);
+                
+                fetch('/api/live/locations')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`API request failed with status ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(locations => {
+                        console.log('API Data received:', locations);
+                        this.displayConnectionStatus('Connected (API)', true);
+                        
+                        if (Array.isArray(locations)) {
+                            locations.forEach(location => {
+                                // Standardize data format
+                                const standardizedData = {
+                                    ...location,
+                                    vehicleStatus: location.vehicleStatus || location.VehicleStatus || 'Unknown',
+                                    deviceID: location.deviceId || location.deviceID || 'Unknown'
+                                };
+                                
+                                // Store vehicle data
+                                this.vehicleData[standardizedData.deviceID] = standardizedData;
+                                
+                                // Update marker
+                                this.createOrUpdateMarker(standardizedData, false);
+                            });
+                            
+                            // Update vehicle list
+                            this.updateVehicleList();
+                            
+                            // Fit map to show all vehicles if first load
+                            if (Object.keys(this.markers).length > 0 && 
+                                Object.keys(this.markers).length === locations.length) {
+                                this.showAllVehicles();
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching from API:', error);
+                        this.displayConnectionStatus('API Error - retrying...', false);
+                    });
+            }
+            
+			
+			
+			
+			
+            createOrUpdateMarker(vehicle, isLive = false) {
+                if (!vehicle.latitude || !vehicle.longitude) {
+                    console.error('Invalid latitude or longitude for vehicle:', vehicle);
+                    return;
+                }
+                
+                const deviceId = vehicle.deviceId || vehicle.deviceID || 'Unknown';
+                const latitude = parseFloat(vehicle.latitude);
+                const longitude = parseFloat(vehicle.longitude);
+                const course = parseFloat(vehicle.course || 0);
+                const ignition = vehicle.ignition || 'IGoff';
+                const vehicleStatus = vehicle.vehicleStatus || vehicle.VehicleStatus || 'Unknown';
+                const speed = vehicle.speed || '0';
+                
+                // Calculate rotation for smooth transition
+                let rotation = course;
+                if (this.previousCourses[deviceId]) {
+                    const prevCourse = this.previousCourses[deviceId];
+                    const diff = course - prevCourse;
+                    if (Math.abs(diff) > 180) {
+                        rotation = diff > 0 ? course - 360 : course + 360;
+                    }
+                }
+                this.previousCourses[deviceId] = course;
+                
+                if (isLive) {
+                    console.log('Live update received:', {
+                        deviceId,
+                        status: vehicleStatus,
+                        ignition,
+                        course: rotation,
+                        speed,
+                        isLive
+                    });
+                }
+                
+                const icon = this.getVehicleIcon(rotation, ignition, vehicleStatus);
+                const timestamp = vehicle.timestamp ? new Date(vehicle.timestamp).toLocaleString() : 'N/A';
+                
+                const markerHtml = `
+                    <img 
+                        src="${icon.path}" 
+                        style="transform: rotate(${icon.rotation}deg); width: 38px; height: 38px;" 
+                        alt="vehicle-icon"
+                        onerror="
+                            if (!this.retryCount) {
+                                this.retryCount = 1;
+                                this.src = '/THINTURE_IMAGE/car/${icon.color}/car0.png';
+                            } else {
+                                // If image load fails, use a default SVG icon
+                                this.outerHTML = '<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 24 24\\' width=\\'38\\' height=\\'38\\'><circle cx=\\'12\\' cy=\\'12\\' r=\\'10\\' fill=\\'${icon.color}\\' /><path d=\\'M7 12 L12 7 L17 12 L12 17 Z\\' fill=\\'white\\' /></svg>';
+                            }
+                        "
+                    >`;
+                
+					const popupContent = `
+					    <div class="vehicle-popup">
+					        <div class="popup-header ${isLive ? 'live-update' : 'last-known'}">
+					            ${isLive ? 'Live Update' : 'Last Known Position'}
+					        </div>
+					        <div class="popup-content">
+					            <p><span class="popup-label">Device ID:</span> ${deviceId}</p>
+					            <p><span class="popup-label">Timestamp:</span> ${timestamp}</p>
+					            <p><span class="popup-label">Speed:</span> ${speed} km/h</p>
+					            <p>
+					                <span class="popup-label">Status:</span> 
+					                <span class="status-indicator ${
+					                    (ignition === 'IGoff' && (vehicleStatus || '').toUpperCase() === 'PARKED') 
+					                    ? 'status-parked' 
+					                    : 'status-running'
+					                }">
+					                    ${vehicleStatus}
+					                </span>
+					            </p>
+					            <p>
+					                <span class="popup-label">Ignition:</span> 
+					                <span class="${ignition === 'IGon' ? 'ignition-on' : 'ignition-off'}">
+					                    ${ignition === 'IGon' ? 'ON' : 'OFF'}
+					                </span>
+					            </p>
+					            ${vehicle.address ? `
+					                <p>
+					                    <span class="popup-label">Address:</span>
+					                    <span class="address">${vehicle.address}</span>
+					                </p>
+					            ` : ''}
+					            <div style="margin-top: 10px; text-align: center;">
+					                <button onclick="vehicleTracker.centerOnVehicle('${deviceId}')">Center Map</button>
+					                <button onclick="showVehicleSpeedometer('${deviceId}', ${speed})">📊 Speedometer</button>
+					                <button class="playback-btn" onclick="navigateToReplay('${deviceId}')">⏮ Playback</button>
+					                ${isLive ? `
+					                    <button class="btn-red" onclick="vehicleTracker.showAlert(vehicleTracker.vehicleData['${deviceId}'], 'live')">
+					                        Show Alert
+					                    </button>
+					                ` : ''}
+					            </div>
+					        </div>
+					    </div>
+					`;
+                
+                if (this.markers[deviceId]) {
+                    // Update existing marker
+                    this.markers[deviceId]
+                        .setLatLng([latitude, longitude])
+                        .setIcon(L.divIcon({
+                            className: 'custom-icon',
+                            html: markerHtml,
+                            iconSize: [38, 38],
+                            iconAnchor: [19, 19],
+                            popupAnchor: [0, -19],
+                        }))
+                        .bindPopup(popupContent);
+                } else {
+                    // Create new marker
+                    const marker = L.marker([latitude, longitude], {
+                        icon: L.divIcon({
+                            className: 'custom-icon',
+                            html: markerHtml,
+                            iconSize: [38, 38],
+                            iconAnchor: [19, 19],
+                            popupAnchor: [0, -19],
+                        }),
+                    }).bindPopup(popupContent);
+                    
+                    this.markers[deviceId] = marker;
+                    this.markerClusterGroup.addLayer(marker);
+                }
+                
+                // Check for parking alert condition
+                if (isLive && ignition === 'IGoff' && (vehicleStatus || '').toUpperCase() === 'PARKED') {
+                    this.showAlert(vehicle, 'parking');
+                }
+                
+                this.deviceLastUpdate[deviceId] = Date.now();
+                if (isLive) {
+                    this.liveDevices.add(deviceId);
+                }
+            }
+            
+            getVehicleIcon(course, ignition, vehicleStatus) {
+                const basePath = '/THINTURE_IMAGE/car';
+                
+                // Default color if images don't load
+                let color = 'red';
+                
+                const normalizedStatus = (vehicleStatus || '').toUpperCase();
+                const normalizedIgnition = (ignition || '').toUpperCase();
+                
+                if (normalizedStatus === 'PARKED' && normalizedIgnition === 'IGOFF') {
+                    color = 'orange';
+                } else if (normalizedIgnition === 'IGON' || normalizedStatus === 'RUNNING') {
+                    color = 'green';
+                }
+                
+                const adjustedCourse = ((parseFloat(course) % 360) + 360) % 360;
+                const imagePath = `${basePath}/${color}/car0.png`;
+                
+                return {
+                    path: imagePath,
+                    color: color,
+                    rotation: adjustedCourse,
+                };
+            }
+            
+            centerOnVehicle(deviceId) {
+                const marker = this.markers[deviceId];
+                if (marker) {
+                    const position = marker.getLatLng();
+                    this.map.setView(position, 15);
+                    marker.openPopup();
+                }
+            }
+            
+            loadLastKnownPositions() {
+                console.log('Loading last known positions...');
+                this.fetchAndUpdateVehicleData('/api/vehicles/last-known', false);
+            }
+            
+            fetchAndUpdateVehicleData(url, isLive = false) {
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            console.error(`API call failed with status ${response.status}`);
+                            throw new Error(`Failed to fetch data: ${response.statusText}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Data received from API:", data);
+                        if (Array.isArray(data) && data.length > 0) {
+                            data.forEach(vehicle => {
+                                // Standardize data format
+                                const standardizedData = {
+                                    ...vehicle,
+                                    vehicleStatus: vehicle.vehicleStatus || vehicle.VehicleStatus || 'Unknown',
+                                    deviceID: vehicle.deviceId || vehicle.deviceID || 'Unknown'
+                                };
+                                
+                                // Store vehicle data
+                                this.vehicleData[standardizedData.deviceID] = standardizedData;
+                                
+                                // Create or update marker
+                                this.createOrUpdateMarker(standardizedData, isLive);
+                            });
+                            
+                            // Update vehicle list
+                            this.updateVehicleList();
+                            
+                            // Fit map to show all vehicles if first load
+                            if (!isLive) {
+                                this.showAllVehicles();
+                            }
+                        } else if (typeof data === 'object' && data !== null) {
+                            // Single vehicle data
+                            const standardizedData = {
+                                ...data,
+                                vehicleStatus: data.vehicleStatus || data.VehicleStatus || 'Unknown',
+                                deviceID: data.deviceId || data.deviceID || 'Unknown'
+                            };
+                            
+                            this.vehicleData[standardizedData.deviceID] = standardizedData;
+                            this.createOrUpdateMarker(standardizedData, isLive);
+                            this.updateVehicleList();
+                        } else {
+                            console.warn('No data received for vehicles.');
+                        }
+                    })
+                    .catch(error => console.error('Error fetching vehicle data:', error));
+            }
+            
+            pollOfflineDevices() {
+                setInterval(() => {
+                    if (this.isUsingWebSocket) {
+                        console.log('Fetching offline vehicles...');
+                        this.fetchAndUpdateVehicleData('/api/vehicles/last-known', false);
+                    }
+                }, 30000);
+            }
+			
+			
+			
+            
+            checkInactiveDevices() {
+                setInterval(() => {
+                    const now = Date.now();
+                    this.liveDevices.forEach(deviceId => {
+                        if (now - this.deviceLastUpdate[deviceId] > this.inactivityThreshold) {
+                            console.log('Device became inactive:', deviceId);
+                            this.liveDevices.delete(deviceId);
+                            
+                            // Only fetch if using WebSocket (API will handle via polling)
+                            if (this.isUsingWebSocket) {
+                                this.fetchAndUpdateVehicleData(`/api/vehicle/latest-location/${deviceId}`, false);
+                            }
+                        }
+                    });
+                }, this.inactivityThreshold);
+            }
+            
+            updateVehicleList() {
+                const vehicleList = document.getElementById('vehicle-list');
+                if (!vehicleList) return;
+                
+                // Clear existing list
+                vehicleList.innerHTML = '';
+                
+                // Get all vehicles from markers
+                const vehicles = Object.keys(this.markers).map(deviceId => {
+                    return {
+                        deviceId: deviceId,
+                        ...this.vehicleData[deviceId],
+                        isLive: this.liveDevices.has(deviceId),
+                        lastUpdate: this.deviceLastUpdate[deviceId] || 0
+                    };
+                });
+                
+                // Sort vehicles: live ones first, then by last update time
+                vehicles.sort((a, b) => {
+                    if (a.isLive && !b.isLive) return -1;
+                    if (!a.isLive && b.isLive) return 1;
+                    return b.lastUpdate - a.lastUpdate;
+                });
+                
+                // Apply filters if set
+                const filterText = document.getElementById('vehicle-filter')?.value?.toLowerCase() || '';
+                const statusFilter = document.getElementById('status-filter')?.value?.toUpperCase() || '';
+                
+                const filteredVehicles = vehicles.filter(vehicle => {
+                    // Filter by text (device ID or status)
+                    const matchesText = !filterText || 
+                        vehicle.deviceId?.toLowerCase().includes(filterText) || 
+                        vehicle.vehicleStatus?.toLowerCase().includes(filterText);
+                    
+                    // Filter by status
+                    const matchesStatus = !statusFilter || 
+                        vehicle.vehicleStatus?.toUpperCase() === statusFilter;
+                    
+                    return matchesText && matchesStatus;
+                });
+                
+                // Add filtered vehicles to list
+                filteredVehicles.forEach(vehicle => {
+                    const vehicleItem = document.createElement('div');
+                    vehicleItem.className = 'vehicle-item';
+                    vehicleItem.dataset.deviceId = vehicle.deviceId;
+                    
+                    // Determine status indicator class
+                    let statusClass = 'status-offline';
+                    if (vehicle.isLive) {
+                        statusClass = 'status-online';
+                    } else if ((vehicle.vehicleStatus || '').toUpperCase() === 'PARKED') {
+                        statusClass = 'status-idle';
+                    }
+                    
+                    vehicleItem.innerHTML = `
+                        <span class="vehicle-status ${statusClass}"></span>
+                        <strong>${vehicle.deviceId}</strong>
+                       <div><small>${vehicle.vehicleStatus || 'Unknown'} - ${vehicle.timestamp ? new Date(vehicle.timestamp).toLocaleTimeString() : 'N/A'}</small></div>
+                    `;
+                    
+                    vehicleItem.addEventListener('click', () => {
+                        this.centerOnVehicle(vehicle.deviceId);
+                    });
+                    
+                    vehicleList.appendChild(vehicleItem);
+                });
+                
+                // Show message if no vehicles match filter
+                if (filteredVehicles.length === 0) {
+                    const noVehicles = document.createElement('div');
+                    noVehicles.className = 'vehicle-item';
+                    noVehicles.textContent = filterText || statusFilter 
+                        ? 'No vehicles match current filters'
+                        : 'No vehicles available';
+                    vehicleList.appendChild(noVehicles);
+                }
+            }
+            
+            showAllVehicles() {
+                const markers = Object.values(this.markers);
+                if (markers.length === 0) {
+                    return;
+                }
+                
+                const bounds = L.latLngBounds(markers.map(marker => marker.getLatLng()));
+                this.map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+            }
+            
+            filterVehicles() {
+                // Update the vehicle list with current filters
+                this.updateVehicleList();
+                
+                // Also update markers on map
+                const filterText = document.getElementById('vehicle-filter')?.value?.toLowerCase() || '';
+                const statusFilter = document.getElementById('status-filter')?.value?.toUpperCase() || '';
+                
+                Object.entries(this.markers).forEach(([deviceId, marker]) => {
+                    // Get vehicle data
+                    const vehicle = this.vehicleData[deviceId];
+                    const status = (vehicle?.vehicleStatus || '').toLowerCase();
+                    
+                    // Apply filters
+                    const matchesText = !filterText || 
+                        deviceId.toLowerCase().includes(filterText) || 
+                        status.includes(filterText);
+                    
+                    const matchesStatus = !statusFilter || 
+                        (vehicle?.vehicleStatus || '').toUpperCase() === statusFilter;
+                    
+                    // Show or hide marker based on filters
+                    if (matchesText && matchesStatus) {
+                        if (!this.markerClusterGroup.hasLayer(marker)) {
+                            this.markerClusterGroup.addLayer(marker);
+                        }
+                    } else {
+                        this.markerClusterGroup.removeLayer(marker);
+                    }
+                });
+            }
+            
+            displayConnectionStatus(message, isConnected) {
+                const statusEl = document.getElementById('connection-status');
+                if (statusEl) {
+                    statusEl.textContent = message;
+                    statusEl.className = isConnected 
+                        ? 'connection-status connected' 
+                        : 'connection-status disconnected';
+                }
+            }
+            
+            showAlert(vehicle, type) {
+                const deviceId = vehicle.deviceId || vehicle.deviceID || 'Unknown';
+                if (this.activeAlerts.has(deviceId)) return;
+                
+                const container = document.getElementById('alert-container');
+                if (!container) return;
+                
+                const config = {
+                    parking: {
+                        class: 'parking-alert',
+                        icon: '/THINTURE_IMAGE/car/parking-area.png',
+                        title: 'Vehicle Parked'
+                    },
+                    live: {
+                        class: 'live-alert',
+                        icon: '/THINTURE_IMAGE/car/car_icon4.png',
+                        title: 'Live Message Alert'
+                    }
+                };
+                
+                const alertConfig = config[type];
+                const alertDiv = document.createElement('div');
+                alertDiv.className = alertConfig.class;
+                alertDiv.style.opacity = '0';
+                
+                // Create alert content
+                alertDiv.innerHTML = `
+                    <img src="${alertConfig.icon}" class="${type}-icon" alt="${type}" 
+                         onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'24\\' height=\\'24\\'><circle cx=\\'12\\' cy=\\'12\\' r=\\'10\\' fill=\\'orange\\'/></svg>'">
+                    <div class="${type}-info">
+                        <strong>${alertConfig.title}</strong>
+                        <span>Device ID: ${deviceId}</span>
+                        <span>Time: ${new Date().toLocaleTimeString()}</span>
+                    </div>
+                    <button class="alert-close" onclick="vehicleTracker.removeAlertDiv(this.parentElement, '${deviceId}')">×</button>
+                `;
+                
+                // Force reflow to enable transition
+                void alertDiv.offsetWidth;
+                container.appendChild(alertDiv);
+                alertDiv.style.opacity = '1';
+                
+                this.activeAlerts.add(deviceId);
+                
+                // Auto-remove after 10 seconds
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.classList.add('slide-out');
+                        setTimeout(() => {
+                            this.removeAlertDiv(alertDiv, deviceId);
+                        }, 500);
+                    }
+                }, 10000);
+            }
+            
+            removeAlertDiv(alertDiv, deviceId) {
+                if (alertDiv && alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+                this.activeAlerts.delete(deviceId);
+            }
+        }
+        
+        // Initialize the VehicleTracker when the page is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Create a global instance for access from popup buttons
+            window.vehicleTracker = new VehicleTracker('map');
+            
+            // Initialize select boxes
+            const selects = document.querySelectorAll('select');
+            selects.forEach(select => {
+                if (select.value === '') {
+                    const firstOption = select.querySelector('option');
+                    if (firstOption) select.value = firstOption.value;
+                }
+            });
+            
+            // Set up username display
+            const username = document.getElementById('username');
+            if (username) {
+                const userRole = document.getElementById('userRole').value;
+                const displayRole = userRole.replace('ROLE_', '');
+                
+                // Set sample username based on role
+                switch (userRole) {
+                    case 'ROLE_SUPERADMIN':
+                        username.textContent = 'Super Admin';
+                        break;
+                    case 'ROLE_ADMIN':
+                        username.textContent = 'Admin User';
+                        break;
+                    case 'ROLE_DEALER':
+                        username.textContent = 'Dealer';
+                        break;
+                    case 'ROLE_CLIENT':
+                        username.textContent = 'Client';
+                        break;
+                    case 'ROLE_USER':
+                        username.textContent = 'Regular User';
+                        break;
+                    default:
+                        username.textContent = 'User';
+                }
+            }
+        });
+        
+        // Function to navigate to replay page
+        function navigateToReplay(deviceId) {
+            window.location.href = `/replay?deviceId=${deviceId}`;
+        }
+        
+        // Function to show vehicle details
+        function showVehicleDetails(deviceId) {
+            window.location.href = `/vehicle/details?deviceId=${deviceId}`;
+        }
+        
+        // Function to open the side tab
+        function openSideTab() {
+            // Implementation depends on your side tab functionality
+            console.log("Open side tab clicked");
+        }
+		
+		// Global variable to track which vehicle's speed is being shown
+		window.currentSpeedometerVehicleId = null;
+
+		// Function to show the speedometer for a specific vehicle
+		function showVehicleSpeedometer(deviceId, speed) {
+		    // Show the speedometer container
+		    const container = document.getElementById("speedometer-container");
+		    if (container) {
+		        container.classList.add("visible");
+		    }
+		    
+		    // Update speedometer with the vehicle's speed
+		    updateSpeedometer(parseFloat(speed) || 0);
+		    
+		    // Store the current vehicle ID to update it on future updates
+		    window.currentSpeedometerVehicleId = deviceId;
+		    
+		    console.log(`Showing speedometer for vehicle ${deviceId} with speed ${speed}`);
+		}
+
+		// Modify the setupSpeedometerToggle function to reset vehicle tracking when closing
+		function setupSpeedometerToggle() {
+		    const toggleIcon = document.getElementById("toggleSpeedometer");
+		    const container = document.getElementById("speedometer-container");
+		    
+		    toggleIcon.addEventListener("click", () => {
+		        const isVisible = container.classList.contains("visible");
+		        if (isVisible) {
+		            // Hide speedometer
+		            container.classList.remove("visible");
+		            // Reset tracking
+		            window.currentSpeedometerVehicleId = null;
+		        } else {
+		            // Show speedometer with 0 speed initially
+		            container.classList.add("visible");
+		            updateSpeedometer(0);
+		        }
+		    });
+		}
+
+		// Add this method to the VehicleTracker class - place it after an existing method
+		VehicleTracker.prototype.getVehicleSpeed = function(deviceId) {
+		    const vehicle = this.vehicleData[deviceId];
+		    if (vehicle) {
+		        return parseFloat(vehicle.speed) || 0;
+		    }
+		    return 0;
+		};
+
+		// Modify the centerOnVehicle method to update speedometer
+		const originalCenterOnVehicle = VehicleTracker.prototype.centerOnVehicle;
+		VehicleTracker.prototype.centerOnVehicle = function(deviceId) {
+		    // Call the original method
+		    originalCenterOnVehicle.call(this, deviceId);
+		    
+		    // Update speedometer if it's visible and tracking this vehicle
+		    if (window.currentSpeedometerVehicleId === deviceId) {
+		        const speed = this.getVehicleSpeed(deviceId);
+		        const container = document.getElementById("speedometer-container");
+		        if (container && container.classList.contains("visible")) {
+		            updateSpeedometer(speed);
+		        }
+		    }
+		};
+
+		// Add code to the end of createOrUpdateMarker to update speedometer for live updates
+		const originalCreateOrUpdateMarker = VehicleTracker.prototype.createOrUpdateMarker;
+		VehicleTracker.prototype.createOrUpdateMarker = function(vehicle, isLive) {
+		    // Call the original method
+		    originalCreateOrUpdateMarker.call(this, vehicle, isLive);
+		    
+		    // Update the speedometer if this is a live update for the tracked vehicle
+		    if (isLive) {
+		        const deviceId = vehicle.deviceId || vehicle.deviceID || 'Unknown';
+		        
+		        if (window.currentSpeedometerVehicleId === deviceId) {
+		            const speed = parseFloat(vehicle.speed) || 0;
+		            const container = document.getElementById("speedometer-container");
+		            
+		            if (container && container.classList.contains("visible")) {
+		                updateSpeedometer(speed);
+		                console.log(`Updated speedometer for vehicle ${deviceId} with new speed ${speed}`);
+		            }
+		        }
+		    }
+		};
+
+		// Initialize these changes when the page loads
+		document.addEventListener("DOMContentLoaded", function() {
+		    // Make sure we have access to the global vehicleTracker
+		    if (window.vehicleTracker) {
+		        console.log("Speedometer integration initialized");
+		    } else {
+		        console.error("VehicleTracker not found. Speedometer integration might not work properly.");
+		    }
+		});
+		
+		
+    </script>
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+		    const sidebar = document.querySelector('.sidebar');
+		    const toggleBtn = document.getElementById('sidebar-toggle');
+
+		    // Hide sidebar on load
+		    sidebar.classList.add('hidden');
+		    toggleBtn.textContent = '☰ Open Sidebar';
+		    toggleBtn.style.right = '10px';
+
+		    toggleBtn.addEventListener('click', () => {
+		        sidebar.classList.toggle('hidden');
+
+		        const isHidden = sidebar.classList.contains('hidden');
+
+		        // Update button position and label
+		        toggleBtn.textContent = isHidden ? '☰ Open Sidebar' : '✖ Close Sidebar';
+		        toggleBtn.style.right = isHidden ? '10px' : '320px';
+		    });
+		});
+
+
+	</script>
+	<script>
+		function navigateToReplay(deviceId) {
+		    if (!deviceId) {
+		        alert("Device ID is required to navigate to the replay page.");
+		        return;
+		    }
+		    window.location.href = `/playback?deviceId=${encodeURIComponent(deviceId)}`;
+		}
+
+	</script>
+	
+
+
+</body>
+</html>

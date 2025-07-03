@@ -1,0 +1,563 @@
+
+.navbar {
+background: linear-gradient(135deg,white,white,rgba(15, 15, 15, 0),rgba(15, 15, 15, 0), rgba(26, 26, 46, 0.8), rgba(22, 33, 62, 0.8), rgba(15, 52, 96, 0.8));
+            width: 100%;
+            position: fixed;
+            height: 100px;
+            top: 6px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 900;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 6px 15px rgba(0, 0, 169, 0.5);
+        }
+		/* Ensure navbar items are aligned properly */
+		.navbar-nav {
+		    display: flex;
+		    align-items: center;
+		    justify-content: space-between; /* Distribute menu items */
+		    width: 100%;
+		}
+
+		/* Move HOME button to the right */
+		.navbar-nav .nav-item:first-child {
+		    margin-left: 350px; /* Push "HOME" to the right */
+		}
+
+		/* Add spacing between the remaining menu items */
+		.navbar-nav .nav-item {
+		    margin: 0 15px; /* Adjust space between items */
+		}
+
+		/* Ensure profile (email) stays on the right */
+		.navbar-nav .nav-item:last-child {
+		    margin-left: auto;
+		}
+
+        .navbar ul {
+			position: relative;
+            list-style-type: none;
+            padding: 0;
+			gap: 5px;
+			
+            margin: 0;
+            display: flex;
+          
+			font-size: 24PX;
+			
+        }
+		
+		/* Adjust spacing between navigation items */
+		
+        .navbar ul li {
+            position: relative;
+            margin: 0 -2px;
+            font-size: 12px;
+        }
+
+        .navbar ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 20px;
+            display: block;
+            font-style: normal;
+        }
+		
+
+        .navbar-nav .nav-link:hover {
+            color:lightseagreen !important;
+        }
+
+        .navbar ul li .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            background-color: rgba(100, 130, 150, 0.5);
+            color: #000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            min-width: 180px;
+            z-index: 1000;
+           font-size:12px;
+        }
+
+        .navbar ul li:hover .dropdown-content {
+            display: block;
+        }
+
+        .navbar ul li .dropdown-content a {
+            color: white;
+            border-radius: 5px;
+            padding: 10px;
+            display: block;
+            text-decoration: none;
+        }
+		#dashboard-user {
+		    cursor: pointer; /* Changes the cursor to a hand icon */
+		    text-decoration: none; /* Optional: Remove underline for a cleaner look */
+		}
+
+		#dashboard-user:hover {
+		    text-decoration: underline; /* Optional: Add underline on hover for feedback */
+		}
+
+        .logo img {
+			position: relative;
+            height: 60px;
+            width: 150px;
+            margin-right: 10px;
+			left: 15px;
+        }
+
+        .footer {
+            background-color: rgba(21, 27, 84, 0.3);
+            color: white;
+            position: fixed;
+            width: 100%;
+			height: 80px;
+            bottom: 2px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+			font-size: 8px;
+        }
+
+        .footer p {
+            margin: 20px 0;
+            text-align: center;
+			font-size: 10px;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+.social-icons i{
+	font-size: 15px;
+}
+        .social-icons a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            color: #ffdd57;
+        }
+
+        .navbar-toggler-icon {
+            filter: invert(1);
+        }
+
+        .navbar-toggler {
+            border-color: white;
+        }
+		
+		.navbar ul li .submenu-content {
+				    display: none;
+					border-radius: 5px;
+				    position: absolute;
+				    left: 160px;
+				    top: 0;
+				    background-color: rgba(100, 130, 150, 0.9);
+				    min-width: 190px;
+				    z-index: 2;
+				}
+
+				.navbar ul li .submenu-toggle:hover + .submenu-content,
+				.navbar ul li .submenu-content:hover {
+				    display: block;
+				}
+
+				.navbar ul li .submenu-content a {
+				    color: white;
+				    padding: 10px;
+					
+				    display: block;
+				    text-decoration: none;
+				}
+
+				.navbar ul li .submenu-contentdevice {
+				    display: none;
+				    position: absolute;
+				    left: 160px;
+				    top: 80px;
+					border-radius: 5px;
+				    background-color: rgba(100, 130, 150, 0.9);
+				    min-width: 160px;
+				    z-index: 2;
+				}
+
+				.navbar ul li .submenu-toggle:hover + .submenu-contentdevice,
+				.navbar ul li .submenu-contentdevice:hover {
+				    display: block;
+				}
+				.navbar ul li .submenu-contentdv {
+						    display: none;
+						    position: absolute;
+						    left: 160px;
+							border-radius: 5px;
+						    top: 50px;
+						    background-color: rgba(100, 130, 150, 0.9);
+						    min-width: 160px;
+						    z-index: 2;
+						}
+
+						.navbar ul li .submenu-toggle:hover + .submenu-contentdv,
+						.navbar ul li .submenu-contentdv:hover {
+						    display: block;
+						}
+				.content {
+				    padding: 10px;
+				    margin-top: 120px;
+				}
+				/* 📌 General Mobile Navbar Styling */
+				@media screen and (max-width: 1024px) {
+				    .navbar {
+				        height: 60px;
+				        padding: 0 15px;
+				        background: #0f0f0f;
+				        display: flex;
+				        align-items: center;
+				        justify-content: space-between;
+				    }
+
+				    .navbar-toggler {
+				        display: block;
+				        background: none;
+				        border: none;
+				        color: white;
+				        font-size: 24px;
+				        cursor: pointer;
+				    }
+
+				    /* Hide menu by default */
+				    .navbar-nav {
+				        display: none;
+				        flex-direction: column;
+				        width: 100%;
+				        background: rgba(15, 15, 15, 0.95);
+				        position: absolute;
+				        top: 60px;
+				        left: 0;
+				        z-index: 999;
+				        padding: 10px 0;
+				        border-radius: 5px;
+				    }
+
+				    /* Show menu when active */
+				    .navbar-nav.active {
+				        display: flex;
+				    }
+
+				    .navbar-nav .nav-item {
+				        text-align: center;
+				        padding: 12px;
+				        width: 100%;
+				        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+				    }
+
+				    .navbar-nav .nav-item:last-child {
+				        border-bottom: none;
+				    }
+
+				    .navbar-nav .nav-link {
+				        font-size: 16px;
+				        color: white;
+				        padding: 10px 0;
+				        display: block;
+				    }
+
+				    .navbar-nav .nav-link:hover {
+				        background: rgba(255, 255, 255, 0.1);
+				    }
+
+				    /* 🔹 Fix Main Dropdown Menu */
+				    .dropdown-content {
+				        display: none;
+				        flex-direction: column;
+				        width: 100%;
+				        background: rgba(0, 0, 0, 0.9);
+				        text-align: center;
+				        padding: 5px 0;
+				        border-radius: 5px;
+				        position: relative;
+				        z-index: 1000; /* Ensure it appears on top */
+				    }
+
+				    .nav-item.active .dropdown-content {
+				        display: block;
+				    }
+
+				    .dropdown-content a {
+				        color: white;
+				        padding: 10px;
+				        text-decoration: none;
+				        display: block;
+				    }
+
+				    .dropdown-content a:hover {
+				        background: rgba(255, 255, 255, 0.1);
+				    }
+
+				    /* 🔹 Fix Submenu (Second-Level Dropdown) */
+				    .submenu-content {
+				        display: none;
+				        flex-direction: column;
+				        background: rgba(20, 20, 20, 0.95);
+				        padding: 5px 0;
+				        border-radius: 5px;
+				        position: relative;
+				        width: 100%;
+				        text-align: center;
+				    }
+
+				    /* Show submenu when active */
+				    .submenu-content.active {
+				        display: block;
+				    }
+
+				    /* Style submenu items */
+				    .submenu-content a {
+				        padding: 10px 15px;
+				        color: white;
+				        display: block;
+				        text-align: center;
+				    }
+
+				    .submenu-content a:hover {
+				        background: rgba(255, 255, 255, 0.1);
+				    }
+
+				    /* 🔹 Fix Submenu Toggle Button */
+				    .submenu-toggle {
+				        display: flex;
+				        justify-content: space-between;
+				        align-items: center;
+				        padding: 10px 15px;
+				        cursor: pointer;
+				        color: white;
+				        width: 100%;
+				        background: none;
+				        border: none;
+				    }
+
+				    .submenu-toggle i {
+				        margin-left: 10px;
+				    }
+				}
+
+					   /* Responsive Styles for Laptop Screens */
+					   /* General Responsive Fix */
+					   @media screen and (min-width: 1024px) and (max-width: 1440px) {
+					       .navbar {
+					           background: linear-gradient(135deg, white, white, #0f0f0f, #1a1a2e, #16213e, #0f3460);
+					           height: 80px; /* Reduce navbar height for laptops */
+					           padding: 0 20px; /* Ensure space inside */
+					       }
+
+					       .navbar ul {
+					           gap: 10px; /* Consistent spacing between menu items */
+							   right:100px;
+					       }
+
+					       .navbar ul li {
+					           margin-left: 80px; /* Push the menu to the right */
+					       }
+
+					       .navbar ul li a {
+					           padding: 8px 50px; /* Adjust menu item padding */
+					           font-size: 12px; /* Reduce font size slightly for better fit */
+					       }
+
+					       .logo img {
+					           height: 50px; /* Reduce logo size for laptops */
+					       }
+
+					       /* Adjusting submenu positioning */
+					       .dropdown-content, .submenu-content, .submenu-contentdevice, .submenu-contentdv {
+					           position: absolute;
+					           left: 10px; /* Adjust for better alignment */
+					           background-color: rgba(100, 130, 150, 0.9);
+					           min-width: 180px;
+					           font-size: 12px;
+					       }
+					   }
+
+					   /* Laptops and Small Desktops (Below 1024px) */
+					   @media screen and (max-width: 1024px) {
+					       .navbar {
+					           height: 75px; /* Adjust navbar height */
+					       }
+
+					       .navbar-toggler {
+					           display: block; /* Show toggler for menu */
+					       }
+
+					       .navbar-nav {
+					           flex-direction: column;
+					           width: 100%;
+					           background: rgba(21, 27, 84, 0.9);
+					           position: absolute;
+					           top: 100%;
+					           left: 0;
+					       }
+
+					       .navbar ul {
+					           flex-direction: column;
+					           padding-left: 0;
+					           font-size: 14px;
+					           text-align: center;
+					       }
+
+					       .navbar ul li {
+					           margin: 0 5px;
+					       }
+
+					       .navbar-nav.active {
+					           display: flex;
+					       }
+
+					       .dropdown-content {
+					           position: static;
+					           box-shadow: none;
+					           border-radius: 0;
+					           font-size: 12px;
+					       }
+
+					       .container {
+					           padding: 10px 30px;
+					           margin-right: 10px;
+					       }
+					   }
+
+					   /* Full HD Screens (Above 1440px) */
+					   @media screen and (min-width: 1440px) {
+					       .navbar {
+					           height: 90px; /* Keep it large */
+					       }
+
+					       .navbar ul li {
+					           margin-left: 120px; /* Adjust spacing */
+					       }
+
+					       .navbar ul li a {
+					           padding: 12px 80px; /* Increase padding */
+					       }
+
+					       .logo img {
+					           height: 60px;
+					       }
+					   }
+
+					   .container{
+						
+						display: flex;
+														           align-items: center;
+														           justify-content: space-between;
+														           padding: 15px 55px;
+														           margin-right: 50px;
+					   }
+												
+
+	.footer {
+									      background-color: #151B54; /* Gradient from light to dark blue */
+									    color: WHITE;
+									    position: fixed;
+									    width: 100%;
+									    bottom: 0;
+									    display: flex;
+									    flex-direction: column; /* Set column direction to stack content */
+									    justify-content: center;
+									    align-items: center;
+									    padding: 23px 20px; /* Adjust padding */
+									}
+
+									.footer p {
+									    margin: 10px 0; /* Adjust margin */
+									   
+									    text-align: center;
+									}
+
+									
+
+									.social-icons {
+									    display: flex;
+									    justify-content: center; /* Center the icons */
+									    align-items: center; /* Vertically align icons */
+									    margin-top: 10px; /* Add space between icons and other content */
+									}
+
+									.social-icons a {
+									    color: WHITE;
+									    margin: 0 15px;
+									    text-decoration: none;
+									    font-size: 24px;
+									    transition: color 0.3s ease;
+									}
+
+									.social-icons a:hover {
+									    color: #ffdd57; /* Change color on hover */
+									}
+
+       .reports-section {
+           padding: 20px;
+           background: #f9f9f9;
+           border-radius: 8px;
+           box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+           margin-top: 30px;
+       }
+
+       .report {
+           margin: 20px 0;
+       }
+
+	h2 {
+			    text-align: center;
+			    font-size: 2em; /* Adjust size as needed */
+				font-weight: 400;
+			    color:black; /* Text color */
+			    text-shadow: 
+				1px 1px 2px rgba(0, 0, 0, 0.4), /* First shadow for initial depth */
+				        3px 3px 5px rgba(0, 0, 0, 0.3), /* Slightly darker shadow for increased depth */
+				        6px 6px 8px rgba(0, 0, 0, 0.2); /* Darker shadow for stronger 3D effect */
+				}
+				.panicb {
+				    background-color: red;
+				    color: white;
+				    padding: 10px 20px;
+				    border: none;
+				    border-radius: 5px;
+				    position: fixed;
+				    top: 150px;
+				    right: 20px;
+				    z-index: 2000; /* Ensure it's on top of all other elements */
+				    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add some depth to make it more prominent */
+				    cursor: pointer;
+				}
+				
+				
+				
+				#back-button {
+							    position: absolute;
+							    top: 150px;
+							    left: 190px;
+							    padding: 10px 15px;
+							    font-size: 14px;
+							    font-weight: bold;
+							    background: darkblue;
+							    color: #ecf0f1;
+							    border: none;
+							    border-radius: 8px;
+							    cursor: pointer;
+							    transition: background 0.3s;
+							}
+
+							#back-button:hover {
+							    background: #2c3e50;
+							}

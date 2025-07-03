@@ -1,0 +1,132 @@
+.invalid-field {
+	  border: 2px solid red !important;
+	  box-shadow: 0 0 10px rgba(255, 0, 0, 0.6) !important;
+	  background-color: #fff5f5 !important;
+	  color: #b30000;
+	}
+
+	.invalid-field::placeholder {
+	  color: #ff4d4d;
+	  opacity: 1;
+	}
+
+	
+	.invalid-field {
+	  border: 2px solid red !important;
+	  box-shadow: 0 0 6px rgba(255, 0, 0, 0.8) !important;
+	  background-color: #fff0f0;
+	}
+
+	input.invalid-field:focus,
+	select.invalid-field:focus,
+	textarea.invalid-field:focus {
+	  box-shadow: 0 0 10px rgba(255, 0, 0, 0.9) !important;
+	}
+	
+	
+	
+	/* Navigation Menu Styles */
+	body::before {
+	  content: "";
+	  position: fixed;
+	  top: 0;
+	  left: 0;
+	  width: 100%;
+	  height: 100%;
+	  background: linear-gradient(rgba(10, 25, 47, 0.95), rgba(15, 32, 65, 0.95)),
+	              url('/THINTURE_IMAGE/add_new.jpg') no-repeat center center/cover;
+	  filter: blur(2px);
+	  z-index: -1;
+	}
+
+	@media (max-width: 768px) {
+	  body {
+	    font-size: 14px;
+	    background-color: #0a192f;
+	  }
+	}
+
+
+	.card {
+			    position: absolute;
+			    top: -110px;
+			    margin: 250px auto;
+			    right: 50%;
+			    transform: translateX(50%);
+			    padding: 30px;
+			    background-color: rgba(0, 0, 0, 0.5);
+			    border: 1px solid #ddd;
+			    border-radius: 10px;
+			    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+			    width: 90%;
+			    max-width: 500px;
+			}
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h2 {
+      text-align: center;
+      color:white;
+      margin-bottom: 25px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color:white;
+    }
+    input, select, textarea {
+      width: 50%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+    input:focus, select:focus, textarea:focus {
+     
+    box-shadow: 0 6px 15px rgba(255, 255, 255, 0.4);
+      outline: none;
+    }
+    .form-group-inline {
+      display: flex;
+      gap: 20px;
+    }
+    .form-group-inline .form-group {
+      flex: 1;
+    }
+    .submit {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+	  background: linear-gradient(
+	  						     135deg,
+	  						    
+	  						     rgba(15, 32, 65, 1.6),
+	  						     rgba(15, 32, 65, 1.6),
+	  						     rgba(15, 32, 65, 1.6)
+	  						 );
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+   
+    #ageDisplay {
+      font-weight: bold;
+      color: #007bff;
+      margin-top: -10px;
+      margin-bottom: 15px;
+    }
+	.invalid-field {
+	  border-color: red !important;
+	  box-shadow: 0 0 8px rgba(255, 0, 0, 0.6) !important;
+	}
+	.invalid-field {
+	    border: 1px solid red;
+	    background-color: #ffe6e6;
+	  }

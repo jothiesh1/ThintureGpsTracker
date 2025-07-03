@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" type="text/css" th:href="@{/css/styled.css}">
+  <link rel="stylesheet" type="text/css" th:href="@{/css/viewallstyle.css}">
+  <title>Thinture GPS</title>
+  <link rel="icon" type="image/x-icon" href="THINTURE_IMAGE/favicon.jpg">
+</head>
+<body>
+ <div th:insert="navigation_admin :: navbar_admin"></div>
+  <div class="card">
+    <h2>Dealers Management</h2>
+
+    <div class="mb-3">
+      <input type="text" id="searchInput" class="form-control" placeholder="Search dealers..." />
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
+      <span id="totalRecords" class="text-white fw-semibold">Total Dealers: 0</span>
+      <button class="btn btn-success btn-sm" onclick="exportToExcel()">
+        <i class="fas fa-file-excel me-1"></i> Export to Excel
+      </button>
+    </div>
+
+    <div class="table-wrapper">
+      <table id="dealerTable" class="table table-bordered table-hover table-dark">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Company Name</th>
+            <th>Email</th>
+            <th>Address</th>
+            <th>Phone</th>
+            <th>Country</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div id="pagination" class="text-center mt-3"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "/api/users/dealer";
+    const ROWS_PER_PAGE = 10;
+    let currentPage = 1;
+    let dealersData = [];
+    let filteredData = [];
+
+    async function loadDealers() {
+      try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error("Failed to fetch dealer data");
+
+        dealersData = await response.json();
+        filteredData = [...dealersData];
+        renderTable();
+      } catch (err) {
+        alert("Error loading dealers: " + err.message);
+        console.error(err);
+      }
+    }
+
+    function renderTable() {
+      const tbody = document.querySelector("#dealerTable tbody");
+      const totalSpan = document.getElementById("totalRecords");
+      tbody.innerHTML = "";
+
+      totalSpan.innerText = `Total Dealers: ${filteredData.length}`;
+
+      const startIndex = (currentPage - 1) * ROWS_PER_PAGE;
+      const paginatedDealers = filteredData.slice(startIndex, startIndex + ROWS_PER_PAGE);
+
+      paginatedDealers.forEach(dealer => {
+        const isActive = dealer.status;
+        const statusBadge = isActive
+          ? '<span class="badge bg-success">Active</span>'
+          : '<span class="badge bg-danger">Locked</span>';
+        const toggleBtnClass = isActive ? 'btn-warning' : 'btn-dark';
+        const toggleIcon = isActive ? 'fa-user-lock' : 'fa-user-check';
+        const toggleText = isActive ? 'Lock' : 'Unlock';
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${dealer.id}</td>
+          <td>${dealer.name}</td>
+          <td>${dealer.email}</td>
+          <td>${dealer.address}</td>
+          <td>${dealer.phone}</td>
+          <td>${dealer.country}</td>
+          <td>${statusBadge}</td>
+          <td>
+            <button class="btn btn-sm btn-primary me-1" onclick="editDealer(${dealer.id})"><i class="fas fa-edit"></i></button>
+            <button class="btn btn-sm btn-danger me-1" onclick="deleteDealer(${dealer.id})"><i class="fas fa-trash"></i></button>
+            <button class="btn btn-sm ${toggleBtnClass}" data-id="${dealer.id}" onclick="toggleStatus(this)">
+              <i class="fas ${toggleIcon}"></i> ${toggleText}
+            </button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      renderPagination();
+    }
+
+    async function toggleStatus(button) {
+      const row = button.closest("tr");
+      const dealerId = row.querySelector("td").textContent;
+
+      try {
+        const response = await fetch(`/dealers/${dealerId}/toggle-status`, {
+          method: "PUT"
+        });
+
+        const result = await response.text();
+        const isNowActive = result.toLowerCase().includes("unlock");
+
+        // Update button
+        button.classList.toggle("btn-warning", isNowActive);
+        button.classList.toggle("btn-dark", !isNowActive);
+        button.innerHTML = isNowActive
+          ? '<i class="fas fa-user-lock"></i> Lock'
+          : '<i class="fas fa-user-check"></i> Unlock';
+
+        // Update status badge
+        const statusCell = row.querySelector("td:nth-child(7)");
+        statusCell.innerHTML = isNowActive
+          ? '<span class="badge bg-success">Active</span>'
+          : '<span class="badge bg-danger">Locked</span>';
+
+        Swal.fire({
+          icon: "success",
+          title: `Dealer is now ${result}`,
+          timer: 1500,
+          showConfirmButton: false
+        });
+
+      } catch (error) {
+        console.error("Status toggle failed:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Failed to toggle",
+          text: error.message
+        });
+      }
+    }
+
+    function renderPagination() {
+      const paginationContainer = document.getElementById("pagination");
+      paginationContainer.innerHTML = "";
+
+      const totalPages = Math.ceil(filteredData.length / ROWS_PER_PAGE);
+
+      const prevBtn = document.createElement("button");
+      prevBtn.className = "btn btn-sm btn-light";
+      prevBtn.innerText = "Previous";
+      prevBtn.disabled = currentPage === 1;
+      prevBtn.onclick = () => {
+        currentPage--;
+        renderTable();
+      };
+      paginationContainer.appendChild(prevBtn);
+
+      const pageInfo = document.createElement("span");
+      pageInfo.className = "mx-3 text-white";
+      pageInfo.innerText = `Page ${currentPage} of ${totalPages}`;
+      paginationContainer.appendChild(pageInfo);
+
+      const nextBtn = document.createElement("button");
+      nextBtn.className = "btn btn-sm btn-light";
+      nextBtn.innerText = "Next";
+      nextBtn.disabled = currentPage === totalPages;
+      nextBtn.onclick = () => {
+        currentPage++;
+        renderTable();
+      };
+      paginationContainer.appendChild(nextBtn);
+    }
+
+	function editDealer(id) {
+	  const dealer = dealersData.find(d => d.id === id);
+	  if (!dealer) return alert("Dealer not found");
+
+	  Swal.fire({
+	    title: 'Edit Dealer',
+	    html: `
+	      <input id="name" class="swal2-input" placeholder="Name" value="${dealer.name}">
+	      <input id="email" class="swal2-input" placeholder="Email" value="${dealer.email}">
+	      <input id="address" class="swal2-input" placeholder="Address" value="${dealer.address}">
+	      <input id="phone" class="swal2-input" placeholder="Phone" value="${dealer.phone}">
+	      <input id="country" class="swal2-input" placeholder="Country" value="${dealer.country}">
+	    `,
+	    focusConfirm: false,
+	    preConfirm: () => {
+	      return {
+	        name: document.getElementById('name').value,
+	        email: document.getElementById('email').value,
+	        address: document.getElementById('address').value,
+	        phone: document.getElementById('phone').value,
+	        country: document.getElementById('country').value,
+	      };
+	    }
+	  }).then((result) => {
+	    if (result.isConfirmed) {
+	      fetch(`/dealers/edit/${id}`, {
+	        method: 'PUT',
+	        headers: { 'Content-Type': 'application/json' },
+	        body: JSON.stringify(result.value)
+	      })
+	      .then(res => res.text())
+	      .then(msg => {
+	        Swal.fire("✅ Updated!", msg, "success");
+	        loadDealers();
+	      })
+	      .catch(err => {
+	        Swal.fire("❌ Error", "Update failed: " + err.message, "error");
+	      });
+	    }
+	  });
+	}
+
+	function deleteDealer(id) {
+	  Swal.fire({
+	    title: 'Are you sure?',
+	    text: "You won't be able to revert this!",
+	    icon: 'warning',
+	    showCancelButton: true,
+	    confirmButtonText: 'Yes, delete it!',
+	  }).then((result) => {
+	    if (result.isConfirmed) {
+	      fetch(`/dealers/delete/${id}`, {
+	        method: 'DELETE'
+	      })
+	      .then(res => res.text())
+	      .then(msg => {
+	        Swal.fire("🗑️ Deleted!", msg, "success");
+	        loadDealers();
+	      })
+	      .catch(err => {
+	        Swal.fire("❌ Error", "Delete failed: " + err.message, "error");
+	      });
+	    }
+	  });
+	}
+
+
+    function exportToExcel() {
+      const worksheet = XLSX.utils.json_to_sheet(filteredData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Dealers");
+      XLSX.writeFile(workbook, "Dealers_List.xlsx");
+    }
+
+    window.onload = loadDealers;
+  </script>
+</body>
+</html>

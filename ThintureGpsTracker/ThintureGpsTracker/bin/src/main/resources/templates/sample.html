@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page with Validation</title>
+	<style>
+	    /* General Reset Styles */
+	    * {
+	        margin: 0;
+	        padding: 0;
+	        box-sizing: border-box;
+	    }
+
+	    body {
+	        font-family: 'Arial', sans-serif;
+	        background-image: url(THINTURE_IMAGE/add_new.jpg);
+	        height: 100vh;
+	        display: flex;
+	        justify-content: center;
+	        align-items: center;
+	        background-size: cover;
+	        background-position: center;
+	        overflow: hidden;
+	    }
+
+	    .container {
+	        display: flex;
+	        flex-direction: row;
+	        width: 90%;
+			height: 50%;
+	        max-width: 1200px;
+	        background: rgba(255, 255, 255, 0.9);
+	        border-radius: 15px;
+	        overflow: hidden;
+	        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+	    }
+
+	    /* Features Section */
+	    .features {
+	        width: 50%; /* Adjusted for responsiveness */
+	         background:  rgba(21, 27, 84, 0.8);
+	        padding: 30px;
+	        color: white;
+	        display: flex;
+	        flex-direction: column;
+	        justify-content: center;
+	        text-align: center;
+	    }
+
+	    .features h3 {
+	        font-size: 1.8rem;
+	        margin-bottom: 20px;
+	    }
+
+	    .features ul {
+	        list-style: none;
+	        padding: 0;
+	    }
+
+	    .features ul li {
+	        margin: 15px 0;
+	        font-size: 1rem;
+	        position: relative;
+	        padding-left: 30px;
+	    }
+
+	    .features ul li::before {
+	        content: "✔";
+	        position: absolute;
+	        left: 0;
+	        color: #00f2fe;
+	        font-size: 1.2rem;
+	    }
+
+	    /* Login Section */
+	    .login-container {
+	        width: 20%; /* Adjusted for responsiveness */
+	        padding: 30px;
+	        display: flex;
+	        flex-direction: column;
+	        align-items: center;
+	    }
+
+	    .login-container .logo img {
+	        width: 150px;
+	        margin-bottom: 20px;
+	    }
+
+	    .login-container h2 {
+	        font-size: 1.8rem;
+	        margin-bottom: 20px;
+	        color: #333;
+	    }
+
+	    .login-container form {
+	        width: 100%;
+	        max-width: 400px;
+	        display: flex;
+	        flex-direction: column;
+	        gap: 15px;
+	    }
+
+	    input, select {
+	        width: 100%;
+	        padding: 12px;
+	        font-size: 1rem;
+	        border: 1px solid #ddd;
+	        border-radius: 8px;
+	    }
+.header{
+	position: absolute;
+	right:25%;
+}
+	    button {
+	        padding: 12px;
+	        font-size: 1.2rem;
+	        background: linear-gradient(to right, #4facfe, #00f2fe);
+	        border: none;
+	        border-radius: 8px;
+	        color: white;
+	        cursor: pointer;
+	    }
+
+	    button:hover {
+	        background: linear-gradient(to right, #00f2fe, #4facfe);
+	    }
+
+	    .deviceqr {
+	        position: absolute;
+	        bottom: 20px;
+	        right: 20px;
+	        display: flex;
+	        flex-direction: column;
+	        align-items: center;
+	        text-align: center;
+	    }
+
+	    .deviceqr img {
+	        width: 80px;
+	        border-radius: 6px;
+	        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	    }
+
+	    .qr-title {
+	        margin-top: 8px;
+	        font-size: 14px;
+	        color: white;
+	        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+	    }
+
+		/* Responsive Design for Small Screens */
+		@media (max-width: 768px) {
+		    .container {
+		        flex-direction: column;
+		        width: 100%;
+		        height: auto;
+		    }
+
+		    .features {
+		        width: 100%;
+		        padding: 20px;
+		    }
+
+		    .login-container {
+		        width: 90%; /* Reduced width for smaller screens */
+		        padding: 15px; /* Less padding for a compact look */
+		    }
+		}
+
+		@media (max-width: 480px) {
+		    .features h3 {
+		        font-size: 1.5rem;
+		    }
+
+		    .features ul li {
+		        font-size: 0.9rem;
+		    }
+
+		    .login-container {
+		        width: 85%; /* Further reduced width for very small screens */
+		        padding: 10px; /* Compact padding */
+		    }
+
+		    .login-container h2 {
+		        font-size: 1.2rem; /* Smaller heading font size */
+		    }
+
+		    .login-container form {
+		        gap: 10px; /* Less spacing between form elements */
+		    }
+
+		    input, select, button {
+		        font-size: 0.85rem; /* Smaller input font size */
+		        padding: 10px; /* Compact input padding */
+		    }
+
+		    button {
+		        font-size: 1rem; /* Adjusted button font size */
+		        padding: 12px;
+		    }
+
+		    .deviceqr img {
+		        width: 60px; /* Smaller QR code for mobile */
+		    }
+
+		    .qr-title {
+		        font-size: 12px; /* Smaller QR title */
+		    }
+		}
+
+	</style>
+
+</head>
+<body>
+	<div class="container">
+	      <!-- Features Section -->
+		  <div class="features">
+		      <h3>Our Services</h3>
+		      <ul>
+		          <li><strong>24/7 Monitoring:</strong> Always stay in control.</li>
+		          <li><strong>Route Optimization:</strong> Save time, cut costs.</li>
+		          <li><strong>Accident Alerts:</strong> Swift notifications, safer assets.</li>
+		          <li><strong>Data Insights:</strong> Smarter decisions, better performance.</li>
+		          
+		      </ul>
+		  </div>
+
+
+    <div class="login-container">
+		<div class="header">
+			            <a href="#" class="logo">
+			                <img src="THINTURE_IMAGE/Thinture.png" alt="Fleet Tracking Logo" ">
+			            </a>
+       <form th:action="@{/login}" method="post" id="loginForm">
+            <select name="usertype" id="usertype">
+              
+                <option value="SUPERADMIN">Superadmin</option>
+                <option value="ADMIN">Admin</option>
+                <option value="DEALER">Dealer</option>
+                <option value="CLIENT">Client</option>
+                <option value="USER">User</option>
+            </select>
+            <span class="error-message" id="usertypeError"></span>
+            <input type="text" id="username" name="username" placeholder="Enter Username">
+            <span class="error-message" id="usernameError"></span>
+            <input type="password" id="password" name="password" placeholder="Enter Password">
+            <span class="error-message" id="passwordError"></span>
+            <button type="submit">Login</button>
+        </form>
+        <p class="info-text"> <a href="/register">Forgot Password?</a></p>
+    </div>
+<div class="deviceqr">
+	
+	
+				                <img src="THINTURE_IMAGE/qrcode.png" alt="Fleet Tracking Logo" > <p class="qr-title">Thinture.com</p>
+</div>
+				           
+<script>
+	const form = document.getElementById("loginForm");
+	const usertype = document.getElementById("usertype");
+	const username = document.getElementById("username");
+	const password = document.getElementById("password");
+	const usertypeError = document.getElementById("usertypeError");
+	const usernameError = document.getElementById("usernameError");
+	const passwordError = document.getElementById("passwordError");
+
+	form.addEventListener("submit", (e) => {
+	    e.preventDefault(); // Prevent default form submission
+
+	    let isValid = true;
+	    resetErrors();
+
+	    // Validate usertype
+	    if (usertype.value === "") {
+	        isValid = false;
+	        usertypeError.textContent = "Please select a user type.";
+	    }
+
+	    // Validate username
+	    if (username.value.trim() === "") {
+	        isValid = false;
+	        usernameError.textContent = "Username is required.";
+	    }
+
+	    // Validate password
+	    if (password.value.trim() === "") {
+	        isValid = false;
+	        passwordError.textContent = "Password is required.";
+	    }
+
+	    // If valid, redirect to the appropriate page
+		
+
+	});
+
+	function resetErrors() {
+	    usertypeError.textContent = "";
+	    usernameError.textContent = "";
+	    passwordError.textContent = "";
+	}
+
+</script>
+
+	
+</body>
+</html>

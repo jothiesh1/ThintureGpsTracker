@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="icon" type="image/png" href="THINTURE_IMAGE/favicon.jpg" />
+
+    <title>Thinture.com</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+	  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+	  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+		body {
+		          font-family: Arial, sans-serif;
+		          margin: 0;
+		          padding: 0;
+				background-image: url(THINTURE_IMAGE/add_new.jpg);
+				           background-size: cover;
+				           background-repeat: no-repeat;
+				           overflow: hidden;
+		      }
+		      .container {
+				position: absolute;
+				          padding: 20px;
+				          width: 70%;
+				          height: auto;
+				          top: 190px;
+				          left: 15%;
+				          background: rgba(0, 0, 0, 0.4);
+				      }
+		      
+        .filters {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filters select,
+        .filters input,
+        .filters button {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .filters button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .filters button:hover {
+            background-color: #0056b3;
+        }
+        .table-container {
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+        }
+        table th, table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        table th {
+            background-color: #007bff;
+            color: white;
+        }
+        .map-container {
+            display: none;
+            height: 400px;
+            margin-top: 20px;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+		label{
+			color:white;
+		}
+		h1 {
+				text-align: center;
+								    font-size: 2em; /* Adjust size as needed */
+									font-weight: 600;
+								    color:white; /* Text color */
+								    text-shadow: 
+									1px 1px 2px rgba(0, 0, 0, 0.6), /* First shadow for initial depth */
+									        3px 3px 5px rgba(0, 0, 0, 0.4), /* Slightly darker shadow for increased depth */
+									        6px 6px 8px rgba(0, 0, 0, 0.1); /* Darker shadow for stronger 3D effect */
+									}
+									.alert{
+										color: red;
+									}
+									.print{
+										position: relative;
+										top:-60px;
+										right:160px;
+										background-color: #0056b3;
+									}
+									.print button:hover {
+									            background-color:gray;
+									        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PARKING REPORT</h1>
+        
+        <!-- Filters -->
+        <div class="filters">
+            <label>Duration (min):</label>
+            <input type="number" id="parkingDuration" placeholder="00:03" min="0">
+            <label>Quick time:</label>
+            <select id="quickTime">
+                <option value="">Select</option>
+                <option value="today">Today</option>
+                <option value="lastWeek">Last Week</option>
+            </select>
+            <label>From:</label>
+            <input type="date" id="fromDate">
+            <input type="time" id="fromTime">
+            <label>To:</label>
+            <input type="date" id="toDate">
+            <input type="time" id="toTime">
+            <button onclick="searchReports()">Search</button>
+			<button class="print" onclick="downloadExcel()">
+											 <img src="THINTURE_IMAGE/excel.jpg" alt="Download PDF" style="width: 28px; height: 35px; vertical-align: middle; margin-right: 5px;"></button>
+										<button class="print" onclick="downloadPDF()">
+										    <img src="THINTURE_IMAGE/pdf.jpg" alt="Download PDF" style="width: 28px; height: 35px; vertical-align: middle; margin-right: 5px;">
+										    
+										</button>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Device ID</th>
+                        <th>Start Parked Time</th>
+                        <th>End Parked Time</th>
+                        <th>Parking Duration (min)</th>
+                        <th>Parking Location</th>
+                        <th>Latitude</th>
+                        <th>Longitude</th>
+                    </tr>
+                </thead>
+                <tbody id="reportTable">
+                    <tr>
+                        <td class="alert" colspan="7">No data available</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Map -->
+        <div class="map-container" id="mapContainer">
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <script>
+        let map;
+        let marker;
+
+        // Function to initialize the map
+        function initMap(lat, lng, address) {
+            const mapContainer = document.getElementById('mapContainer');
+            mapContainer.style.display = 'block';
+
+            const position = [parseFloat(lat), parseFloat(lng)];
+
+            if (!map) {
+                map = L.map('map').setView(position, 15);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+            } else {
+                map.setView(position, 15);
+            }
+
+            if (marker) {
+                marker.setLatLng(position).bindPopup(address).openPopup();
+            } else {
+                marker = L.marker(position).addTo(map).bindPopup(address).openPopup();
+            }
+        }
+
+        // Function to fetch address from latitude and longitude
+        function fetchAddress(lat, lng, callback) {
+            const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.display_name) {
+                        callback(data.display_name);
+                    } else {
+                        callback('Address not found');
+                    }
+                })
+                .catch(() => {
+                    callback('Error fetching address');
+                });
+        }
+
+        // Function to handle row click
+        function rowClicked(row) {
+            const lat = row.getAttribute('data-lat');
+            const lng = row.getAttribute('data-lng');
+
+            // Fetch address and show on map
+            fetchAddress(lat, lng, (address) => {
+                initMap(lat, lng, address);
+            });
+        }
+
+        // Function to search and populate reports
+        function searchReports() {
+            const reportTable = document.getElementById('reportTable');
+
+            // Get filter values
+            const duration = document.getElementById('parkingDuration').value;
+            const quickTime = document.getElementById('quickTime').value;
+            const fromDate = document.getElementById('fromDate').value;
+            const fromTime = document.getElementById('fromTime').value;
+            const toDate = document.getElementById('toDate').value;
+            const toTime = document.getElementById('toTime').value;
+
+            // Construct query parameters
+            const params = new URLSearchParams({
+                duration,
+                quickTime,
+                fromDate,
+                fromTime,
+                toDate,
+                toTime
+            });
+
+            // Fetch data from the backend
+            fetch(`/api/parking-reports?${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        reportTable.innerHTML = data
+                            .map(row => `
+                                <tr data-lat="${row.parkedLatitude}" data-lng="${row.parkedLongitude}" onclick="rowClicked(this)">
+                                    <td>${row.deviceId}</td>
+                                    <td>${row.startParkedTime}</td>
+                                    <td>${row.endParkedTime}</td>
+                                    <td>${row.parkedDurationFull}</td>
+                                    <td id="location-${row.parkedLatitude}-${row.parkedLongitude}">Fetching location...</td>
+                                    <td>${row.parkedLatitude}</td>
+                                    <td>${row.parkedLongitude}</td>
+                                </tr>
+                            `)
+                            .join('');
+
+                        // Fetch addresses for all rows
+                        data.forEach(row => {
+                            fetchAddress(row.parkedLatitude, row.parkedLongitude, (address) => {
+                                document.getElementById(`location-${row.parkedLatitude}-${row.parkedLongitude}`).textContent = address;
+                            });
+                        });
+                    } else {
+                        reportTable.innerHTML = `<tr><td class="alert" colspan="7">No data available</td></tr>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching reports:', error);
+                });
+        }
+    </script>
+	<script>
+		// Function to download table data as Excel
+		function downloadExcel() {
+		    const table = document.querySelector('table'); // Get the table element directly
+		    const workbook = XLSX.utils.table_to_book(table, { sheet: "Event Data" });
+		    XLSX.writeFile(workbook, 'Parking_Report.xlsx');
+		}
+
+
+				
+		async function downloadPDF() {
+		    const { jsPDF } = window.jspdf;
+		    const doc = new jsPDF();
+
+		    // Set dark blue color for the header
+		    doc.setTextColor(0, 0, 139);  // RGB values for dark blue
+
+		    // Add centered heading
+		    const heading = 'Vehicle_Parking Report';
+		    const pageWidth = doc.internal.pageSize.width;
+		    const textWidth = doc.getTextWidth(heading);
+		    const xPosition = (pageWidth - textWidth) / 2;  // Center the text
+
+		    doc.setFontSize(18);
+		    doc.text(heading, xPosition, 20);  // Position the heading at the center
+
+		    const headers = [...document.querySelectorAll('table th')].map(th => th.textContent);
+		    const rows = [...document.querySelectorAll('table tbody tr')].map(tr => 
+		        [...tr.querySelectorAll('td')].map(td => td.textContent)
+		    );
+
+		    // Add table to the PDF
+		    doc.autoTable({ head: [headers], body: rows, startY: 30 });  // Adjust startY to ensure the table is below the heading
+
+		    doc.save('Vehicle_Parking_Report.pdf');
+		}
+
+
+
+
+			</script>
+</body>
+</html>

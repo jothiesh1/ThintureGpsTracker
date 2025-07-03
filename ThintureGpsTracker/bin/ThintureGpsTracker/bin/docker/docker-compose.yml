@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  gps-tracker:
+
+    container_name: thinture-gps
+    ports:
+      - "8182:8182"
+    restart: always
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - MQTT_BROKER_URL=tcp://3.109.116.92:1883
+      - MQTT_CLIENT_ID=spring-client
+      - DB_HOST=3.109.116.92
+      - DB_PORT=3306
+      - DB_NAME=ThintureGpsTrackerDB
+      - DB_USERNAME=admin
+      - DB_PASSWORD=Thinture
+
+	  
+	  
+	  

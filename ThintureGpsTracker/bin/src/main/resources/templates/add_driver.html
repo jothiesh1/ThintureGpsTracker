@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thinture GPS</title>
+  		    <link rel="icon" type="image/x-icon" href="/THINTURE_IMAGE/favicon.jpg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  
+  <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+  <link rel="stylesheet" type="text/css" th:href="@{/css/adddriver.css}">
+  <style>
+	
+  </style>
+</head>
+
+
+<body>
+  <header th:insert="navigation :: navbar"></header>
+
+  <div class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col-12 col-sm-10 col-md-8 col-lg-7">
+        <div class="card p-4">
+          <h2 class="text-center">ADD DRIVER</h2>
+          <form id="addDriverForm">
+            <!-- Hidden fields for dealer/client filtering -->
+            <input type="hidden" id="dealerId" value="101"> <!-- Replace dynamically -->
+            <input type="hidden" id="clientId" value="">   <!-- Replace dynamically -->
+
+            <div class="form-group mb-3">
+              <label for="fullName">Full Name</label>
+              <input type="text" id="fullName" class="form-control" required>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="dob">Date of Birth</label>
+                <input type="date" id="dob" class="form-control" required>
+                <div id="ageDisplay" class="mt-1"></div>
+              </div>
+              <div class="col-md-6">
+                <label for="contact">Contact Number</label>
+                <input type="text" id="contact" class="form-control" required>
+              </div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" class="form-control" required>
+            </div>
+
+            <div class="form-group mb-3">
+              <label for="address">Address</label>
+              <textarea id="address" rows="3" class="form-control" placeholder="Enter full address" required></textarea>
+            </div>
+
+            <div class="form-group mb-3">
+              <label for="license">License Number</label>
+              <input type="text" id="license" class="form-control" required>
+            </div>
+
+            <div class="form-group mb-3">
+              <label for="licenseType">License Type</label>
+              <select id="licenseType" class="form-select" required>
+                <option value="">Select</option>
+                <option value="LV">Light Vehicle</option>
+                <option value="HGV">Heavy Goods Vehicle</option>
+                <option value="Bus">Bus</option>
+                <option value="Tanker">Tanker</option>
+              </select>
+            </div>
+
+            <div class="form-group mb-3">
+              <label for="ddp">Defensive Driving Permit Code</label>
+              <select id="ddp" class="form-select" required>
+                <option value="">Select</option>
+                <option value="DD01">DD01 - LV</option>
+                <option value="DD02">DD02 - HGV</option>
+                <option value="DD03">DD03 - Graded Roads</option>
+                <option value="DD04">DD04 - Tanker</option>
+                <option value="DD05">DD05 - Bus</option>
+              </select>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="ddpExpiry">DDP Expiry Date</label>
+                <input type="date" id="ddpExpiry" class="form-control" required>
+              </div>
+              <div class="col-md-6">
+                <label for="vehicle">Assign Vehicle</label>
+                <input type="text" id="vehicle" class="form-control">
+              </div>
+            </div>
+
+            <!-- Updated RFID field: now a dropdown -->
+            <div class="form-group mb-3">
+              <label for="rfid">Assign RFID</label>
+              <select id="rfid" class="form-select" required>
+                <option value="">Loading RFIDs...</option>
+				
+              </select>
+            </div>
+
+            <div class="form-group mb-4">
+              <label for="country">Country</label>
+              <input type="text" id="country" class="form-control" placeholder="Country">
+            </div>
+
+            <div class="form-group">
+              <button type="submit" class="submit btn btn-primary w-100">Add Driver</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    let currentAge = null;
+
+    document.getElementById('dob').addEventListener('change', function () {
+      const dob = new Date(this.value);
+      const today = new Date();
+      let age = today.getFullYear() - dob.getFullYear();
+      const m = today.getMonth() - dob.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+      currentAge = age;
+      document.getElementById('ageDisplay').innerText = isNaN(age) ? '' : `Age: ${age} years`;
+    });
+
+    document.getElementById('addDriverForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const requiredFields = [
+        'fullName', 'dob', 'contact', 'email',
+        'address', 'license', 'licenseType',
+        'ddp', 'ddpExpiry', 'rfid'
+      ];
+
+      let hasError = false;
+
+      requiredFields.forEach(id => {
+        document.getElementById(id).classList.remove('invalid-field');
+      });
+
+      requiredFields.forEach(id => {
+        const field = document.getElementById(id);
+        if (!field.value.trim()) {
+          field.classList.add('invalid-field');
+          hasError = true;
+        }
+      });
+
+      if (hasError) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Missing Fields',
+          text: 'Please fill all required fields. Missing fields are highlighted.'
+        });
+        return;
+      }
+
+      const licenseType = document.getElementById('licenseType').value;
+      const age = currentAge;
+      let minAge = 21;
+      if (licenseType === 'HGV') minAge = 26;
+      if (licenseType === 'Bus' || licenseType === 'Tanker') minAge = 30;
+
+      if (age === null || age < minAge) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Age Restriction',
+          text: `Minimum age for ${licenseType} license is ${minAge} years. Current age is ${age ?? 'N/A'}.`
+        });
+        document.getElementById('dob').classList.add('invalid-field');
+        return;
+      }
+
+      const data = {
+        fullName: document.getElementById('fullName').value.trim(),
+        dob: document.getElementById('dob').value,
+        contact: document.getElementById('contact').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        address: document.getElementById('address').value.trim(),
+        license: document.getElementById('license').value.trim(),
+        licenseType: licenseType,
+        ddp: document.getElementById('ddp').value,
+        ddpExpiry: document.getElementById('ddpExpiry').value,
+        vehicle: document.getElementById('vehicle')?.value || "",
+        rfid: document.getElementById('rfid').value,
+        country: document.getElementById('country')?.value || ""
+      };
+
+      fetch('/api/drivers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+        .then(response => {
+          if (response.ok) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Driver Saved',
+              text: `${data.fullName} has been added successfully.`
+            });
+            document.getElementById('addDriverForm').reset();
+            document.getElementById('ageDisplay').textContent = '';
+            currentAge = null;
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Something went wrong while saving the driver.'
+            });
+          }
+        })
+        .catch(error => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Request Failed',
+            text: error.message
+          });
+        });
+    });
+
+    // RFID dropdown population
+	document.addEventListener('DOMContentLoaded', () => {
+	  fetch('/api/rfid/all')
+	    .then(response => {
+	      console.log("RFID API triggered ✅");
+	      return response.json();
+	    })
+	    .then(rfids => {
+	      const rfidSelect = document.getElementById('rfid');
+	      rfidSelect.innerHTML = '<option value="">Select RFID</option>';
+
+	      rfids.forEach(rfid => {
+	        const option = document.createElement('option');
+	        option.value = rfid.rfidCode;
+	        option.textContent = rfid.rfidCode;
+	        rfidSelect.appendChild(option);
+	      });
+
+	      if (rfidSelect.options.length === 1) {
+	        rfidSelect.innerHTML = '<option value="">No available RFIDs</option>';
+	      }
+	    })
+	    .catch(error => {
+	      console.error('Error fetching RFIDs:', error);
+	      const rfidSelect = document.getElementById('rfid');
+	      rfidSelect.innerHTML = '<option value="">Error loading RFIDs</option>';
+	    });
+	});
+
+
+  </script>
+
+  <style>
+    .invalid-field {
+      border: 1px solid red;
+      background-color: #ffe6e6;
+    }
+  </style>
+</body>
+
+
+
+</html>

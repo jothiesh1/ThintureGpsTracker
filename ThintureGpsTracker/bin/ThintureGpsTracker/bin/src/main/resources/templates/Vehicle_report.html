@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+
+    <title>THINTURE</title>
+	<style>
+	        html, body {
+	            height: 100%;
+	            margin: 0;
+	        }
+			@media screen and (min-width: 768px) {
+			     .container {
+			       width: 250px;
+			     }
+			   }
+
+			   /* Styles for laptops and desktops */
+			   @media screen and (min-width: 1024px) {
+			     .container {
+			       width: 990px;
+			     }
+			   }
+
+			   /* Styles for large desktops */
+			   @media screen and (min-width: 1200px) {
+			     .container {
+			       width: 1190px;
+			     }
+			   }
+
+			   /* Custom styles for mobile screens */
+			   @media screen and (max-width: 767px) {
+			     .container {
+			       padding: 10px;
+			     }
+			   }
+			body {
+			    height: 100%;
+			    margin: 0;
+				background-image: url(THINTURE_IMAGE/reportd.jpg);
+								            background-size: cover;
+								            background-position: center;
+								            overflow: hidden;
+			}
+
+		
+						   .container {
+							background-color: rgba(240, 248, 255, 0.3); /* 70% transparent aliceblue */
+									    width: 70%;
+									    position: absolute;
+									    right: 10%;
+									    top: 150px;
+									    padding: 20px;
+									    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+									    border-radius: 8px;
+						   }
+
+	        .search-container {
+	            margin-bottom: 20px;
+	            display: flex;
+	            flex-wrap: wrap;
+	        }
+	        .filter {
+	            padding: 5px;
+	            margin-right: 10px;
+	            width: calc(20% - 120px);
+				border-radius: 34px;
+	        }
+	        .search-button {
+	            padding: 5px 10px;
+	            border: 4px solid white;
+	            background-color: darkblue;
+	            color: white;
+	            height: 38px;
+	            cursor: pointer;
+	        }
+	        table {
+				position: absolute;
+	            width:50%;
+	            border-collapse: collapse;
+	            font-size: 10px;
+	        }
+	        th, td {
+	            padding: -3px;
+	            border: 1px solid black;
+				background-color: white;
+	        }
+	        th {
+				color:white;
+							background-color: #0056b3;
+							            padding: 5px;
+							            text-align: center;
+	        }
+	        .violation-page {
+				top:150px;
+	            display: none;
+	            background-color: white;
+	            padding: 20px;
+	            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	            border-radius: 8px;
+	            position: absolute;
+	        }
+	        .close-btn {
+	            position: absolute;
+	            top: 10px;
+	            right: 10px;
+	            background-color: darkred;
+	            color: white;
+	            padding: 5px;
+	            border: none;
+	            cursor: pointer;
+	            border-radius: 50%;
+	            font-size: 16px;
+	        }
+	        .alert {
+	            color: red;
+	            display: none;
+	        }
+	        /* Hide main content when violation tab is open */
+	        .hide-main-content {
+	            display: none;
+	        }
+			h2 {
+					    text-align: center;
+					    font-size: 2em; /* Adjust size as needed */
+						font-weight: 400;
+					    color:black; /* Text color */
+					    text-shadow: 
+						1px 1px 2px rgba(0, 0, 0, 0.4), /* First shadow for initial depth */
+						        3px 3px 5px rgba(0, 0, 0, 0.3), /* Slightly darker shadow for increased depth */
+						        6px 6px 8px rgba(0, 0, 0, 0.0); /* Darker shadow for stronger 3D effect */
+						}
+					.filterb	{
+						background-color:darkblue;
+						color:white;
+							
+						}
+						.footer {
+																      background-color: #151B54; /* Gradient from light to dark blue */
+																    color: WHITE;
+																    position: fixed;
+																    width: 100%;
+																    bottom: 0;
+																    display: flex;
+																    flex-direction: column; /* Set column direction to stack content */
+																    justify-content: center;
+																    align-items: center;
+																    padding: 23px 20px; /* Adjust padding */
+																}
+
+																.footer p {
+																    margin: 10px 0; /* Adjust margin */
+																   
+																    text-align: center;
+																}
+
+																.certificate-wrapper {
+																    position: absolute;
+																    right: 50px;
+																    top: 20px;
+																    text-align: center;
+																}
+
+																.certificateqr {
+																	position: absolute;
+																    height: 120px;
+																    width: auto;
+																    display: block;
+																	right: 20px;
+																	top:-25px;
+																}
+
+																.certificate-wrapper label {
+																	position: absolute;
+																    font-size: 16px;
+																    margin-top: 80px;
+																    color: white;
+																    display: block;
+																	right:30px;
+																}
+
+																.social-icons {
+																    display: flex;
+																    justify-content: center; /* Center the icons */
+																    align-items: center; /* Vertically align icons */
+																    margin-top: 10px; /* Add space between icons and other content */
+																}
+
+																.social-icons a {
+																    color: WHITE;
+																    margin: 0 15px;
+																    text-decoration: none;
+																    font-size: 24px;
+																    transition: color 0.3s ease;
+																}
+
+																.social-icons a:hover {
+																    color: #ffdd57; /* Change color on hover */
+																}
+	    </style>
+</head>
+<body>
+	<div th:insert="navigation :: navbar"></div>
+			  <div class="container main-content">
+			      <h2><strong>Vehicle Management Report</strong></h2>
+
+			      <div class="search-container">
+			          <!-- Input for Device ID -->
+			          <input type="text" class="filter" id="deviceID" placeholder="Search Device ID...">
+
+			          <!-- Dropdown for Selecting Month -->
+			          <select id="violationMonth" class="filter">
+			              <option value="">Select Month</option>
+			              <option value="01">January</option>
+			              <option value="02">February</option>
+			              <option value="03">March</option>
+			              <option value="04">April</option>
+			              <option value="05">May</option>
+			              <option value="06">June</option>
+			              <option value="07">July</option>
+			              <option value="08">August</option>
+			              <option value="09">September</option>
+			              <option value="10">October</option>
+			              <option value="11">November</option>
+			              <option value="12">December</option>
+			          </select>
+
+			          <!-- Dropdown for Selecting Year -->
+			          <select id="violationYear" class="filter"></select>
+
+			          <!-- Button for filtering data -->
+			          <button type="button" class="search-button" onclick="filterData()">Filter</button>
+
+			          <!-- Button for exporting data to Excel -->
+			          <button type="button" class="search-button" onclick="exportTableToExcel('dataTable', 'Vehicle_Report')">Export to Excel</button>
+			      </div>
+
+			      <!-- Alert for no results -->
+			      <div class="alert" id="noResultsAlert" style="display: none;">No results found for the selected criteria.</div>
+
+			      <!-- Table to display vehicle data -->
+			      <div id="tableContainer" class="table-container">
+			          <table id="dataTable">
+			              <thead>
+			                  <tr>
+			                      <th>DEVICE ID</th>
+			                      <th>VEHICLE NO.</th>
+			                      <th>Owner</th>
+			                      <th>Vehicle Type</th>
+			                      <th>Latitude</th>
+			                      <th>Longitude</th>
+			                      <th>Engine No</th>
+			                      <th>Manufacturer</th>
+			                      <th>Model</th>
+			                      <th>Driver</th>
+			                      <th>Installation</th>
+			                      <th>Technician</th>
+			                      <th>IMEI</th>
+			                      <th>SIM NO</th>
+			                      <th>STATUS</th>
+			                      <th>Dealer</th>
+			                      <th>Country</th>
+			                      <th>Violation Date</th>
+			                      <th>Violation Type</th>
+			                      <th>Violation Speed</th>
+			                      <th>Violation Location</th>
+			                      <th>Violation Status</th>
+			                  </tr>
+			              </thead>
+			              <tbody id="vehicle-table-body"></tbody>
+			          </table>
+			          <div id="pagination"></div>
+			      </div>
+			  </div>
+
+			  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+			  <script>
+			      // Populate the Year Dropdown dynamically
+			      function populateYearDropdown() {
+			          const yearDropdown = document.getElementById('violationYear');
+			          const currentYear = new Date().getFullYear();
+
+			          for (let i = currentYear; i >= 2000; i--) {
+			              const option = document.createElement('option');
+			              option.value = i;
+			              option.text = i;
+			              yearDropdown.appendChild(option);
+			          }
+			      }
+
+			      // Fetch vehicle data from the API based on filters (Device ID, Month, Year)
+			      function fetchVehicleData(deviceID, month, year) {
+			          let url = /api/vehicle/report;
+
+			          let queryParams = {};
+			          if (deviceID) queryParams.deviceID = deviceID;
+			          if (month) queryParams.month = month;
+			          if (year) queryParams.year = year;
+
+			          console.log('API URL:', url, queryParams);  // Log the URL to verify
+
+			          $.ajax({
+			              url: url,
+			              type: 'GET',
+			              data: queryParams,  // Send query parameters
+			              dataType: 'json',   // Expected data type
+			              success: function (response) {
+			                  if (response.length === 0) {
+			                      document.getElementById('noResultsAlert').style.display = 'block';
+			                  } else {
+			                      document.getElementById('noResultsAlert').style.display = 'none';
+			                      populateVehicleTable(response);
+			                  }
+			                  console.log('API URL:', url, queryParams);  // Log URL and parameters to verify
+			              },
+			              error: function (jqXHR, textStatus, errorThrown) {
+			                  console.error('Error fetching vehicle data:', textStatus, errorThrown, jqXHR.responseText);
+			                  alert('Failed to fetch vehicle data.');
+			                  console.log('API URL:', url, queryParams);  // Log URL and parameters to verify
+			              }
+			          });
+			      }
+
+			      // Populate the vehicle table dynamically with fetched data
+			      function populateVehicleTable(vehicleData) {
+			          const tableBody = document.getElementById('vehicle-table-body');
+			          tableBody.innerHTML = '';  // Clear previous data
+
+			          vehicleData.forEach((vehicle) => {
+			              const row = document.createElement('tr');
+			              row.innerHTML = `
+			                  <td>${vehicle.deviceID || ''}</td>
+			                  <td>${vehicle.vehicleNumber || ''}</td>
+			                  <td>${vehicle.ownerName || ''}</td>
+			                  <td>${vehicle.vehicleType || ''}</td>
+			                  <td>${vehicle.latitude || ''}</td>
+			                  <td>${vehicle.longitude || ''}</td>
+			                  <td>${vehicle.engineNumber || ''}</td>
+			                  <td>${vehicle.manufacturer || ''}</td>
+			                  <td>${vehicle.model || ''}</td>
+			                  <td>${vehicle.driver || ''}</td>
+			                  <td>${vehicle.installationDate || ''}</td>
+			                  <td>${vehicle.technicianName || ''}</td>
+			                  <td>${vehicle.imei || ''}</td>
+			                  <td>${vehicle.simNumber || ''}</td>
+			                  <td>${vehicle.status || ''}</td>
+			                  <td>${vehicle.dealerName || ''}</td>
+			                  <td>${vehicle.country || ''}</td>
+			                  <td>${vehicle.violationDate || ''}</td>
+			                  <td>${vehicle.violationType || ''}</td>
+			                  <td>${vehicle.violationSpeed || ''}</td>
+			                  <td>${vehicle.location || ''}</td>
+			                  <td>${vehicle.status || ''}</td>
+			              `;
+			              tableBody.appendChild(row);
+			          });
+			      }
+
+			      // Filter data based on selected search criteria
+			      function filterData() {
+			          const deviceID = document.getElementById('deviceID').value;
+			          const month = document.getElementById('violationMonth').value;
+			          const year = document.getElementById('violationYear').value;
+
+			          fetchVehicleData(deviceID, month, year);
+			      }
+				  // Export table to Excel
+				  function exportTableToExcel(tableID, filename = 'Vehicle_Report') {
+				      const downloadLink = document.createElement('a');
+				      const tableSelect = document.getElementById(tableID);
+				      const tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
+
+				      // Correctly use template literals with backticks
+				      filename = `${filename}.xls`;
+
+				      downloadLink.href = 'data:application/vnd.ms-excel,' + tableHTML;
+				      downloadLink.download = filename;
+
+				      // Trigger download
+				      downloadLink.click();
+				  }
+
+				  // Initialize on page load
+				  window.onload = () => {
+				      populateYearDropdown();
+				      filterData();  // Automatically load data on page load
+				  };
+			  </script>
+
+
+</html>

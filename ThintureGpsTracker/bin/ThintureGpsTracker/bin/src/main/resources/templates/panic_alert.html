@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <title>Thinture GPS</title>
+    <link rel="icon" type="image/x-icon" href="/THINTURE_IMAGE/favicon.jpg">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-image: url('THINTURE_IMAGE/fleet.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        h2 {
+            color: white;
+            margin-top: 20px;
+        }
+
+        /* Search Bar */
+        .search-container {
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .search-container input {
+            width: 80%;
+            max-width: 400px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /* Responsive Table */
+		.table-container {
+		    width: 90%;
+		    margin: 20px auto;
+		    overflow-x: auto;
+		    overflow-y: auto; /* Enable vertical scroll if needed */
+		    max-height: 500px; /* Adjust height to make scrolling work */
+		    background: white;
+		    padding: 10px;
+		    border-radius: 8px;
+		    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+		}
+
+		/* Custom Scrollbar for WebKit browsers (Chrome, Safari) */
+		.table-container::-webkit-scrollbar {
+		    width: 10px; /* Width of scrollbar */
+		    height: 8px; /* Height of horizontal scrollbar */
+		}
+
+		.table-container::-webkit-scrollbar-track {
+		    background: #f1f1f1; /* Track background */
+		    border-radius: 5px;
+		}
+
+		.table-container::-webkit-scrollbar-thumb {
+		    background: #007bff; /* Scrollbar color */
+		    border-radius: 5px;
+		}
+
+		.table-container::-webkit-scrollbar-thumb:hover {
+		    background: #0056b3; /* Darker shade on hover */
+		}
+
+		/* For Firefox */
+		.table-container {
+		    scrollbar-width: thin;
+		    scrollbar-color: #007bff #f1f1f1;
+		}
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        /* Action Buttons */
+        .btn {
+            padding: 8px 12px;
+            margin: 5px;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .btn-edit {
+            background-color: #ffc107;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+        }
+
+        .btn-view {
+            background-color: #28a745;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 15px;
+			color: white;
+            gap: 10px;
+        }
+
+        .pagination button {
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+        }
+
+        .pagination button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .table-container {
+                width: 100%;
+                overflow-x: scroll;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div th:insert="navigation :: navbar"></div>
+    
+    <h2>Device Details Report</h2>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search by Vehicle ID, Owner Name, IMEI...">
+    </div>
+
+    <div id="error-message" class="error"></div>
+
+    <div class="table-container">
+        <table id="tracker-table">
+            <thead>
+                <tr>
+                    <th>Vehicle ID</th>
+                    <th>Owner Name</th>
+                    <th>IMEI</th>
+                    <th>Vehicle Number</th>
+                    <th>Engine Number</th>
+                    <th>Vehicle Type</th>
+                    <th>Model</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination">
+        <button id="prevPage" onclick="prevPage()" disabled>Previous</button>
+        <span id="pageInfo"></span>
+        <button id="nextPage" onclick="nextPage()">Next</button>
+    </div>
+
+    <script>
+        let data = []; // Holds API data
+        let currentPage = 1;
+        const rowsPerPage = 10; // Number of rows per page
+
+        function fetchAndPopulateTrackerTable() {
+            fetch("/api/details")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch vehicle locations");
+                    }
+                    return response.json();
+                })
+                .then(fetchedData => {
+                    if (Array.isArray(fetchedData) && fetchedData.length > 0) {
+                        data = fetchedData;
+                        currentPage = 1; // Reset to first page
+                        populateTable();
+                    } else {
+                        showError("No vehicles found");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching vehicle locations:", error);
+                    showError("Failed to load vehicle data");
+                });
+        }
+
+        function populateTable() {
+            const tableBody = document.querySelector("#tracker-table tbody");
+            tableBody.innerHTML = ""; // Clear previous data
+
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            const paginatedData = data.slice(start, end);
+
+            paginatedData.forEach(vehicle => {
+                const row = document.createElement("tr");
+
+				row.innerHTML = `
+				                    <td>${vehicle.deviceID || "N/A"}</td>
+				                    <td>${vehicle.ownerName || "N/A"}</td>
+									<td>${vehicle.imei|| "N/A"}</td>
+									<td>${vehicle.vehicleNumber|| "N/A"}</td>
+									<td>${vehicle.engineNumber|| "N/A"}</td>
+									<td>${vehicle.vehicleType|| "N/A"}</td>
+									<td>${vehicle.model|| "N/A"}</td>
+				                    <td>
+				                        <button class="btn btn-view" onclick="viewVehicle('${vehicle.deviceID}')">View</button>
+				                        <button class="btn btn-edit" onclick="editVehicle('${vehicle.deviceID}')">Edit</button>
+				                        <button class="btn btn-delete" onclick="deleteVehicle('${vehicle.deviceID}')">Delete</button>
+				                    </td>
+				                `;
+
+				                tableBody.appendChild(row);
+				            });
+
+            document.getElementById("error-message").textContent = ""; // Clear error message
+
+            updatePagination();
+        }
+
+        function searchTable() {
+            let input = document.getElementById("searchInput").value.toLowerCase();
+            let tableRows = document.querySelectorAll("#tracker-table tbody tr");
+
+            tableRows.forEach(row => {
+                let text = row.innerText.toLowerCase();
+                row.style.display = text.includes(input) ? "" : "none";
+            });
+        }
+
+        function updatePagination() {
+            const totalPages = Math.ceil(data.length / rowsPerPage);
+            document.getElementById("pageInfo").textContent = `Page ${currentPage} of ${totalPages}`;
+            document.getElementById("prevPage").disabled = currentPage === 1;
+            document.getElementById("nextPage").disabled = currentPage === totalPages;
+        }
+
+        function nextPage() {
+            if (currentPage * rowsPerPage < data.length) {
+                currentPage++;
+                populateTable();
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                populateTable();
+            }
+        }
+
+        // Load data on page load
+        fetchAndPopulateTrackerTable();
+    </script>
+
+</body>
+</html>

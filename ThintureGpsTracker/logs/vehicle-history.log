@@ -1,0 +1,1194 @@
+2025-02-11 10:50:08 [INFO] o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.1.Final
+2025-02-11 10:50:08 [INFO] c.G.T.ThintureGpsTrackerApplication - Starting ThintureGpsTrackerApplication using Java 17.0.12 with PID 25292 (C:\Users\jothi\git\bigno\ThintureGpsTracker\ThintureGpsTracker\ThintureGpsTracker\ThintureGpsTracker\target\classes started by jothi in C:\Users\jothi\git\bigno\ThintureGpsTracker\ThintureGpsTracker\ThintureGpsTracker\ThintureGpsTracker)
+2025-02-11 10:50:08 [DEBUG] c.G.T.ThintureGpsTrackerApplication - Running with Spring Boot v3.3.2, Spring v6.1.11
+2025-02-11 10:50:08 [INFO] c.G.T.ThintureGpsTrackerApplication - No active profile set, falling back to 1 default profile: "default"
+2025-02-11 10:50:10 [INFO] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-02-11 10:50:10 [INFO] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 210 ms. Found 13 JPA repository interfaces.
+2025-02-11 10:50:10 [INFO] o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2025-02-11 10:50:10 [INFO] o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2025-02-11 10:50:11 [WARN] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.ws.config.annotation.DelegatingWsConfiguration' of type [org.springframework.ws.config.annotation.DelegatingWsConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [annotationActionEndpointMapping] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2025-02-11 10:50:11 [INFO] o.s.w.s.a.s.AnnotationActionEndpointMapping - Supporting [WS-Addressing August 2004, WS-Addressing 1.0]
+2025-02-11 10:50:12 [INFO] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8181 (http)
+2025-02-11 10:50:12 [INFO] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8181"]
+2025-02-11 10:50:12 [INFO] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-02-11 10:50:12 [INFO] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.26]
+2025-02-11 10:50:12 [INFO] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-02-11 10:50:12 [INFO] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 3087 ms
+2025-02-11 10:50:12 [DEBUG] o.s.o.j.LocalContainerEntityManagerFactoryBean - Building JPA container EntityManagerFactory for persistence unit 'default'
+2025-02-11 10:50:12 [INFO] o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-02-11 10:50:12 [INFO] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.5.2.Final
+2025-02-11 10:50:13 [INFO] o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-02-11 10:50:13 [INFO] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-02-11 10:50:13 [INFO] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-02-11 10:50:14 [INFO] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@72406594
+2025-02-11 10:50:14 [INFO] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-02-11 10:50:14 [WARN] org.hibernate.orm.deprecation - HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-02-11 10:50:14 [WARN] org.hibernate.orm.deprecation - HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-02-11 10:50:16 [INFO] o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-02-11 10:50:17 [DEBUG] org.hibernate.SQL - alter table dealers add constraint FKfugggvpusqtkllfmas5l79ctv foreign key (superadmin_id) references SuperAdmin (id)
+2025-02-11 10:50:17 [WARN] o.h.t.s.i.ExceptionHandlerLoggedImpl - GenerationTarget encountered exception accepting command : Error executing DDL "alter table dealers add constraint FKfugggvpusqtkllfmas5l79ctv foreign key (superadmin_id) references SuperAdmin (id)" via JDBC [Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_97e`, CONSTRAINT `FKfugggvpusqtkllfmas5l79ctv` FOREIGN KEY (`superadmin_id`) REFERENCES `SuperAdmin` (`id`))]
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table dealers add constraint FKfugggvpusqtkllfmas5l79ctv foreign key (superadmin_id) references SuperAdmin (id)" via JDBC [Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_97e`, CONSTRAINT `FKfugggvpusqtkllfmas5l79ctv` FOREIGN KEY (`superadmin_id`) REFERENCES `SuperAdmin` (`id`))]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:94)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:575)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:515)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applyForeignKeys(AbstractSchemaMigrator.java:447)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:268)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:117)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:280)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:322)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:457)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1506)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:75)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1853)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1802)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:205)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:954)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:625)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.GpsTracker.Thinture.ThintureGpsTrackerApplication.main(ThintureGpsTrackerApplication.java:12)
+Caused by: java.sql.SQLIntegrityConstraintViolationException: Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_97e`, CONSTRAINT `FKfugggvpusqtkllfmas5l79ctv` FOREIGN KEY (`superadmin_id`) REFERENCES `SuperAdmin` (`id`))
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:118)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.StatementImpl.executeInternal(StatementImpl.java:763)
+	at com.mysql.cj.jdbc.StatementImpl.execute(StatementImpl.java:648)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:80)
+	... 36 common frames omitted
+2025-02-11 10:50:17 [DEBUG] org.hibernate.SQL - alter table drivers add constraint FKik7us7jhlka3uoamgqmteyojf foreign key (dealer_id) references dealers (id)
+2025-02-11 10:50:17 [WARN] o.h.t.s.i.ExceptionHandlerLoggedImpl - GenerationTarget encountered exception accepting command : Error executing DDL "alter table drivers add constraint FKik7us7jhlka3uoamgqmteyojf foreign key (dealer_id) references dealers (id)" via JDBC [Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_97e`, CONSTRAINT `FKik7us7jhlka3uoamgqmteyojf` FOREIGN KEY (`dealer_id`) REFERENCES `dealers` (`id`))]
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table drivers add constraint FKik7us7jhlka3uoamgqmteyojf foreign key (dealer_id) references dealers (id)" via JDBC [Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_97e`, CONSTRAINT `FKik7us7jhlka3uoamgqmteyojf` FOREIGN KEY (`dealer_id`) REFERENCES `dealers` (`id`))]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:94)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:575)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:515)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applyForeignKeys(AbstractSchemaMigrator.java:447)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:268)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:117)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:280)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:322)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:457)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1506)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:75)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1853)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1802)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:205)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:954)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:625)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.GpsTracker.Thinture.ThintureGpsTrackerApplication.main(ThintureGpsTrackerApplication.java:12)
+Caused by: java.sql.SQLIntegrityConstraintViolationException: Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_97e`, CONSTRAINT `FKik7us7jhlka3uoamgqmteyojf` FOREIGN KEY (`dealer_id`) REFERENCES `dealers` (`id`))
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:118)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.StatementImpl.executeInternal(StatementImpl.java:763)
+	at com.mysql.cj.jdbc.StatementImpl.execute(StatementImpl.java:648)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:80)
+	... 36 common frames omitted
+2025-02-11 10:50:18 [DEBUG] org.hibernate.SQL - alter table vehicle add constraint FK6jkw5mcxok432sytte1upabj1 foreign key (admin_id) references admins (id)
+2025-02-11 10:50:18 [WARN] c.zaxxer.hikari.pool.ProxyLeakTask - Connection leak detection triggered for com.mysql.cj.jdbc.ConnectionImpl@72406594 on thread main, stack trace follows
+java.lang.Exception: Apparent connection leak detected
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:127)
+	at org.hibernate.engine.jdbc.connections.internal.DatasourceConnectionProviderImpl.getConnection(DatasourceConnectionProviderImpl.java:122)
+	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess.obtainConnection(JdbcEnvironmentInitiator.java:437)
+	at org.hibernate.resource.transaction.backend.jdbc.internal.DdlTransactionIsolatorNonJtaImpl.getIsolatedConnection(DdlTransactionIsolatorNonJtaImpl.java:46)
+	at org.hibernate.resource.transaction.backend.jdbc.internal.DdlTransactionIsolatorNonJtaImpl.getIsolatedConnection(DdlTransactionIsolatorNonJtaImpl.java:39)
+	at org.hibernate.tool.schema.internal.exec.ImprovedExtractionContextImpl.getJdbcConnection(ImprovedExtractionContextImpl.java:63)
+	at org.hibernate.tool.schema.internal.exec.ImprovedExtractionContextImpl.getJdbcDatabaseMetaData(ImprovedExtractionContextImpl.java:70)
+	at org.hibernate.tool.schema.extract.internal.InformationExtractorJdbcDatabaseMetaDataImpl.processTableResultSet(InformationExtractorJdbcDatabaseMetaDataImpl.java:65)
+	at org.hibernate.tool.schema.extract.internal.AbstractInformationExtractorImpl.getTables(AbstractInformationExtractorImpl.java:570)
+	at org.hibernate.tool.schema.extract.internal.DatabaseInformationImpl.getTablesInformation(DatabaseInformationImpl.java:122)
+	at org.hibernate.tool.schema.internal.GroupedSchemaMigratorImpl.performTablesMigration(GroupedSchemaMigratorImpl.java:72)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:232)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:117)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:280)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:322)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:457)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1506)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:75)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1853)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1802)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:205)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:954)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:625)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.GpsTracker.Thinture.ThintureGpsTrackerApplication.main(ThintureGpsTrackerApplication.java:12)
+2025-02-11 10:50:18 [WARN] o.h.t.s.i.ExceptionHandlerLoggedImpl - GenerationTarget encountered exception accepting command : Error executing DDL "alter table vehicle add constraint FK6jkw5mcxok432sytte1upabj1 foreign key (admin_id) references admins (id)" via JDBC [Can't write; duplicate key in table '#sql-70f_97e']
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table vehicle add constraint FK6jkw5mcxok432sytte1upabj1 foreign key (admin_id) references admins (id)" via JDBC [Can't write; duplicate key in table '#sql-70f_97e']
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:94)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:575)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:515)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applyForeignKeys(AbstractSchemaMigrator.java:447)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:268)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:117)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:280)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:322)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:457)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1506)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:75)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1853)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1802)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:205)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:954)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:625)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.GpsTracker.Thinture.ThintureGpsTrackerApplication.main(ThintureGpsTrackerApplication.java:12)
+Caused by: java.sql.SQLIntegrityConstraintViolationException: Can't write; duplicate key in table '#sql-70f_97e'
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:118)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.StatementImpl.executeInternal(StatementImpl.java:763)
+	at com.mysql.cj.jdbc.StatementImpl.execute(StatementImpl.java:648)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:80)
+	... 36 common frames omitted
+2025-02-11 10:50:18 [DEBUG] org.hibernate.SQL - alter table vehicle add constraint FK5lr77dwyrb3gbxsrouti8upqh foreign key (dealer_id) references dealers (id)
+2025-02-11 10:50:18 [WARN] o.h.t.s.i.ExceptionHandlerLoggedImpl - GenerationTarget encountered exception accepting command : Error executing DDL "alter table vehicle add constraint FK5lr77dwyrb3gbxsrouti8upqh foreign key (dealer_id) references dealers (id)" via JDBC [Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_97e`, CONSTRAINT `FK5lr77dwyrb3gbxsrouti8upqh` FOREIGN KEY (`dealer_id`) REFERENCES `dealers` (`id`))]
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table vehicle add constraint FK5lr77dwyrb3gbxsrouti8upqh foreign key (dealer_id) references dealers (id)" via JDBC [Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_97e`, CONSTRAINT `FK5lr77dwyrb3gbxsrouti8upqh` FOREIGN KEY (`dealer_id`) REFERENCES `dealers` (`id`))]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:94)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:575)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:515)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applyForeignKeys(AbstractSchemaMigrator.java:447)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:268)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:117)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:280)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:322)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:457)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1506)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:75)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1853)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1802)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:205)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:954)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:625)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.GpsTracker.Thinture.ThintureGpsTrackerApplication.main(ThintureGpsTrackerApplication.java:12)
+Caused by: java.sql.SQLIntegrityConstraintViolationException: Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_97e`, CONSTRAINT `FK5lr77dwyrb3gbxsrouti8upqh` FOREIGN KEY (`dealer_id`) REFERENCES `dealers` (`id`))
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:118)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.StatementImpl.executeInternal(StatementImpl.java:763)
+	at com.mysql.cj.jdbc.StatementImpl.execute(StatementImpl.java:648)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:80)
+	... 36 common frames omitted
+2025-02-11 10:50:18 [DEBUG] org.hibernate.SQL - alter table vehicle add constraint FK52k6oq1piyfsvdxd81ihsn543 foreign key (superadmin_id) references SuperAdmin (id)
+2025-02-11 10:50:18 [WARN] o.h.t.s.i.ExceptionHandlerLoggedImpl - GenerationTarget encountered exception accepting command : Error executing DDL "alter table vehicle add constraint FK52k6oq1piyfsvdxd81ihsn543 foreign key (superadmin_id) references SuperAdmin (id)" via JDBC [Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_97e`, CONSTRAINT `FK52k6oq1piyfsvdxd81ihsn543` FOREIGN KEY (`superadmin_id`) REFERENCES `SuperAdmin` (`id`))]
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table vehicle add constraint FK52k6oq1piyfsvdxd81ihsn543 foreign key (superadmin_id) references SuperAdmin (id)" via JDBC [Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_97e`, CONSTRAINT `FK52k6oq1piyfsvdxd81ihsn543` FOREIGN KEY (`superadmin_id`) REFERENCES `SuperAdmin` (`id`))]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:94)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:575)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:515)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applyForeignKeys(AbstractSchemaMigrator.java:447)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:268)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:117)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:280)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:322)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:457)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1506)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:75)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1853)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1802)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:205)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:954)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:625)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.GpsTracker.Thinture.ThintureGpsTrackerApplication.main(ThintureGpsTrackerApplication.java:12)
+Caused by: java.sql.SQLIntegrityConstraintViolationException: Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_97e`, CONSTRAINT `FK52k6oq1piyfsvdxd81ihsn543` FOREIGN KEY (`superadmin_id`) REFERENCES `SuperAdmin` (`id`))
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:118)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.StatementImpl.executeInternal(StatementImpl.java:763)
+	at com.mysql.cj.jdbc.StatementImpl.execute(StatementImpl.java:648)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:80)
+	... 36 common frames omitted
+2025-02-11 10:50:18 [DEBUG] org.hibernate.SQL - alter table vehicle_history add constraint FK73uoyfepihpnf7c636cfl2vkd foreign key (client_id) references Client (id)
+2025-02-11 10:50:18 [WARN] o.h.t.s.i.ExceptionHandlerLoggedImpl - GenerationTarget encountered exception accepting command : Error executing DDL "alter table vehicle_history add constraint FK73uoyfepihpnf7c636cfl2vkd foreign key (client_id) references Client (id)" via JDBC [Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_97e`, CONSTRAINT `FK73uoyfepihpnf7c636cfl2vkd` FOREIGN KEY (`client_id`) REFERENCES `Client` (`id`))]
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table vehicle_history add constraint FK73uoyfepihpnf7c636cfl2vkd foreign key (client_id) references Client (id)" via JDBC [Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_97e`, CONSTRAINT `FK73uoyfepihpnf7c636cfl2vkd` FOREIGN KEY (`client_id`) REFERENCES `Client` (`id`))]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:94)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:575)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:515)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applyForeignKeys(AbstractSchemaMigrator.java:447)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:268)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:117)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:280)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:322)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:457)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1506)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:75)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1853)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1802)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:205)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:954)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:625)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.GpsTracker.Thinture.ThintureGpsTrackerApplication.main(ThintureGpsTrackerApplication.java:12)
+Caused by: java.sql.SQLIntegrityConstraintViolationException: Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_97e`, CONSTRAINT `FK73uoyfepihpnf7c636cfl2vkd` FOREIGN KEY (`client_id`) REFERENCES `Client` (`id`))
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:118)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.StatementImpl.executeInternal(StatementImpl.java:763)
+	at com.mysql.cj.jdbc.StatementImpl.execute(StatementImpl.java:648)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:80)
+	... 36 common frames omitted
+2025-02-11 10:50:18 [INFO] c.zaxxer.hikari.pool.ProxyLeakTask - Previously reported leaked connection com.mysql.cj.jdbc.ConnectionImpl@72406594 on thread main was returned to the pool (unleaked)
+2025-02-11 10:50:18 [INFO] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-02-11 10:50:19 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:19 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:19 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:19 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:19 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:19 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:19 [INFO] o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:20 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:21 [INFO] c.G.Thinture.config.SecurityConfig - Using NoOpPasswordEncoder for testing purposes (insecure).
+2025-02-11 10:50:22 [INFO] c.G.Thinture.service.MqttService - [32m[MQTT] Subscribed to topic: Teste[0m
+2025-02-11 10:50:22 [INFO] c.G.Thinture.service.MqttService - [32m[MQTT] Subscribed to topic: TTe[0m
+2025-02-11 10:50:22 [INFO] c.G.Thinture.service.MqttService - [32m[MQTT] Subscribed to topic: TTTe[0m
+2025-02-11 10:50:22 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:22 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:22 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:22 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:22 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:22 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:22 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:22 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:22 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:23 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:50:23 [INFO] o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2025-02-11 10:50:23 [INFO] c.G.Thinture.config.SecurityConfig - Configuring security filter chain...
+2025-02-11 10:50:24 [INFO] o.s.b.a.e.web.EndpointLinksResolver - Exposing 15 endpoints beneath base path '/actuator'
+2025-02-11 10:50:24 [INFO] c.G.Thinture.config.SecurityConfig - Role-based access configured.
+2025-02-11 10:50:24 [INFO] c.G.Thinture.config.SecurityConfig - Login form configuration set.
+2025-02-11 10:50:24 [INFO] c.G.Thinture.config.SecurityConfig - Logout configuration set.
+2025-02-11 10:50:25 [WARN] o.t.templatemode.TemplateMode - [THYMELEAF][main] Unknown Template Mode 'HTML5'. Must be one of: 'HTML', 'XML', 'TEXT', 'JAVASCRIPT', 'CSS', 'RAW'. Using default Template Mode 'HTML'.
+2025-02-11 10:50:26 [INFO] o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2025-02-11 10:50:26 [INFO] o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 1 subscriber(s).
+2025-02-11 10:50:26 [INFO] o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2025-02-11 10:50:26 [INFO] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8181"]
+2025-02-11 10:50:26 [INFO] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8181 (http) with context path '/'
+2025-02-11 10:50:26 [INFO] o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
+2025-02-11 10:50:26 [INFO] o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@45af5362]]
+2025-02-11 10:50:26 [INFO] o.s.m.s.b.SimpleBrokerMessageHandler - Started.
+2025-02-11 10:50:26 [INFO] c.G.T.ThintureGpsTrackerApplication - Started ThintureGpsTrackerApplication in 18.167 seconds (process running for 19.261)
+2025-02-11 10:50:26 [INFO] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-02-11 10:50:26 [INFO] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-02-11 10:50:26 [INFO] o.s.web.servlet.DispatcherServlet - Completed initialization in 6 ms
+2025-02-11 10:50:26 [INFO] c.G.T.controller.LoginController - Rendering login page.
+2025-02-11 10:50:28 [WARN] o.a.c.util.SessionIdGeneratorBase - Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took [185] milliseconds.
+2025-02-11 10:50:28 [WARN] o.a.c.util.SessionIdGeneratorBase - Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took [185] milliseconds.
+2025-02-11 10:50:28 [INFO] c.G.T.controller.LoginController - Rendering login page.
+2025-02-11 10:50:28 [INFO] c.G.T.controller.LoginController - Rendering login page.
+2025-02-11 10:50:28 [INFO] c.G.T.controller.LoginController - Rendering login page.
+2025-02-11 10:51:26 [INFO] o.s.w.s.c.WebSocketMessageBrokerStats - WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[unknown], outboundChannel[unknown], sockJsScheduler[pool size = 1, active threads = 1, queued tasks = 0, completed tasks = 0]
+2025-02-11 10:56:17 [INFO] c.G.T.s.CustomUserDetailsService - Attempting to load user by username: sabu@thinture.com
+2025-02-11 10:56:17 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:56:17 [DEBUG] org.hibernate.SQL - select a1_0.id,a1_0.address,a1_0.companyName,a1_0.country,a1_0.email,a1_0.password,a1_0.phone,a1_0.status,a1_0.superadmin_id from admins a1_0 where upper(a1_0.email)=upper(?)
+2025-02-11 10:56:17 [INFO] c.G.T.s.CustomUserDetailsService - Admin found with email: sabu@thinture.com
+2025-02-11 10:56:17 [INFO] c.G.T.security.CustomUserDetails - Created CustomUserDetails for Admin: sabu@thinture.com with ID: 34
+2025-02-11 10:56:17 [DEBUG] c.G.T.security.CustomUserDetails - Fetching password for user: sabu@thinture.com
+2025-02-11 10:56:17 [DEBUG] c.G.T.security.CustomUserDetails - Fetching authorities for user: sabu@thinture.com
+2025-02-11 10:56:17 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:17 [WARN] o.t.s.p.AbstractStandardFragmentInsertionTagProcessor - [THYMELEAF][http-nio-8181-exec-3][dashboard] Deprecated unwrapped fragment expression "navigation :: navbar" found in template dashboard, line 153, col 7. Please use the complete syntax of fragment expressions instead ("~{navigation :: navbar}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
+2025-02-11 10:56:17 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:18 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:18 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:18 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:18 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:18 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:18 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:19 [WARN] o.t.s.p.AbstractStandardFragmentInsertionTagProcessor - [THYMELEAF][http-nio-8181-exec-7][map4] Deprecated unwrapped fragment expression "navigation :: navbar" found in template map4, line 512, col 10. Please use the complete syntax of fragment expressions instead ("~{navigation :: navbar}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
+2025-02-11 10:56:19 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:19 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:19 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:20 [INFO] c.G.T.s.VehicleLastLocationService - Fetching all last known locations from the database...
+2025-02-11 10:56:20 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Creating new transaction with name [org.springframework.data.jpa.repository.support.SimpleJpaRepository.findAll]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT,readOnly
+2025-02-11 10:56:20 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Opened new EntityManager [SessionImpl(479796918<open>)] for JPA transaction
+2025-02-11 10:56:20 [INFO] c.G.T.c.VehicleLastLocationController - Request received: Fetch all last known locations.
+2025-02-11 10:56:20 [INFO] c.G.T.s.VehicleLastLocationService - Fetching all last known locations from the database...
+2025-02-11 10:56:20 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Creating new transaction with name [org.springframework.data.jpa.repository.support.SimpleJpaRepository.findAll]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT,readOnly
+2025-02-11 10:56:20 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Opened new EntityManager [SessionImpl(6360412<open>)] for JPA transaction
+2025-02-11 10:56:20 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:20 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Exposing JPA transaction as JDBC [org.springframework.orm.jpa.vendor.HibernateJpaDialect$HibernateConnectionHandle@2e3f50f9]
+2025-02-11 10:56:20 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Exposing JPA transaction as JDBC [org.springframework.orm.jpa.vendor.HibernateJpaDialect$HibernateConnectionHandle@772ff65f]
+2025-02-11 10:56:20 [DEBUG] org.hibernate.SQL - select vll1_0.id,vll1_0.VehicleStatus,vll1_0.admin_id,vll1_0.client_id,vll1_0.course,vll1_0.dealer_id,vll1_0.device_id,vll1_0.ignition,vll1_0.latitude,vll1_0.longitude,vll1_0.status,vll1_0.timestamp from vehicle_last_location vll1_0
+2025-02-11 10:56:20 [DEBUG] org.hibernate.SQL - select vll1_0.id,vll1_0.VehicleStatus,vll1_0.admin_id,vll1_0.client_id,vll1_0.course,vll1_0.dealer_id,vll1_0.device_id,vll1_0.ignition,vll1_0.latitude,vll1_0.longitude,vll1_0.status,vll1_0.timestamp from vehicle_last_location vll1_0
+2025-02-11 10:56:20 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Initiating transaction commit
+2025-02-11 10:56:20 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Initiating transaction commit
+2025-02-11 10:56:20 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Committing JPA transaction on EntityManager [SessionImpl(479796918<open>)]
+2025-02-11 10:56:20 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Committing JPA transaction on EntityManager [SessionImpl(6360412<open>)]
+2025-02-11 10:56:20 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:20 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Closing JPA EntityManager [SessionImpl(479796918<open>)] after transaction
+2025-02-11 10:56:20 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Closing JPA EntityManager [SessionImpl(6360412<open>)] after transaction
+2025-02-11 10:56:20 [INFO] c.G.T.s.VehicleLastLocationService - Fetched 5 locations from the database.
+2025-02-11 10:56:20 [INFO] c.G.T.s.VehicleLastLocationService - Fetched 5 locations from the database.
+2025-02-11 10:56:20 [DEBUG] c.G.T.s.VehicleLastLocationService - Location Data - ID: 76, DeviceID: TEST000101, Timestamp: 2025-02-11 09:42:26, Latitude: 13.0778048, Longitude: 77.5598784
+2025-02-11 10:56:20 [DEBUG] c.G.T.s.VehicleLastLocationService - Location Data - ID: 76, DeviceID: TEST000101, Timestamp: 2025-02-11 09:42:26, Latitude: 13.0778048, Longitude: 77.5598784
+2025-02-11 10:56:20 [DEBUG] c.G.T.s.VehicleLastLocationService - Location Data - ID: 77, DeviceID: RETH000101, Timestamp: 2025-02-10 17:47:09, Latitude: 25.2785904, Longitude: 55.3534976
+2025-02-11 10:56:20 [DEBUG] c.G.T.s.VehicleLastLocationService - Location Data - ID: 78, DeviceID: TEST000100, Timestamp: 2025-02-10 17:34:03, Latitude: 13.0778248, Longitude: 77.5594752
+2025-02-11 10:56:20 [DEBUG] c.G.T.s.VehicleLastLocationService - Location Data - ID: 77, DeviceID: RETH000101, Timestamp: 2025-02-10 17:47:09, Latitude: 25.2785904, Longitude: 55.3534976
+2025-02-11 10:56:20 [DEBUG] c.G.T.s.VehicleLastLocationService - Location Data - ID: 80, DeviceID: RETH000102, Timestamp: 2025-02-11 08:18:01, Latitude: 25.1733024, Longitude: 55.5088896
+2025-02-11 10:56:20 [DEBUG] c.G.T.s.VehicleLastLocationService - Location Data - ID: 78, DeviceID: TEST000100, Timestamp: 2025-02-10 17:34:03, Latitude: 13.0778248, Longitude: 77.5594752
+2025-02-11 10:56:20 [DEBUG] c.G.T.s.VehicleLastLocationService - Location Data - ID: 81, DeviceID: TEST000001, Timestamp: 2025-02-10 12:59:49, Latitude: 13.0781752, Longitude: 77.5595264
+2025-02-11 10:56:20 [DEBUG] c.G.T.s.VehicleLastLocationService - Location Data - ID: 80, DeviceID: RETH000102, Timestamp: 2025-02-11 08:18:01, Latitude: 25.1733024, Longitude: 55.5088896
+2025-02-11 10:56:20 [DEBUG] c.G.T.s.VehicleLastLocationService - Location Data - ID: 81, DeviceID: TEST000001, Timestamp: 2025-02-10 12:59:49, Latitude: 13.0781752, Longitude: 77.5595264
+2025-02-11 10:56:20 [INFO] c.G.T.c.VehicleLastLocationController - Returning 5 locations: [com.GpsTracker.Thinture.model.VehicleLastLocation@24417b9c, com.GpsTracker.Thinture.model.VehicleLastLocation@2573e94a, com.GpsTracker.Thinture.model.VehicleLastLocation@12db4792, com.GpsTracker.Thinture.model.VehicleLastLocation@67ef930c, com.GpsTracker.Thinture.model.VehicleLastLocation@485d99f6]
+2025-02-11 10:56:20 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:20 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:20 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:20 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:20 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:20 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:26 [WARN] o.t.s.p.AbstractStandardFragmentInsertionTagProcessor - [THYMELEAF][http-nio-8181-exec-10][replay] Deprecated unwrapped fragment expression "navigation :: navbar" found in template replay, line 349, col 10. Please use the complete syntax of fragment expressions instead ("~{navigation :: navbar}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
+2025-02-11 10:56:26 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:26 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:26 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:26 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:26 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:27 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:45 [INFO] c.G.T.c.VehicleHistoryController - Fetching history for deviceID: TEST000101, from: 2025-02-10T12:00:00, to: 2025-02-10T23:00:00
+2025-02-11 10:56:45 [INFO] c.G.T.c.VehicleHistoryController - Calculating total distance for deviceID: TEST000101, from: 2025-02-10T12:00:00, to: 2025-02-10T23:00:00
+2025-02-11 10:56:45 [INFO] c.G.T.service.VehicleHistoryService - Calculating total distance for deviceID: TEST000101 from 2025-02-10 12:00:00.0 to 2025-02-10 23:00:00.0
+2025-02-11 10:56:45 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Creating new transaction with name [com.GpsTracker.Thinture.service.VehicleHistoryService.getVehicleHistory]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2025-02-11 10:56:45 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Opened new EntityManager [SessionImpl(1267282766<open>)] for JPA transaction
+2025-02-11 10:56:45 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 10:56:45 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Exposing JPA transaction as JDBC [org.springframework.orm.jpa.vendor.HibernateJpaDialect$HibernateConnectionHandle@6ee0aed8]
+2025-02-11 10:56:45 [INFO] c.G.T.service.VehicleHistoryService - Fetching vehicle history for deviceID: TEST000101 from 2025-02-10 12:00:00.0 to 2025-02-10 23:00:00.0
+2025-02-11 10:56:45 [DEBUG] org.hibernate.SQL - SELECT vh.*
+FROM vehicle_history vh
+WHERE vh.device_id = ?
+  AND vh.timestamp BETWEEN ? AND ?
+ORDER BY vh.timestamp ASC
+
+2025-02-11 10:56:45 [DEBUG] org.hibernate.SQL - SELECT vh.*
+FROM vehicle_history vh
+WHERE vh.device_id = ?
+  AND vh.timestamp BETWEEN ? AND ?
+ORDER BY vh.timestamp ASC
+
+2025-02-11 10:56:45 [DEBUG] org.hibernate.SQL - select v1_0.id,v1_0.addressPhone,v1_0.admin_id,v1_0.client_id,v1_0.country,v1_0.dealer_id,v1_0.dealerName,v1_0.deviceID,v1_0.engineNumber,v1_0.imei,v1_0.installationDate,v1_0.manufacturer,v1_0.model,v1_0.ownerName,v1_0.serial_no,v1_0.simNumber,v1_0.superadmin_id,v1_0.technicianName,v1_0.vehicleNumber,v1_0.vehicleType from vehicle v1_0 where v1_0.deviceID=?
+2025-02-11 10:56:45 [DEBUG] org.hibernate.SQL - select v1_0.id,v1_0.addressPhone,v1_0.admin_id,v1_0.client_id,v1_0.country,v1_0.dealer_id,v1_0.dealerName,v1_0.deviceID,v1_0.engineNumber,v1_0.imei,v1_0.installationDate,v1_0.manufacturer,v1_0.model,v1_0.ownerName,v1_0.serial_no,v1_0.simNumber,v1_0.superadmin_id,v1_0.technicianName,v1_0.vehicleNumber,v1_0.vehicleType from vehicle v1_0 where v1_0.deviceID=?
+2025-02-11 10:56:45 [INFO] c.G.T.service.VehicleHistoryService - Fetched 63 records for deviceID: TEST000101
+2025-02-11 10:56:45 [INFO] c.G.T.service.VehicleHistoryService - Total distance calculated: 1.0880134753063015
+2025-02-11 10:56:45 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Initiating transaction commit
+2025-02-11 10:56:45 [INFO] c.G.T.service.VehicleHistoryService - Total distance calculated for deviceID: TEST000101 is 1.0880134753063015 km
+2025-02-11 10:56:45 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Committing JPA transaction on EntityManager [SessionImpl(1267282766<open>)]
+2025-02-11 10:56:45 [INFO] c.G.T.c.VehicleHistoryController - Total distance for deviceID: TEST000101 is 1.0880134753063015 km
+2025-02-11 10:56:45 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:45 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Closing JPA EntityManager [SessionImpl(1267282766<open>)] after transaction
+2025-02-11 10:56:45 [INFO] c.G.T.c.VehicleHistoryController - Returning 63 history records for deviceID: TEST000101
+2025-02-11 10:56:45 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:46 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 10:56:46 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:04:52 [INFO] o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2025-02-11 11:04:52 [INFO] o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
+2025-02-11 11:04:52 [INFO] o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@45af5362]]
+2025-02-11 11:04:52 [INFO] o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
+2025-02-11 11:04:52 [INFO] o.a.coyote.http11.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8181"]
+2025-02-11 11:04:52 [INFO] o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2025-02-11 11:04:52 [INFO] o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 0 subscriber(s).
+2025-02-11 11:04:52 [INFO] o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2025-02-11 11:04:52 [WARN] o.s.b.f.s.DisposableBeanAdapter - Invocation of close method failed on bean with name 'mqttClient': Client is connected (32100)
+2025-02-11 11:04:52 [INFO] o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-02-11 11:04:52 [INFO] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-02-11 11:04:52 [INFO] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-02-11 11:04:56 [INFO] o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.1.Final
+2025-02-11 11:04:56 [INFO] c.G.T.ThintureGpsTrackerApplication - Starting ThintureGpsTrackerApplication using Java 17.0.12 with PID 14100 (C:\Users\jothi\git\bigno\ThintureGpsTracker\ThintureGpsTracker\ThintureGpsTracker\ThintureGpsTracker\target\classes started by jothi in C:\Users\jothi\git\bigno\ThintureGpsTracker\ThintureGpsTracker\ThintureGpsTracker\ThintureGpsTracker)
+2025-02-11 11:04:56 [DEBUG] c.G.T.ThintureGpsTrackerApplication - Running with Spring Boot v3.3.2, Spring v6.1.11
+2025-02-11 11:04:56 [INFO] c.G.T.ThintureGpsTrackerApplication - No active profile set, falling back to 1 default profile: "default"
+2025-02-11 11:04:58 [INFO] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-02-11 11:04:58 [INFO] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 230 ms. Found 13 JPA repository interfaces.
+2025-02-11 11:04:59 [INFO] o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2025-02-11 11:04:59 [INFO] o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2025-02-11 11:04:59 [WARN] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.ws.config.annotation.DelegatingWsConfiguration' of type [org.springframework.ws.config.annotation.DelegatingWsConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [annotationActionEndpointMapping] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2025-02-11 11:04:59 [INFO] o.s.w.s.a.s.AnnotationActionEndpointMapping - Supporting [WS-Addressing August 2004, WS-Addressing 1.0]
+2025-02-11 11:05:00 [INFO] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8181 (http)
+2025-02-11 11:05:00 [INFO] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8181"]
+2025-02-11 11:05:00 [INFO] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-02-11 11:05:00 [INFO] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.26]
+2025-02-11 11:05:00 [INFO] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-02-11 11:05:00 [INFO] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 3921 ms
+2025-02-11 11:05:00 [DEBUG] o.s.o.j.LocalContainerEntityManagerFactoryBean - Building JPA container EntityManagerFactory for persistence unit 'default'
+2025-02-11 11:05:01 [INFO] o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-02-11 11:05:01 [INFO] org.hibernate.Version - HHH000412: Hibernate ORM core version 6.5.2.Final
+2025-02-11 11:05:01 [INFO] o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-02-11 11:05:01 [INFO] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-02-11 11:05:01 [INFO] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-02-11 11:05:02 [INFO] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@254d8ef6
+2025-02-11 11:05:02 [INFO] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-02-11 11:05:02 [WARN] org.hibernate.orm.deprecation - HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-02-11 11:05:02 [WARN] org.hibernate.orm.deprecation - HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2025-02-11 11:05:05 [INFO] o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-02-11 11:05:06 [DEBUG] org.hibernate.SQL - alter table dealers add constraint FKfugggvpusqtkllfmas5l79ctv foreign key (superadmin_id) references SuperAdmin (id)
+2025-02-11 11:05:06 [WARN] o.h.t.s.i.ExceptionHandlerLoggedImpl - GenerationTarget encountered exception accepting command : Error executing DDL "alter table dealers add constraint FKfugggvpusqtkllfmas5l79ctv foreign key (superadmin_id) references SuperAdmin (id)" via JDBC [Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_980`, CONSTRAINT `FKfugggvpusqtkllfmas5l79ctv` FOREIGN KEY (`superadmin_id`) REFERENCES `SuperAdmin` (`id`))]
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table dealers add constraint FKfugggvpusqtkllfmas5l79ctv foreign key (superadmin_id) references SuperAdmin (id)" via JDBC [Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_980`, CONSTRAINT `FKfugggvpusqtkllfmas5l79ctv` FOREIGN KEY (`superadmin_id`) REFERENCES `SuperAdmin` (`id`))]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:94)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:575)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:515)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applyForeignKeys(AbstractSchemaMigrator.java:447)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:268)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:117)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:280)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:322)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:457)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1506)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:75)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1853)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1802)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:205)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:954)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:625)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.GpsTracker.Thinture.ThintureGpsTrackerApplication.main(ThintureGpsTrackerApplication.java:12)
+Caused by: java.sql.SQLIntegrityConstraintViolationException: Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_980`, CONSTRAINT `FKfugggvpusqtkllfmas5l79ctv` FOREIGN KEY (`superadmin_id`) REFERENCES `SuperAdmin` (`id`))
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:118)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.StatementImpl.executeInternal(StatementImpl.java:763)
+	at com.mysql.cj.jdbc.StatementImpl.execute(StatementImpl.java:648)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:80)
+	... 36 common frames omitted
+2025-02-11 11:05:07 [DEBUG] org.hibernate.SQL - alter table drivers add constraint FKik7us7jhlka3uoamgqmteyojf foreign key (dealer_id) references dealers (id)
+2025-02-11 11:05:07 [WARN] o.h.t.s.i.ExceptionHandlerLoggedImpl - GenerationTarget encountered exception accepting command : Error executing DDL "alter table drivers add constraint FKik7us7jhlka3uoamgqmteyojf foreign key (dealer_id) references dealers (id)" via JDBC [Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_980`, CONSTRAINT `FKik7us7jhlka3uoamgqmteyojf` FOREIGN KEY (`dealer_id`) REFERENCES `dealers` (`id`))]
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table drivers add constraint FKik7us7jhlka3uoamgqmteyojf foreign key (dealer_id) references dealers (id)" via JDBC [Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_980`, CONSTRAINT `FKik7us7jhlka3uoamgqmteyojf` FOREIGN KEY (`dealer_id`) REFERENCES `dealers` (`id`))]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:94)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:575)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:515)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applyForeignKeys(AbstractSchemaMigrator.java:447)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:268)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:117)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:280)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:322)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:457)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1506)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:75)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1853)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1802)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:205)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:954)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:625)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.GpsTracker.Thinture.ThintureGpsTrackerApplication.main(ThintureGpsTrackerApplication.java:12)
+Caused by: java.sql.SQLIntegrityConstraintViolationException: Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_980`, CONSTRAINT `FKik7us7jhlka3uoamgqmteyojf` FOREIGN KEY (`dealer_id`) REFERENCES `dealers` (`id`))
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:118)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.StatementImpl.executeInternal(StatementImpl.java:763)
+	at com.mysql.cj.jdbc.StatementImpl.execute(StatementImpl.java:648)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:80)
+	... 36 common frames omitted
+2025-02-11 11:05:07 [WARN] c.zaxxer.hikari.pool.ProxyLeakTask - Connection leak detection triggered for com.mysql.cj.jdbc.ConnectionImpl@254d8ef6 on thread main, stack trace follows
+java.lang.Exception: Apparent connection leak detected
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:127)
+	at org.hibernate.engine.jdbc.connections.internal.DatasourceConnectionProviderImpl.getConnection(DatasourceConnectionProviderImpl.java:122)
+	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess.obtainConnection(JdbcEnvironmentInitiator.java:437)
+	at org.hibernate.resource.transaction.backend.jdbc.internal.DdlTransactionIsolatorNonJtaImpl.getIsolatedConnection(DdlTransactionIsolatorNonJtaImpl.java:46)
+	at org.hibernate.resource.transaction.backend.jdbc.internal.DdlTransactionIsolatorNonJtaImpl.getIsolatedConnection(DdlTransactionIsolatorNonJtaImpl.java:39)
+	at org.hibernate.tool.schema.internal.exec.ImprovedExtractionContextImpl.getJdbcConnection(ImprovedExtractionContextImpl.java:63)
+	at org.hibernate.tool.schema.internal.exec.ImprovedExtractionContextImpl.getJdbcDatabaseMetaData(ImprovedExtractionContextImpl.java:70)
+	at org.hibernate.tool.schema.extract.internal.InformationExtractorJdbcDatabaseMetaDataImpl.processTableResultSet(InformationExtractorJdbcDatabaseMetaDataImpl.java:65)
+	at org.hibernate.tool.schema.extract.internal.AbstractInformationExtractorImpl.getTables(AbstractInformationExtractorImpl.java:570)
+	at org.hibernate.tool.schema.extract.internal.DatabaseInformationImpl.getTablesInformation(DatabaseInformationImpl.java:122)
+	at org.hibernate.tool.schema.internal.GroupedSchemaMigratorImpl.performTablesMigration(GroupedSchemaMigratorImpl.java:72)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:232)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:117)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:280)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:322)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:457)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1506)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:75)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1853)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1802)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:205)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:954)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:625)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.GpsTracker.Thinture.ThintureGpsTrackerApplication.main(ThintureGpsTrackerApplication.java:12)
+2025-02-11 11:05:07 [DEBUG] org.hibernate.SQL - alter table vehicle add constraint FK6jkw5mcxok432sytte1upabj1 foreign key (admin_id) references admins (id)
+2025-02-11 11:05:07 [WARN] o.h.t.s.i.ExceptionHandlerLoggedImpl - GenerationTarget encountered exception accepting command : Error executing DDL "alter table vehicle add constraint FK6jkw5mcxok432sytte1upabj1 foreign key (admin_id) references admins (id)" via JDBC [Can't write; duplicate key in table '#sql-70f_980']
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table vehicle add constraint FK6jkw5mcxok432sytte1upabj1 foreign key (admin_id) references admins (id)" via JDBC [Can't write; duplicate key in table '#sql-70f_980']
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:94)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:575)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:515)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applyForeignKeys(AbstractSchemaMigrator.java:447)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:268)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:117)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:280)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:322)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:457)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1506)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:75)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1853)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1802)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:205)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:954)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:625)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.GpsTracker.Thinture.ThintureGpsTrackerApplication.main(ThintureGpsTrackerApplication.java:12)
+Caused by: java.sql.SQLIntegrityConstraintViolationException: Can't write; duplicate key in table '#sql-70f_980'
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:118)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.StatementImpl.executeInternal(StatementImpl.java:763)
+	at com.mysql.cj.jdbc.StatementImpl.execute(StatementImpl.java:648)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:80)
+	... 36 common frames omitted
+2025-02-11 11:05:07 [DEBUG] org.hibernate.SQL - alter table vehicle add constraint FK5lr77dwyrb3gbxsrouti8upqh foreign key (dealer_id) references dealers (id)
+2025-02-11 11:05:07 [WARN] o.h.t.s.i.ExceptionHandlerLoggedImpl - GenerationTarget encountered exception accepting command : Error executing DDL "alter table vehicle add constraint FK5lr77dwyrb3gbxsrouti8upqh foreign key (dealer_id) references dealers (id)" via JDBC [Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_980`, CONSTRAINT `FK5lr77dwyrb3gbxsrouti8upqh` FOREIGN KEY (`dealer_id`) REFERENCES `dealers` (`id`))]
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table vehicle add constraint FK5lr77dwyrb3gbxsrouti8upqh foreign key (dealer_id) references dealers (id)" via JDBC [Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_980`, CONSTRAINT `FK5lr77dwyrb3gbxsrouti8upqh` FOREIGN KEY (`dealer_id`) REFERENCES `dealers` (`id`))]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:94)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:575)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:515)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applyForeignKeys(AbstractSchemaMigrator.java:447)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:268)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:117)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:280)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:322)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:457)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1506)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:75)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1853)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1802)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:205)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:954)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:625)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.GpsTracker.Thinture.ThintureGpsTrackerApplication.main(ThintureGpsTrackerApplication.java:12)
+Caused by: java.sql.SQLIntegrityConstraintViolationException: Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_980`, CONSTRAINT `FK5lr77dwyrb3gbxsrouti8upqh` FOREIGN KEY (`dealer_id`) REFERENCES `dealers` (`id`))
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:118)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.StatementImpl.executeInternal(StatementImpl.java:763)
+	at com.mysql.cj.jdbc.StatementImpl.execute(StatementImpl.java:648)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:80)
+	... 36 common frames omitted
+2025-02-11 11:05:07 [DEBUG] org.hibernate.SQL - alter table vehicle add constraint FK52k6oq1piyfsvdxd81ihsn543 foreign key (superadmin_id) references SuperAdmin (id)
+2025-02-11 11:05:07 [WARN] o.h.t.s.i.ExceptionHandlerLoggedImpl - GenerationTarget encountered exception accepting command : Error executing DDL "alter table vehicle add constraint FK52k6oq1piyfsvdxd81ihsn543 foreign key (superadmin_id) references SuperAdmin (id)" via JDBC [Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_980`, CONSTRAINT `FK52k6oq1piyfsvdxd81ihsn543` FOREIGN KEY (`superadmin_id`) REFERENCES `SuperAdmin` (`id`))]
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table vehicle add constraint FK52k6oq1piyfsvdxd81ihsn543 foreign key (superadmin_id) references SuperAdmin (id)" via JDBC [Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_980`, CONSTRAINT `FK52k6oq1piyfsvdxd81ihsn543` FOREIGN KEY (`superadmin_id`) REFERENCES `SuperAdmin` (`id`))]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:94)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:575)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:515)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applyForeignKeys(AbstractSchemaMigrator.java:447)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:268)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:117)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:280)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:322)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:457)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1506)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:75)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1853)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1802)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:205)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:954)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:625)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.GpsTracker.Thinture.ThintureGpsTrackerApplication.main(ThintureGpsTrackerApplication.java:12)
+Caused by: java.sql.SQLIntegrityConstraintViolationException: Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_980`, CONSTRAINT `FK52k6oq1piyfsvdxd81ihsn543` FOREIGN KEY (`superadmin_id`) REFERENCES `SuperAdmin` (`id`))
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:118)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.StatementImpl.executeInternal(StatementImpl.java:763)
+	at com.mysql.cj.jdbc.StatementImpl.execute(StatementImpl.java:648)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:80)
+	... 36 common frames omitted
+2025-02-11 11:05:07 [DEBUG] org.hibernate.SQL - alter table vehicle_history add constraint FK73uoyfepihpnf7c636cfl2vkd foreign key (client_id) references Client (id)
+2025-02-11 11:05:08 [WARN] o.h.t.s.i.ExceptionHandlerLoggedImpl - GenerationTarget encountered exception accepting command : Error executing DDL "alter table vehicle_history add constraint FK73uoyfepihpnf7c636cfl2vkd foreign key (client_id) references Client (id)" via JDBC [Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_980`, CONSTRAINT `FK73uoyfepihpnf7c636cfl2vkd` FOREIGN KEY (`client_id`) REFERENCES `Client` (`id`))]
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table vehicle_history add constraint FK73uoyfepihpnf7c636cfl2vkd foreign key (client_id) references Client (id)" via JDBC [Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_980`, CONSTRAINT `FK73uoyfepihpnf7c636cfl2vkd` FOREIGN KEY (`client_id`) REFERENCES `Client` (`id`))]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:94)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:575)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:515)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applyForeignKeys(AbstractSchemaMigrator.java:447)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:268)
+	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:117)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:280)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:322)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:457)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1506)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:75)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1853)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1802)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:205)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:954)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:625)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.GpsTracker.Thinture.ThintureGpsTrackerApplication.main(ThintureGpsTrackerApplication.java:12)
+Caused by: java.sql.SQLIntegrityConstraintViolationException: Cannot add or update a child row: a foreign key constraint fails (`ThintureGpsTrackerDB`.`#sql-70f_980`, CONSTRAINT `FK73uoyfepihpnf7c636cfl2vkd` FOREIGN KEY (`client_id`) REFERENCES `Client` (`id`))
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:118)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
+	at com.mysql.cj.jdbc.StatementImpl.executeInternal(StatementImpl.java:763)
+	at com.mysql.cj.jdbc.StatementImpl.execute(StatementImpl.java:648)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:80)
+	... 36 common frames omitted
+2025-02-11 11:05:08 [INFO] c.zaxxer.hikari.pool.ProxyLeakTask - Previously reported leaked connection com.mysql.cj.jdbc.ConnectionImpl@254d8ef6 on thread main was returned to the pool (unleaked)
+2025-02-11 11:05:08 [INFO] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-02-11 11:05:08 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:08 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:09 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:09 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:09 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:09 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:09 [INFO] o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-02-11 11:05:10 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:10 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:10 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:10 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:10 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:10 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:10 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:10 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:10 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:10 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:10 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:10 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:10 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:10 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:10 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:10 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:10 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:11 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:12 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:12 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:12 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:12 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:12 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:12 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:12 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:12 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:12 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:12 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:12 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:12 [INFO] c.G.Thinture.config.SecurityConfig - Using NoOpPasswordEncoder for testing purposes (insecure).
+2025-02-11 11:05:13 [INFO] c.G.Thinture.service.MqttService - [32m[MQTT] Subscribed to topic: Teste[0m
+2025-02-11 11:05:13 [INFO] c.G.Thinture.service.MqttService - [32m[MQTT] Subscribed to topic: TTe[0m
+2025-02-11 11:05:13 [INFO] c.G.Thinture.service.MqttService - [32m[MQTT] Subscribed to topic: TTTe[0m
+2025-02-11 11:05:13 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:13 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:13 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:13 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:13 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:13 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:13 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:13 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:13 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:13 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:14 [INFO] o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2025-02-11 11:05:14 [INFO] c.G.Thinture.config.SecurityConfig - Configuring security filter chain...
+2025-02-11 11:05:15 [INFO] o.s.b.a.e.web.EndpointLinksResolver - Exposing 15 endpoints beneath base path '/actuator'
+2025-02-11 11:05:15 [INFO] c.G.Thinture.config.SecurityConfig - Role-based access configured.
+2025-02-11 11:05:15 [INFO] c.G.Thinture.config.SecurityConfig - Login form configuration set.
+2025-02-11 11:05:15 [INFO] c.G.Thinture.config.SecurityConfig - Logout configuration set.
+2025-02-11 11:05:16 [WARN] o.t.templatemode.TemplateMode - [THYMELEAF][main] Unknown Template Mode 'HTML5'. Must be one of: 'HTML', 'XML', 'TEXT', 'JAVASCRIPT', 'CSS', 'RAW'. Using default Template Mode 'HTML'.
+2025-02-11 11:05:17 [INFO] o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2025-02-11 11:05:17 [INFO] o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 1 subscriber(s).
+2025-02-11 11:05:17 [INFO] o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2025-02-11 11:05:17 [INFO] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8181"]
+2025-02-11 11:05:17 [INFO] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8181 (http) with context path '/'
+2025-02-11 11:05:17 [INFO] o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
+2025-02-11 11:05:17 [INFO] o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@66d358cc]]
+2025-02-11 11:05:17 [INFO] o.s.m.s.b.SimpleBrokerMessageHandler - Started.
+2025-02-11 11:05:17 [INFO] c.G.T.ThintureGpsTrackerApplication - Started ThintureGpsTrackerApplication in 21.922 seconds (process running for 23.045)
+2025-02-11 11:05:18 [INFO] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-02-11 11:05:18 [INFO] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-02-11 11:05:18 [INFO] o.s.web.servlet.DispatcherServlet - Completed initialization in 4 ms
+2025-02-11 11:05:23 [INFO] c.G.T.controller.LoginController - Rendering login page.
+2025-02-11 11:05:24 [WARN] o.a.c.util.SessionIdGeneratorBase - Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took [130] milliseconds.
+2025-02-11 11:05:24 [WARN] o.a.c.util.SessionIdGeneratorBase - Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took [130] milliseconds.
+2025-02-11 11:05:24 [INFO] c.G.T.controller.LoginController - Rendering login page.
+2025-02-11 11:05:24 [INFO] c.G.T.controller.LoginController - Rendering login page.
+2025-02-11 11:05:24 [INFO] c.G.T.controller.LoginController - Rendering login page.
+2025-02-11 11:05:25 [INFO] c.G.T.controller.LoginController - Rendering login page.
+2025-02-11 11:05:25 [INFO] c.G.T.controller.LoginController - Rendering login page.
+2025-02-11 11:05:25 [INFO] c.G.T.controller.LoginController - Rendering login page.
+2025-02-11 11:05:26 [INFO] c.G.T.controller.LoginController - Rendering login page.
+2025-02-11 11:05:32 [INFO] c.G.T.s.CustomUserDetailsService - Attempting to load user by username: sabu@thinture.com
+2025-02-11 11:05:32 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:33 [DEBUG] org.hibernate.SQL - select a1_0.id,a1_0.address,a1_0.companyName,a1_0.country,a1_0.email,a1_0.password,a1_0.phone,a1_0.status,a1_0.superadmin_id from admins a1_0 where upper(a1_0.email)=upper(?)
+2025-02-11 11:05:33 [INFO] c.G.T.s.CustomUserDetailsService - Admin found with email: sabu@thinture.com
+2025-02-11 11:05:33 [INFO] c.G.T.security.CustomUserDetails - Created CustomUserDetails for Admin: sabu@thinture.com with ID: 34
+2025-02-11 11:05:33 [DEBUG] c.G.T.security.CustomUserDetails - Fetching password for user: sabu@thinture.com
+2025-02-11 11:05:33 [DEBUG] c.G.T.security.CustomUserDetails - Fetching authorities for user: sabu@thinture.com
+2025-02-11 11:05:33 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:33 [WARN] o.t.s.p.AbstractStandardFragmentInsertionTagProcessor - [THYMELEAF][http-nio-8181-exec-7][dashboard] Deprecated unwrapped fragment expression "navigation :: navbar" found in template dashboard, line 153, col 7. Please use the complete syntax of fragment expressions instead ("~{navigation :: navbar}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
+2025-02-11 11:05:33 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:33 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:33 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:33 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:33 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:33 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:33 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:34 [WARN] o.t.s.p.AbstractStandardFragmentInsertionTagProcessor - [THYMELEAF][http-nio-8181-exec-2][map4] Deprecated unwrapped fragment expression "navigation :: navbar" found in template map4, line 512, col 10. Please use the complete syntax of fragment expressions instead ("~{navigation :: navbar}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
+2025-02-11 11:05:35 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:35 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:35 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:35 [INFO] c.G.T.s.VehicleLastLocationService - Fetching all last known locations from the database...
+2025-02-11 11:05:35 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Creating new transaction with name [org.springframework.data.jpa.repository.support.SimpleJpaRepository.findAll]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT,readOnly
+2025-02-11 11:05:35 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Opened new EntityManager [SessionImpl(1034187393<open>)] for JPA transaction
+2025-02-11 11:05:35 [INFO] c.G.T.c.VehicleLastLocationController - Request received: Fetch all last known locations.
+2025-02-11 11:05:35 [INFO] c.G.T.s.VehicleLastLocationService - Fetching all last known locations from the database...
+2025-02-11 11:05:35 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Creating new transaction with name [org.springframework.data.jpa.repository.support.SimpleJpaRepository.findAll]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT,readOnly
+2025-02-11 11:05:35 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Opened new EntityManager [SessionImpl(1790123190<open>)] for JPA transaction
+2025-02-11 11:05:35 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:35 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Exposing JPA transaction as JDBC [org.springframework.orm.jpa.vendor.HibernateJpaDialect$HibernateConnectionHandle@1a670036]
+2025-02-11 11:05:35 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Exposing JPA transaction as JDBC [org.springframework.orm.jpa.vendor.HibernateJpaDialect$HibernateConnectionHandle@23a28c5]
+2025-02-11 11:05:35 [DEBUG] org.hibernate.SQL - select vll1_0.id,vll1_0.VehicleStatus,vll1_0.admin_id,vll1_0.client_id,vll1_0.course,vll1_0.dealer_id,vll1_0.device_id,vll1_0.ignition,vll1_0.latitude,vll1_0.longitude,vll1_0.status,vll1_0.timestamp from vehicle_last_location vll1_0
+2025-02-11 11:05:35 [DEBUG] org.hibernate.SQL - select vll1_0.id,vll1_0.VehicleStatus,vll1_0.admin_id,vll1_0.client_id,vll1_0.course,vll1_0.dealer_id,vll1_0.device_id,vll1_0.ignition,vll1_0.latitude,vll1_0.longitude,vll1_0.status,vll1_0.timestamp from vehicle_last_location vll1_0
+2025-02-11 11:05:35 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Initiating transaction commit
+2025-02-11 11:05:35 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Initiating transaction commit
+2025-02-11 11:05:35 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Committing JPA transaction on EntityManager [SessionImpl(1790123190<open>)]
+2025-02-11 11:05:35 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Committing JPA transaction on EntityManager [SessionImpl(1034187393<open>)]
+2025-02-11 11:05:35 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:35 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Closing JPA EntityManager [SessionImpl(1790123190<open>)] after transaction
+2025-02-11 11:05:35 [INFO] c.G.T.s.VehicleLastLocationService - Fetched 5 locations from the database.
+2025-02-11 11:05:35 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Closing JPA EntityManager [SessionImpl(1034187393<open>)] after transaction
+2025-02-11 11:05:35 [INFO] c.G.T.s.VehicleLastLocationService - Fetched 5 locations from the database.
+2025-02-11 11:05:35 [DEBUG] c.G.T.s.VehicleLastLocationService - Location Data - ID: 76, DeviceID: TEST000101, Timestamp: 2025-02-11 09:42:26, Latitude: 13.0778048, Longitude: 77.5598784
+2025-02-11 11:05:35 [DEBUG] c.G.T.s.VehicleLastLocationService - Location Data - ID: 76, DeviceID: TEST000101, Timestamp: 2025-02-11 09:42:26, Latitude: 13.0778048, Longitude: 77.5598784
+2025-02-11 11:05:35 [DEBUG] c.G.T.s.VehicleLastLocationService - Location Data - ID: 77, DeviceID: RETH000101, Timestamp: 2025-02-10 17:47:09, Latitude: 25.2785904, Longitude: 55.3534976
+2025-02-11 11:05:35 [DEBUG] c.G.T.s.VehicleLastLocationService - Location Data - ID: 77, DeviceID: RETH000101, Timestamp: 2025-02-10 17:47:09, Latitude: 25.2785904, Longitude: 55.3534976
+2025-02-11 11:05:35 [DEBUG] c.G.T.s.VehicleLastLocationService - Location Data - ID: 78, DeviceID: TEST000100, Timestamp: 2025-02-10 17:34:03, Latitude: 13.0778248, Longitude: 77.5594752
+2025-02-11 11:05:35 [DEBUG] c.G.T.s.VehicleLastLocationService - Location Data - ID: 78, DeviceID: TEST000100, Timestamp: 2025-02-10 17:34:03, Latitude: 13.0778248, Longitude: 77.5594752
+2025-02-11 11:05:35 [DEBUG] c.G.T.s.VehicleLastLocationService - Location Data - ID: 80, DeviceID: RETH000102, Timestamp: 2025-02-11 08:18:01, Latitude: 25.1733024, Longitude: 55.5088896
+2025-02-11 11:05:35 [DEBUG] c.G.T.s.VehicleLastLocationService - Location Data - ID: 80, DeviceID: RETH000102, Timestamp: 2025-02-11 08:18:01, Latitude: 25.1733024, Longitude: 55.5088896
+2025-02-11 11:05:35 [DEBUG] c.G.T.s.VehicleLastLocationService - Location Data - ID: 81, DeviceID: TEST000001, Timestamp: 2025-02-10 12:59:49, Latitude: 13.0781752, Longitude: 77.5595264
+2025-02-11 11:05:35 [DEBUG] c.G.T.s.VehicleLastLocationService - Location Data - ID: 81, DeviceID: TEST000001, Timestamp: 2025-02-10 12:59:49, Latitude: 13.0781752, Longitude: 77.5595264
+2025-02-11 11:05:35 [INFO] c.G.T.c.VehicleLastLocationController - Returning 5 locations: [com.GpsTracker.Thinture.model.VehicleLastLocation@6d022048, com.GpsTracker.Thinture.model.VehicleLastLocation@23fa763e, com.GpsTracker.Thinture.model.VehicleLastLocation@24aea80c, com.GpsTracker.Thinture.model.VehicleLastLocation@2a7634b5, com.GpsTracker.Thinture.model.VehicleLastLocation@560a41d3]
+2025-02-11 11:05:35 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:35 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:35 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:35 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:35 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:35 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:40 [WARN] o.t.s.p.AbstractStandardFragmentInsertionTagProcessor - [THYMELEAF][http-nio-8181-exec-3][replay] Deprecated unwrapped fragment expression "navigation :: navbar" found in template replay, line 349, col 10. Please use the complete syntax of fragment expressions instead ("~{navigation :: navbar}"). The old, unwrapped syntax for fragment expressions will be removed in future versions of Thymeleaf.
+2025-02-11 11:05:40 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:40 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:40 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:40 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:40 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:40 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:58 [INFO] c.G.T.c.VehicleHistoryController - Calculating total distance for deviceID: TEST000101, from: 2025-02-10T12:05:00, to: 2025-02-12T23:09:00
+2025-02-11 11:05:58 [INFO] c.G.T.c.VehicleHistoryController - Fetching history for deviceID: TEST000101, from: 2025-02-10T12:05:00, to: 2025-02-12T23:09:00
+2025-02-11 11:05:58 [INFO] c.G.T.service.VehicleHistoryService - Calculating total distance for deviceID: TEST000101 from 2025-02-10 12:05:00.0 to 2025-02-12 23:09:00.0
+2025-02-11 11:05:58 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Creating new transaction with name [com.GpsTracker.Thinture.service.VehicleHistoryService.getVehicleHistory]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2025-02-11 11:05:58 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Opened new EntityManager [SessionImpl(884406065<open>)] for JPA transaction
+2025-02-11 11:05:58 [DEBUG] o.s.o.j.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler - Creating new EntityManager for shared EntityManager invocation
+2025-02-11 11:05:58 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Exposing JPA transaction as JDBC [org.springframework.orm.jpa.vendor.HibernateJpaDialect$HibernateConnectionHandle@79cd75eb]
+2025-02-11 11:05:58 [INFO] c.G.T.service.VehicleHistoryService - Fetching vehicle history for deviceID: TEST000101 from 2025-02-10 12:05:00.0 to 2025-02-12 23:09:00.0
+2025-02-11 11:05:58 [DEBUG] org.hibernate.SQL - SELECT vh.*
+FROM vehicle_history vh
+WHERE vh.device_id = ?
+  AND vh.timestamp BETWEEN ? AND ?
+ORDER BY vh.timestamp ASC
+
+2025-02-11 11:05:58 [DEBUG] org.hibernate.SQL - SELECT vh.*
+FROM vehicle_history vh
+WHERE vh.device_id = ?
+  AND vh.timestamp BETWEEN ? AND ?
+ORDER BY vh.timestamp ASC
+
+2025-02-11 11:05:58 [DEBUG] org.hibernate.SQL - select v1_0.id,v1_0.addressPhone,v1_0.admin_id,v1_0.client_id,v1_0.country,v1_0.dealer_id,v1_0.dealerName,v1_0.deviceID,v1_0.engineNumber,v1_0.imei,v1_0.installationDate,v1_0.manufacturer,v1_0.model,v1_0.ownerName,v1_0.serial_no,v1_0.simNumber,v1_0.superadmin_id,v1_0.technicianName,v1_0.vehicleNumber,v1_0.vehicleType from vehicle v1_0 where v1_0.deviceID=?
+2025-02-11 11:05:58 [DEBUG] org.hibernate.SQL - select v1_0.id,v1_0.addressPhone,v1_0.admin_id,v1_0.client_id,v1_0.country,v1_0.dealer_id,v1_0.dealerName,v1_0.deviceID,v1_0.engineNumber,v1_0.imei,v1_0.installationDate,v1_0.manufacturer,v1_0.model,v1_0.ownerName,v1_0.serial_no,v1_0.simNumber,v1_0.superadmin_id,v1_0.technicianName,v1_0.vehicleNumber,v1_0.vehicleType from vehicle v1_0 where v1_0.deviceID=?
+2025-02-11 11:05:58 [INFO] c.G.T.service.VehicleHistoryService - Fetched 64 records for deviceID: TEST000101
+2025-02-11 11:05:58 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Initiating transaction commit
+2025-02-11 11:05:58 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Committing JPA transaction on EntityManager [SessionImpl(884406065<open>)]
+2025-02-11 11:05:58 [INFO] c.G.T.service.VehicleHistoryService - Total distance calculated: 1.1142770668621842
+2025-02-11 11:05:58 [INFO] c.G.T.service.VehicleHistoryService - Total distance calculated for deviceID: TEST000101 is 1.1142770668621842 km
+2025-02-11 11:05:58 [INFO] c.G.T.c.VehicleHistoryController - Total distance for deviceID: TEST000101 is 1.1142770668621842 km
+2025-02-11 11:05:58 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:58 [DEBUG] o.s.orm.jpa.JpaTransactionManager - Closing JPA EntityManager [SessionImpl(884406065<open>)] after transaction
+2025-02-11 11:05:58 [INFO] c.G.T.c.VehicleHistoryController - Returning 64 history records for deviceID: TEST000101
+2025-02-11 11:05:58 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:58 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:05:58 [DEBUG] c.G.T.security.CustomUserDetails - Fetching username: sabu@thinture.com
+2025-02-11 11:06:17 [INFO] o.s.w.s.c.WebSocketMessageBrokerStats - WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 1 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(1)-CONNECTED(1)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[unknown], outboundChannel[unknown], sockJsScheduler[pool size = 12, active threads = 1, queued tasks = 1, completed tasks = 9]
+2025-02-11 11:08:10 [INFO] o.s.b.a.SpringApplicationAdminMXBeanRegistrar$SpringApplicationAdmin - Application shutdown requested.
+2025-02-11 11:08:10 [INFO] o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
+2025-02-11 11:08:10 [INFO] o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@66d358cc]]
+2025-02-11 11:08:10 [INFO] o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
+2025-02-11 11:08:10 [INFO] o.a.coyote.http11.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8181"]
+2025-02-11 11:08:10 [INFO] o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2025-02-11 11:08:10 [INFO] o.s.i.c.PublishSubscribeChannel - Channel 'ThintureGpsTracker.errorChannel' has 0 subscriber(s).
+2025-02-11 11:08:10 [INFO] o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2025-02-11 11:08:10 [WARN] o.s.b.f.s.DisposableBeanAdapter - Invocation of close method failed on bean with name 'mqttClient': Client is connected (32100)
+2025-02-11 11:08:10 [INFO] o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-02-11 11:08:10 [INFO] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-02-11 11:08:10 [INFO] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.

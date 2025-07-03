@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Map Speedometer</title>
+    <style>
+        #speedometer-toggle-wrapper {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10001; /* higher than map's z-index */
+            background: rgba(255, 255, 255, 0.6);
+            padding: 4px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        #speedometer-container {
+            position: absolute;
+            top: 60px;
+            left: 20px;
+            z-index: 9999;
+            pointer-events: none;
+            transform: scale(0.75);
+            transform-origin: top left;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        #speedometer-container.visible {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        #speedDisplay {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: rgb(0, 0, 64);
+            margin-top: 20px;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        canvas {
+            background-color: white;
+            display: block;
+            height: 200px;
+            align-items: center;
+            border-radius: 8px;
+        }
+
+        #toggleSpeedometer {
+            font-size: 24px;
+            margin: 5px;
+            color: rgb(0,0,64);
+            cursor: pointer;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Your map div would go here -->
+    <div id="map" style="width: 100%; height: 700px;"></div>
+
+    <!-- FontAwesome icon for toggle -->
+    <div id="speedometer-toggle-wrapper">
+        <i class="fa-solid fa-gauge" id="toggleSpeedometer"></i>
+    </div>
+
+    <!-- Speedometer container -->
+    <div id="speedometer-container">
+        <canvas id="speedometer" width="500" height="300"></canvas>
+        <div id="speedDisplay"><b>Speed: 0 km/h</b></div>
+    </div>
+
+    <script>
+        // Speedometer variables
+        let speedometerCanvas, speedometerCtx, centerX, centerY, radius, maxSpeed;
+
+        // Initialize when DOM is loaded
+        document.addEventListener("DOMContentLoaded", function() {
+            initSpeedometer();
+            setupSpeedometerToggle();
+        });
+
+        // Initialize speedometer
+        function initSpeedometer() {
+            speedometerCanvas = document.getElementById("speedometer");
+            if (!speedometerCanvas) {
+                console.error("Speedometer canvas not found");
+                return;
+            }
+            
+            speedometerCtx = speedometerCanvas.getContext("2d");
+            centerX = speedometerCanvas.width / 2;
+            centerY = speedometerCanvas.height;
+            radius = 200;
+            maxSpeed = 240;
+            
+            // Draw initial speedometer at 0
+            drawSpeedometer(0);
+        }
+
+        // Function to draw the speedometer with the given speed
+        function drawSpeedometer(speed) {
+            if (!speedometerCtx) return;
+            
+            speedometerCtx.clearRect(0, 0, speedometerCanvas.width, speedometerCanvas.height);
+
+            // Gradient arc
+            const grad = speedometerCtx.createLinearGradient(0, 0, speedometerCanvas.width, 0);
+            grad.addColorStop(0, "#4caf50");
+            grad.addColorStop(0.5, "#ffeb3b");
+            grad.addColorStop(1, "#f44336");
+
+            speedometerCtx.lineWidth = 14;
+            speedometerCtx.strokeStyle = grad;
+            speedometerCtx.beginPath();
+            speedometerCtx.arc(centerX, centerY, radius, Math.PI, 2 * Math.PI);
+            speedometerCtx.stroke();
+
+            // Ticks and labels
+            speedometerCtx.font = "bold 18px sans-serif";
+            speedometerCtx.textAlign = "center";
+            speedometerCtx.textBaseline = "middle";
+
+            for (let i = 0; i <= maxSpeed; i += 20) {
+                const angle = Math.PI + (i / maxSpeed) * Math.PI;
+                const outerX = centerX + radius * Math.cos(angle);
+                const outerY = centerY + radius * Math.sin(angle);
+                const innerX = centerX + (radius - 10) * Math.cos(angle);
+                const innerY = centerY + (radius - 10) * Math.sin(angle);
+
+                speedometerCtx.strokeStyle = "#888";
+                speedometerCtx.lineWidth = 1.5;
+                speedometerCtx.beginPath();
+                speedometerCtx.moveTo(innerX, innerY);
+                speedometerCtx.lineTo(outerX, outerY);
+                speedometerCtx.stroke();
+
+                const textX = centerX + (radius - 25) * Math.cos(angle);
+                const textY = centerY + (radius - 25) * Math.sin(angle);
+
+                // Color coding
+                speedometerCtx.fillStyle = "black";
+                speedometerCtx.fillText(i.toString(), textX, textY);
+            }
+
+            // Needle
+            const needleAngle = Math.PI + (speed / maxSpeed) * Math.PI;
+            const needleLength = radius - 40;
+            const needleX = centerX + needleLength * Math.cos(needleAngle);
+            const needleY = centerY + needleLength * Math.sin(needleAngle);
+
+            speedometerCtx.strokeStyle = "#e53935";
+            speedometerCtx.lineWidth = 3;
+            speedometerCtx.beginPath();
+            speedometerCtx.moveTo(centerX, centerY);
+            speedometerCtx.lineTo(needleX, needleY);
+            speedometerCtx.stroke();
+
+            // Needle center
+            speedometerCtx.beginPath();
+            speedometerCtx.arc(centerX, centerY, 6, 0, 2 * Math.PI);
+            speedometerCtx.fillStyle = "#ddd";
+            speedometerCtx.fill();
+
+            // Speed text
+            if (document.getElementById("speedDisplay")) {
+                document.getElementById("speedDisplay").innerHTML = `<b>Speed: ${Math.round(speed)} km/h</b>`;
+            }
+        }
+
+        // Setup speedometer toggle functionality
+        function setupSpeedometerToggle() {
+            const toggleIcon = document.getElementById("toggleSpeedometer");
+            const speedometerContainer = document.getElementById("speedometer-container");
+            
+            if (toggleIcon && speedometerContainer) {
+                toggleIcon.addEventListener("click", () => {
+                    const isVisible = speedometerContainer.classList.contains("visible");
+                    if (isVisible) {
+                        speedometerContainer.classList.remove("visible");
+                    } else {
+                        speedometerContainer.classList.add("visible");
+                        // Update with current speed from your live map data
+                        // For example: drawSpeedometer(currentVehicleSpeed);
+                        drawSpeedometer(0); // Default to 0 when initially shown
+                    }
+                });
+            }
+        }
+
+        // Call this function whenever you want to update the speedometer
+        // For example, when receiving new GPS data
+        function updateSpeedometer(speed) {
+            drawSpeedometer(speed);
+        }
+
+        // Example usage:
+        // When you receive new vehicle data in your live map:
+        // updateSpeedometer(vehicleData.speed);
+    </script>
+</body>
+</html>

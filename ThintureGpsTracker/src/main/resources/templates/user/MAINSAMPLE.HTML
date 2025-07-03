@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Tracker with HERE Maps</title>
+    
+    <!-- HERE Maps CSS -->
+    <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
+    
+    <!-- WebSocket Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #0f1e41, #1e3a6e);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h2 {
+            margin: 0;
+        }
+        
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 12px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .status-connected {
+            background-color: #27ae60;
+            box-shadow: 0 0 8px #27ae60;
+        }
+        
+        .status-disconnected {
+            background-color: #e74c3c;
+            box-shadow: 0 0 8px #e74c3c;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        #map-container {
+            width: 100%;
+            height: calc(100vh - 130px);
+            background-color: #f2f2f2;
+        }
+        
+        button {
+            padding: 8px 16px;
+            background-color: #0f1e41;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        button:hover {
+            background-color: #1e3a6e;
+        }
+        
+        /* Speed info panel */
+        .speed-info {
+            position: absolute;
+            bottom: 30px;
+            left: 20px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            min-width: 200px;
+            display: none;
+        }
+        
+        .speed-circle {
+            border: 3px solid #c00;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .speed-limit {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        #error-message {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(231, 76, 60, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 2000;
+            display: none;
+            min-width: 200px;
+            max-width: 80%;
+            text-align: center;
+        }
+        
+        /* Sidebar styles */
+        #devices-sidebar {
+            position: fixed;
+            right: -350px;
+            top: 70px;
+            width: 330px;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #devices-sidebar.active {
+            right: 0;
+        }
+        
+        #toggleDevicesButton {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1001;
+            background: #0f1e41;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        #toggleDevicesButton:hover {
+            background: #1e3a6e;
+            transform: scale(1.05);
+        }
+        
+        #toggleDevicesButton.active {
+            right: 350px;
+        }
+        
+        .devices-header {
+            background: #0f1e41;
+            color: white;
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .devices-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+        
+        .search-container {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            background: white;
+            position: sticky;
+            top: 55px;
+            z-index: 5;
+        }
+        
+        #searchDevices {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        
+        .devices-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+        
+        .device-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .device-item:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .device-item.active {
+            background-color: #e9f7ff;
+            border-left: 4px solid #0f1e41;
+        }
+        
+        .device-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .device-id {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .device-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: white;
+        }
+        
+        .status-running {
+            background-color: #27ae60;
+        }
+        
+        .status-parked {
+            background-color: #f39c12;
+        }
+        
+        .status-off {
+            background-color: #e74c3c;
+        }
+        
+        .status-unknown {
+            background-color: #95a5a6;
+        }
+        
+        /* Speed Alert Popup */
+        .speed-alert-popup {
+            position: fixed;
+            top: 150px;
+            right: 20px;
+            background: rgba(255, 0, 0, 0.9);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            animation: blink 1s infinite alternate;
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        
+        /* Highlight animation for markers */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* Status Summary Box */
+        .status-summary {
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 10px 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+        
+        .status-summary p {
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+        }
+        
+        .status-summary span {
+            margin-left: 15px;
+            font-weight: bold;
+        }
+        
+        #totalCount { color: #333; }
+        #runningCount { color: #27ae60; }
+        #idleCount { color: #f39c12; }
+        #parkedCount { color: #3498db; }
+        #lostCount { color: #e74c3c; }
+        
+        /* Map Controls */
+        #mapSwitcher {
+            position: fixed;
+            top: 150px;
+            right: 20px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .map-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            color: #0f1e41;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .map-button:hover {
+            transform: scale(1.1);
+        }
+        
+        .map-button.active {
+            background: #0f1e41;
+            color: white;
+        }
+        
+        /* Popup styling */
+        .vehicle-popup {
+            min-width: 200px;
+            padding: 5px;
+        }
+        
+        .popup-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .details-btn, .playback-btn {
+            flex: 1;
+            padding: 6px 8px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .details-btn {
+            background: #3498db;
+        }
+        
+        .playback-btn {
+            background: #f39c12;
+        }
+        
+        /* Vehicle Details Panel */
+        .vehicle-details-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            padding: 15px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .vehicle-details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .vehicle-details-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .vehicle-details-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #555;
+            cursor: pointer;
+        }
+        
+        .vehicle-details-content {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .vehicle-detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .vehicle-detail-label {
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .vehicle-detail-value {
+            color: #333;
+        }
+        
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .header h2 {
+                font-size: 16px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            #devices-sidebar {
+                width: 280px;
+            }
+            
+            .status-summary {
+                bottom: 20px;
+                top: auto;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 90%;
+                max-width: 350px;
+            }
+            
+            #mapSwitcher {
+                bottom: 20px;
+                top: auto;
+                right: 20px;
+                flex-direction: row;
+            }
+            
+            .speed-info {
+                left: 50%;
+                transform: translateX(-50%);
+                width: 90%;
+                max-width: 350px;
+            }
+            
+            .vehicle-details-panel {
+                left: 20px;
+                right: 20px;
+                width: auto;
+            }
+        }
+
+        /* Live indicator with ripple effect */
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            color: #27ae60;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .live-ripple {
+            width: 10px;
+            height: 10px;
+            background-color: #27ae60;
+            border-radius: 50%;
+            margin-right: 5px;
+            position: relative;
+        }
+
+        .live-ripple::before,
+        .live-ripple::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: rgba(39, 174, 96, 0.6);
+            animation: pulse 1.5s infinite ease-out;
+        }
+
+        .live-ripple::after {
+            animation-delay: 0.5s;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+
+        /* Status badge for non-live markers */
+        .status-badge {
+            display: inline-block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .status-badge.last-known {
+            color: #e74c3c;
+        }
+
+        /* Speed and ignition status styles */
+        .speed {
+            font-weight: bold;
+        }
+        
+        .speed-low {
+            color: #27ae60;
+        }
+        
+        .speed-medium {
+            color: #f39c12;
+        }
+        
+        .speed-high {
+            color: #e74c3c;
+        }
+        
+        .ignition-status {
+            font-weight: bold;
+        }
+        
+        .ignition-status.on {
+            color: #27ae60;
+        }
+        
+        .ignition-status.off {
+            color: #e74c3c;
+        }
+        
+        .ignition-status.unknown {
+            color: #95a5a6;
+        }
+        
+        /* Vehicle status styles */
+        .status {
+            display: inline-block;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+        
+        .status-running {
+            color: #27ae60;
+        }
+        
+        .status-idle {
+            color: #f39c12;
+        }
+        
+        .status-parked {
+            color: #f39c12;
+        }
+        
+        .status-connection-lost {
+            color: #e74c3c;
+        }
+        
+        .status-unknown {
+            color: #95a5a6;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+    
+    <div class="header">
+        <h2>Vehicle Tracker</h2>
+        <div class="connection-status">
+            <div class="status-dot status-disconnected" id="status-indicator"></div>
+            <span id="connection-status">Disconnected</span>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <div>
+            <button id="reset-view-btn">
+                <i class="fas fa-sync-alt"></i> Reset View
+            </button>
+            <button id="show-all-btn">
+                <i class="fas fa-eye"></i> Show All Devices
+            </button>
+        </div>
+        <div>
+            <button id="show-traffic-btn">
+                <i class="fas fa-traffic-light"></i> Show Traffic
+            </button>
+            <button id="toggle-logs-btn">
+                <i class="fas fa-list"></i> Show Logs
+            </button>
+        </div>
+    </div>
+    
+    <div id="error-message"></div>
+    <div id="map-container"></div>
+    
+    <!-- Status Summary Box -->
+    <div class="status-summary">
+        <p>Total Vehicles: <span id="totalCount">0</span></p>
+        <p>Running: <span id="runningCount">0</span></p>
+        <p>Idle: <span id="idleCount">0</span></p>
+        <p>Parked: <span id="parkedCount">0</span></p>
+        <p>Offline: <span id="lostCount">0</span></p>
+    </div>
+    
+    <!-- Map Control Buttons -->
+    <div id="mapSwitcher">
+        <button class="map-button active" data-map="normal" title="Standard Map">
+            <i class="fas fa-map"></i>
+        </button>
+        <button class="map-button" data-map="satellite" title="Satellite View">
+            <i class="fas fa-satellite"></i>
+        </button>
+        <button class="map-button" data-map="terrain" title="Terrain View">
+            <i class="fas fa-mountain"></i>
+        </button>
+        <button class="map-button" id="fullscreen-btn" title="Fullscreen">
+            <i class="fas fa-expand"></i>
+        </button>
+    </div>
+    
+    <!-- Devices Sidebar Toggle Button -->
+    <button id="toggleDevicesButton">
+        <i class="fas fa-car"></i>
+        <div class="alert-counter" id="device-counter" style="display: none;">0</div>
+    </button>
+    
+    <!-- Devices Sidebar -->
+    <div id="devices-sidebar">
+        <div class="devices-header">
+            <h2>Connected Devices</h2>
+        </div>
+        <div class="search-container">
+            <input type="text" id="searchDevices" placeholder="Search by Device ID or Status">
+        </div>
+        <div class="devices-content" id="devices-content">
+            <!-- Devices will be added here dynamically -->
+        </div>
+    </div>
+    
+    <!-- Speed Alert Popup -->
+    <div id="speedAlertPopup" class="speed-alert-popup">
+        <h4><i class="fas fa-exclamation-triangle"></i> Speed Alert!</h4>
+        <p><strong>Vehicle:</strong> <span id="alertDeviceID"></span></p>
+        <p><strong>Speed:</strong> <span id="alertSpeed"></span> km/h</p>
+        <p><strong>Limit:</strong> <span id="alertLimit"></span> km/h</p>
+        <button onclick="document.getElementById('speedAlertPopup').style.display='none'">Dismiss</button>
+    </div>
+    
+    <!-- Vehicle Details Panel -->
+    <div id="vehicleDetailsPanel" class="vehicle-details-panel">
+        <div class="vehicle-details-header">
+            <h3 class="vehicle-details-title" id="vehicleDetailsTitle">Vehicle Details</h3>
+            <button class="vehicle-details-close" onclick="closeVehicleDetails()">&times;</button>
+        </div>
+        <div class="vehicle-details-content" id="vehicleDetailsContent">
+            <!-- Vehicle details will be populated here -->
+        </div>
+    </div>
+    
+    <!-- Load HERE Maps JavaScript APIs -->
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
+    
+    <script>
+        // API key for HERE Maps
+        const apiKey = '19cJwlsY5xkdO13O_869LM29OScg30J1TCstjWfPSF8';
+        
+        // Global variables
+        let map, platform, defaultLayers, trafficLayer, ui;
+        let markers = {};
+        let deviceData = {};
+        let liveDevices = new Set();
+        let deviceLastUpdate = {};
+        let selectedDeviceId = null;
+        let stompClient = null;
+        let isConnected = false;
+        let speedLimitCache = {};
+        let activeAlerts = new Set();
+        let mapType = 'normal';
+        
+        // Car SVG icons for different states
+        const carIcons = {
+            'green': `<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 2C10.5 2 6 6.5 6 12v12c0 1.1.9 2 2 2h2v2c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2v-2h4v2c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2v-2h2c1.1 0 2-.9 2-2V12c0-5.5-4.5-10-10-10zm-7 12h14v2H9v-2zm0 4h14v2H9v-2z" fill="#27ae60"/>
+                <circle cx="11" cy="23" r="2" fill="#333"/>
+                <circle cx="21" cy="23" r="2" fill="#333"/>
+                </svg>`,
+            'orange': `<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 2C10.5 2 6 6.5 6 12v12c0 1.1.9 2 2 2h2v2c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2v-2h4v2c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2v-2h2c1.1 0 2-.9 2-2V12c0-5.5-4.5-10-10-10zm-7 12h14v2H9v-2zm0 4h14v2H9v-2z" fill="#f39c12"/>
+                <circle cx="11" cy="23" r="2" fill="#333"/>
+                <circle cx="21" cy="23" r="2" fill="#333"/>
+                </svg>`,
+            'red': `<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 2C10.5 2 6 6.5 6 12v12c0 1.1.9 2 2 2h2v2c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2v-2h4v2c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2v-2h2c1.1 0 2-.9 2-2V12c0-5.5-4.5-10-10-10zm-7 12h14v2H9v-2zm0 4h14v2H9v-2z" fill="#e74c3c"/>
+                <circle cx="11" cy="23" r="2" fill="#333"/>
+                <circle cx="21" cy="23" r="2" fill="#333"/>
+                </svg>`,
+            'gray': `<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 2C10.5 2 6 6.5 6 12v12c0 1.1.9 2 2 2h2v2c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2v-2h4v2c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2v-2h2c1.1 0 2-.9 2-2V12c0-5.5-4.5-10-10-10zm-7 12h14v2H9v-2zm0 4h14v2H9v-2z" fill="#95a5a6"/>
+                <circle cx="11" cy="23" r="2" fill="#333"/>
+                <circle cx="21" cy="23" r="2" fill="#333"/>
+                </svg>`
+        };
+        
+        // DOM Elements
+        const statusIndicator = document.getElementById('status-indicator');
+        const connectionStatus = document.getElementById('connection-status');
+        const deviceCounter = document.getElementById('device-counter');
+        const devicesContent = document.getElementById('devices-content');
+        const searchDevicesInput = document.getElementById('searchDevices');
+        const vehicleDetailsPanel = document.getElementById('vehicleDetailsPanel');
+        
+        // Logging system
+        function addLogEntry(message, type = 'info') {
+            // Log to console
+            console.log(`${type.toUpperCase()}: ${message}`);
+        }
+        
+        // Error handling
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            if (errorDiv) {
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+                addLogEntry(message, 'error');
+                
+                // Hide error after 5 seconds
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                }, 5000);
+            } else {
+                console.error("Error element not found:", message);
+            }
+        }
+        
+        // Map initialization
+        function initMap() {
+            try {
+                addLogEntry('Initializing map...');
+                
+                // Initialize HERE platform with API key
+                platform = new H.service.Platform({
+                    apikey: apiKey
+                });
+                
+                // Get default map layers
+                defaultLayers = platform.createDefaultLayers();
+                
+                // Initialize the map
+                map = new H.Map(
+                    document.getElementById('map-container'),
+                    defaultLayers.vector.normal.map,
+                    {
+                        zoom: 4,
+                        center: { lat: 20, lng: 0 } // Default to a world view
+                    }
+                );
+                
+                // Make the map responsive
+                window.addEventListener('resize', () => {
+                    map.getViewPort().resize();
+                });
+                
+                // Add map interaction behaviors
+                const behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+                
+                // Add UI components
+                ui = H.ui.UI.createDefault(map, defaultLayers);
+                
+                // Set up map click handler
+                setupMapClickHandler();
+                
+                // Hide loading overlay
+                document.getElementById('loading-overlay').style.display = 'none';
+                
+                addLogEntry('Map initialized successfully');
+                
+                return true;
+            } catch (error) {
+                console.error('Map initialization error:', error);
+                showError('Failed to initialize map: ' + error.message);
+                return false;
+            }
+        }
+        
+        // Set up map click handler
+        function setupMapClickHandler() {
+            if (map) {
+                map.addEventListener('tap', function(evt) {
+                    try {
+                        const coord = map.screenToGeo(
+                            evt.currentPointer.viewportX,
+                            evt.currentPointer.viewportY
+                        );
+                        
+                        const lat = coord.lat;
+                        const lng = coord.lng;
+                        
+                        addLogEntry(`Map clicked at: ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+                    } catch (error) {
+                        showError("Error handling map click: " + error.message);
+                    }
+                });
+                addLogEntry('Map click handler set up');
+            }
+        }
+        
+        // Initialize WebSocket connection
+        function initWebSocket() {
+            try {
+                addLogEntry('Initializing WebSocket connection...');
+                
+                // Create a new SockJS connection
+                const socket = new SockJS('/gs-guide-websocket');
+                stompClient = Stomp.over(socket);
+                
+                // Disable debug logging
+                stompClient.debug = null;
+                
+                // Connect to the WebSocket server
+                stompClient.connect({}, frame => {
+                    isConnected = true;
+                    updateConnectionStatus(true);
+                    addLogEntry('WebSocket connected successfully');
+                    
+                    // Subscribe to the location updates topic
+                    stompClient.subscribe('/topic/location-updates', message => {
+                        handleWebSocketMessage(message);
+                    });
+                    
+                }, error => {
+                    isConnected = false;
+                    updateConnectionStatus(false);
+                    console.error('WebSocket connection error:', error);
+                    addLogEntry('WebSocket connection failed: ' + (error.message || 'Unknown error'), 'error');
+                    
+                    // Retry connection after delay
+                    setTimeout(() => initWebSocket(), 5000);
+                });
+            } catch (error) {
+                console.error('Error initializing WebSocket:', error);
+                showError('Error initializing live updates: ' + error.message);
+                
+                // Retry connection after delay
+                setTimeout(() => initWebSocket(), 5000);
+            }
+        }
+        
+        // Handle WebSocket messages
+        function handleWebSocketMessage(message) {
+            try {
+                const data = JSON.parse(message.body);
+                
+                // Standardize the data structure
+                const vehicleData = {
+                    deviceId: data.deviceId || data.deviceID || 'Unknown',
+                    latitude: parseFloat(data.latitude) || 0,
+                    longitude: parseFloat(data.longitude) || 0,
+                    speed: parseFloat(data.speed) || 0,
+                    course: parseFloat(data.course) || 0,
+                    timestamp: data.timestamp || new Date().toISOString(),
+                    ignition: data.ignition || 'IGoff',
+                    vehicleStatus: data.vehicleStatus || data.VehicleStatus || 'Unknown'
+                };
+                
+                // Only process if we have valid coordinates
+                if (!isNaN(vehicleData.latitude) && !isNaN(vehicleData.longitude) && 
+                    vehicleData.latitude !== 0 && vehicleData.longitude !== 0) {
+                    
+                    // Store data for this device
+                    deviceData[vehicleData.deviceId] = vehicleData;
+                    
+                    // Update the device marker
+                    updateDeviceMarker(vehicleData, true);
+                    
+                    // Update the devices sidebar
+                    updateDevicesList();
+                    
+                    // Show notification for this update
+                    showDeviceAlert(vehicleData);
+                    
+                    // Check for speed limits if needed
+                    checkSpeedingVehicle(vehicleData);
+                    
+                    // Update detailed panel if this is the selected device
+                    if (selectedDeviceId === vehicleData.deviceId) {
+                        updateVehicleDetails(vehicleData);
+                    }
+                    
+                    // Update device counter
+                    updateDeviceCounter();
+                    
+                    addLogEntry(`Received update for device ${vehicleData.deviceId}`);
+                }
+            } catch (error) {
+                console.error('Error processing WebSocket message:', error);
+                showError('Error processing live update: ' + error.message);
+            }
+        }
+        
+        // Load initial device data
+        function loadInitialDeviceData() {
+            addLogEntry('Loading device data...');
+            
+            // Make a request to get the last known device positions
+            fetch('/api/vehicle/last/latests-locations/all')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (Array.isArray(data) && data.length > 0) {
+                        addLogEntry(`Loaded ${data.length} device positions`);
+                        
+                        // Process each device
+                        data.forEach(device => {
+                            const deviceId = device.deviceId || device.deviceID || 'Unknown';
+                            
+                            // Standardize the data structure
+                            const deviceInfo = {
+                                deviceId: deviceId,
+                                latitude: parseFloat(device.latitude) || 0,
+                                longitude: parseFloat(device.longitude) || 0,
+                                speed: parseFloat(device.speed) || 0,
+                                course: parseFloat(device.course) || 0,
+                                timestamp: device.timestamp || new Date().toISOString(),
+                                ignition: device.ignition || 'IGoff',
+                                vehicleStatus: device.vehicleStatus || device.VehicleStatus || 'Unknown'
+                            };
+                            
+                            // Only process valid coordinates
+                            if (!isNaN(deviceInfo.latitude) && !isNaN(deviceInfo.longitude) && 
+                                deviceInfo.latitude !== 0 && deviceInfo.longitude !== 0) {
+                                
+                                // Store data for this device
+                                deviceData[deviceId] = deviceInfo;
+                                
+                                // Update the device marker on the map
+                                updateDeviceMarker(deviceInfo, false);
+                            }
+                        });
+                        
+                        // Update the devices list in the sidebar
+                        updateDevicesList();
+                        
+                        // Update device counter
+                        updateDeviceCounter();
+                        
+                        // Fit the map to show all devices
+                        fitMapToAllDevices();
+                        
+                        // Count devices by status
+                        updateStatusCounts();
+                    } else {
+                        addLogEntry('No device data available');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading device data:', error);
+                    showError('Failed to load device data: ' + error.message);
+                });
+        }
+        
+        // Update device marker on the map
+        function updateDeviceMarker(device, isLive) {
+            const deviceId = device.deviceId;
+            const latitude = device.latitude;
+            const longitude = device.longitude;
+            const course = device.course || 0;
+            const timestamp = device.timestamp ? new Date(device.timestamp) : new Date();
+            
+            if (!map || !deviceId || isNaN(latitude) || isNaN(longitude)) {
+                console.warn('Invalid device data:', device);
+                return;
+            }
+            
+            // Create SVG marker icon based on status and rotation
+            const svgIcon = createSvgVehicleIcon(device);
+            
+            // Create a marker if it doesn't exist
+            if (!markers[deviceId]) {
+                try {
+                    // Create the marker with the SVG icon
+                    const marker = new H.map.Marker(
+                        { lat: latitude, lng: longitude },
+                        { icon: svgIcon }
+                    );
+                    
+                    // Add click event handler
+                    marker.addEventListener('tap', () => {
+                        selectDevice(deviceId);
+                    });
+                    
+                    // Add the vehicle ID as a data attribute to the marker
+                    marker.setData({ deviceId: deviceId });
+                    
+                    // Add marker to the map
+                    map.addObject(marker);
+                    markers[deviceId] = marker;
+                    
+                    addLogEntry(`Created marker for device ${deviceId}`);
+                } catch (error) {
+                    console.error(`Error creating marker for device ${deviceId}:`, error);
+                }
+            } else {
+                // Update existing marker position
+                markers[deviceId].setGeometry({ lat: latitude, lng: longitude });
+                
+                // Update marker icon to reflect current state
+                markers[deviceId].setIcon(svgIcon);
+                
+                if (isLive) {
+                    addLogEntry(`Updated marker for device ${deviceId}`);
+                }
+            }
+            
+            // Record the last update time
+            deviceLastUpdate[deviceId] = timestamp;
+            
+            // Mark device as live if this is a live update
+            if (isLive) {
+                liveDevices.add(deviceId);
+            }
+        }
+        
+        // Create SVG vehicle icon with rotation
+        function createSvgVehicleIcon(device) {
+            // Get status to determine color
+            const status = getDeviceStatus(device);
+            const course = device.course || 0;
+            
+            // Define color based on status
+            let color;
+            switch (status.toLowerCase()) {
+                case 'running':
+                    color = 'green';
+                    break;
+                case 'parked':
+                case 'idle':
+                    color = 'orange';
+                    break;
+                case 'off':
+                    color = 'red';
+                    break;
+                default:
+                    color = 'gray';
+            }
+            
+            // Get the SVG for the car
+            const carSvg = carIcons[color];
+            
+            // Create a blob URL for the SVG with rotation
+            const svgWithRotation = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                    <g transform="rotate(${course} 16 16)">
+                        ${carSvg.split('<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">')[1].split('</svg>')[0]}
+                    </g>
+                </svg>
+            `;
+            
+            // Create a new HERE Maps icon with an SVG
+            return new H.map.Icon(svgWithRotation, {
+                size: { w: 32, h: 32 },
+                anchor: { x: 16, y: 16 }
+            });
+        }
+        
+        // Get device status text
+        function getDeviceStatus(device) {
+            const ignition = (device.ignition || '').toUpperCase();
+            const vehicleStatus = (device.vehicleStatus || '').toUpperCase();
+            const speed = parseFloat(device.speed) || 0;
+            
+            if (ignition === 'IGON' && speed > 0) {
+                return 'Running';
+            } else if (ignition === 'IGON' && speed === 0) {
+                return 'Idle';
+            } else if (vehicleStatus === 'PARKED' || vehicleStatus === 'IDLE') {
+                return 'Parked';
+            } else if (ignition === 'IGOFF') {
+                return 'Off';
+            } else {
+                return 'Unknown';
+            }
+        }
+        
+        // Get status color
+        function getStatusColor(status) {
+            switch (status.toLowerCase()) {
+                case 'running':
+                    return '#27ae60'; // Green
+                case 'idle':
+                case 'parked':
+                    return '#f39c12'; // Orange
+                case 'off':
+                    return '#e74c3c'; // Red
+                default:
+                    return '#95a5a6'; // Gray
+            }
+        }
+        
+        // Update the connection status indicator
+        function updateConnectionStatus(connected) {
+            if (connected) {
+                statusIndicator.className = 'status-dot status-connected';
+                connectionStatus.textContent = 'Connected';
+            } else {
+                statusIndicator.className = 'status-dot status-disconnected';
+                connectionStatus.textContent = 'Disconnected';
+            }
+        }
+        
+        // Update the devices list in the sidebar
+        function updateDevicesList() {
+            // Get all devices (convert object to array)
+            const devices = Object.values(deviceData);
+            
+            // Sort devices by last update time (most recent first)
+            devices.sort((a, b) => {
+                const timeA = new Date(a.timestamp).getTime();
+                const timeB = new Date(b.timestamp).getTime();
+                return timeB - timeA;
+            });
+            
+            // Clear current list
+            devicesContent.innerHTML = '';
+            
+            // Add each device to the list
+            if (devices.length === 0) {
+                devicesContent.innerHTML = '<div class="device-item">No devices available</div>';
+            } else {
+                devices.forEach(device => {
+                    const deviceId = device.deviceId;
+                    const status = getDeviceStatus(device);
+                    const timestamp = new Date(device.timestamp);
+                    const speed = parseFloat(device.speed) || 0;
+                    const isLive = liveDevices.has(deviceId);
+                    
+                    // Create device item element
+                    const deviceElement = document.createElement('div');
+                    deviceElement.className = 'device-item';
+                    deviceElement.id = `device-${deviceId}`;
+                    
+                    if (selectedDeviceId === deviceId) {
+                        deviceElement.classList.add('active');
+                    }
+                    
+                    // Format time display
+                    const timeDisplay = formatTimeDisplay(timestamp);
+                    
+                    // Create device content
+                    deviceElement.innerHTML = `
+                        <div class="device-header">
+                            <div class="device-id">${deviceId}</div>
+                            <div class="device-status status-${status.toLowerCase()}">${status}</div>
+                        </div>
+                        <div class="device-info">
+                            <span>
+                                <i class="fas fa-clock"></i>
+                                ${timeDisplay}
+                            </span>
+                            <span>
+                                <i class="fas fa-tachometer-alt"></i>
+                                ${speed.toFixed(1)} km/h
+                            </span>
+                        </div>
+                    `;
+                    
+                    // Add click handler
+                    deviceElement.addEventListener('click', () => {
+                        selectDevice(deviceId);
+                    });
+                    
+                    // Add to the content container
+                    devicesContent.appendChild(deviceElement);
+                });
+            }
+        }
+        
+        // Format time for display
+        function formatTimeDisplay(timestamp) {
+            const now = new Date();
+            const diffMs = now - timestamp;
+            const diffMinutes = Math.floor(diffMs / 60000);
+            
+            if (diffMinutes < 1) {
+                return 'Just now';
+            } else if (diffMinutes < 60) {
+                return `${diffMinutes}m ago`;
+            } else if (diffMinutes < 1440) {
+                return `${Math.floor(diffMinutes / 60)}h ago`;
+            } else {
+                // Format as date
+                return timestamp.toLocaleDateString();
+            }
+        }
+        
+        // Show device alert notification
+        function showDeviceAlert(device) {
+            const deviceId = device.deviceId;
+            const speed = parseFloat(device.speed) || 0;
+            
+            // Only show alerts for significant speed
+            if (speed < 5) return;
+            
+            // Don't show multiple alerts for the same device in short succession
+            if (activeAlerts.has(deviceId)) {
+                return;
+            }
+            
+            // Only alert for devices with speed over threshold
+            if (speed >= 80) {
+                // Show speed alert popup
+                document.getElementById('alertDeviceID').textContent = deviceId;
+                document.getElementById('alertSpeed').textContent = speed.toFixed(1);
+                document.getElementById('alertLimit').textContent = '80';
+                document.getElementById('speedAlertPopup').style.display = 'block';
+                
+                // Auto hide after 10 seconds
+                setTimeout(() => {
+                    document.getElementById('speedAlertPopup').style.display = 'none';
+                }, 10000);
+                
+                activeAlerts.add(deviceId);
+                
+                // Remove from active alerts after a delay
+                setTimeout(() => {
+                    activeAlerts.delete(deviceId);
+                }, 30000);
+            }
+        }
+        
+        // Select a device to focus on
+        function selectDevice(deviceId) {
+            // Deselect previous device
+            if (selectedDeviceId) {
+                const previousElement = document.getElementById(`device-${selectedDeviceId}`);
+                if (previousElement) {
+                    previousElement.classList.remove('active');
+                }
+            }
+            
+            // Set new selected device
+            selectedDeviceId = deviceId;
+            
+            // Highlight in sidebar
+            const deviceElement = document.getElementById(`device-${deviceId}`);
+            if (deviceElement) {
+                deviceElement.classList.add('active');
+                deviceElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            
+            // Zoom to device on map
+            zoomToDevice(deviceId);
+            
+            // Show device details panel
+            if (deviceData[deviceId]) {
+                updateVehicleDetails(deviceData[deviceId]);
+                vehicleDetailsPanel.style.display = 'block';
+            }
+            
+            addLogEntry(`Selected device: ${deviceId}`);
+        }
+        
+        // Zoom to a device on the map
+        function zoomToDevice(deviceId) {
+            const marker = markers[deviceId];
+            if (marker && map) {
+                const position = marker.getGeometry();
+                map.setCenter(position);
+                map.setZoom(15);
+                
+                // Highlight the marker with InfoBubble
+                showInfoBubble(deviceId);
+            }
+        }
+        
+        // Show info bubble for a marker
+        function showInfoBubble(deviceId) {
+            if (markers[deviceId] && ui) {
+                const device = deviceData[deviceId];
+                const position = markers[deviceId].getGeometry();
+                
+                // Create info bubble
+                const bubble = new H.ui.InfoBubble(position, {
+                    content: createInfoBubbleContent(device)
+                });
+                
+                // Add bubble to the UI
+                ui.addBubble(bubble);
+            }
+        }
+        
+        // Create content for info bubble
+        function createInfoBubbleContent(device) {
+            const deviceId = device.deviceId;
+            const status = getDeviceStatus(device);
+            const timestamp = new Date(device.timestamp);
+            const speed = parseFloat(device.speed) || 0;
+            const isLive = liveDevices.has(deviceId);
+            const ignitionStatus = device.ignition && device.ignition.toUpperCase() === 'IGON' ? 'ON' : 'OFF';
+            const formattedTime = formatTimeDisplay(timestamp);
+            
+            // Format the content
+            let content = `
+                <div class="vehicle-popup">
+            `;
+            
+            // Add live/last known indicator
+            if (isLive) {
+                content += `<div class="live-indicator"><div class="live-ripple"></div>LIVE</div>`;
+            } else {
+                content += `<div class="status-badge last-known">Last update: ${formattedTime}</div>`;
+            }
+            
+            // Add vehicle details
+            content += `
+                    <p><b>Vehicle ID:</b> ${deviceId}</p>
+                    <p><b>Speed:</b> <span class="speed speed-${speed < 30 ? 'low' : speed < 60 ? 'medium' : 'high'}">${speed.toFixed(1)} km/h</span></p>
+                    <p><b>Ignition:</b> <span class="ignition-status ${ignitionStatus.toLowerCase()}">${ignitionStatus}</span></p>
+                    <p><b>Status:</b> <span class="status status-${status.toLowerCase()}">${status}</span></p>
+                    
+                    <div class="popup-actions">
+                        <button class="details-btn" onclick="selectDevice('${deviceId}')">
+                            <i class="fas fa-info-circle"></i> Details
+                        </button>
+                        <button class="playback-btn" onclick="navigateToReplay('${deviceId}')">
+                            <i class="fas fa-history"></i> Playback
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return content;
+        }
+        
+        // Update vehicle details panel
+        function updateVehicleDetails(device) {
+            const deviceId = device.deviceId;
+            const status = getDeviceStatus(device);
+            const speed = parseFloat(device.speed) || 0;
+            const timestamp = new Date(device.timestamp);
+            const ignitionStatus = device.ignition && device.ignition.toUpperCase() === 'IGON' ? 'ON' : 'OFF';
+            const formattedTime = formatTimeDisplay(timestamp);
+            const latitude = device.latitude.toFixed(6);
+            const longitude = device.longitude.toFixed(6);
+            const course = device.course ? `${device.course}°` : 'N/A';
+            
+            // Update panel title
+            document.getElementById('vehicleDetailsTitle').textContent = deviceId;
+            
+            // Create content
+            const content = `
+                <div class="vehicle-detail-item">
+                    <span class="vehicle-detail-label">Status:</span>
+                    <span class="vehicle-detail-value status-${status.toLowerCase()}">${status}</span>
+                </div>
+                <div class="vehicle-detail-item">
+                    <span class="vehicle-detail-label">Speed:</span>
+                    <span class="vehicle-detail-value">${speed.toFixed(1)} km/h</span>
+                </div>
+                <div class="vehicle-detail-item">
+                    <span class="vehicle-detail-label">Ignition:</span>
+                    <span class="vehicle-detail-value">${ignitionStatus}</span>
+                </div>
+                <div class="vehicle-detail-item">
+                    <span class="vehicle-detail-label">Last Update:</span>
+                    <span class="vehicle-detail-value">${formattedTime}</span>
+                </div>
+                <div class="vehicle-detail-item">
+                    <span class="vehicle-detail-label">Course:</span>
+                    <span class="vehicle-detail-value">${course}</span>
+                </div>
+                <div class="vehicle-detail-item">
+                    <span class="vehicle-detail-label">Latitude:</span>
+                    <span class="vehicle-detail-value">${latitude}</span>
+                </div>
+                <div class="vehicle-detail-item">
+                    <span class="vehicle-detail-label">Longitude:</span>
+                    <span class="vehicle-detail-value">${longitude}</span>
+                </div>
+                <div class="vehicle-detail-item">
+                    <span class="vehicle-detail-label">Location:</span>
+                    <span class="vehicle-detail-value">
+                        <button onclick="checkSpeedLimit(${latitude}, ${longitude})" class="btn btn-primary" style="padding: 3px 8px; font-size: 12px;">
+                            <i class="fas fa-tachometer-alt"></i> Check Speed Limit
+                        </button>
+                    </span>
+                </div>
+            `;
+            
+            // Update panel content
+            document.getElementById('vehicleDetailsContent').innerHTML = content;
+        }
+        
+        // Close vehicle details panel
+        function closeVehicleDetails() {
+            vehicleDetailsPanel.style.display = 'none';
+            
+            // Deselect device
+            if (selectedDeviceId) {
+                const deviceElement = document.getElementById(`device-${selectedDeviceId}`);
+                if (deviceElement) {
+                    deviceElement.classList.remove('active');
+                }
+                selectedDeviceId = null;
+            }
+        }
+        
+        // Navigate to replay page
+        function navigateToReplay(deviceId) {
+            window.location.href = `/superadmin/replay?deviceId=${encodeURIComponent(deviceId)}`;
+        }
+        
+        // Check if a vehicle is speeding
+        function checkSpeedingVehicle(device) {
+            const speed = parseFloat(device.speed) || 0;
+            const deviceId = device.deviceId;
+            
+            // If speed is low, we don't need to check
+            if (speed < 20) {
+                return;
+            }
+            
+            // Get coordinates
+            const lat = device.latitude;
+            const lng = device.longitude;
+            
+            // Check if we already have the speed limit cached
+            if (speedLimitCache[`${lat.toFixed(4)},${lng.toFixed(4)}`]) {
+                const speedLimit = speedLimitCache[`${lat.toFixed(4)},${lng.toFixed(4)}`];
+                checkSpeedViolation(deviceId, speed, speedLimit);
+            } else {
+                // For now, just check against a fixed threshold
+                if (speed > 80) {
+                    showDeviceAlert(device);
+                }
+            }
+        }
+        
+        // Check if speed exceeds limit
+        function checkSpeedViolation(deviceId, currentSpeed, speedLimit) {
+            // Allow for 10% margin over speed limit
+            const threshold = speedLimit * 1.1;
+            
+            if (currentSpeed > threshold) {
+                addLogEntry(`Speed violation detected: Device ${deviceId} traveling at ${currentSpeed.toFixed(1)} km/h in a ${speedLimit} km/h zone`);
+                
+                // Show speed alert
+                const device = deviceData[deviceId];
+                if (device) {
+                    showDeviceAlert(device);
+                }
+            }
+        }
+        
+        // Update device counter
+        function updateDeviceCounter() {
+            const count = Object.keys(deviceData).length;
+            deviceCounter.textContent = count;
+            deviceCounter.style.display = count > 0 ? 'flex' : 'none';
+        }
+        
+        // Update status counts in the summary box
+        function updateStatusCounts() {
+            const devices = Object.values(deviceData);
+            let runningCount = 0;
+            let idleCount = 0;
+            let parkedCount = 0;
+            let lostCount = 0;
+            
+            devices.forEach(device => {
+                const status = getDeviceStatus(device);
+                
+                switch (status.toLowerCase()) {
+                    case 'running':
+                        runningCount++;
+                        break;
+                    case 'idle':
+                        idleCount++;
+                        break;
+                    case 'parked':
+                        parkedCount++;
+                        break;
+                    case 'off':
+                        lostCount++;
+                        break;
+                }
+            });
+            
+            // Update counts in UI
+            document.getElementById('totalCount').textContent = devices.length;
+            document.getElementById('runningCount').textContent = runningCount;
+            document.getElementById('idleCount').textContent = idleCount;
+            document.getElementById('parkedCount').textContent = parkedCount;
+            document.getElementById('lostCount').textContent = lostCount;
+        }
+        
+        // Fit map to show all devices
+        function fitMapToAllDevices() {
+            if (map && Object.keys(markers).length > 0) {
+                // Get bounding box for all markers
+                const bbox = new H.geo.Rect(90, -180, -90, 180);
+                let valid = false;
+                
+                Object.values(markers).forEach(marker => {
+                    const pos = marker.getGeometry();
+                    bbox.top = Math.max(bbox.top, pos.lat);
+                    bbox.left = Math.min(bbox.left, pos.lng);
+                    bbox.bottom = Math.min(bbox.bottom, pos.lat);
+                    bbox.right = Math.max(bbox.right, pos.lng);
+                    valid = true;
+                });
+                
+                if (valid) {
+                    map.getViewModel().setLookAtData({
+                        bounds: bbox,
+                        padding: 50
+                    });
+                }
+            }
+        }
+        
+        // Toggle fullscreen mode
+        function toggleFullscreen() {
+            const mapContainer = document.getElementById('map-container');
+            
+            if (!document.fullscreenElement) {
+                if (mapContainer.requestFullscreen) {
+                    mapContainer.requestFullscreen();
+                } else if (mapContainer.mozRequestFullScreen) { /* Firefox */
+                    mapContainer.mozRequestFullScreen();
+                } else if (mapContainer.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+                    mapContainer.webkitRequestFullscreen();
+                } else if (mapContainer.msRequestFullscreen) { /* IE/Edge */
+                    mapContainer.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.mozCancelFullScreen) { /* Firefox */
+                    document.mozCancelFullScreen();
+                } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) { /* IE/Edge */
+                    document.msExitFullscreen();
+                }
+            }
+        }
+        
+        // Switch map type
+        function switchMapType(type) {
+            if (map) {
+                // Remove current layer
+                map.setBaseLayer(null);
+                
+                // Add new layer based on type
+                switch (type) {
+                    case 'satellite':
+                        map.setBaseLayer(defaultLayers.raster.satellite.map);
+                        break;
+                    case 'terrain':
+                        map.setBaseLayer(defaultLayers.vector.normal.terrain);
+                        break;
+                    case 'normal':
+                    default:
+                        map.setBaseLayer(defaultLayers.vector.normal.map);
+                        break;
+                }
+                
+                // Update mapType variable
+                mapType = type;
+                
+                // Update map button active state
+                document.querySelectorAll('.map-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector(`.map-button[data-map="${type}"]`).classList.add('active');
+            }
+        }
+        
+        // Auto-refresh vehicle data
+        function autoRefreshData() {
+            fetch('/api/vehicle/last/latests-locations/all')
+                .then(response => response.json())
+                .then(data => {
+                    // Process each vehicle
+                    data.forEach(vehicle => {
+                        const deviceId = vehicle.deviceId || vehicle.deviceID || 'Unknown';
+                        const lat = parseFloat(vehicle.latitude);
+                        const lng = parseFloat(vehicle.longitude);
+                        
+                        // Only process valid coordinates
+                        if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0 && 
+                            deviceId && deviceId.toLowerCase() !== 'null') {
+                            
+                            // Standardize the data
+                            const deviceInfo = {
+                                deviceId: deviceId,
+                                latitude: lat,
+                                longitude: lng,
+                                speed: parseFloat(vehicle.speed) || 0,
+                                course: parseFloat(vehicle.course) || 0,
+                                timestamp: vehicle.timestamp || new Date().toISOString(),
+                                ignition: vehicle.ignition || 'IGoff',
+                                vehicleStatus: vehicle.vehicleStatus || vehicle.VehicleStatus || 'Unknown'
+                            };
+                            
+                            // Store data for this device
+                            deviceData[deviceId] = deviceInfo;
+                            
+                            // Update the device marker
+                            updateDeviceMarker(deviceInfo, false);
+                        }
+                    });
+                    
+                    // Update the devices list in the sidebar
+                    updateDevicesList();
+                    
+                    // Update device counter
+                    updateDeviceCounter();
+                    
+                    // Update status counts in summary box
+                    updateStatusCounts();
+                })
+                .catch(error => {
+                    console.error('Error fetching vehicle data:', error);
+                });
+        }
+        
+        // Event handlers 
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize map
+            if (initMap()) {
+                // Connect WebSocket
+                initWebSocket();
+                
+                // Load initial device data
+                loadInitialDeviceData();
+                
+                // Set up periodic data refresh
+                setInterval(autoRefreshData, 15000);
+                
+                // Toggle devices sidebar
+                document.getElementById('toggleDevicesButton').addEventListener('click', function() {
+                    const sidebar = document.getElementById('devices-sidebar');
+                    const toggleButton = this;
+                    
+                    sidebar.classList.toggle('active');
+                    toggleButton.classList.toggle('active');
+                });
+                
+                // Search devices
+                document.getElementById('searchDevices').addEventListener('input', function() {
+                    const searchText = this.value.toLowerCase();
+                    const deviceItems = document.querySelectorAll('.device-item');
+                    
+                    deviceItems.forEach(item => {
+                        const deviceId = item.querySelector('.device-id').textContent.toLowerCase();
+                        const status = item.querySelector('.device-status').textContent.toLowerCase();
+                        
+                        if (deviceId.includes(searchText) || status.includes(searchText)) {
+                            item.style.display = '';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+                
+                // Reset view button
+                document.getElementById('reset-view-btn').addEventListener('click', function() {
+                    // Reset the map to default view
+                    map.setCenter({ lat: 20, lng: 0 });
+                    map.setZoom(4);
+                    addLogEntry('Reset map view');
+                });
+                
+                // Show all devices button
+                document.getElementById('show-all-btn').addEventListener('click', function() {
+                    fitMapToAllDevices();
+                    addLogEntry('Showing all devices');
+                });
+                
+                // Traffic toggle
+                document.getElementById('show-traffic-btn').addEventListener('click', function() {
+                    if (!trafficLayer && map) {
+                        try {
+                            // Add traffic layer
+                            trafficLayer = map.createTileLayer(
+                                // Use HERE Vector Tile Service for traffic flow
+                                new H.service.extension.platformData.TileProvider(
+                                    platform.getPlatformDataService(), 
+                                    { min: 8, max: 20 }, 
+                                    256, 
+                                    'traffic.flow', 
+                                    'newest', 
+                                    apiKey
+                                ),
+                                { opacity: 0.7 }
+                            );
+                            
+                            // Update button
+                            this.innerHTML = '<i class="fas fa-traffic-light"></i> Hide Traffic';
+                            
+                            addLogEntry('Traffic layer enabled');
+                        } catch (error) {
+                            showError('Error enabling traffic layer: ' + error.message);
+                        }
+                    } else if (trafficLayer && map) {
+                        // Remove traffic layer
+                        map.removeLayer(trafficLayer);
+                        trafficLayer = null;
+                        
+                        // Update button
+                        this.innerHTML = '<i class="fas fa-traffic-light"></i> Show Traffic';
+                        
+                        addLogEntry('Traffic layer disabled');
+                    }
+                });
+                
+                // Map control buttons
+                document.querySelectorAll('.map-button[data-map]').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const mapType = this.getAttribute('data-map');
+                        switchMapType(mapType);
+                    });
+                });
+                
+                // Fullscreen button
+                document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
+                
+                // Make selectDevice and navigateToReplay available globally
+                window.selectDevice = selectDevice;
+                window.navigateToReplay = navigateToReplay;
+            }
+        });
+    </script>
+</body>
+</html>

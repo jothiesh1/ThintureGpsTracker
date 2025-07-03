@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Server Logs Viewer</title>
+    <link rel="icon" type="image/x-icon" href="/THINTURE_IMAGE/favicon.jpg">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/addstyle.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/onestyle.css}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #f0f0f0;
+        }
+        #logsContainer {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            height: 70vh;
+            overflow-y: scroll;
+            font-family: monospace;
+            white-space: pre-wrap;
+            border: 1px solid #444;
+            font-size: 0.9rem;
+        }
+        .log-info { color: #00f; }
+        .log-warn { color: #ffa500; }
+        .log-error { color: #ff4c4c; }
+        .log-debug { color: #0f0; }
+        .log-other { color: #bbb; }
+
+        .form-control {
+            background-color: #2c2c2c;
+            border: 1px solid #666;
+            color: #f0f0f0;
+        }
+        .form-control::placeholder {
+            color: #aaa;
+        }
+        .btn i {
+            pointer-events: none;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: end;
+            margin-bottom: 1rem;
+        }
+        .controls .col-md-4,
+        .controls .col-md-2 {
+            display: flex;
+            flex-direction: column;
+        }
+        .controls .col-md-1 {
+            display: flex;
+            align-items: end;
+        }
+    </style>
+</head>
+<body>
+    <header th:replace="navigation :: navbar"></header>
+    <div class="container mt-4">
+        <h2 class="mb-4 text-center fw-semibold text-light">
+            Server Logs Viewer <span class="text-white" style="font-size: 0.6em;">(Color-Coded)</span>
+        </h2>
+
+        <!-- Controls -->
+        <div class="controls text-light">
+            <div class="col-md-4">
+                <label for="searchInput" class="form-label mb-1">Search Logs</label>
+                <input type="text" id="searchInput" class="form-control" placeholder="Enter keyword...">
+            </div>
+            <div class="col-md-1">
+                <button class="btn btn-outline-light w-100" id="searchBtn" title="Search">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <div class="col-md-2">
+                <label for="startDate" class="form-label mb-1">Start Date</label>
+                <input type="date" id="startDate" class="form-control">
+            </div>
+            <div class="col-md-2">
+                <label for="endDate" class="form-label mb-1">End Date</label>
+                <input type="date" id="endDate" class="form-control">
+            </div>
+            <div class="col-md-1">
+                <button class="btn btn-light w-100" id="downloadBtn" title="Download Logs">
+                    <i class="fas fa-download"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Refresh & Fullscreen Buttons -->
+        <div class="d-flex justify-content-end mb-3 gap-2">
+            <button class="btn btn-outline-info" id="refreshBtn" title="Refresh Logs">
+                <i class="fas fa-rotate-right"></i>
+            </button>
+            <button class="btn btn-outline-light" id="fullscreenBtn" title="Toggle Fullscreen">
+                <i class="fas fa-expand"></i>
+            </button>
+        </div>
+
+        <!-- Logs Display -->
+        <div id="logsContainer" class="rounded shadow-sm">Loading logs...</div>
+    </div>
+
+    <script>
+        let allLogs = '';
+
+        async function fetchLogs() {
+            document.getElementById('logsContainer').textContent = 'Loading logs...';
+            try {
+                const response = await fetch('/api/logs/all');
+                if (response.ok) {
+                    const text = await response.text();
+                    allLogs = text;
+                    renderLogs(text);
+                } else {
+                    document.getElementById('logsContainer').textContent = "Failed to load logs.";
+                }
+            } catch (error) {
+                document.getElementById('logsContainer').textContent = "Error loading logs.";
+            }
+        }
+
+        function renderLogs(logText) {
+            const container = document.getElementById('logsContainer');
+            container.innerHTML = '';
+            const lines = logText.split('\n');
+            lines.forEach(line => {
+                const span = document.createElement('div');
+                if (line.includes('ERROR')) {
+                    span.className = 'log-error';
+                } else if (line.includes('WARN')) {
+                    span.className = 'log-warn';
+                } else if (line.includes('INFO')) {
+                    span.className = 'log-info';
+                } else if (line.includes('DEBUG')) {
+                    span.className = 'log-debug';
+                } else {
+                    span.className = 'log-other';
+                }
+                span.textContent = line;
+                container.appendChild(span);
+            });
+            scrollToBottom();
+        }
+
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+            if (!keyword) {
+                renderLogs(allLogs);
+                return;
+            }
+            const filtered = allLogs.split('\n').filter(line => line.toLowerCase().includes(keyword));
+            renderLogs(filtered.join('\n'));
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            if (!startDate || !endDate) {
+                alert("⚠️ Please select both start and end dates.");
+                return;
+            }
+            const url = `/api/logs/download?startDate=${startDate}&endDate=${endDate}`;
+            window.open(url, '_blank');
+        });
+
+        document.getElementById('refreshBtn').addEventListener('click', fetchLogs);
+
+        document.getElementById('fullscreenBtn').addEventListener('click', () => {
+            const logsContainer = document.getElementById('logsContainer');
+            if (!document.fullscreenElement) {
+                logsContainer.requestFullscreen().catch(err => {
+                    alert(`Error attempting fullscreen: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        function scrollToBottom() {
+            const container = document.getElementById('logsContainer');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        fetchLogs();
+    </script>
+</body>
+</html>

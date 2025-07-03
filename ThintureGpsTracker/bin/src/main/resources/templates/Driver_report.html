@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fleet Tracking Report with Date Range and Driver Filter</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script> <!-- Include XLSX library -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+		<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+	
+
+	<style>
+	
+				
+				.card {
+					background-color: rgba(240, 248, 255, 0.8); /* 70% transparent aliceblue */
+					width: 70%;
+					position: absolute;
+					right: 10%;
+					top: 150px;
+					padding: 20px;
+					box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+					border-radius: 8px;
+
+				}
+
+	        
+	        .filter-container {
+	            margin: 20px;
+	        }
+	        .table-container {
+	            margin: 20px;
+	        }
+	        table {
+				
+	            width: 100%;
+				border-collapse: collapse;
+	          
+	        }
+	        table, th, td {
+	            border: 1.5px solid black;
+				background-color: white;
+	        }
+	        th{
+				color:white;
+				background-color: #0056b3;
+				            padding: 2px;
+				            text-align: center;
+				        
+			}
+			td {
+	            padding: 4px;
+	            text-align: center;
+	        }
+			
+	        .view-summary-btn {
+	            cursor: pointer;
+	            padding: 5px 10px;
+	            background-color: darkblue;
+	            color: white;
+	            border: none;
+	            border-radius: 4px;
+	        }
+	        .view-summary-btn:hover {
+	            background-color: #0056b3;
+	        }
+	        .tab-container {
+	            display: flex;
+	            border-bottom: 2px solid #ddd;
+	            margin-top: 20px;
+	        }
+	        .tab-button {
+	            padding: 10px 20px;
+	            cursor: pointer;
+	            background-color: darkblue;
+	            border: 1px solid #ccc;
+	            border-bottom: none;
+	            margin-right: 5px;
+	            border-radius: 4px 4px 0 0;
+	        }
+	        .tab-button.active {
+	            background-color: #fff;
+	            border-bottom: 2px solid darkblue;
+	        }
+	        .tab-content {
+	            display: none;
+	            padding: 20px;
+	            border: 1px solid #ddd;
+	            border-radius: 4px;
+	            background-color: #fff;
+	        }
+	        .tab-content.active {
+	            display: block;
+	        }
+	        .rag-red {
+	            background-color: #FF6347;
+	            color: white;
+	        }
+	        .rag-amber {
+	            background-color: #FFD700;
+	        }
+	        .rag-green {
+	            background-color: #32CD32;
+	            color: white;
+	        }
+	        /* Side Panel Styles */
+	        .side-panel {
+	            position: fixed;
+	            top: 0;
+	            right: 0;
+	            height: 100%;
+	            width: 300px;
+	            background-color: white;
+	            box-shadow: -4px 0 8px rgba(0, 0, 0, 0.2);
+	            transform: translateX(100%);
+	            transition: transform 0.3s ease;
+	            overflow-y: auto;
+	            z-index: 1000;
+	            padding: 20px;
+	            border-left: 1px solid #ddd;
+	        }
+	        .side-panel.open {
+	            transform: translateX(0);
+	        }
+	        .side-panel .close-btn {
+	            position: absolute;
+	            top: 10px;
+	            left: 10px;
+	            background-color:white;
+	            color:red;
+	            border: none;
+	            border-radius: 50%;
+	            width: 24px;
+	            height: 24px;
+	            display: flex;
+	            align-items: center;
+	            justify-content: center;
+	            cursor: pointer;
+				font-size: 18px;
+	        }
+	        .side-panel .close-btn:hover {
+	            background-color: darkgray;
+	        }
+			.side-panel filter{
+				
+				background-color: darkblue;
+				border: 1px solid #ccc;
+						           border-radius: 4px;
+								   color:white;
+								   height:35px;
+								   width:65px;
+			}
+			h2 {
+			    text-align: center;
+			    font-size: 2em; /* Adjust size as needed */
+				font-weight: 400;
+			    color:black; /* Text color */
+			    text-shadow: 
+				1px 1px 2px rgba(0, 0, 0, 0.4), /* First shadow for initial depth */
+				        3px 3px 5px rgba(0, 0, 0, 0.3), /* Slightly darker shadow for increased depth */
+				        6px 6px 8px rgba(0, 0, 0, 0.0); /* Darker shadow for stronger 3D effect */
+				}
+				.modal {
+						    display: none; /* Hidden by default */
+						    position: fixed;
+						    z-index: 1000;
+						    left: 0;
+						    top: 0;
+						    width: 100%;
+						    height: 100%;
+						    background-color: rgba(0, 0, 0, 0.5);
+						}
+
+						.modal-content {
+						    background-color: #fff;
+						    margin: 10% auto;
+						    padding: 20px;
+						    border-radius: 10px;
+						    width: 80%;
+						    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+						}
+
+						.close {
+						    color: red;
+						    float: right;
+						    font-size: 28px;
+						    cursor: pointer;
+						}
+
+						.modal-content table {
+						    width: 100%;
+						}
+
+						.modal-content button {
+						    height: 30px;
+						    width: 150px;
+						    background-color: #0056b3;
+						    color: white;
+						}
+
+						.modal-content th {
+						    background-color: #0056b3;
+						    color: white;
+						}
+
+	.alert {
+	    color: red; /* Ensure the text is red */
+	    font-weight: bold;
+	    margin-top: 10px;
+	    display: none; /* Initially hidden */
+	}
+	.filterv{
+		background-color: darkblue;
+		color:white;
+		font-size: 11px;
+		height: 27px;
+	}
+	.rag-red {
+	            background-color: #FF6347;
+	            color: white;
+	        }
+	        .rag-amber {
+	            background-color: #FFD700;
+	        }
+	        .rag-green {
+	            background-color: #32CD32;
+	            color: white;
+	        }
+
+	    </style>
+</head>
+<body>
+	<!-- Insert the navigation fragment -->
+		<div th:insert="navigation :: navbar"></div>
+		
+		
+	  <div class="card">
+	      <h2><strong>Driver Management Report</strong></h2>
+
+	      <!-- Filter Section -->
+	      <div class="filter-container">
+	          <label for="start-month">Start Month:</label>
+	          <select id="start-month">
+	              <option value="">Select Month</option>
+	              <option value="01">January</option>
+	              <option value="02">February</option>
+	              <option value="03">March</option>
+	              <option value="04">April</option>
+	              <option value="05">May</option>
+	              <option value="06">June</option>
+	              <option value="07">July</option>
+	              <option value="08">August</option>
+	              <option value="09">September</option>
+	              <option value="10">October</option>
+	              <option value="11">November</option>
+	              <option value="12">December</option>
+	          </select>
+
+	          <label for="filterYears">Select Year:</label>
+	          <select id="filterYears">
+	              <option value="">Select Year</option>
+	              <option>2020</option>
+	              <option>2021</option>
+	              <option>2022</option>
+	              <option>2023</option>
+	              <option>2024</option>
+	          </select>
+
+	          <label for="filterDriverOrVehicleNo">Driver/Vehicle ID:</label>
+	          <input type="text" id="filterDriverOrVehicleNo" placeholder="Enter Driver/Vehicle ID" />
+
+	          <button  class="filterv"onclick="filterData()">Filter</button>
+	          <button class="filterv"onclick="exportToExcel()">Download Excel</button>
+			  <script>
+				function exportToExcel() {
+				    // Get the table element
+				    const table = document.getElementById('vehicle-table');
+
+				    // Check if table exists
+				    if (!table) {
+				        alert("Table not found!");
+				        return;
+				    }
+
+				    // Create a new Workbook from the table
+				    const wb = XLSX.utils.table_to_book(table, { sheet: "Driver Report" });
+
+				    // Generate a file name based on the current date
+				    const fileName = `Driver_Report_${new Date().toISOString().slice(0, 10)}.xlsx`;
+
+				    // Export the file
+				    XLSX.writeFile(wb, fileName);
+				}
+
+			  					</script>
+			  
+			  
+			  
+			  
+	      </div>
+
+	      <!-- Table Section -->
+	      <div class="table-container">
+	          <table id="vehicle-table">
+	              <thead>
+	                  <tr>
+	                      <th>Device ID</th>
+	                      <th>Driver Name</th>
+	                      <th>IVMS Key</th>
+	                      <th>Performance Category</th>
+	                      <th>Status</th>
+	                      <th>Location</th>
+	                      <th>Date</th>
+	                      <th>Kilometres Driven</th>
+	                      <th>Total Time</th>
+	                      <th>Max Speed</th>
+	                      <th>Score</th>
+	                      <th>Summary</th>
+	                      <th>Violations</th>
+	                  </tr>
+	              </thead>
+	              <tbody id="vehicle-table-body">
+	                  <!-- Data will be dynamically populated here -->
+	              </tbody>
+	          </table>
+	      </div>
+		  <div class="side-panel" id="side-panel">
+		          <button class="close-btn" onclick="closeSidePanel()">&times;</button>
+		          <div id="side-panel-content"></div>
+		      </div>
+	      <!-- Violation Modal -->
+		  <!-- Modal -->
+		  <div id="violation-modal" class="modal">
+		  	    <div class="modal-content">
+		  	        <span class="close" onclick="closeModal()">&times;</span>
+		  	        <h2>Driver Violations for <span id="modal-driver-name"></span></h2>
+		  	        <table id="violation-table">
+		  	            <thead>
+		  	                <tr>
+		  	                    <th>Violation ID</th>
+		  	                    <th>Device ID</th>
+		  	                    <th>Date & Time</th>
+		  	                    <th>Harsh Acceleration</th>
+		  	                    <th>Harsh Deceleration</th>
+		  	                    <th>Seatbelt Violation Count</th>
+		  	                    <th>Panic Button Alerts</th>
+		  	                    <th>Over Speeding Violation</th>
+		  	                    <th>Total Over Speeding Time</th>
+		  	                </tr>
+		  	            </thead>
+		  	            <tbody id="violation-table-body">
+		  	                <!-- Violations will be dynamically populated here -->
+		  	            </tbody>
+		  	        </table>
+		  	    </div>
+		  	</div>
+
+
+	      <script>
+	          // Filter data function
+			  async function filterData() {
+			      const month = document.getElementById('start-month').value;
+			      const year = document.getElementById('filterYears').value;
+			      const vehicleId = document.getElementById('filterDriverOrVehicleNo').value;
+
+			      console.log(`Fetching data for Month: ${month}, Year: ${year}, Vehicle ID: ${vehicleId}`);
+
+			      try {
+			          const response = await fetch(`/api/reports?month=${month}&year=${year}&vehicleId=${vehicleId}`);
+			          
+			          if (!response.ok) {
+			              throw new Error('Error fetching report data');
+			          }
+
+			          const data = await response.json();
+			          const tbody = document.getElementById('vehicle-table-body');
+			          tbody.innerHTML = ''; // Clear previous data
+
+			          if (data.length === 0) {
+			              alert("No data found for the selected criteria.");
+			          } else {
+			              data.forEach(report => {
+			                  const score = report.score ?? 0;  // Get score from the report data, default to 0 if missing
+			                  const performance = classifyPerformance(score);  // Classify based on the score
+
+			                  const row = `
+			                      <tr>
+			                          <td>${report.deviceId ?? 'N/A'}</td>
+			                          <td>${report.driverName ?? 'N/A'}</td>
+			                          <td>${report.ivmsKey ?? 'N/A'}</td>
+			                          <td class="${performance.cssClass}">${performance.category}</td>  <!-- RAG Performance column -->
+			                          <td>${report.status ?? 'N/A'}</td>
+			                          <td>${report.location ?? 'N/A'}</td>
+			                          <td>${report.date ?? 'N/A'}</td>
+			                          <td>${report.kilometresDriven ?? 'N/A'}</td>
+			                          <td>${report.totalTime ?? 'N/A'}</td>
+			                          <td>${report.maxSpeed ?? 'N/A'}</td>
+			                          <td>30</td>  <!-- Display actual score here -->
+			                          <td><button onclick="showSummary('${report.deviceId}')">View</button></td>
+			                          <td><button onclick="showViolations('${report.deviceId}', '${report.driverName}')">View</button></td>
+			                      </tr>
+			                  `;
+			                  tbody.innerHTML += row;
+			              });
+			          }
+			      } catch (error) {
+			          console.error('Error fetching data:', error);
+			      }
+			  }
+
+			  // Define thresholds for RAG classification
+			  const scoreThresholds = {
+			      green: 80,  // Green: Score >= 80
+			      amber: 50,  // Amber: Score between 50 and 80
+			      red: 0      // Red: Score < 50
+			  };
+
+			  // Function to classify performance based on score
+			  function classifyPerformance(score) {
+			      if (score >= scoreThresholds.green) {
+			          return { category: 'Green', cssClass: 'rag-green' };
+			      } else if (score >= scoreThresholds.amber) {
+			          return { category: 'Amber', cssClass: 'rag-amber' };
+			      } else {
+			          return { category: 'Red', cssClass: 'rag-red' };
+			      }
+			  }
+
+
+			  function showSummary(deviceId) {
+			             // Populate the side panel with dummy content
+			             const sidePanelContent = `
+			                 <h2>Report Summary for Device ID: ${deviceId}</h2>
+			                 <p><strong>Performance:</strong> Sample performance data</p>
+			                 <p><strong>Kilometres Driven:</strong> Sample kilometres driven</p>
+			                 <p><strong>Max Speed:</strong> Sample max speed</p>
+			             `;
+			             document.getElementById('side-panel-content').innerHTML = sidePanelContent;
+
+			             // Open the side panel
+			             document.getElementById('side-panel').style.transform = 'translateX(0)';
+			         }
+
+			         // Close the side panel
+			         function closeSidePanel() {
+			             document.getElementById('side-panel').style.transform = 'translateX(100%)';
+			         }
+
+
+	          // Show violations for a particular vehicle
+			
+			      // Function to show violations for a particular vehicle
+				  // Function to show violations for a particular vehicle
+				  async function showViolations(deviceId, driverName) {
+				      console.log(`Fetching violations for Device ID: ${deviceId}, Driver: ${driverName}`);
+
+				      try {
+				          const response = await fetch(`/api/violations?deviceId=${deviceId}`);
+				          
+				          if (!response.ok) {
+				              throw new Error('Error fetching violation data');
+				          }
+
+				          const violations = await response.json();
+				          const tbody = document.getElementById('violation-table-body');
+				          tbody.innerHTML = ''; // Clear previous data
+
+				          document.getElementById('modal-driver-name').innerText = driverName ?? 'N/A';
+
+				          if (violations.length === 0) {
+				              tbody.innerHTML = '<tr><td colspan="9">No violations found</td></tr>';
+				          } else {
+				              violations.forEach(violation => {
+				                  const row = `
+				                      <tr>
+				                          <td>${violation.id ?? 'N/A'}</td>
+				                          <td>${violation.deviceId ?? 'N/A'}</td>
+				                          <td>${violation.dateTime ?? 'N/A'}</td>
+				                          <td>${violation.harshAcceleration ?? 'N/A'}</td>
+				                          <td>${violation.harshDeceleration ?? 'N/A'}</td>
+				                          <td>${violation.seatbeltViolationCount ?? 'N/A'}</td>
+				                          <td>${violation.panicButtonAlerts ?? 'N/A'}</td>
+				                          <td>${violation.overSpeedingViolation ?? 'N/A'}</td>
+				                          <td>${violation.totalOverSpeedingTime ?? 'N/A'}</td>
+				                      </tr>
+				                  `;
+				                  tbody.innerHTML += row;
+				              });
+				          }
+
+				          // Show the modal
+				          document.getElementById('violation-modal').style.display = 'block';
+				      } catch (error) {
+				          console.error('Error fetching violations:', error);
+				      }
+				  }
+
+				  // Function to close the modal
+				  function closeModal() {
+				      document.getElementById('violation-modal').style.display = 'none';
+				  }
+
+				  window.onload = function() {
+				          filterData();
+				      };
+
+					  
+					  
+					  function exportDriverViolationsToExcel(tableID, filename = '') {
+					  						        const table = document.getElementById(tableID);
+					  						        let csv = [];
+					  						        for (let i = 0; i < table.rows.length; i++) {
+					  						            let row = [];
+					  						            for (let j = 0; j < table.rows[i].cells.length; j++) {
+					  						                row.push(table.rows[i].cells[j].innerText);
+					  						            }
+					  						            csv.push(row.join(","));
+					  						        }
+					  						        const csvString = csv.join("\n");
+					  						        const blob = new Blob([csvString], { type: 'text/csv' });
+					  						        const url = URL.createObjectURL(blob);
+					  						        const a = document.createElement('a');
+					  						        a.href = url;
+					  						        a.download = filename + '.csv';
+					  						        document.body.appendChild(a);
+					  						        a.click();
+					  						        document.body.removeChild(a);
+					  						    }
+
+					  						    // Populate the initial table with all sample data
+					  						    populateVehicleTable();
+	      </script>
+	  </body>
+
+				</html>

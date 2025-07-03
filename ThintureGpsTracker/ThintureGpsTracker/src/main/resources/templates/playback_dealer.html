@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thinture GPS</title>
+    <link rel="icon" type="image/x-icon" href="/THINTURE_IMAGE/favicon.jpg">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+			<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+   
+			
+			 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	
+	
+	
+    <script src="https://cdn.jsdelivr.net/npm/moment/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment-timezone/moment-timezone.min.js"></script>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/styled.css}">
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	
+	
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+
+	<style>
+		body {
+										    font-family: Arial, sans-serif;
+										    margin: 0;
+										    padding: 0;
+										    position: relative;
+										}
+
+										body::before {
+										    content: "";
+										    position: fixed;
+										    top: 0;
+										    left: 0;
+										    width: 100%;
+										    height: 100%;
+										    background: url('THINTURE_IMAGE/mainbg.jpg') no-repeat center center/cover;
+										    filter: blur(25px);
+										    z-index: -1; /* Ensures the background remains behind the content */
+										}
+										@media only screen and (max-width: 768px) {
+												    body {
+												        background-attachment: fixed; /* Fixes background on small screens */
+												        min-height: 100vh; /* Ensures full height */
+												        font-size: 14px; /* Adjust font size for better readability */
+														background-size: cover;
+												    }
+												}
+		.panel {
+		    position: absolute;
+		    top: 100px;
+		    width: 100%;
+		    height: 900px; /* Adjust this height as needed */
+		   left:0;
+		    border: 1px solid #ccc; /* Optional: to visually separate the panel */
+		    padding: -1px; /* Optional: for spacing */
+		}
+	
+		
+
+		/* Sidebar Hidden by Default */
+		#replay-panel {
+		    position: fixed;
+		    top: 110px;
+		    right: -300px; /* Hidden by default */
+		    width: 300px;
+		    height: 100vh;
+		    background: rgba(255, 255, 255, 0.5);
+		    padding: 15px;
+		    border-right: 2px solid #ddd;
+		    box-shadow: 4px 0px 10px rgba(0, 0, 0, 0.2);
+		    font-size: 12px;
+		    z-index: 1000;
+		    overflow-y: auto;
+		    transition: left 0.3s ease-in-out;
+		}
+		/* Map Switcher Container */
+				#mapSwitcher {
+				    position: fixed;
+				    top: 210px; /* Adjust based on your navbar height */
+				    left: 20px;
+				    z-index: 1000;
+				    background: rgba(0, 0, 0, 0.8);
+				    padding: 10px;
+				    border-radius: 10px;
+				    display: flex;
+				    flex-direction: column;
+				    gap: 5px;
+				}
+
+				/* Map Switching Buttons */
+				.map-button {
+				    display: flex;
+				    align-items: center;
+				    gap: 8px;
+				    background:transparent;
+				    color: white;
+				    border: none;
+				    padding: 10px 15px;
+				    border-radius: 8px;
+				    cursor: pointer;
+				    font-size: 14px;
+				    transition: all 0.3s ease;
+				    width:50px;
+				    text-align: left;
+				    font-weight: bold;
+				   
+				}
+
+				.map-button i {
+				    font-size: 18px;
+				}
+
+				/* Hover and Active States */
+				.map-button:hover {
+				    background:gray;
+				}
+
+				.map-button.active {
+				    background: #16a085; /* Highlight active map */
+				}
+
+				/* Responsive for smaller screens */
+				@media (max-width: 768px) {
+				    #mapSwitcher {
+				        top: 190px;
+				        left: 10px;
+				    }
+
+				    .map-button {
+				        font-size: 10px;
+				        width: 80px;
+				        padding: 8px 10px;
+				    }
+				}
+		/* Show Sidebar */
+		.sidebar-open #replay-panel {
+		    right: 0;
+		}
+
+		/* Sidebar Toggle Button */
+		/* Sidebar Toggle Button - Default Position */
+		#toggle-sidebar-btn {
+		    position: fixed;
+		    top: 150px;
+		    right: 10px; /* Default position when sidebar is closed */
+		    background: #007bff;
+		    color: white;
+		    border: none;
+		    padding: 10px 15px;
+		    font-size: 16px;
+		    border-radius: 5px;
+		    cursor: pointer;
+		    z-index: 1001;
+		    transition: right 0.3s ease-in-out;
+		}
+
+		/* Change Position When Sidebar is Open */
+		.sidebar-open #toggle-sidebar-btn {
+		    right: 310px; /* Move to sidebar end */
+		}
+
+		#toggle-sidebar-btn:hover {
+		    background: #0056b3;
+		}
+
+
+		/* Adjust Map when Sidebar is Open */
+		.sidebar-open #map {
+		    width: calc(100% - 280px);
+		    transition: width 0.3s ease-in-out;
+		}
+	/*	#time-zone{
+			display: none;	
+		}
+		*/
+		#replay-panel input,
+		#replay-panel button {
+		    width: 100%;
+		    margin: 4px 0;
+		    font-size: 12px;
+		    padding: 6px;
+		}
+
+					/* Responsive Adjustments */
+					@media (max-width: 768px) {
+					    #replay-panel {
+					        width: 90%;
+					        left: -100%; /* Initially hidden for mobile */
+					        transition: left 0.3s ease-in-out;
+					    }
+
+					    #map {
+					        width: 100%; /* Full width when sidebar is hidden */
+					    }
+
+					    /* Toggle Sidebar */
+					    .sidebar-open #replay-panel {
+					        left: 0;
+					    }
+					}
+
+
+					.panel input:focus {
+					    box-shadow: 0 0 10px rgba(52, 152, 219, 0.7);
+					    background: rgba(255, 255, 255, 0.3);
+					}
+
+					/* Buttons */
+					.button {
+					    padding: 12px 25px;
+					    margin: 10px 5px;
+					    font-size: 14px;
+					    font-weight: bold;
+					    text-transform: uppercase;
+					    color: white;
+					    background: linear-gradient(135deg, #007bff, #0023b7);
+					    border: none;
+					    border-radius: 8px;
+					    cursor: pointer;
+					    transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+					    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+					}
+
+					.button:hover {
+					    background: linear-gradient(135deg, #0023b7, #007bff);
+					    transform: scale(1.05);
+					}
+					#back-button {
+					    background-color: #007bff; /* Blue background */
+					    color: white; /* White text */
+					    border: none;
+					    padding: 10px 20px;
+					    font-size: 16px;
+					    border-radius: 5px;
+					    cursor: pointer;
+						display: block;
+					    display: flex;
+					    align-items: center;
+					    gap: 8px; /* Space between icon and text */
+					    transition: background 0.3s ease;
+					}
+
+					#back-button i {
+					    font-size: 18px; /* Adjust icon size */
+					}
+
+					/* Hover Effect */
+					#back-button:hover {
+					    background-color: #0056b3;
+					}
+
+					/* Mobile-Friendly Styles */
+					@media (max-width: 768px) {
+					    #back-button {
+					        display: none;
+					    }
+					}
+					@media (max-width: 768px) {
+					    #map {
+					        height: 80vh; /* Reduce height for mobile screens */
+					    }
+					}
+					.custom-parked-icon {
+					    background: white;
+					    border-radius: 50%;
+					    text-align: center;
+					    width: 35px;
+					    height: 35px;
+					    display: flex;
+					    align-items: center;
+					    justify-content: center;
+					    border: 2px solid #007bff;
+					    box-shadow: 0px 0px 5px rgba(0, 0, 255, 0.7);
+					}
+
+					.custom-parked-icon i {
+					    color:orange;
+					    font-size: 18px;
+					}
+					
+
+
+	</style>
+</head>
+<body>
+		<header th:replace="~{navigation_dealer :: navbar_dealer}"></header>
+
+	
+	
+	
+	
+	<div class="panel">
+		
+		<button id="toggle-sidebar-btn" onclick="toggleSidebar()">
+		    ☰ 
+		</button>
+	      <!-- <button class="button" id="back-button"><i class="fas fa-arrow-left"></i> Back</button> --> 
+			<div id="replay-panel" >
+	        <h2>History</h2>
+	        <div>
+	            <label for="device-id">Device ID:</label>
+	            <input type="text" id="device-id" placeholder="Enter Device ID">
+	        </div>
+
+	        <div>
+	            <label for="from-date">From:</label>
+	            <input type="datetime-local" id="from-date">
+	            <label for="to-date">To:</label>
+	            <input type="datetime-local" id="to-date">
+	        </div>
+			<div>
+			    <label for="replay-progress">Progress:</label>
+			    <input type="range" id="replay-progress" min="0" max="100" value="0" style="width: 50%;">
+			</div>
+
+			<div>
+			    <button class="button" id="toggle-playback"><i class="fas fa-pause"></i> Pause</button>
+			</div>
+
+			<div>
+			    <input type="checkbox" id="show-idle-icons" checked>
+			    <label for="show-idle-icons">Show Idle Icons</label>
+			</div>
+
+	        <div>
+	            <label for="time-zone"></label>
+	            <select id="time-zone">
+	                <option value="auto">Auto (Local Time)</option>
+	               <!-- <option value="UTC">UTC</option>--->
+					<option value="GST+4">GMT+4</option>
+ <!-- Added UAE Time Zone -->
+	                <option value="Asia/Kolkata">IST (India)</option>
+	                <option value="America/New_York">EST (New York)</option>
+	                <option value="Europe/London">GMT (London)</option>
+	            </select>
+	        </div>
+		
+	        <button class="button" id="show-replay"><i class="fas fa-play"></i> Play</button>
+			<button class="button" id="refresh-page"><i class="fas fa-sync"></i> Refresh</button>
+
+
+	        <div>
+	            <p><b>Total Distance:</b> <span id="total-distance-display">0 km</span></p>
+	        </div>
+			</div>
+	        <div id="map-container">
+	            <div id="map" style="width: 100%; height: 900px;"></div>
+	        </div>
+			<div id="mapSwitcher">
+			    <button class="map-button active" data-map="osm" onclick="switchMap('osm')">
+			        <i class="fas fa-map"></i>
+			    </button>
+			    <button class="map-button" data-map="googleRoadMap" onclick="switchMap('googleRoadMap')">
+			        <i class="fas fa-road"></i>
+			    </button>
+			   
+			    <button id="fullScreenBtn" class="map-button" onclick="toggleFullScreen()">
+			        <i class="fas fa-expand"></i>
+			    </button>
+			</div>
+
+			<!--
+			
+			    <h2>Parked Report</h2>
+			    <table id="parked-report-table" border="1" style="width: 100%; text-align: center;">
+			        <thead>
+			            <tr>
+			                <th>Start Time</th>
+			                <th>End Time</th>
+			                <th>Total Parked Duration</th>
+			                <th>Location</th>
+			            </tr>
+			        </thead>
+			        <tbody>
+			            
+			        </tbody>
+			    </table>
+				-->
+	    </div>
+
+		<script>
+		    var map = L.map('map').setView([12.225284, 79.074699], 5);
+		    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		        attribution: '&copy; OpenStreetMap contributors'
+		    }).addTo(map);
+			// Define all map layers
+			const layers = {
+			    osm: L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+			        attribution: "&copy; OpenStreetMap contributors"
+			    }),
+			    googleRoadMap: L.tileLayer("https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
+			        attribution: "&copy; Google Road Map"
+			    }),
+			    googleSatellite: L.tileLayer("https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", {
+			        attribution: "&copy; Google Satellite"
+			    }),
+			    googleHybrid: L.tileLayer("https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}", {
+			        attribution: "&copy; Google Hybrid"
+			    })
+			};
+
+			// Set default layer to OSM
+			let currentLayer = layers.osm;
+			currentLayer.addTo(map);
+
+			// Function to switch map layers
+			function switchMap(type) {
+			    if (layers[type]) {
+			        map.eachLayer(layer => {
+			            if (layer !== currentLayer) {
+			                map.removeLayer(layer);
+			            }
+			        });
+
+			        currentLayer = layers[type];
+			        currentLayer.addTo(map);
+
+			        // Update active button styling
+			        document.querySelectorAll(".map-button").forEach(btn => btn.classList.remove("active"));
+			        document.querySelector(`.map-button[data-map="${type}"]`).classList.add("active");
+
+			        console.log(`Switched to: ${type}`);
+			    } else {
+			        console.error("Map type not found:", type);
+			    }
+			}
+
+		    var routePolyline;
+		    var carMarker;
+		    var replayIndex = 0;
+		    var replayData = [];
+
+		    function convertToUTC(dateString, timeZone) {
+		        if (!dateString) return null;
+		        return moment.tz(dateString, timeZone).utc().format("YYYY-MM-DDTHH:mm:ss");
+		    }
+
+			
+			function convertToLocalTime(utcDate, timeZone) {
+			    if (!utcDate) return "N/A";
+
+			    try {
+			        let momentTime = moment.utc(utcDate); // Convert to UTC first
+
+			        if (timeZone === "UTC") {
+			            return momentTime.utc().format("YYYY-MM-DD HH:mm:ss [UTC]");
+			        } else if (timeZone === "auto") {
+			            return momentTime.local().format("YYYY-MM-DD HH:mm:ss"); // Convert to user's local time
+			        } else {
+			            return momentTime.tz(timeZone).format("YYYY-MM-DD HH:mm:ss z"); // Convert to selected time zone
+			        }
+			    } catch (error) {
+			        console.error("❌ Error converting time:", error);
+			        return "Invalid Date";
+			    }
+			}
+
+
+			const addressCache = {}; // Cache to prevent duplicate API calls
+
+			async function fetchAddress(latitude, longitude) {
+			    const cacheKey = `${latitude},${longitude}`;
+
+			    if (addressCache[cacheKey]) {
+			        return addressCache[cacheKey];  // ✅ Return cached address immediately
+			    }
+
+			    try {
+			        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+			        
+			        if (!response.ok) {
+			            console.error("Nominatim API Error:", response.status, response.statusText);
+			            return "Address not found";
+			        }
+
+			        const data = await response.json();
+			        const address = data.display_name || "Unknown location";
+
+			        addressCache[cacheKey] = address;  // ✅ Store response in cache
+			        return address;
+			    } catch (error) {
+			        console.error("Error fetching address:", error);
+			        return "Address not found";
+			    }
+			}
+			window.addressCache = window.addressCache || {};  // ✅ Ensures no redeclaration
+ 
+
+			async function preloadAddresses(replayData) {
+			    console.log("⏳ Preloading addresses...");
+			    
+			    for (let point of replayData) {
+			        const cacheKey = `${point.latitude},${point.longitude}`;
+
+			        if (!window.addressCache[cacheKey]) {  // ✅ Use window.addressCache to prevent redeclaration
+			            try {
+			                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${point.latitude}&lon=${point.longitude}`);
+			                
+			                if (response.ok) {
+			                    const data = await response.json();
+			                    window.addressCache[cacheKey] = data.display_name || "Unknown location";
+			                } else {
+			                    console.warn(`⚠️ Address API Error: ${response.status}`);
+			                    window.addressCache[cacheKey] = "Address not found";
+			                }
+			            } catch (error) {
+			                console.error("Error fetching address:", error);
+			                window.addressCache[cacheKey] = "Address not found";
+			            }
+			        }
+
+			        // ✅ Assign fetched address to the point
+			        point.address = window.addressCache[cacheKey];
+			    }
+
+			    console.log("✅ Address preloading complete!");
+			}
+
+
+
+
+
+			async function fetchVehicleHistory(deviceID, fromDate, toDate, timeZone) {
+			    if (!deviceID || !fromDate || !toDate) {
+			        alert("Please provide a device ID and select both from and to dates.");
+			        console.warn("⚠️ Missing parameters:", { deviceID, fromDate, toDate });
+			        return;
+			    }
+
+			    const utcFromDate = convertToUTC(fromDate, timeZone);
+			    const utcToDate = convertToUTC(toDate, timeZone);
+
+			    console.log(`📡 Fetching history for Device ID: ${deviceID}, From: ${utcFromDate}, To: ${utcToDate}`);
+
+			    try {
+			        const response = await fetch(`/api/vehicle/history/${deviceID}?from=${encodeURIComponent(utcFromDate)}&to=${encodeURIComponent(utcToDate)}`);
+			        
+			        console.log("📥 API Response Status:", response.status);
+			        
+			        if (!response.ok) {
+			            console.error("❌ API Error:", response.statusText);
+			            return;
+			        }
+
+			        const data = await response.json();
+			        console.log("✅ Raw API Response Data:", data);
+
+			        if (data && Array.isArray(data)) {
+			            replayData = data;
+			            console.log(`✅ Successfully fetched ${replayData.length} records for Device ID: ${deviceID}`);
+
+			            // ✅ Log individual records for debugging
+			            replayData.forEach((record, index) => {
+			                console.log(`📝 Record ${index + 1}:`, {
+			                    timestamp: record.timestamp,
+			                    localTime: convertToLocalTime(record.timestamp, timeZone),
+			                    latitude: record.latitude,
+			                    longitude: record.longitude,
+			                    speed: record.speed,
+			                    vehicleStatus: record.vehicleStatus,
+			                    ignition: record.ignition,
+			                    
+			                });
+			            });
+
+			            // ✅ Preload addresses before starting replay
+			            await preloadAddresses(replayData);
+
+			            drawPolyline(replayData);
+			            startReplay(); // ✅ Start animation after address preloading
+			            updateTotalDistance();
+			            markParkedLocations();
+			        } else {
+			            alert("⚠️ Unexpected data format received from the backend.");
+			            console.warn("⚠️ Unexpected response format:", data);
+			        }
+			    } catch (error) {
+			        console.error("❌ Error fetching vehicle history:", error);
+			    }
+			}
+
+
+
+			const speedLimit = 120; // Set your speed limit here (in km/h)
+
+			function drawPolyline(routeData) {
+			    if (routePolyline) {
+			        map.removeLayer(routePolyline);
+			    }
+			    
+			    let normalPath = [];
+			    let overspeedPath = [];
+			    let lastPoint = null;
+			    let overspeedSegments = [];
+
+			    routeData.forEach((point, index) => {
+			        if (lastPoint) {
+			            if (point.speed > speedLimit) {
+			                overspeedPath.push([lastPoint.latitude, lastPoint.longitude]);
+			                overspeedPath.push([point.latitude, point.longitude]);
+			                overspeedSegments.push({ start: [lastPoint.latitude, lastPoint.longitude], end: [point.latitude, point.longitude], speed: point.speed });
+			            } else {
+			                normalPath.push([lastPoint.latitude, lastPoint.longitude]);
+			                normalPath.push([point.latitude, point.longitude]);
+			            }
+			        }
+			        lastPoint = point;
+			    });
+
+			    if (normalPath.length > 0) {
+			        routePolyline = L.polyline(normalPath, {
+			            color: 'blue',
+			            weight: 5,
+			            opacity: 0.7
+			        }).addTo(map);
+			    }
+
+			    if (overspeedPath.length > 0) {
+			        overspeedSegments.forEach(segment => {
+			            let polyline = L.polyline([segment.start, segment.end], {
+			                color: 'red',
+			                weight: 5,
+			                opacity: 0.7
+			            }).addTo(map);
+
+			            polyline.on('click', function () {
+			                L.popup()
+			                    .setLatLng(segment.end)
+			                    .setContent(`<b>Overspeeding</b><br>Speed: ${segment.speed} km/h`)
+			                    .openOn(map);
+			            });
+			        });
+			    }
+			}
+
+
+			async function startReplay() {
+			    if (!replayData.length) {
+			        alert("No history data available for this device.");
+			        return;
+			    }
+
+			    if (carMarker) map.removeLayer(carMarker); // Remove any existing marker
+
+			    // Get first data point
+			    let firstPoint = replayData[0];
+			    let { path, rotation } = getVehicleIcon(firstPoint.vehicleStatus, firstPoint.ignition, firstPoint.course);
+
+			    let carIcon = L.icon({
+			        iconUrl: path,
+			        iconSize: [30, 30],
+			        iconAnchor: [15, 15]
+			    });
+
+			    // ✅ Set marker at first position before animation starts
+			    carMarker = L.marker([firstPoint.latitude, firstPoint.longitude], {
+			        icon: carIcon
+			    }).addTo(map);
+
+			    // ✅ Move map to marker and zoom in
+			    map.setView([firstPoint.latitude, firstPoint.longitude], 15); // Adjust zoom level as needed
+
+			    // Reset replay index before starting animation
+			    replayIndex = 0;
+
+			    // ✅ Start moving immediately
+			    setTimeout(moveMarker, 100);
+			}
+
+			// ✅ Function to Update Popup Time Zone on Selection Change
+			function updatePopupWithSelectedTimeZone() {
+			    if (!carMarker) return; // No marker, no need to update
+
+			    let timeZone = document.getElementById("time-zone").value;
+			    let point = replayData[replayIndex]; // Get the current replay point
+
+			    if (!point) return; // No data, exit function
+
+			    let localTime = convertToLocalTime(point.timestamp, timeZone);
+			  
+
+			    let popupContent = `
+			        <b>🚗 Vehicle Status:</b> ${point.vehicleStatus}<br>
+			        <b>💨 Speed:</b> ${point.speed} km/h<br>
+			        <b>📅 Timestamp:</b> ${localTime}<br>
+			        <b>📍 Latitude:</b> ${point.latitude}<br>
+			        <b>📍 Longitude:</b> ${point.longitude}<br>
+			      
+			    `;
+
+			    carMarker.bindPopup(popupContent).openPopup(); // ✅ Update and re-open the popup
+			}
+
+			// ✅ Ensure Popup Updates During Replay Movement
+			async function moveMarker() { 
+			    if (replayIndex >= replayData.length || isPaused) return;
+
+			    let point = replayData[replayIndex];
+			    let timeZone = document.getElementById("time-zone").value;
+			    let localTime = convertToLocalTime(point.timestamp, timeZone);
+
+			    let { path, rotation } = getVehicleIcon(point.vehicleStatus, point.ignition, point.course);
+
+			    let carIcon = L.divIcon({
+			        className: 'custom-icon',
+			        html: `<div style="transform: rotate(${rotation}deg);">
+			                    <img src="${path}" class="car-icon" style="width: 38px; height: 38px;">
+			               </div>`,
+			        iconSize: [30, 30],
+			        iconAnchor: [15, 15]
+			    });
+
+			    if (!carMarker) {
+			        carMarker = L.marker([point.latitude, point.longitude], { icon: carIcon }).addTo(map);
+			    } else {
+			        smoothMoveMarker(carMarker, [point.latitude, point.longitude]);
+			        carMarker.setIcon(carIcon);
+			    }
+
+			    let popupContent = `
+			        <b>🚗 Vehicle Status:</b> ${point.vehicleStatus}<br>
+			        <b>💨 Speed:</b> ${point.speed} km/h<br>
+			        <b>📅 Timestamp:</b> ${localTime}<br>
+			        <b>📍 Latitude:</b> ${point.latitude}<br>
+			        <b>📍 Longitude:</b> ${point.longitude}<br>
+			    `;
+
+			    carMarker.bindPopup(popupContent);
+
+			    let progressPercentage = (replayIndex / (replayData.length - 1)) * 100;
+			    document.getElementById("replay-progress").value = progressPercentage;
+
+			    replayIndex++;
+
+			    if (!isPaused) {
+			        setTimeout(moveMarker, 700);
+			    }
+			}
+
+
+
+
+
+
+
+
+			function smoothMoveMarker(marker, newLatLng) {
+			    let startLatLng = marker.getLatLng();
+			    let endLatLng = L.latLng(newLatLng);
+			    
+			    let duration = 700; // Slower movement for smoother visibility
+
+			    let startTime = null;
+
+			    function animateMarker(timestamp) {
+			        if (!startTime) startTime = timestamp;
+			        let elapsed = timestamp - startTime;
+
+			        let progress = Math.min(elapsed / duration, 1);
+			        let interpolatedLat = startLatLng.lat + (endLatLng.lat - startLatLng.lat) * progress;
+			        let interpolatedLng = startLatLng.lng + (endLatLng.lng - startLatLng.lng) * progress;
+
+			        marker.setLatLng([interpolatedLat, interpolatedLng]);
+
+			        if (progress < 1) {
+			            requestAnimationFrame(animateMarker);
+			        }
+			    }
+
+			    requestAnimationFrame(animateMarker);
+			}
+
+		    function getVehicleIcon(vehicleStatus, ignition, course) {
+		        const basePath = '/THINTURE_IMAGE/car';
+		        let color = 'red';
+
+		        if (vehicleStatus === 'RUNNING' || ignition === 'IGON') color = 'green';
+		        else if (vehicleStatus === 'IDLE') color = 'orange';
+		        else if (vehicleStatus === 'PARKED' && ignition === 'IGOFF') color = 'red';
+
+		        let rotationAngle = ((parseFloat(course) % 360) + 360) % 360;
+
+		        return {
+		            path: `${basePath}/${color}/car0.png`,
+		            rotation: rotationAngle
+		        };
+		    }
+
+		    // ✅ Haversine Formula to calculate distance between two points
+		    function calculateDistance(lat1, lon1, lat2, lon2) {
+		        const R = 6371;
+		        const dLat = (lat2 - lat1) * (Math.PI / 180);
+		        const dLon = (lon2 - lon1) * (Math.PI / 180);
+
+		        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+		                  Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+		                  Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+		        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+		        return R * c;
+		    }
+
+		    // ✅ Calculate total distance and update UI
+		    function updateTotalDistance() {
+		        let totalDistance = 0;
+		        for (let i = 0; i < replayData.length - 1; i++) {
+		            totalDistance += calculateDistance(replayData[i].latitude, replayData[i].longitude, 
+		                                               replayData[i + 1].latitude, replayData[i + 1].longitude);
+		        }
+
+		        document.getElementById("total-distance-display").textContent = `${totalDistance.toFixed(2)} km`;
+		    }
+
+		    document.getElementById("show-replay").addEventListener("click", function () {
+		        const deviceID = document.getElementById("device-id").value.trim();
+		        const fromDate = document.getElementById("from-date").value;
+		        const toDate = document.getElementById("to-date").value;
+		        const timeZone = document.getElementById("time-zone").value;
+
+		        fetchVehicleHistory(deviceID, fromDate, toDate, timeZone);
+		    });
+		</script>
+		<script>
+		    async function generateParkedReport() {
+		        const tableBody = document.querySelector("#parked-report-table tbody");
+		        tableBody.innerHTML = ""; // Clear previous data
+
+		        if (!replayData || replayData.length === 0) {
+		            tableBody.innerHTML = "<tr><td colspan='4'>No data available</td></tr>";
+		            return;
+		        }
+
+		        let parkedRecords = [];
+		        let parkedStartTime = null;
+		        let parkedEndTime = null;
+		        let lastLocation = null;
+
+		        for (let i = 0; i < replayData.length; i++) {
+		            let point = replayData[i];
+
+		            // Check if vehicle is parked (status "PARKED" or ignition "IGOFF")
+		            if (point.vehicleStatus === "PARKED" || point.ignition === "IGOFF") {
+		                if (!parkedStartTime) {
+		                    parkedStartTime = point.timestamp; // Start parking time
+		                    lastLocation = await fetchAddress(point.latitude, point.longitude);
+		                }
+		                parkedEndTime = point.timestamp; // Continuously update end time
+		            } else {
+		                if (parkedStartTime && parkedEndTime) {
+		                    let totalDuration = calculateDuration(parkedStartTime, parkedEndTime);
+		                    parkedRecords.push({ 
+		                        startTime: parkedStartTime, 
+		                        endTime: parkedEndTime, 
+		                        duration: totalDuration, 
+		                        location: lastLocation 
+		                    });
+		                    parkedStartTime = null; // Reset after adding a record
+		                }
+		            }
+		        }
+
+		        // ✅ If the last point is parked, add it
+		        if (parkedStartTime && parkedEndTime) {
+		            let totalDuration = calculateDuration(parkedStartTime, parkedEndTime);
+		            parkedRecords.push({ 
+		                startTime: parkedStartTime, 
+		                endTime: parkedEndTime, 
+		                duration: totalDuration, 
+		                location: lastLocation 
+		            });
+		        }
+
+		        // Add parked data to the table
+		        parkedRecords.forEach(record => {
+		            let row = document.createElement("tr");
+		            row.innerHTML = `
+		                <td>${convertToLocalTime(record.startTime, "auto")}</td>
+		                <td>${convertToLocalTime(record.endTime, "auto")}</td>
+		                <td>${record.duration}</td>
+		                <td>${record.location}</td>
+		            `;
+		            tableBody.appendChild(row);
+		        });
+
+		        console.log("✅ Parked report generated successfully!");
+		    }
+
+		    // Function to calculate total duration between two timestamps
+		    function calculateDuration(startTime, endTime) {
+		        let start = moment(startTime);
+		        let end = moment(endTime);
+		        let duration = moment.duration(end.diff(start));
+
+		        let hours = duration.hours();
+		        let minutes = duration.minutes();
+		        let seconds = duration.seconds();
+
+		        return `${hours}h ${minutes}m ${seconds}s`;
+		    }
+
+		    // Call this function after fetching replay data
+		    function fetchVehicleHistory(deviceID, fromDate, toDate, timeZone) {
+		        if (!deviceID || !fromDate || !toDate) {
+		            alert("Please provide a device ID and select both from and to dates.");
+		            return;
+		        }
+
+		        const utcFromDate = convertToUTC(fromDate, timeZone);
+		        const utcToDate = convertToUTC(toDate, timeZone);
+
+		        console.log(`Fetching history for Device ID: ${deviceID}, From: ${utcFromDate}, To: ${utcToDate}`);
+
+		        fetch(`/api/vehicle/history/${deviceID}?from=${encodeURIComponent(utcFromDate)}&to=${encodeURIComponent(utcToDate)}`)
+		            .then(response => response.json())
+		            .then(data => {
+		                if (data && Array.isArray(data)) {
+		                    replayData = data;
+		                    drawPolyline(replayData);
+		                    startReplay();
+		                    updateTotalDistance();
+		                    generateParkedReport(); // ✅ Generate parked report after fetching history
+		                } else {
+		                    alert("Unexpected data format received from the backend.");
+		                }
+		            })
+		            .catch(error => console.error("Error fetching vehicle history:", error));
+		    }
+			
+			
+			
+			
+			
+			
+			document.addEventListener("DOMContentLoaded", () => {
+					    const urlParams = new URLSearchParams(window.location.search);
+					    const deviceId = urlParams.get("deviceId");
+
+					    if (deviceId) {
+					        const searchBar = document.getElementById("device-id");
+					        if (searchBar) searchBar.value = deviceId;
+					    }
+					});
+					document.getElementById("refresh-page").addEventListener("click", function () {
+					    location.reload(); // 🔄 Reloads the entire browser page
+					});
+
+					document.getElementById("back-button").addEventListener("click", function() {
+					    window.history.back();
+					});
+
+		</script>
+		<script>
+			let parkedMarkers = [];
+			let parkedPolylines = [];
+
+			async function markParkedLocations() {
+			    const showIdle = document.getElementById("show-idle-icons").checked; // ✅ Check if checkbox is checked
+
+			    parkedMarkers.forEach(marker => map.removeLayer(marker)); // Clear previous markers
+			    parkedPolylines.forEach(poly => map.removeLayer(poly)); // Clear previous polylines
+
+			    parkedMarkers = [];
+			    parkedPolylines = [];
+
+			    if (!showIdle) return; // ✅ If checkbox is unchecked, don't draw markers
+
+			    let parkedSegments = [];
+			    let parkedStart = null;
+			    let parkedEnd = null;
+			    let parkedCoords = [];
+
+			    for (let i = 0; i < replayData.length; i++) {
+			        let point = replayData[i];
+
+			        // ✅ Check for IDLE status
+			        if (point.vehicleStatus === "IDLE") {
+			            if (!parkedStart) {
+			                parkedStart = point.timestamp;
+			                parkedCoords = [];
+			            }
+			            parkedCoords.push([point.latitude, point.longitude]);
+			        }
+
+			        if (parkedStart && (point.vehicleStatus === "PARKED" || point.vehicleStatus === "RUNNING" || i === replayData.length - 1)) {
+			            parkedEnd = point.timestamp;
+
+			            if (parkedCoords.length > 1) {
+			                parkedSegments.push({ start: parkedStart, end: parkedEnd, coords: [...parkedCoords] });
+			            }
+
+			            parkedStart = null;
+			        }
+			    }
+
+			    for (let segment of parkedSegments) {
+			        let startTime = convertToLocalTime(segment.start, "auto");
+			        let endTime = convertToLocalTime(segment.end, "auto");
+			        let totalTime = calculateDuration(segment.start, segment.end);
+
+			        // ✅ Draw blue polyline for idle segment
+			        let polyline = L.polyline(segment.coords, { color: 'blue', weight: 4, opacity: 0.8 }).addTo(map);
+			        parkedPolylines.push(polyline);
+
+			        let midIndex = Math.floor(segment.coords.length / 2);
+			        let midPoint = segment.coords[midIndex];
+
+			        // ✅ Fetch address (commented out if you don't need address)
+			        // let address = await fetchAddress(midPoint[0], midPoint[1]);
+
+			        // ✅ Create an attractive parked icon using FontAwesome
+			        let parkedIcon = L.divIcon({
+			            className: 'custom-parked-icon',
+			            html: `<div class="fa-icon">
+			                        <i class="fas fa-info-circle"></i>
+			                   </div>`,
+			            iconSize: [30, 30],
+			            iconAnchor: [15, 15]
+			        });
+
+			        // ✅ Marker with popup showing start time, end time, and total duration
+			        let marker = L.marker(midPoint, { icon: parkedIcon }).addTo(map);
+			        marker.bindPopup(`
+			            <b>🚗 IDLE Start:</b> ${startTime}<br>
+			            <b>🕒 IDLE End:</b> ${endTime}<br>
+			            <b>📍 Latitude:</b> ${midPoint[0]}<br>
+			            <b>📍 Longitude:</b> ${midPoint[1]}<br>
+			            <b>⏳ Total Duration:</b> ${totalTime}<br>
+			        `);
+
+			        marker.on('click', () => marker.openPopup()); // ✅ Ensure popups open when clicked
+			        parkedMarkers.push(marker);
+			    }
+
+			    console.log("🚙 Parked locations marked successfully!");
+			}
+
+			// ✅ Add event listener for checkbox
+			document.getElementById("show-idle-icons").addEventListener("change", function () {
+			    markParkedLocations(); // ✅ Re-run function when checkbox is toggled
+			});
+
+
+			// ✅ Fetch vehicle history and process data
+			function fetchVehicleHistory(deviceID, fromDate, toDate, timeZone) {
+			    if (!deviceID || !fromDate || !toDate) {
+			        alert("Please provide a device ID and select both from and to dates.");
+			        return;
+			    }
+
+			    const utcFromDate = convertToUTC(fromDate, timeZone);
+			    const utcToDate = convertToUTC(toDate, timeZone);
+
+			    console.log(`Fetching history for Device ID: ${deviceID}, From: ${utcFromDate}, To: ${utcToDate}`);
+
+			    fetch(`/api/vehicle/history/${deviceID}?from=${encodeURIComponent(utcFromDate)}&to=${encodeURIComponent(utcToDate)}`)
+			        .then(response => response.json())
+			        .then(data => {
+			            if (data && Array.isArray(data)) {
+			                replayData = data;
+			                drawPolyline(replayData);
+			                startReplay();
+			                updateTotalDistance();
+			                markParkedLocations(); // ✅ Mark parked locations with icons and blue lines
+			            } else {
+			                alert("Unexpected data format received from the backend.");
+			            }
+			        })
+			        .catch(error => console.error("Error fetching vehicle history:", error));
+			}
+
+			// ✅ Function to calculate total duration
+			function calculateDuration(startTime, endTime) {
+			    let start = moment(startTime);
+			    let end = moment(endTime);
+			    let duration = moment.duration(end.diff(start));
+
+			    let hours = duration.hours();
+			    let minutes = duration.minutes();
+			    let seconds = duration.seconds();
+
+			    return `${hours}h ${minutes}m ${seconds}s`;
+			}
+			
+			
+			// ✅ Update progress bar dynamically based on replay progress
+			document.getElementById("replay-progress").addEventListener("input", function () {
+			    let progressValue = parseFloat(this.value);
+			    replayIndex = Math.floor((progressValue / 100) * (replayData.length - 1));
+			    updateVehiclePosition(); // ✅ Immediately move vehicle marker to selected point
+			});
+
+			// ✅ Move the marker dynamically during replay
+			async function moveMarker() { 
+			    if (replayIndex >= replayData.length || isPaused) return;
+
+			    let point = replayData[replayIndex];
+			    let timeZone = document.getElementById("time-zone").value;
+			    let localTime = convertToLocalTime(point.timestamp, timeZone);
+
+			    let { path, rotation } = getVehicleIcon(point.vehicleStatus, point.ignition, point.course);
+
+			    let carIcon = L.divIcon({
+			        className: 'custom-icon',
+			        html: `<div style="transform: rotate(${rotation}deg);">
+			                    <img src="${path}" class="car-icon" style="width: 38px; height: 38px;">
+			               </div>`,
+			        iconSize: [30, 30],
+			        iconAnchor: [15, 15]
+			    });
+
+			    if (!carMarker) {
+			        carMarker = L.marker([point.latitude, point.longitude], { icon: carIcon }).addTo(map);
+			    } else {
+			        smoothMoveMarker(carMarker, [point.latitude, point.longitude]);
+			        carMarker.setIcon(carIcon);
+			    }
+
+			    // ✅ Ensure address is fetched properly
+			   
+
+			    let popupContent = `
+			        <b>🚗 Vehicle Status:</b> ${point.vehicleStatus}<br>
+			        <b>💨 Speed:</b> ${point.speed} km/h<br>
+			        <b>📅 Timestamp:</b> ${localTime}<br>
+			        <b>📍 Latitude:</b> ${point.latitude}<br>
+			        <b>📍 Longitude:</b> ${point.longitude}<br>
+			       
+			    `;
+
+			    carMarker.bindPopup(popupContent);
+
+			    // ✅ Ensure progress bar updates correctly
+			    let progressPercentage = (replayIndex / (replayData.length - 1)) * 100;
+			    document.getElementById("replay-progress").value = progressPercentage;
+
+			    replayIndex++;
+
+			    if (!isPaused) {
+			        setTimeout(moveMarker, 700); // ✅ Ensure this only runs when replay is not paused
+			    }
+			}
+
+			// ✅ Function to update the marker when user jumps in the progress bar
+			function updateVehiclePosition() {
+			    if (replayData.length === 0 || replayIndex >= replayData.length) return;
+
+			    let point = replayData[replayIndex];
+
+			    let { path, rotation } = getVehicleIcon(point.vehicleStatus, point.ignition, point.course);
+
+			    let carIcon = L.divIcon({
+			        className: 'custom-icon',
+			        html: `<div style="transform: rotate(${rotation}deg);">
+			                    <img src="${path}" class="car-icon" style="width: 38px; height: 38px;">
+			               </div>`,
+			        iconSize: [30, 30],
+			        iconAnchor: [15, 15]
+			    });
+
+			    if (!carMarker) {
+			        carMarker = L.marker([point.latitude, point.longitude], { icon: carIcon }).addTo(map);
+			    } else {
+			        smoothMoveMarker(carMarker, [point.latitude, point.longitude]);
+			        carMarker.setIcon(carIcon);
+			    }
+
+			    let timeZone = document.getElementById("time-zone").value;
+			    let localTime = convertToLocalTime(point.timestamp, timeZone);
+
+			    carMarker.bindPopup(`
+			        <b>🚗 Vehicle Status:</b> ${point.vehicleStatus}<br>
+			        <b>💨 Speed:</b> ${point.speed} km/h<br>
+			        <b>📅 Timestamp:</b> ${localTime}<br>
+			        <b>📍 Latitude:</b> ${point.latitude}<br>
+			        <b>📍 Longitude:</b> ${point.longitude}<br>
+			    `).openPopup();
+			}
+
+
+			// ✅ Reset progress bar when new data is loaded
+			function fetchVehicleHistory(deviceID, fromDate, toDate, timeZone) {
+			    if (!deviceID || !fromDate || !toDate) {
+			        alert("Please provide a device ID and select both from and to dates.");
+			        return;
+			    }
+
+			    const utcFromDate = convertToUTC(fromDate, timeZone);
+			    const utcToDate = convertToUTC(toDate, timeZone);
+
+			    console.log(`Fetching history for Device ID: ${deviceID}, From: ${utcFromDate}, To: ${utcToDate}`);
+
+			    fetch(`/api/vehicle/history/${deviceID}?from=${encodeURIComponent(utcFromDate)}&to=${encodeURIComponent(utcToDate)}`)
+			        .then(response => response.json())
+			        .then(data => {
+			            if (data && Array.isArray(data)) {
+			                replayData = data;
+			                replayIndex = 0; // ✅ Reset index
+			                document.getElementById("replay-progress").value = 0; // ✅ Reset progress bar
+
+			                drawPolyline(replayData);
+			                startReplay();
+			                updateTotalDistance();
+			                markParkedLocations();
+			            } else {
+			                alert("Unexpected data format received from the backend.");
+			            }
+			        })
+			        .catch(error => console.error("Error fetching vehicle history:", error));
+			}
+
+			// ✅ Global playback state
+			let isPaused = false; 
+
+			document.getElementById("toggle-playback").addEventListener("click", function () {
+			    isPaused = !isPaused; // ✅ Toggle playback state
+
+			    if (isPaused) {
+			        this.innerHTML = '<i class="fas fa-play"></i> Resume'; // ✅ Change to "Resume"
+			    } else {
+			        this.innerHTML = '<i class="fas fa-pause"></i> Pause'; // ✅ Change to "Pause"
+			        moveMarker(); // ✅ Restart movement
+			    }
+			});
+
+			
+			
+			function toggleSidebar() {
+			    document.body.classList.toggle("sidebar-open");
+
+			    // Change button text dynamically
+			    let button = document.getElementById("toggle-sidebar-btn");
+			    if (document.body.classList.contains("sidebar-open")) {
+			        button.innerHTML = "✖"; // Close button
+			    } else {
+			        button.innerHTML = "☰"; // Menu button
+			    }
+			}
+
+
+			function centerToUserLocation() {
+				    if (navigator.geolocation) {
+				        navigator.geolocation.getCurrentPosition(position => {
+				            window.vehicleTracker.map.setView([position.coords.latitude, position.coords.longitude], 15);
+				        }, error => {
+				            alert("Unable to retrieve location. Please enable GPS.");
+				        });
+				    } else {
+				        alert("Geolocation is not supported by this browser.");
+				    }
+				}
+
+				function toggleDarkMode() {
+				    document.body.classList.toggle("dark-mode");
+
+				    let isDark = document.body.classList.contains("dark-mode");
+				    localStorage.setItem("darkMode", isDark ? "enabled" : "disabled");
+
+				    // Update map layers
+				    let darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png');
+				    let lightLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+
+				    if (isDark) {
+				        window.vehicleTracker.map.removeLayer(lightLayer);
+				        darkLayer.addTo(window.vehicleTracker.map);
+				    } else {
+				        window.vehicleTracker.map.removeLayer(darkLayer);
+				        lightLayer.addTo(window.vehicleTracker.map);
+				    }
+				}
+				function toggleFullScreen() {
+				    let mapContainer = document.getElementById('map');
+				    if (!document.fullscreenElement) {
+				        mapContainer.requestFullscreen().catch(err => {
+				            console.error(`Error attempting full-screen mode: ${err.message}`);
+				        });
+				    } else {
+				        document.exitFullscreen();
+				    }
+				}
+				function switchMap(type) {
+				    if (layers[type]) {
+				        map.eachLayer(layer => {
+				            if (layer !== currentLayer) {
+				                map.removeLayer(layer);
+				            }
+				        });
+
+				        currentLayer = layers[type];
+				        currentLayer.addTo(map);
+
+				        // Keep existing polyline and vehicle marker visible after switching maps
+				        if (routePolyline) {
+				            routePolyline.addTo(map);
+				        }
+				        if (carMarker) {
+				            carMarker.addTo(map);
+				        }
+
+				        // Ensure playback continues after switching maps
+				        if (replayData.length > 0) {
+				            drawPolyline(replayData);
+				        }
+
+				        // Update active button styling
+				        document.querySelectorAll(".map-button").forEach(btn => btn.classList.remove("active"));
+				        document.querySelector(`.map-button[data-map="${type}"]`).classList.add("active");
+
+				        console.log(`Switched to: ${type}, Keeping previous playback data visible.`);
+				    } else {
+				        console.error("Map type not found:", type);
+				    }
+				}
+
+				function adjustMapHeight() {
+				    let windowHeight = window.innerHeight;
+				    let navbarHeight = document.querySelector("header")?.offsetHeight || 0;
+				    let newMapHeight = windowHeight - navbarHeight - 20; // Adjust padding if needed
+
+				    document.getElementById("map").style.height = newMapHeight + "px";
+				}
+
+				// Run on load & resize
+				window.addEventListener("load", adjustMapHeight);
+				window.addEventListener("resize", adjustMapHeight);
+
+		</script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
