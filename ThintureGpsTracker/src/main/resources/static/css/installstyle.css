@@ -1,0 +1,456 @@
+body::before {
+				    content: "";
+				    position: fixed;
+				    top: 0;
+				    left: 0;
+				    width: 100%;
+				    height: 100%;
+
+				    background: linear-gradient(
+				        rgba(10, 25, 47, 0.95),
+				        rgba(15, 32, 65, 0.95)
+				      ),
+				      url('/THINTURE_IMAGE/add_new.jpg') no-repeat center center/cover;
+
+				    filter: blur(2px);
+				    z-index: -1;
+				}
+				@media only screen and (max-width: 768px) {
+				    body {
+				        background-attachment: fixed;
+				        min-height: 100vh;
+				        font-size: 14px;
+				        background-color: #0a192f; /* fallback for small screens if image fails */
+				        background-size: cover;
+				        color: #f0f0f0;
+				    }
+				}
+				.form-container {
+				            max-width: 600px;
+							position: absolute;
+							top:150px;
+							left:30%;
+				            width: 100%;
+				            padding: 20px;
+				            border: 1px solid #ccc;
+				            border-radius: 8px;
+				            background-color: #fff;
+				            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+							background-color: rgba(0, 0, 0, 0.7);
+							
+
+				        }
+						/* Mobile responsiveness adjustments */
+						@media (max-width: 768px) {
+						    .form-container {
+						        margin: 60px auto 30px auto;
+						        padding: 15px;
+						    }
+							.form-container input[type="text"],
+							    .form-container input[type="date"],
+							    .form-container input[type="tel"],
+							    .form-container input[type="email"],
+							    .form-container select,
+							    .form-container textarea {
+							        width: 90%;            /* Mobile-friendly width */
+							        max-width: none;       /* Remove any max-width restriction */
+							        box-sizing: border-box;
+							        margin: 0 auto;        /* Center align */
+							        display: block; 
+									  text-transform: uppercase;       /* Ensures centering works properly */
+							    }
+						    .form-row {
+						        flex-direction: column;
+						    }
+
+						    .form-group {
+						        width: 100px;
+						        min-width: unset;
+						    }
+
+						    button {
+						        padding: 12px;
+						    }
+						}
+
+						/* Extra small devices (below 480px) */
+						@media (max-width: 480px) {
+						    .form-container {
+						        padding: 10px;
+						        margin: 40px auto 20px auto;
+						    }
+							.form-group {
+												        width: 100px;
+												        min-width: unset;
+												    }
+						    legend {
+						        font-size: 1.2em;
+						    }
+
+						    button {
+						        font-size: 0.9em;
+						        padding: 10px;
+						    }
+						}
+			        fieldset {
+			            border: none;
+			            padding: 0;
+			        }
+
+			        legend {
+			            font-size: 1.5em;
+			            margin-bottom: 10px;
+			            color: white;
+			        }
+
+			        label {
+			            display: block;
+			            margin-bottom: 8px;
+			            color: white;
+			        }
+
+			        input[type="text"], input[type="date"], input[type="tel"], select, textarea {
+			            width: 55%;
+			            padding: 8px;
+			            margin-bottom: 12px;
+			            border: 1px solid #ccc;
+			            border-radius: 4px;
+			            box-sizing: border-box;
+						text-transform: uppercase;  
+			        }
+					.form-group input[type="email"] {
+						width: 145px;
+						           padding: 8px;
+						           margin-bottom: 12px;
+						           border: 1px solid #ccc;
+						           border-radius: 4px;
+						           box-sizing: border-box;
+					}
+			        button {
+			            display: block;
+			            width: 100%;
+			            padding: 10px;
+			            border: none;
+			            border-radius: 4px;
+						box-shadow: 0 6px 15px rgba(255, 255, 255, 0.4);
+							 background: linear-gradient(
+							     135deg,
+							    
+							     rgba(15, 32, 65, 1.6),
+							     rgba(15, 32, 65, 1.6),
+							     rgba(15, 32, 65, 1.6)
+							 );
+			            color: white;
+			            font-size: 1em;
+			            cursor: pointer;
+			            box-sizing: border-box;
+			        }
+
+			        button:hover {
+			            background-color: #0056b3;
+			        }
+
+					.hidden {
+					    display: none;
+					}
+
+
+			        .error {
+			            color: red;
+			            font-size: 0.875em;
+			            margin-top: -10px;
+			            margin-bottom: 10px;
+			        }
+
+			        .submitted-data p {
+			            margin: 8px 0;
+			        }
+
+			        .form-container {
+			            width: 60%;
+			            margin: 0 auto;
+			        }
+
+			        .form-row {
+			            display: flex;
+			            justify-content: space-between;
+			            margin-bottom: 15px;
+			        }
+
+			        .form-group {
+			            width: 80%;
+			        }
+
+			        fieldset {
+			            padding: 20px;
+			            border: 1px solid #ccc;
+			            margin-bottom: 20px;
+			        }
+
+			        legend {
+			            font-weight: bold;
+			        }
+
+			        button {
+			            margin-top: 20px;
+			        }
+
+			        .review-section p {
+			            font-weight: bold;
+			        }
+
+			        #add-vehicle-section {
+			            margin-top: 20px;
+			            padding: 20px;
+			            border: 1px solid #ccc;
+			            border-radius: 8px;
+			            background-color: #fff;
+			            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+			        }
+
+			        /* Styles for the autocomplete container */
+					.suggestions {
+					            border: 1px solid #ccc;
+					            max-height: 150px;
+					            overflow-y: auto;
+					            position: absolute;
+					             background-color: white;
+								
+					            z-index: 1000;
+					            width: 25%;
+					            display: none;
+					        }
+					        .suggestion-item {
+					            padding: 8px;
+					            cursor: pointer;
+					        }
+					        .suggestion-item:hover {
+					            background-color: #f0f0f0;
+					        }
+					.input-container {
+					    position: relative;
+					    width: 100%;
+					}
+
+					.input-container input[type="text"] {
+					   /* Adjust the width to account for the button */
+					    padding-right: 120px; /* Ensure padding is added to make space for the button */
+					}
+					
+					.add-vehicle-button {
+					    position: absolute;
+					    right: -290px;
+					    top: -105px;
+					    height: 90%;
+					    width: 110px; /* Set a fixed width for the button */
+					    border: none;
+					    border-left: 1px solid #ccc; /* Border to separate the button from the input */
+					    background-color:darkblue;
+					    color: white;
+					    cursor: pointer;
+					    box-sizing: border-box;
+						font-size: 14px;
+					}
+
+					.add-vehicle-button:hover {
+					    background-color: #0056b3;
+					}
+					.add-driver{
+						
+						position: absolute;
+								    right: -290px;
+								    top: 90px;
+								    height: 90%;
+								    width: 110px; /* Set a fixed width for the button */
+								    border: none;
+								    border-left: 1px solid #ccc; /* Border to separate the button from the input */
+								    background-color: mediumaquamarine;
+								    color: white;
+								    cursor: pointer;
+								    box-sizing: border-box;
+									font-size: 14px;
+						
+					}
+			.search{
+				position: absolute;
+					    right: 940px;
+					    top: 288px;
+					    height: 43px;
+					    width: 120px; /* Set a fixed width for the button */
+					    border: none;
+					    border-left: 1px solid #ccc; /* Border to separate the button from the input */
+					    background-color: mediumaquamarine;
+					    color: white;
+					    cursor: pointer;
+					    box-sizing: border-box;
+						font-size: 14px;
+				
+			}
+			.search-bar{
+				width:20px;
+			}
+			/* Modal Styles */
+			.modal {
+			  
+			    position: fixed; /* Stay in place */
+			    z-index: 1; /* Sit on top */
+			    left: 550px;
+			    top: 0;
+			    width: 50%; /* Full width */
+			    height: 100%; /* Full height */
+			    overflow: auto; /* Enable scroll if needed */
+			    background-color: rgb(0,0,0); /* Fallback color */
+			    background-color: transparent; /* Black w/ opacity */
+			}
+
+			.modal-content {
+			    background-color: #fefefe;
+			    margin: 15% auto; /* 15% from the top and centered */
+			    padding: 20px;
+			    border: 1px solid #888;
+			    width: 80%; /* Could be more or less, depending on screen size */
+			}
+
+			.close {
+			    color: #aaa;
+			    float: right;
+			    font-size: 28px;
+			    font-weight: bold;
+			}
+
+			.close:hover,
+			.close:focus {
+			    color:red;
+			    text-decoration: none;
+			    cursor: pointer;
+			}
+
+			/* Ensure the form-row divs use flexbox for the layout */
+			.form-row {
+			    display: flex;
+			    flex-wrap: wrap; /* Wrap to next line if needed */
+			    margin-bottom: 15px; /* Spacing between rows */
+			}
+
+			/* Each form-group will take up half of the row width */
+			.form-group {
+			    flex: 1 1 50%; /* Grow to fill space and take up 50% of the width */
+			    padding: 0 10px; /* Spacing between columns */
+			    box-sizing: border-box; /* Include padding in width calculation */
+			}
+
+			/* Optional: Adjust label and input width to fit nicely */
+			.form-group label {
+			    display: block;
+			    margin-bottom: 5px;
+			}
+
+			.form-group input {
+			    width: 55%; /* Make input take full width of the form-group */
+			}
+			.add-drivers{
+				
+				position: absolute;
+							    right: 50px;
+							    top: 50px;
+							    height: 8%;
+							    width: 105px; /* Set a fixed width for the button */
+							    border: none;
+							    border-left: 1px solid #ccc; /* Border to separate the button from the input */
+							    background-color:darkblue;
+							    color: white;
+							    cursor: pointer;
+							    box-sizing: border-box;
+								font-size: 14px;
+					
+			}
+			/* Hidden class to hide elements */
+
+
+			/* Style for the add vehicle section as a modal */
+			#add-vehicle-section {
+			    padding: 20px;
+			    border: 1px solid #ddd;
+			    margin-top: 20px;
+			    background-color: #f4f4f4;
+			    position: fixed;
+			    top: 50%;
+			    left: 50%;
+			    transform: translate(-50%, -50%);
+			    width: 300px;
+			    z-index: 1000;
+			    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+			}
+
+			/* Style for the close button */
+			.close {
+			    color: #aaa;
+			    float: right;
+			    font-size: 28px;
+			    font-weight: bold;
+			}
+
+			.close:hover,
+			.close:focus {
+			    color: red;
+			    text-decoration: none;
+			    cursor: pointer;
+			}
+
+			/* Optional: Style for background overlay */
+			body.modal-open {
+			    overflow: hidden;
+			    position: relative;
+			}
+
+			body.modal-open::before {
+			    content: '';
+			    position: fixed;
+			    top: 0;
+			    left: 0;
+			    right: 0;
+			    bottom: 0;
+			    background-color: rgba(0, 0, 0, 0.4);
+			    z-index: 999;
+			}
+			.add-vechile input[type="text"], .add-vechile select {
+			    width: 180px;
+			}
+
+			.error {
+			    color: red;
+			    font-size: 12px;
+			}
+#user-selection{
+	color: black;
+}
+.review-container{
+	position: absolute;
+	color:white;
+	background: linear-gradient(
+							     135deg,
+							    
+							     rgba(15, 32, 65, 1.6),
+							     rgba(15, 32, 65, 1.6),
+							     rgba(15, 32, 65, 1.6)
+							 );
+	top:150px;
+	width: 50%;
+	left:30%;
+}
+
+/* add user and add driver button*/
+
+
+.add{
+			position: absolute;
+			width: 25%;
+			top:110px;
+			right:20%;
+		}
+		.addd{
+					position: absolute;
+					width: 25%;
+					top:208px;
+					right:20%;
+				}

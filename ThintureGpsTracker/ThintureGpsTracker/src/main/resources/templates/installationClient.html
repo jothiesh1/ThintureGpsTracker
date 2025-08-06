@@ -1,0 +1,1288 @@
+
+<!-- @Controller  class VehicleController -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+    <title>Thinture-GPS</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+ 
+	<style>
+		
+				.form-container {
+				            max-width: 600px;
+							position: absolute;
+							top:150px;
+							left:30%;
+				            width: 100%;
+				            padding: 20px;
+				            border: 1px solid #ccc;
+				            border-radius: 8px;
+				            background-color: #fff;
+				            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+							background-color: rgba(0, 0, 0, 0.7);
+
+				        }
+
+			        fieldset {
+			            border: none;
+			            padding: 0;
+			        }
+
+			        legend {
+			            font-size: 1.5em;
+			            margin-bottom: 10px;
+			            color: white;
+			        }
+
+			        label {
+			            display: block;
+			            margin-bottom: 8px;
+			            color: white;
+			        }
+
+			        input[type="text"], input[type="date"], input[type="tel"], select, textarea {
+			            width: 55%;
+			            padding: 8px;
+			            margin-bottom: 12px;
+			            border: 1px solid #ccc;
+			            border-radius: 4px;
+			            box-sizing: border-box;
+			        }
+					.form-group input[type="email"] {
+						width: 145px;
+						           padding: 8px;
+						           margin-bottom: 12px;
+						           border: 1px solid #ccc;
+						           border-radius: 4px;
+						           box-sizing: border-box;
+					}
+			        button {
+			            display: block;
+			            width: 100%;
+			            padding: 10px;
+			            border: none;
+			            border-radius: 4px;
+			            background-color: darkblue;
+			            color: white;
+			            font-size: 1em;
+			            cursor: pointer;
+			            box-sizing: border-box;
+			        }
+
+			        button:hover {
+			            background-color: #0056b3;
+			        }
+
+					.hidden {
+					    display: none;
+					}
+
+
+			        .error {
+			            color: red;
+			            font-size: 0.875em;
+			            margin-top: -10px;
+			            margin-bottom: 10px;
+			        }
+
+			        .submitted-data p {
+			            margin: 8px 0;
+			        }
+
+			        .form-container {
+			            width: 60%;
+			            margin: 0 auto;
+			        }
+
+			        .form-row {
+			            display: flex;
+			            justify-content: space-between;
+			            margin-bottom: 15px;
+			        }
+
+			        .form-group {
+			            width: 80%;
+			        }
+
+			        fieldset {
+			            padding: 20px;
+			            border: 1px solid #ccc;
+			            margin-bottom: 20px;
+			        }
+
+			        legend {
+			            font-weight: bold;
+			        }
+
+			        button {
+			            margin-top: 20px;
+			        }
+
+			        .review-section p {
+			            font-weight: bold;
+			        }
+
+			        #add-vehicle-section {
+			            margin-top: 20px;
+			            padding: 20px;
+			            border: 1px solid #ccc;
+			            border-radius: 8px;
+			            background-color: #fff;
+			            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+			        }
+
+			        /* Styles for the autocomplete container */
+					.suggestions {
+					            border: 1px solid #ccc;
+					            max-height: 150px;
+					            overflow-y: auto;
+					            position: absolute;
+					             background-color: white;
+								
+					            z-index: 1000;
+					            width: 25%;
+					            display: none;
+					        }
+					        .suggestion-item {
+					            padding: 8px;
+					            cursor: pointer;
+					        }
+					        .suggestion-item:hover {
+					            background-color: #f0f0f0;
+					        }
+					.input-container {
+					    position: relative;
+					    width: 100%;
+					}
+
+					.input-container input[type="text"] {
+					   /* Adjust the width to account for the button */
+					    padding-right: 120px; /* Ensure padding is added to make space for the button */
+					}
+					
+					.add-vehicle-button {
+					    position: absolute;
+					    right: -290px;
+					    top: -105px;
+					    height: 90%;
+					    width: 110px; /* Set a fixed width for the button */
+					    border: none;
+					    border-left: 1px solid #ccc; /* Border to separate the button from the input */
+					    background-color:darkblue;
+					    color: white;
+					    cursor: pointer;
+					    box-sizing: border-box;
+						font-size: 14px;
+					}
+
+					.add-vehicle-button:hover {
+					    background-color: #0056b3;
+					}
+					.add-driver{
+						
+						position: absolute;
+								    right: -290px;
+								    top: 90px;
+								    height: 90%;
+								    width: 110px; /* Set a fixed width for the button */
+								    border: none;
+								    border-left: 1px solid #ccc; /* Border to separate the button from the input */
+								    background-color: mediumaquamarine;
+								    color: white;
+								    cursor: pointer;
+								    box-sizing: border-box;
+									font-size: 14px;
+						
+					}
+			.search{
+				position: absolute;
+					    right: 940px;
+					    top: 288px;
+					    height: 43px;
+					    width: 120px; /* Set a fixed width for the button */
+					    border: none;
+					    border-left: 1px solid #ccc; /* Border to separate the button from the input */
+					    background-color: mediumaquamarine;
+					    color: white;
+					    cursor: pointer;
+					    box-sizing: border-box;
+						font-size: 14px;
+				
+			}
+			.search-bar{
+				width:20px;
+			}
+			/* Modal Styles */
+			.modal {
+			  
+			    position: fixed; /* Stay in place */
+			    z-index: 1; /* Sit on top */
+			    left: 550px;
+			    top: 0;
+			    width: 50%; /* Full width */
+			    height: 100%; /* Full height */
+			    overflow: auto; /* Enable scroll if needed */
+			    background-color: rgb(0,0,0); /* Fallback color */
+			    background-color: transparent; /* Black w/ opacity */
+			}
+
+			.modal-content {
+			    background-color: #fefefe;
+			    margin: 15% auto; /* 15% from the top and centered */
+			    padding: 20px;
+			    border: 1px solid #888;
+			    width: 80%; /* Could be more or less, depending on screen size */
+			}
+
+			.close {
+			    color: #aaa;
+			    float: right;
+			    font-size: 28px;
+			    font-weight: bold;
+			}
+
+			.close:hover,
+			.close:focus {
+			    color:red;
+			    text-decoration: none;
+			    cursor: pointer;
+			}
+
+			/* Ensure the form-row divs use flexbox for the layout */
+			.form-row {
+			    display: flex;
+			    flex-wrap: wrap; /* Wrap to next line if needed */
+			    margin-bottom: 15px; /* Spacing between rows */
+			}
+
+			/* Each form-group will take up half of the row width */
+			.form-group {
+			    flex: 1 1 50%; /* Grow to fill space and take up 50% of the width */
+			    padding: 0 10px; /* Spacing between columns */
+			    box-sizing: border-box; /* Include padding in width calculation */
+			}
+
+			/* Optional: Adjust label and input width to fit nicely */
+			.form-group label {
+			    display: block;
+			    margin-bottom: 5px;
+			}
+
+			.form-group input {
+			    width: 55%; /* Make input take full width of the form-group */
+			}
+			.add-drivers{
+				
+				position: absolute;
+							    right: 50px;
+							    top: 50px;
+							    height: 8%;
+							    width: 105px; /* Set a fixed width for the button */
+							    border: none;
+							    border-left: 1px solid #ccc; /* Border to separate the button from the input */
+							    background-color:darkblue;
+							    color: white;
+							    cursor: pointer;
+							    box-sizing: border-box;
+								font-size: 14px;
+					
+			}
+			/* Hidden class to hide elements */
+
+
+			/* Style for the add vehicle section as a modal */
+			#add-vehicle-section {
+			    padding: 20px;
+			    border: 1px solid #ddd;
+			    margin-top: 20px;
+			    background-color: #f4f4f4;
+			    position: fixed;
+			    top: 50%;
+			    left: 50%;
+			    transform: translate(-50%, -50%);
+			    width: 300px;
+			    z-index: 1000;
+			    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+			}
+
+			/* Style for the close button */
+			.close {
+			    color: #aaa;
+			    float: right;
+			    font-size: 28px;
+			    font-weight: bold;
+			}
+
+			.close:hover,
+			.close:focus {
+			    color: red;
+			    text-decoration: none;
+			    cursor: pointer;
+			}
+
+			/* Optional: Style for background overlay */
+			body.modal-open {
+			    overflow: hidden;
+			    position: relative;
+			}
+
+			body.modal-open::before {
+			    content: '';
+			    position: fixed;
+			    top: 0;
+			    left: 0;
+			    right: 0;
+			    bottom: 0;
+			    background-color: rgba(0, 0, 0, 0.4);
+			    z-index: 999;
+			}
+			.add-vechile input[type="text"], .add-vechile select {
+			    width: 180px;
+			}
+
+			.error {
+			    color: red;
+			    font-size: 12px;
+			}
+#user-selection{
+	color: black;
+}
+
+.review-container {
+	top:150px;
+	position: absolute;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: black;
+    padding: 30px;
+    border-radius: 10px;
+    width: 40%;
+left:40%;
+    margin: 40px auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.review-item {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.button-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.button-row button {
+    width: 48%;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #004aad;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+.button-row button:hover {
+    background-color: #006eff;
+}
+.review{
+	color:black
+}
+	    </style>
+
+	<link rel="stylesheet" type="text/css" th:href="@{/css/installstyle.css}">
+
+</head>
+
+<div th:insert="~{navigation_client :: navbar_client}"></div>
+
+   
+	<div class="form-container">
+	    <form id="gps-installation-form" onsubmit="event.preventDefault(); saveVehicle();">
+	        <!-- Part 1: Vehicle Information -->
+	        <fieldset id="part1">
+	            <legend>Part 1: Vehicle Information</legend>
+	            <div class="form-row">
+	                <div class="form-group">
+					<!-- 	<button type="button" class="add-drivers" onclick="openAddDriverModal()">+ Add Driver</button> -->
+	                </div>
+					</div>
+					
+					<div class="form-row">
+					    <div class="form-group">
+							<label for="user-selection">Select User:</label>
+							
+							<!-- Autocomplete Input -->
+							<input list="user-list" id="user-selection" name="user-selection" placeholder="Select a user" required>
+
+							<!-- Datalist Options -->
+							<datalist id="user-list"></datalist>
+
+							<!-- Hidden field to store selected user ID -->
+							<input type="hidden" id="user-id" name="user-id">
+
+					        <span id="user-selection-error" class="error"></span>
+					    </div>
+					</div>
+					<div id="user-preview" style="margin-top: 10px; color: white;">
+					    <strong>Selected User:</strong> <span id="preview-username">None</span><br>
+					    <strong>User ID:</strong> <span id="preview-userid">N/A</span>
+					</div>
+
+					
+					<script>
+					    let userMap = {}; // name → id
+
+					    document.addEventListener("DOMContentLoaded", () => {
+					        fetchUsers();
+					        setupUserSelectionListener();
+					    });
+
+					    // Fetch all users from backend
+					    function fetchUsers() {
+					        fetch('/users/api/all')
+					            .then(response => {
+					                if (!response.ok) throw new Error("Failed to fetch users.");
+					                return response.json();
+					            })
+					            .then(users => {
+					                const datalist = document.getElementById("user-list");
+					                datalist.innerHTML = ""; // Clear existing options
+					                userMap = {}; // Reset map
+
+					                users.forEach(user => {
+					                    const option = document.createElement("option");
+					                    option.value = user.name;
+					                    datalist.appendChild(option);
+					                    userMap[user.name] = user.id;
+					                });
+					            })
+					            .catch(error => console.error("Error loading users:", error));
+					    }
+
+					    // Attach input change listener to validate selection
+					    function setupUserSelectionListener() {
+					        const userInput = document.getElementById("user-selection");
+
+					        userInput.addEventListener("change", function () {
+					            const selectedName = this.value;
+					            const userId = userMap[selectedName];
+
+					            if (userId) {
+					                document.getElementById("user-id").value = userId;
+					                console.log("✅ User ID set:", userId);
+					            } else {
+					                document.getElementById("user-id").value = "";
+					                console.warn("❌ Invalid user selected or typed manually.");
+					            }
+					        });
+					    }
+						document.getElementById("user-selection").addEventListener("change", function () {
+						    const selectedName = this.value;
+						    const userId = userMap[selectedName];
+						    document.getElementById("user-id").value = userId || "";
+						});
+						function setupUserSelectionListener() {
+						    const userInput = document.getElementById("user-selection");
+
+						    userInput.addEventListener("change", function () {
+						        const selectedName = this.value;
+						        const userId = userMap[selectedName];
+
+						        if (userId) {
+						            document.getElementById("user-id").value = userId;
+
+						            // ✅ Update preview
+						            document.getElementById("preview-username").textContent = selectedName;
+						            document.getElementById("preview-userid").textContent = userId;
+
+						            console.log("✅ User selected:", selectedName, "ID:", userId);
+						        } else {
+						            document.getElementById("user-id").value = "";
+						            document.getElementById("preview-username").textContent = "None";
+						            document.getElementById("preview-userid").textContent = "N/A";
+						            console.warn("❌ Invalid user selected or typed manually.");
+						        }
+						    });
+						}
+
+					</script>
+
+
+	           
+				<br>
+				<br>
+	            <div class="form-row">
+	                
+	                <div class="form-group">
+	                    <label for="owner-name">Owner Name:</label>
+	                    <input type="text" id="owner-name" name="owner-name"  required>
+	                    <span id="owner-name-error" class="error"></span>
+	                </div>
+					
+					<div class="form-group">
+						                    <label for="vehicle-type">Vehicle Type:</label>
+						                  <input type="text" id="vehicle-type" name="vehicle-type"   required >
+						                    <span id="vehicle-type-error" class="error"></span>
+						                </div>
+					
+					
+	            </div>
+	            <div class="form-row">
+	                
+	                <div class="form-group">
+	                    <label for="engine-number">Engine Number:</label>
+	                    <input type="text" id="engine-number" name="engine-number"  required>
+	                    <span id="engine-number-error" class="error"></span>
+	                </div>
+	                <div class="form-group">
+	                    <label for="manufacturer">Manufacturer:</label>
+	                    <input type="text" id="manufacturer" name="manufacturer"  required>
+	                    <span id="manufacturer-error" class="error"></span>
+	                </div>
+					<div class="form-group">
+						                    <label for="vehicle-number">Manufacturer Year:</label>
+						                   
+						                      <input type="text" id="vehiclenumber" name="vehiclenumber" required >
+						                       <!-- <button type="button" onclick="showAddVehicleSection()" class="add-vehicle-button"><strong>+Add Vehicle</strong></button>-->
+						                  
+						                    <span id="vehicle-number-error" class="error"></span>
+						                </div>
+	                <div class="form-group">
+	                    <label for="model">Model:</label>
+	                    <input type="text" id="model" name="model"  required>
+	                    <span id="model-error" class="error"></span>
+	                </div>
+	            </div>
+	            <button type="button" onclick="showPart3()">Next</button>
+	        </fieldset>
+	   
+	
+
+
+	
+	<script>
+		
+	// Function to show the Add Vehicle Section
+	function showAddVehicleSection() {
+	    const vehicleSection = document.getElementById('add-vehicle-section');
+	    if (vehicleSection) {
+	        vehicleSection.classList.remove('hidden');
+	    } else {
+	        console.error("Element with ID 'add-vehicle-section' not found.");
+	    }
+	}
+
+	// Function to hide the Add Vehicle Section
+	function hideAddVehicleSection() {
+	    const vehicleSection = document.getElementById('add-vehicle-section');
+	    if (vehicleSection) {
+	        vehicleSection.classList.add('hidden');
+	    } else {
+	        console.error("Element with ID 'add-vehicle-section' not found.");
+	    }
+	}
+
+	// Function to save the new vehicle
+	function saveVehicle() {
+	    const userId = document.getElementById('user-id').value;
+
+	    const newVehicleData = {
+	        vehicleNumber: document.getElementById('new-vehicle-number').value,
+	        vehicleType: document.getElementById('new-vehicle-type').value,
+	        ownerName: document.getElementById('new-owner-name').value,
+	        engineNumber: document.getElementById('new-engine-number').value,
+	        manufacturer: document.getElementById('new-manufacturer').value,
+	        model: document.getElementById('new-model').value,
+	        deviceID: document.getElementById('new-device-id') ? document.getElementById('new-device-id').value : null,
+	       userId: document.getElementById("user-id").value.trim() // ✅ Add this line
+	    };
+
+	    if (newVehicleData.vehicleNumber && newVehicleData.vehicleType && newVehicleData.ownerName && newVehicleData.userId) {
+	        fetch('/total_vehicles/createdevices', {
+	            method: 'POST',
+	            headers: {
+	                'Content-Type': 'application/json'
+	            },
+	            body: JSON.stringify(newVehicleData)
+	        })
+	        .then(response => {
+	            if (response.ok) {
+	                alert('Vehicle created successfully');
+	                hideAddVehicleSection();
+	            } else {
+	                alert('Error saving vehicle. Please try again.');
+	            }
+	        })
+	        .catch(error => {
+	            console.error('Error during save:', error);
+	            alert('An unexpected error occurred.');
+	        });
+	    } else {
+	        document.getElementById('add-vehicle-error').innerText =
+	            'Please fill out all fields, including selecting a valid user.';
+	    }
+	}
+
+	// Function to search for a vehicle by number
+	function searchVehicle() {
+	    const vehicleNumber = document.getElementById('search').value;
+
+	    if (vehicleNumber) {
+	        fetch(`/total_vehicles/search?vehicleNumber=${vehicleNumber}`) // Correct the endpoint path as needed
+	        .then(response => {
+	            if (!response.ok) {
+	                throw new Error('Vehicle not found');
+	            }
+	            return response.json();
+	        })
+	        .then(data => {
+	            if (data) {
+	                // Populate the form with fetched data
+	                document.getElementById('vehicle-number').value = data.vehicleNumber;
+	                document.getElementById('owner-name').value = data.ownerName;
+	                document.getElementById('vehicle-type').value = data.vehicleType;
+	                document.getElementById('engine-number').value = data.engineNumber;
+	                document.getElementById('manufacturer').value = data.manufacturer;
+	                document.getElementById('model').value = data.model;
+	            } else {
+	                alert('Vehicle not found');
+	            }
+	        })
+	        .catch(error => {
+	            console.error('Error fetching vehicle:', error);
+	            alert('Error fetching vehicle details. Please try again.');
+	        });
+	    } else {
+	        alert('Please enter a vehicle number to search');
+	    }
+	}
+	
+	</script>
+
+
+
+				
+				
+
+	        <!-- Part 2: Driver Information -->
+	        <fieldset id="part2" class="hidden">
+	            <legend>Part 2: Driver Information</legend>
+	            <div class="form-row">
+	                <div class="form-group">
+						<input type="text" id="search-driver" name="search-driver" class="search-bar" placeholder="Search by Driver name">
+						<button type="button" class="search-button" onclick="searchDriver()">Search</button>
+	                </div>
+	            </div>
+				<br>
+				<!-- Add Driver Button -->
+						<!--	<button type="button" class="add-driver" onclick="openAddDriverModal()">+ Add Driver</button> -->
+							<br>
+							<br>
+	            <div class="form-row">
+	                <div class="form-group">
+	                    <label for="driver-name">Driver Name:</label>
+	                    <input type="text" id="driver-name" name="driver-name"  required readonly>
+	                    <span id="driver-name-error" class="error"></span>
+	                </div>
+	                <div class="form-group">
+	                    <label for="driver-address">Address:</label>
+	                    <input type="text" id="driver-address" name="driver-address"  required readonly>
+	                    <span id="driver-address-error" class="error"></span>
+	                </div>
+	            </div>
+	            <div class="form-row">
+	                <div class="form-group">
+	                    <label for="driver-license">Driver License Number:</label>
+	                    <input type="text" id="driver-license" name="driver-license"  required readonly>
+	                    <span id="driver-license-error" class="error"></span>
+	                </div>
+	                <div class="form-group">
+	                    <label for="driver-phone">Driver Phone:</label>
+	                    <input type="tel" id="driver-phone" name="driver-phone"  required readonly>
+	                    <span id="driver-phone-error" class="error"></span>
+	                </div>
+	                <div class="form-group">
+	                    <label for="driver-email">Driver E-mail:</label>
+	                    <input type="email" id="driver-email" name="driver-email"  required readonly>
+	                    <span id="driver-email-error" class="error"></span>
+	                </div>
+	            </div>
+	            <button type="button" onclick="showPart3()">Next</button>
+	            <button type="button" onclick="showPart1()">Back</button>
+	        </fieldset>
+			
+			<div id="add-driver-modal" class="modal hidden">
+			    <div class="modal-content">
+			        <!-- Close Button -->
+			        <span class="close" onclick="closeAddDriverModal()">&times;</span>
+			        <h2>Add Driver</h2>
+			        <form id="add-driver-form">
+			            <div class="form-group">
+			                <label for="new-driver-name">Driver Name:</label>
+			                <input type="text" id="new-driver-name" name="new-driver-name"  required readonly>
+							<span id="driver-address-error" class="error"></span>
+			            </div>
+			            <div class="form-group">
+			                <label for="new-driver-address">Address:</label>
+			                <input type="text" id="new-driver-address" name="new-driver-address"  required readonly>
+			            </div>
+			            <div class="form-group">
+			                <label for="new-driver-license">Driver License Number:</label>
+			                <input type="text" id="new-driver-license" name="new-driver-license"  required readonly>
+			            </div>
+			            <div class="form-group">
+			                <label for="new-driver-phone">Driver Phone:</label>
+			                <input type="tel" id="new-driver-phone" name="new-driver-phone"  required readonly>
+			            </div>
+			            <div class="form-group">
+			                <label for="driver-mail">Driver E-mail:</label>
+			                <input type="tel" id="driver-mail" name="driver-mail"  required readonly>
+			                <span id="driver-mail-error" class="error"></span>
+			            </div>
+						<div class="form-group">
+						    <label for="driver-country">Driver Country:</label>
+						    <input type="text" id="driver-country" name="driver-country"  required readonly>
+						    <span id="driver-country-error" class="error"></span>
+						</div>
+			            <button type="button" onclick="saveDriver()">Save</button>
+			            <button type="button" onclick="closeAddDriverModal()">Cancel</button>
+			        </form>
+			    </div>
+			</div>
+	    </form>
+						<script>
+							// Function to open the Add Driver modal
+							function openAddDriverModal() {
+							    document.getElementById("add-driver-modal").classList.remove("hidden");
+							}
+
+							function closeAddDriverModal() {
+							    document.getElementById("add-driver-modal").classList.add("hidden");
+							}
+
+
+							// Function to save a new driver
+							function saveDriver() {
+							    const driverData = {
+							        driverName: document.getElementById("new-driver-name").value,
+							        address: document.getElementById("new-driver-address").value,
+							        licenseNumber: document.getElementById("new-driver-license").value,
+							        phone: document.getElementById("new-driver-phone").value,
+							        email: document.getElementById("driver-mail").value,
+							        country: document.getElementById("driver-country").value // Ensure this field is included
+							    };
+
+							    fetch("http://3.109.116.92:8181/drivers/add", {
+							        method: "POST",
+							        headers: {
+							            "Content-Type": "application/json"
+							        },
+							        body: JSON.stringify(driverData)
+							    })
+							    .then(response => {
+							        if (response.ok) {
+							            alert("Driver added successfully!");
+							            closeAddDriverModal();
+							        } else {
+							            return response.text().then(text => { throw new Error(text) });
+							        }
+							    })
+							    .catch(error => alert("Error: " + error.message));
+							}
+
+
+
+							function searchDriver() {
+							    const driverName = document.getElementById("search-driver").value;
+							    fetch(`http://3.109.116.92:8181/drivers/search?driverName=${driverName}`)
+							        .then(response => {
+							            if (!response.ok) {
+							                throw new Error("Driver not found");
+							            }
+							            return response.json();
+							        })
+							        .then(data => {
+							            // Display driver information
+							            if (data.length > 0) {
+							                const driver = data[0]; // Assuming the first match
+							                document.getElementById("driver-name").value = driver.driverName;
+							                document.getElementById("driver-address").value = driver.address;
+							                document.getElementById("driver-license").value = driver.licenseNumber;
+							                document.getElementById("driver-phone").value = driver.phone;
+							                document.getElementById("driver-email").value = driver.email;
+							            } else {
+							                alert("No drivers found with the given name.");
+							            }
+							        })
+							        .catch(error => {
+							            console.error("Error fetching driver data:", error);
+							            alert("Error fetching driver data. Please try again.");
+							        });
+							}
+
+						</script>
+
+			
+			
+			
+			
+			
+			
+			
+			
+						<fieldset id="part3" class="hidden">
+						    <legend>Part 2: Device Information</legend>
+						    <div class="form-row">
+						        <div class="form-group">
+						            <label for="installation-date">Installation Date:</label>
+						            <input type="date" id="installation-date" name="installation-date" required>
+						            <span id="installation-date-error" class="error"></span>
+						        </div>
+						        <div class="form-group">
+						            <label for="SerialNo">Serial No:</label>
+									<input type="text" id="serialNoInput" name="serialNoInput" placeholder="Start typing..." autocomplete="off" />
+									           <div id="suggestions" class="suggestions"></div>
+						            <span id="SerialNo-error" class="error"></span>
+						        </div>
+						    </div>
+						    <div class="form-row">
+						        <div class="form-group">
+						            <label for="installer-name">Technician Name:</label>
+						            <input type="text" id="installer-name" name="installer-name" required>
+						            <span id="installer-name-error" class="error"></span>
+						        </div>
+						        <div class="form-group">
+						            <label for="imei">IMEI:</label>
+						            <input type="text" id="imei" name="imei" required>
+						            <span id="imei-error" class="error"></span>
+						        </div>
+						    </div>
+						    <div class="form-row">
+						        <div class="form-group">
+						            <label for="sim-number">SIM NO:</label>
+						            <input type="tel" id="sim-number" name="sim-number" required>
+						            <span id="sim-number-error" class="error"></span>
+						        </div>
+						        <div class="form-group">
+						            <label for="dealer-name">Dealer Name:</label>
+						            <input type="text" id="dealer-name" name="dealer-name" required>
+						            <span id="dealer-name-error" class="error"></span>
+						        </div>
+						    </div>
+						    <div class="form-row">
+						        <div class="form-group">
+						            <label for="dealer-phone">Address/Phone:</label>
+						            <input type="tel" id="dealer-phone" name="dealer-phone" required>
+						            <span id="dealer-phone-error" class="error"></span>
+						        </div>
+						        <div class="form-group">
+						            <label for="country">Country:</label>
+						            <input type="text" id="country" name="country" required>
+						            <span id="country-error" class="error"></span>
+						        </div>
+						    </div>
+							<button type="button" id="submit-button" onclick="showReview()">Review</button>
+
+							
+							
+							
+							
+
+						    <button type="button" onclick="showPart1()">Back</button>
+						</fieldset>
+						</div>
+						
+						
+						<!-- Review Section -->
+						<div id="review-section" class="hidden review-container">
+						    <fieldset>
+						        <legend class="review">Review Submission</legend>
+						        <div class="review-item" id="review-owner-name"></div>
+						        <div class="review-item" id="review-vehicle-number"></div>
+						        <div class="review-item" id="review-vehicle-type"></div>
+						        <div class="review-item" id="review-engine-number"></div>
+						        <div class="review-item" id="review-installation-date"></div>
+						        <div class="review-item" id="review-gps-device-id"></div>
+						        <div class="review-item" id="review-installer-name"></div>
+						        <div class="review-item" id="review-imei"></div>
+						        <div class="review-item" id="review-sim-number"></div>
+						        <div class="review-item" id="review-dealername"></div>
+						        <div class="review-item" id="review-dealerphone"></div>
+								<div class="review-item" id="review-user-name"></div>
+								<div class="review-item" id="review-user-id"></div>
+
+						        <div class="button-row">
+						            <button type="button" onclick="showPart3()">Edit</button>
+						            <button type="button" onclick="addDevice()">Confirm</button>
+						        </div>
+						    </fieldset>
+						</div>
+
+
+		<div id="add-vehicle-section" class="hidden">
+		    <!-- Close button for the section -->
+		    <span class="close" onclick="hideAddVehicleSection()">&times;</span>
+		    
+		    <h2>Add Vehicle Options</h2>
+		    <div class="form-group">
+		        <label for="new-owner-name">Owner Name:</label>
+		        <input type="text" id="new-owner-name" name="new-owner-name" required>
+		        <span id="new-owner-name-error" class="error"></span>
+		    </div>
+		    <div class="form-group">
+		        <label for="new-vehicle-type">Vehicle Type:</label>
+		        <select id="new-vehicle-type">
+		            <option value="">Select a vehicle type</option>
+		            <option value="car">Car</option>
+		            <option value="bus">Bus</option>
+		            <option value="truck">Truck</option>
+		            <option value="motorcycle">Motorcycle</option>
+		        </select>
+		    </div>
+		    <div class="form-group">
+		        <label for="new-vehicle-number">Vehicle Number:</label>
+		        <input type="text" id="new-vehicle-number" required>
+		    </div>
+		    <div class="form-group">
+		        <label for="new-engine-number">Engine Number:</label>
+		        <input type="text" id="new-engine-number" name="engine-number" required>
+		        <span id="new-engine-number-error" class="error"></span>
+		    </div>
+		    <div class="form-group">
+		        <label for="new-manufacturer">Manufacturer:</label>
+		        <input type="text" id="new-manufacturer" name="manufacturer" required>
+		        <span id="new-manufacturer-error" class="error"></span>
+		    </div>
+		    <div class="form-group">
+		        <label for="new-model">Model:</label>
+		        <input type="text" id="new-model" name="model" required>
+		        <span id="new-model-error" class="error"></span>
+		    </div>
+		    <button type="button" onclick="saveVehicle()">Save Vehicle</button>
+		    <button type="button" onclick="hideAddVehicleSection()">Cancel</button>
+		    <p id="add-vehicle-error" class="error"></p>
+		</div>
+	
+		<script>
+			//controlller class public class VehicleController 
+			    function showPart3() {
+			        document.getElementById('part1').classList.add('hidden');
+			        document.getElementById('part3').classList.remove('hidden');
+			        document.getElementById('review-section').classList.add('hidden');
+			    }
+
+			    function showPart1() {
+			        document.getElementById('part1').classList.remove('hidden');
+			       // document.getElementById('part2').classList.add('hidden');
+			        document.getElementById('part3').classList.add('hidden');
+			        document.getElementById('review-section').classList.add('hidden');
+			    }
+
+
+				function showReview() {
+				    document.getElementById('part3').classList.add('hidden');
+				    document.getElementById('review-section').classList.remove('hidden');
+
+				    document.getElementById("review-owner-name").innerText = "Owner Name: " + document.getElementById("owner-name").value;
+				    document.getElementById("review-vehicle-number").innerText = "Vehicle Number: " + document.getElementById("vehiclenumber").value;
+				    document.getElementById("review-vehicle-type").innerText = "Vehicle Type: " + document.getElementById("vehicle-type").value;
+				    document.getElementById("review-engine-number").innerText = "Engine Number: " + document.getElementById("engine-number").value;
+				    document.getElementById("review-installation-date").innerText = "Installation Date: " + document.getElementById("installation-date").value;
+
+				    // These fields had wrong IDs
+				    document.getElementById("review-gps-device-id").innerText = "GPS Device ID: " + document.getElementById("serialNoInput").value;
+				    document.getElementById("review-installer-name").innerText = "Technician Name: " + document.getElementById("installer-name").value;
+				    document.getElementById("review-imei").innerText = "IMEI: " + document.getElementById("imei").value;
+				    document.getElementById("review-sim-number").innerText = "SIM NO: " + document.getElementById("sim-number").value;
+				    document.getElementById("review-dealername").innerText = "Dealer Name: " + document.getElementById("dealer-name").value;
+				    document.getElementById("review-dealerphone").innerText = "Dealer Phone: " + document.getElementById("dealer-phone").value;
+					document.getElementById("review-user-name").innerText = "User Name: " + document.getElementById("user-selection").value;
+					   document.getElementById("review-user-id").innerText = "User ID: " + document.getElementById("user-id").value;
+				    // If comments field is not present, skip this line or create a comments field in HTML
+				   
+				}
+
+
+		function editForm() {
+		    }
+
+
+	</script>
+	<script>
+	    function showPart2() {
+	        document.getElementById('part1').classList.add('hidden');
+	        document.getElementById('part2').classList.remove('hidden');
+	        document.getElementById('part3').classList.add('hidden');
+	        document.getElementById('review-section').classList.add('hidden');
+	    }
+
+	    function showPart3() {
+	        document.getElementById('part1').classList.add('hidden');
+	        document.getElementById('part3').classList.remove('hidden');
+	        document.getElementById('review-section').classList.add('hidden');
+	    }
+
+	    function showPart1() {
+	        document.getElementById('part1').classList.remove('hidden');
+	        document.getElementById('part2').classList.add('hidden');
+	        document.getElementById('part3').classList.add('hidden');
+	        document.getElementById('review-section').classList.add('hidden');
+	    }
+
+	  
+		</script>
+		<script>
+		    // Open the Add Driver Modal
+		   
+		    // JavaScript to load the navigation HTML
+		    fetch('navigation.html')
+		        .then(response => response.text())
+		        .then(data => {
+		            const navbarContainer = document.getElementById('navbar-container');
+		            if (navbarContainer) {
+		                navbarContainer.innerHTML = data;
+		            } else {
+		                console.error("Element with ID 'navbar-container' not found.");
+		            }
+		        })
+		        .catch(error => console.error('Error loading navigation:', error));
+
+		    // Function to submit the form
+		    function submitForm(event) {
+		        event.preventDefault(); // Prevent default form submission
+
+		        // Collect form data
+		        const formData = {
+		            vehicleNumber: document.getElementById("vehicleNumber")?.value,
+		            driverName: document.getElementById("driverName")?.value,
+		            gpsDeviceId: document.getElementById("gpsDeviceId")?.value
+		        };
+
+		        if (!formData.vehicleNumber || !formData.driverName || !formData.gpsDeviceId) {
+		            alert("Please fill out all required fields.");
+		            return;
+		        }
+//				<!-- @Controller  class VehicleController -->
+
+		        // Send AJAX request to the backend
+		        fetch('/total_vehicles/createdevices', {
+		            method: 'POST',
+		            headers: {
+		                'Content-Type': 'application/json'
+		            },
+		            body: JSON.stringify(formData)
+		        })
+		        .then(response => {
+		            if (response.ok) {
+		                alert("Form submitted successfully!");
+		            } else {
+		                alert("Error submitting the form!");
+		            }
+		        })
+		        .catch(error => {
+		            alert("An error occurred: " + error.message);
+		        });
+		    }
+			
+			function openAddDriverModal() {
+					    // Show the modal
+					    window.location.href = '/add_driver';
+					    
+					 
+					}
+		</script>
+
+		<script>
+		    function validateForm() {
+		        const driverAddress = document.getElementById('driver-address').value;
+		        const errorSpan = document.getElementById('driver-address-error');
+
+		        // Clear any previous errors
+		        errorSpan.textContent = '';
+
+		        if (!driverAddress) {
+		            errorSpan.textContent = 'Driver address is required.';
+		            return false; // Prevent form submission
+		        }
+
+		        // If everything is valid, proceed with the form submission
+		        return true;
+		    }
+
+		    // Attach the validateForm function to the form submit event
+		    document.getElementById('your-form-id').addEventListener('submit', function (event) {
+		        if (!validateForm()) {
+		            event.preventDefault(); // Prevent form submission if validation fails
+		        }
+		    });
+		</script>
+		
+		<script>
+		    $(document).ready(function () {
+		        const serialNoInput = $("#serialNoInput");
+		        const suggestionsDiv = $("#suggestions");
+		        const errorField = $("#serialNo-error");
+
+		        // Handle input for autocomplete
+		        serialNoInput.on("input", function () {
+		            const query = $(this).val().trim();
+		            errorField.text("");
+		            if (query.length > 0) {
+		                fetchSerialNoSuggestions(query);
+		            } else {
+		                suggestionsDiv.hide();
+		            }
+		        });
+                 //controlller class public class VehicleController 
+		        // Fetch suggestions from the server
+		        function fetchSerialNoSuggestions(query) {
+		            $.ajax({
+		                url: `/total_vehicles?query=${encodeURIComponent(query)}`,
+		                method: "GET",
+		                success: function (suggestions) {
+		                    displaySuggestions(suggestions);
+		                },
+		                error: function () {
+		                    errorField.text("Error fetching suggestions. Please try again.");
+		                    suggestionsDiv.hide();
+		                },
+		            });
+		        }
+
+		        // Display suggestions in the dropdown
+		        function displaySuggestions(suggestions) {
+		            if (!suggestions || suggestions.length === 0) {
+		                suggestionsDiv.hide();
+		                return;
+		            }
+		            suggestionsDiv.empty();
+		            suggestions.forEach((suggestion) => {
+		                const item = $(`<div class="suggestion-item">${suggestion}</div>`);
+		                item.on("click", function () {
+		                    serialNoInput.val(suggestion);
+		                    suggestionsDiv.hide();
+		                    fetchVehicleDetails(suggestion);
+		                });
+		                suggestionsDiv.append(item);
+		            });
+		            suggestionsDiv.show();
+		        }
+
+		        // Fetch vehicle details by serial number
+		        function fetchVehicleDetails(serialNo) {
+		            clearFields();
+		            errorField.text("");
+
+		            $.ajax({
+		                url: `/total_vehicles?serialNo=${encodeURIComponent(serialNo)}`,
+		                method: "GET",
+		                dataType: "json",
+		                success: function (data) {
+		                    populateFields(data);
+		                },
+		                error: function (xhr) {
+		                    if (xhr.status === 404) {
+		                        errorField.text("Vehicle not found. Please check the Serial No.");
+		                    } else {
+		                        errorField.text("Error fetching vehicle details. Please try again.");
+		                    }
+		                },
+		            });
+		        }
+
+		        // Populate the vehicle details in the fields
+		        function populateFields(data) {
+		            // Populate missing fields only if they are empty
+		            if (!$("#imei").val() || $("#imei").val() === "NA") {
+		                $("#imei").val(data.imei || "NA");
+		            }
+		            if (!$("#technicianName").val() || $("#technicianName").val() === "NA") {
+		                $("#technicianName").val(data.technicianName || "NA");
+		            }
+		            if (!$("#simNumber").val() || $("#simNumber").val() === "NA") {
+		                $("#simNumber").val(data.simNumber || "NA");
+		            }
+		            if (!$("#dealerName").val() || $("#dealerName").val() === "NA") {
+		                $("#dealerName").val(data.dealerName || "NA");
+		            }
+		            if (!$("#vehicleType").val() || $("#vehicleType").val() === "NA") {
+		                $("#vehicleType").val(data.vehicleType || "NA");
+		            }
+		        }
+
+		        // Clear all fields
+		        function clearFields() {
+		            $("#imei").val("NA");
+		            $("#technicianName").val("NA");
+		            $("#simNumber").val("NA");
+		            $("#dealerName").val("NA");
+		            $("#vehicleType").val("NA");
+		        }
+		    });
+		</script>
+
+		
+		
+		<script>
+			function addDevice() {
+			    const userId = parseInt(document.getElementById("user-id").value.trim());
+			    
+			    const vehicleDetails = {
+			        serialNo: document.getElementById("serialNoInput").value.trim(),
+			        imei: document.getElementById("imei").value.trim(),
+			        vehicleNumber: document.getElementById("vehiclenumber").value.trim(),
+			        ownerName: document.getElementById("owner-name").value.trim(),
+			        vehicleType: document.getElementById("vehicle-type").value.trim(),
+			        engineNumber: document.getElementById("engine-number").value.trim(),
+			        manufacturer: document.getElementById("manufacturer").value.trim(),
+			        model: document.getElementById("model").value.trim(),
+			        installationDate: document.getElementById("installation-date").value.trim(),
+			        technicianName: document.getElementById("installer-name").value.trim(),
+			        simNumber: document.getElementById("sim-number").value.trim(),
+			        dealerName: document.getElementById("dealer-name").value.trim(),
+			        addressPhone: document.getElementById("dealer-phone").value.trim(),
+			        country: document.getElementById("country").value.trim(),
+
+			        // ✅ Wrap user ID into `user` object
+			        user: userId ? { id: userId } : null
+			    };
+
+				
+				//	<!-- @Controller  class VehicleController -->
+
+			    fetch("/total_vehicles/add-vehicle-and-device", {
+			        method: "POST",
+			        headers: {
+			            "Content-Type": "application/json"
+			        },
+			        body: JSON.stringify(vehicleDetails)
+			    })
+			    .then(response => {
+			        if (response.ok) {
+			            alert("Vehicle and device added successfully!");
+			            window.location.href = "/dashboard_client";
+			        } else {
+			            return response.text().then(text => { throw new Error(text); });
+			        }
+			    })
+			    .catch(error => {
+			        console.error("Error:", error);
+			        alert("Failed to add vehicle/device. " + error.message);
+			    });
+			}
+
+		</script>
+		
+		
+</body>
+</html>

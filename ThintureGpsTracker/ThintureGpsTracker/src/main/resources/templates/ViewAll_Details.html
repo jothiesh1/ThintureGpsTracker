@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <title>THINTURE</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            background: linear-gradient(135deg, white,lightgray, gray); 
+            background-size: cover;
+            background-repeat: no-repeat;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            min-height: 100vh; /* Ensures the body takes at least the full viewport height */
+        }
+		.navbar {
+		          background: linear-gradient(135deg, white, white, #87ceeb, #4682b4, #005f6b); /* Gradient from light to dark blue */
+		           color: white;
+		           width: 100%;
+		           position: fixed;
+		           height: 110px; /* Adjust height as needed */
+		           top: 0;
+		           left: 0;
+		           z-index: 1000;
+		           border: 2px solid black; /* Border on all sides */
+		           text-align: center;
+		       }
+
+		       .navbar-container {
+		           display: flex;
+		           align-items: center;
+		           justify-content: space-between;
+		           padding: 10px 20px;
+		       }
+
+		       .navbar h1 {
+		           margin: 0;
+		           font-size: 20px;
+		       }
+
+		       .navbar ul {
+		           list-style-type: none;
+		           padding: 0;
+		           margin: 0;
+		           display: flex;
+		       }
+
+		       .navbar ul li {
+		           position: relative;
+		           margin: 0 10px;
+		       }
+
+		       .navbar ul li a {
+		           color: white;
+		           text-decoration: none;
+		           padding: 10px;
+		           display: block;
+		       }
+
+		       .navbar ul li a:hover {
+		           background-color: #34495e;
+		           border-radius: 5px;
+		       }
+
+		       .navbar ul li .dropdown-content {
+		           display: none;
+		           position: absolute;
+		           top: 100%;
+		           left: 0;
+		           background-color: #ffffff;
+		           color: #000000;
+		           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+		           border-radius: 5px;
+		           min-width: 160px;
+		           z-index: 1000;
+		       }
+
+		       .navbar ul li:hover .dropdown-content {
+		           display: block;
+		       }
+
+		       .navbar ul li .dropdown-content a {
+		           color: #000000;
+		           padding: 10px;
+		           display: block;
+		           text-decoration: none;
+		       }
+
+		       .navbar ul li .dropdown-content a:hover {
+		           background-color: #f0f0f0;
+		       }
+
+		       .content {
+		           padding: 20px;
+		           margin-top: 120px; /* Adjust according to navbar height */
+		       }
+
+		       .logo img {
+		           height: 90px;
+		           width: 210px;
+		           margin-right: 10px;
+		       }
+
+        .container {
+			position: absolute;
+            font-size: 14px;
+             background: linear-gradient(135deg, #f0f0f0, white,white);
+            width: 98%;
+            top:120px;
+            margin: auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .search-container {
+            margin-bottom: 20px;
+        }
+        .search {
+            padding: 5px;
+            margin-right: 10px;
+            width: calc(20% - 120px);
+        }
+        .search-button {
+            padding: 5px 10px;
+            width: 100px;
+			position: absolute;
+					       
+					        border-radius: 1px;
+					        border: 4px solid white;
+					      
+					        background-color: darkblue;
+					        color: white;
+					       
+							height:38px;
+        }
+        .rows-per-page {
+            margin-bottom: 20px;
+        }
+        .rows-per-page select {
+            padding: 5px;
+            margin-right: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+			font-size: 12px;
+        }
+        th, td {
+            padding: 5px;
+            border: 1px solid darkblue;
+            text-align: left;
+        }
+        th {
+            background-color: gray;
+            color: white;
+            font-weight: 800;
+            text-transform: uppercase;
+            text-align: center;
+			font-size: 5;
+        }
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            margin: 0 5px;
+            color: white;
+            font-size: 16px;
+        }
+        .view-btn {
+            color: #2196F3; /* Blue for view */
+        }
+        .delete-btn {
+            color: #f44336; /* Red for delete */
+        }
+        .map-btn {
+            color: #FF5722; /* Orange for map */
+        }
+        .icon-btn i {
+            margin: 0;
+        }
+		.pagination {
+		    display: flex;
+		    justify-content: center;
+		    margin-top: 20%;
+		}
+
+		.pagination button {
+		    padding: 10px 20px;
+		    margin: 0 5px;
+		    border: 4px solid white;
+		    background-color: darkblue;
+		    color: white;
+		    cursor: pointer;
+		}
+
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination span {
+            margin: 0 10px;
+        }
+
+        .pagination .active {
+            font-weight: bold;
+            color: darkblue;
+        }
+
+       
+
+        #detailView button {
+            margin-top: 10px;
+        }
+		#detailView {
+		    display: none;
+		    padding: 20px;
+		    background: linear-gradient(135deg, #f0f0f0, white,white,white,lightgray); /* Subtle gradient background */
+		    border: 3px solid #0078d4; /* Windows-like blue border */
+		    border-radius: 10px; /* Slightly rounded corners for a modern look */
+		    position: fixed;
+		    top: 10%;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    z-index: 1000;
+		    width: 80%;
+		    max-width: 800px;
+		    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
+		}
+
+		#detailView .close {
+		    position: absolute;
+		    top: 10px;
+		    right: 10px;
+		    font-size: 24px;
+		    cursor: pointer;
+		    color: #0078d4; /* Windows-like blue color */
+		}
+
+		#detailView .close:hover {
+		    color: #005a9e; /* Darker blue on hover */
+		}
+
+		#detailView h3 {
+		    margin-top: 0;
+		    color: #0078d4; /* Windows-like blue color for the heading */
+		    border-bottom: 2px solid #0078d4; /* Blue border below heading for emphasis */
+		    padding-bottom: 10px;
+		}
+		.excel {
+		        position: absolute;
+		        right: 83%;
+		        top: 158px;
+		        border-radius: 1px;
+		        border: 4px solid white;
+		      
+		        background-color: darkblue;
+		        color: white;
+		        cursor: pointer;
+				height:38px;
+		    }
+			h2 {
+			  
+			   text-align: center;
+			   height: 35px;
+			   font-size: 34px;
+			   
+			}
+
+    </style>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+	<div class="navbar">
+	       <div class="navbar-container">
+	           <a href="#" class="logo">
+	               <img src="THINTURE_IMAGE/Thinture.png" alt="Fleet Tracking Logo">
+	           </a>
+	           <ul>
+				<li>
+				                   <a href="#" class="dropdown-toggle">SuperAdmin</a>
+				                   <div class="dropdown-content">
+				                       <a href="Add_admin.html">ADD ADMIN</a>
+				                       <a href="addnew.html">ADD DEALER</a>
+				                       <a href="">ADD CLIENT</a>
+									   <a href=""> ADD USER</a>
+				                   </div>
+				               </li>
+	               <li>
+	                   <a href="#" class="dropdown-toggle">Tracking</a>
+	                   <div class="dropdown-content">
+	                       <a href="#live-tracking">Live Tracking</a>
+	                       <a href="#history">History</a>
+	                       <a href="#reports">Reports</a>
+	                   </div>
+	               </li>
+	               <li>
+	                   <a href="#" class="dropdown-toggle">Reports</a>
+	                   <div class="dropdown-content">
+	                       <a href="#monthly">Monthly Reports</a>
+	                       <a href="#annual">Annual Reports</a>
+	                       <a href="#custom">Custom Reports</a>
+	                   </div>
+	               </li>
+	               
+	               <li>
+	                   <a href="#" class="dropdown-toggle">Alerts</a>
+	                   <div class="dropdown-content">
+	                       <a href="#notifications">Notifications</a>
+	                       <a href="#settings">Settings</a>
+	                   </div>
+	               </li>
+	               
+	               <li>
+	                   <a href="#" class="dropdown-toggle">Help & Support</a>
+	                   <div class="dropdown-content">
+	                       <a href="#faq">FAQ</a>
+	                       <a href="#contact">Contact Us</a>
+	                       <a href="#guides">Guides</a>
+	                   </div>
+	               </li>
+	               <li>
+	                   <a href="#" class="dropdown-toggle">Profile</a>
+	                   <div class="dropdown-content">
+	                       <a href="#view-profile">View Profile</a>
+	                      
+	                       <a href="#logout">Logout</a>
+	                   </div>
+	               </li>
+	              
+	           </ul>
+	       </div>
+	   </div>
+    <br><br><br><br><br><br>
+
+    <div class="container">
+        <h2><strong>DEVICE REPORT</strong></h2>
+		
+        <div class="search-container">
+            <input type="text" class="search" id="search" placeholder="Search.......">
+            <button type="button" class="search-button" onclick="searchTable()">Search</button>
+        </div>
+
+        <div class="rows-per-page">
+            <label for="rowsPerPage">Rows per page:</label>
+            <select id="rowsPerPage" onchange="updateRowsPerPage()">
+                <option value="10">10</option>
+                <option value="25" selected>25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+ 
+		<button class="excel" onclick="exportToExcel('dataTable', 'Thinture_Report')">Export to Excel</button>
+		
+        <div id="tableContainer">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>DEVICE ID</th>
+                        <th>VEHICLE NO.</th>
+                        <th>Owner</th>
+                        <th>Vehicle Type</th>
+                        <th>Latitude</th>
+                        <th>Longitude</th>
+                        <th>Engine No</th>
+                        <th>Manufacturer</th>
+                        <th>Model</th>
+                        <th>Driver</th>
+                        <th>Installation</th>
+                        <th>Technician</th>
+                        <th>IMEI</th>
+                        <th>SIM NO</th>
+						<th>STATUS</th>
+                        <th>Dealer</th>
+                        <th>Country</th>
+                        <th>View</th>
+                        <th>Delete</th>
+                        <th>Map</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>TH/15A/0002</td>
+                        <td>KLHJDVF</td>
+                        <td>John Doe</td>
+                        <td>Car</td>
+                        <td>12.3456</td>
+                        <td>65.4321</td>
+                        <td>EN123456789</td>
+                        <td>Toyota</td>
+                        <td>Corolla</td>
+                        <td>Jane Smith</td>
+                        <td>2024-01-01</td>
+                        <td>Tech Guy</td>
+                        <td>123456789012345</td>
+                        <td>9876543210</td>
+						<td>N1</td>
+                        <td>Dealer XYZ</td>
+                        <td>USA</td>
+                        <td><button class="icon-btn view-btn" onclick="viewDetails(this)"><i class="fas fa-eye"></i></button></td>
+                        <td><button class="icon-btn delete-btn" onclick="deleteRow(this)"><i class="fas fa-trash"></i></button></td>
+                        <td><button class="icon-btn map-btn" onclick="openMapInNewTab('TH/15A/0002')"><i class="fas fa-map-marker-alt"></i></button></td>
+                    </tr>
+                    <!-- Add more rows here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="pagination">
+        <button id="prevPage" onclick="changePage(-1)">Previous</button>
+      <!--  <span id="pageNumbers"></span>-->
+        <button id="nextPage" onclick="changePage(1)">Next</button>
+    </div>
+
+    <div id="detailView">
+		<span class="close" onclick="closeDetailView()">&times;</span>
+        <h3>Details</h3>
+        <div id="detailContent"></div>
+        <button onclick="closeDetailView()">Close</button>
+    </div>
+
+    <script>
+        let rowsPerPage = 25; // Default value
+        let currentPage = 1;
+        const table = document.getElementById('dataTable');
+        const rows = Array.from(table.getElementsByTagName('tbody')[0].getElementsByTagName('tr')); // Exclude the header row
+
+        function displayRows() {
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            rows.forEach((row, index) => {
+                row.style.display = (index >= start && index < end) ? '' : 'none';
+            });
+            updatePaginationControls();
+        }
+
+        function updatePaginationControls() {
+            const pageCount = Math.ceil(rows.length / rowsPerPage);
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === pageCount;
+
+            const pageNumbers = document.getElementById('pageNumbers');
+            pageNumbers.innerHTML = '';
+            for (let i = 1; i <= pageCount; i++) {
+                const pageNumber = document.createElement('button');
+                pageNumber.textContent = i;
+                pageNumber.className = i === currentPage ? 'active' : '';
+                pageNumber.onclick = () => {
+                    currentPage = i;
+                    displayRows();
+                };
+                pageNumbers.appendChild(pageNumber);
+            }
+        }
+
+        function changePage(direction) {
+            const pageCount = Math.ceil(rows.length / rowsPerPage);
+            currentPage = Math.max(1, Math.min(pageCount, currentPage + direction));
+            displayRows();
+        }
+
+        function updateRowsPerPage() {
+            rowsPerPage = parseInt(document.getElementById('rowsPerPage').value);
+            currentPage = 1; // Reset to first page
+            displayRows();
+        }
+
+        function viewDetails(button) {
+            const row = button.closest('tr');
+            const cells = row.getElementsByTagName('td');
+
+            // Collect row data
+            const details = `
+                <p><strong>Device ID:</strong> ${cells[0].textContent}</p>
+                <p><strong>Vehicle No.:</strong> ${cells[1].textContent}</p>
+                <p><strong>Owner Name:</strong> ${cells[2].textContent}</p>
+                <p><strong>Vehicle Type:</strong> ${cells[3].textContent}</p>
+                <p><strong>Latitude:</strong> ${cells[4].textContent}</p>
+                <p><strong>Longitude:</strong> ${cells[5].textContent}</p>
+                <p><strong>Engine Number:</strong> ${cells[6].textContent}</p>
+                <p><strong>Manufacturer:</strong> ${cells[7].textContent}</p>
+                <p><strong>Model:</strong> ${cells[8].textContent}</p>
+                <p><strong>Driver Name:</strong> ${cells[9].textContent}</p>
+                <p><strong>Installation Date:</strong> ${cells[10].textContent}</p>
+                <p><strong>Technician Name:</strong> ${cells[11].textContent}</p>
+                <p><strong>IMEI:</strong> ${cells[12].textContent}</p>
+                <p><strong>SIM NO:</strong> ${cells[13].textContent}</p>
+                <p><strong>Dealer:</strong> ${cells[14].textContent}</p>
+                <p><strong>Country:</strong> ${cells[15].textContent}</p>
+            `;
+
+            // Display the details in the detail view section
+            const detailContent = document.getElementById('detailContent');
+            detailContent.innerHTML = details;
+
+            const detailView = document.getElementById('detailView');
+            detailView.style.display = 'block'; // Show the detail view
+        }
+
+        function closeDetailView() {
+            const detailView = document.getElementById('detailView');
+            detailView.style.display = 'none'; // Hide the detail view
+        }
+
+        // Initial display
+        displayRows();
+		
+    </script>
+	<script>
+	function exportToExcel(tableID, filename = '') {
+	    // Get the table data
+	    const table = document.getElementById(tableID);
+	    const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+	    
+	    // Generate Excel file
+	    const excelFilename = filename ? filename + '.xlsx' : 'excel_data.xlsx';
+	    XLSX.writeFile(wb, excelFilename);
+	}
+	</script>
+
+</body>
+</html>

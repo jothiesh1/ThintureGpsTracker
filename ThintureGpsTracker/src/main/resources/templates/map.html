@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Tracker</title>
+    
+    <!-- HERE Maps CSS -->
+    <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+	   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SockJS and STOMP for WebSocket -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+        
+        #map {
+			position: absolute;
+			top: 0;
+            width: 100%;
+            height: 100vh;
+        }
+        
+        .header {
+            background-color: #4285f4;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        #deviceInfo {
+            position: fixed;
+			width: 350px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+              background: rgba(255, 255,255, 0.8);
+            border-top: 1px solid #ccc;
+            min-height: 80px;
+        }
+        
+        .speed-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .speed-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid #c00;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .speed-detail {
+            flex: 1;
+        }
+        
+        .speed-comparison {
+            margin-top: 5px;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        
+        .speed-over {
+            background-color: #ffeeee;
+            color: #c00;
+        }
+        
+        .speed-under {
+            background-color: #eeffee;
+            color: #0c0;
+        }
+        
+        /* Vehicle status colors */
+        .running {
+            color: green;
+        }
+        
+        .idle {
+            color: orange;
+        }
+        
+        .offline {
+            color: red;
+        }
+        
+        /* Debug info panel */
+        #debugPanel {
+            position: fixed;
+            top: 70px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            max-width: 300px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+		.vehicle-popup {
+		    font-size: 13px;
+		    line-height: 1.5;
+		    padding: 5px;
+		    min-width: 200px;
+		}
+
+		.vehicle-popup .over-speed {
+		    color: red;
+		    font-weight: bold;
+		}
+
+		.vehicle-popup .under-speed {
+		    color: green;
+		}
+
+    </style>
+</head>
+<body>
+	
+	
+	
+  
+		<header th:insert="navigation_user :: navbar_user"></header>
+        <button onclick="toggleDebugPanel()" style="position: absolute; right: 10px; top: 10px;">Debug</button>
+   
+    
+    <div id="map"></div>
+    
+    <div id="deviceInfo">
+        <div id="noDeviceMessage">Waiting for devices...</div>
+        <div id="speedLimitInfo" style="display: none">
+            <h3>Current Device: <span id="currentDeviceId"></span> 
+                <span id="deviceStatus" style="margin-left: 10px;"></span>
+            </h3>
+            <div class="speed-info">
+                <div class="speed-circle" id="speedCircle">--</div>
+                <div class="speed-detail">
+                    <div id="speedRoad">Speed Limit</div>
+                    <div id="deviceSpeed">Current Speed: 0 km/h</div>
+                    <div id="deviceLocation">Location: --</div>
+                    <div id="deviceIgnition">Ignition: --</div>
+                    <div id="speedComparison" class="speed-comparison"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Debug Panel -->
+    <div id="debugPanel"></div>
+    
+    <!-- Load HERE Maps APIs -->
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
+    <script src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
+    
+    <script>
+        // Global variables
+        let map, platform, ui;
+        let markers = {};
+        let devices = {};
+        let currentDeviceId = null;
+        let debugEnabled = false;
+        
+        // HERE Maps API key
+        const apiKey = '19cJwlsY5xkdO13O_869LM29OScg30J1TCstjWfPSF8';
+        
+        // Initialize map
+        function initMap() {
+            platform = new H.service.Platform({
+                apikey: apiKey
+            });
+            
+            // Default layers
+            const defaultLayers = platform.createDefaultLayers();
+            
+            // Initialize map
+            map = new H.Map(
+                document.getElementById('map'),
+                defaultLayers.vector.normal.map,
+                {
+                    zoom: 13,
+                    center: { lat: 13.0779, lng: 77.5595 } // Default center based on device data
+                }
+            );
+            
+            // Add map interactions
+            const behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+            
+            // Add UI components
+            ui = H.ui.UI.createDefault(map, defaultLayers);
+            
+            // Make responsive
+            window.addEventListener('resize', () => map.getViewPort().resize());
+            
+            logDebug('Map initialized');
+            
+            // Initialize WebSocket connection
+            initWebSocket();
+            
+            // Test with sample data after 2 seconds
+            setTimeout(() => testWithRealData(), 2000);
+        }
+        
+        // Initialize WebSocket connection
+        function initWebSocket() {
+            logDebug('Initializing WebSocket connection...');
+            
+            const socket = new SockJS('/gs-guide-websocket');
+            const stompClient = Stomp.over(socket);
+            
+            // Disable debug logs for STOMP
+            stompClient.debug = null;
+            
+            stompClient.connect({}, frame => {
+                logDebug('WebSocket connected');
+                
+                // Subscribe to vehicle updates
+                stompClient.subscribe('/topic/location-updates', message => {
+                    try {
+                        const vehicleData = JSON.parse(message.body);
+                        processVehicleData(vehicleData, true);
+                    } catch (error) {
+                        logError('Error processing WebSocket message:', error);
+                    }
+                });
+            }, error => {
+                logError('WebSocket connection error:', error);
+                
+                // Retry connection after delay
+                setTimeout(() => initWebSocket(), 5000);
+            });
+        }
+        
+        // Process vehicle data
+        function processVehicleData(data, isLive = false) {
+            // Log raw data
+            logDebug('Raw data received:', data);
+            
+            try {
+                // Standardize data format with proper parsing of coordinates with leading zeros
+                const device = {
+                    deviceId: data.deviceId || data.deviceID || 'Unknown',
+                    // Parse coordinates with leading zeros
+                    latitude: parseFloat(String(data.latitude).replace(/^0+/, '')) || 0,
+                    longitude: parseFloat(String(data.longitude).replace(/^0+/, '')) || 0,
+                    speed: parseFloat(data.speed) || 0,
+                    course: parseFloat(data.course) || 0,
+                    timestamp: data.timestamp || new Date().toISOString(),
+                    ignition: data.ignition || 'Unknown',
+                    vehicleStatus: data.vehicleStatus || 'Unknown'
+                };
+                
+                // Log processed data
+                logDebug('Processed device data:', device);
+                
+                // Verify coordinates are valid
+                if (isNaN(device.latitude) || isNaN(device.longitude) || 
+                    device.latitude === 0 || device.longitude === 0) {
+                    logError(`Invalid coordinates for device ${device.deviceId}: ${device.latitude}, ${device.longitude}`);
+                    return;
+                }
+                
+                // Store device data
+                devices[device.deviceId] = device;
+                
+                // Update marker on map
+                updateDeviceMarker(device, isLive);
+                
+                // If this is a new device, show its info
+                if (!currentDeviceId) {
+                    showDeviceInfo(device.deviceId);
+                }
+                
+                // Update speed info if this is the currently selected device
+                if (currentDeviceId === device.deviceId) {
+                    updateDeviceSpeedInfo(device);
+                    updateDeviceStatus(device);
+                    
+                    // Get speed limit
+                    getSpeedLimit(device);
+                }
+            } catch (error) {
+                logError('Error processing vehicle data:', error);
+            }
+        }
+        
+        // Update device marker on map
+		function updateDeviceMarker(device, isLive = false) {
+		  const position = { lat: device.latitude, lng: device.longitude };
+		  const rotation = parseFloat(device.course || 0);
+		  let color = 'green';
+
+		  switch (device.vehicleStatus?.toUpperCase()) {
+		    case 'IDLE':
+		    case 'PARKED':
+		      color = 'orange';
+		      break;
+		    case 'OFFLINE':
+		    case 'CONNECTION LOST':
+		      color = 'red';
+		      break;
+		    case 'RUNNING':
+		      color = 'green';
+		      break;
+		  }
+
+		  const imagePath = `/THINTURE_IMAGE/car/${color}/car0.png`;
+
+		  // 🟢 Create a DOM image with rotation applied
+		  const img = document.createElement('img');
+		  img.src = imagePath;
+		  img.style.width = '40px';
+		  img.style.height = '40px';
+		  img.style.transform = `rotate(${rotation}deg)`;
+		  img.style.transformOrigin = 'center center';
+
+		  const domIcon = new H.map.DomIcon(img);
+		  const markerOptions = { icon: domIcon };
+
+		  if (markers[device.deviceId]) {
+		    markers[device.deviceId].setGeometry(position).setIcon(domIcon);
+		  } else {
+		    const marker = new H.map.DomMarker(position, markerOptions);
+			marker.addEventListener('tap', () => {
+			    showDeviceInfo(device.deviceId);
+			    createVehiclePopup(device);
+			});
+
+		    map.addObject(marker);
+		    markers[device.deviceId] = marker;
+		  }
+
+		  if (isLive && markers[device.deviceId]) {
+		    highlightMarker(markers[device.deviceId]);
+		  }
+		}
+
+		function createVehiclePopup(device) {
+		    const speedLimit = device.speedLimitValue || '--';
+		    const deviceSpeed = parseFloat(device.speed) || 0;
+		    const speedLimitVal = parseFloat(speedLimit) || 0;
+		    const isOverSpeed = deviceSpeed > speedLimitVal;
+
+		    const bubbleContent = `
+		        <div class="vehicle-popup">
+		            <div><strong>Device ID:</strong> ${device.deviceId}</div>
+		            <div><strong>Status:</strong> ${device.vehicleStatus}</div>
+		            <div><strong>Ignition:</strong> ${device.ignition}</div>
+		            <div><strong>Speed:</strong> 
+		                <span class="${isOverSpeed ? 'over-speed' : 'under-speed'}">${deviceSpeed} km/h</span>
+		            </div>
+		            <div><strong>Speed Limit:</strong> ${speedLimit} km/h</div>
+		            <div><strong>Location:</strong><br/> ${device.latitude.toFixed(5)}, ${device.longitude.toFixed(5)}</div>
+		        </div>
+		    `;
+
+		    const bubble = new H.ui.InfoBubble(
+		        { lat: device.latitude, lng: device.longitude },
+		        { content: bubbleContent }
+		    );
+
+		    ui.addBubble(bubble);
+		}
+
+
+        
+        // Get vehicle color based on status
+        function getVehicleColor(device) {
+            // Default color
+            let color = '#3b99fc'; // blue
+            
+            // Change color based on vehicle status or ignition
+            if (device.vehicleStatus) {
+                const status = device.vehicleStatus.toUpperCase();
+                if (status === 'RUNNING') {
+                    color = '#2ecc71'; // green
+                } else if (status === 'IDLE' || status === 'PARKED') {
+                    color = '#f39c12'; // orange
+                } else if (status === 'OFFLINE' || status === 'CONNECTION LOST') {
+                    color = '#e74c3c'; // red
+                }
+            } else if (device.ignition) {
+                // Fallback to ignition if status is not available
+                const ignition = device.ignition.toUpperCase();
+                if (ignition === 'IGON') {
+                    color = '#2ecc71'; // green
+                } else if (ignition === 'IGOFF') {
+                    color = '#f39c12'; // orange
+                }
+            }
+            
+            return color;
+        }
+        
+        // Highlight marker with animation
+        function highlightMarker(marker) {
+            // We can't directly animate H.map.Marker objects
+            // This is just a visual indicator in the console
+            logDebug('Marker highlighted (live update)');
+        }
+		function getAddressFromCoordinates(lat, lng, callback) {
+		    const apiKey = '19cJwlsY5xkdO13O_869LM29OScg30J1TCstjWfPSF8'; // your HERE API key
+		    const url = `https://revgeocode.search.hereapi.com/v1/revgeocode?at=${lat},${lng}&lang=en-US&apikey=${apiKey}`;
+
+		    fetch(url)
+		        .then(response => response.json())
+		        .then(data => {
+		            if (data.items && data.items.length > 0) {
+		                const address = data.items[0].address.label;
+		                callback(address);
+		            } else {
+		                callback("Unknown Address");
+		            }
+		        })
+		        .catch(error => {
+		            console.error("Reverse geocoding failed:", error);
+		            callback("Address Error");
+		        });
+		}
+
+        // Show device info
+        function showDeviceInfo(deviceId) {
+            const device = devices[deviceId];
+            if (!device) {
+                logError(`Device ${deviceId} not found in devices list`);
+                return;
+            }
+            
+            // Hide no device message
+            document.getElementById('noDeviceMessage').style.display = 'none';
+            
+            // Show speed limit info
+            document.getElementById('speedLimitInfo').style.display = 'block';
+            
+            // Set current device
+            currentDeviceId = deviceId;
+            document.getElementById('currentDeviceId').textContent = deviceId;
+            
+            // Update device info
+            updateDeviceSpeedInfo(device);
+            updateDeviceStatus(device);
+            
+            // Get speed limit
+            getSpeedLimit(device);
+            
+            // Center map on device
+            map.setCenter({ lat: device.latitude, lng: device.longitude });
+            map.setZoom(15);
+            
+            logDebug(`Showing info for device ${deviceId}`);
+        }
+        
+        // Update device speed info
+        function updateDeviceSpeedInfo(device) {
+            document.getElementById('deviceSpeed').textContent = `Current Speed: ${device.speed} km/h`;
+            document.getElementById('deviceLocation').textContent = 
+                `Location: ${device.latitude.toFixed(5)}, ${device.longitude.toFixed(5)}`;
+            document.getElementById('deviceIgnition').textContent = 
+                `Ignition: ${device.ignition ? (device.ignition.toUpperCase() === 'IGON' ? 'ON' : 'OFF') : 'Unknown'}`;
+        }
+        
+        // Update device status display
+        function updateDeviceStatus(device) {
+            const statusElement = document.getElementById('deviceStatus');
+            let statusClass = '';
+            let statusText = device.vehicleStatus || 'Unknown';
+            
+            // Determine status class
+            if (device.vehicleStatus) {
+                const status = device.vehicleStatus.toUpperCase();
+                if (status === 'RUNNING') {
+                    statusClass = 'running';
+                } else if (status === 'IDLE' || status === 'PARKED') {
+                    statusClass = 'idle';
+                } else if (status === 'OFFLINE' || status === 'CONNECTION LOST') {
+                    statusClass = 'offline';
+                }
+            }
+            
+            // Update status display
+            statusElement.className = statusClass;
+            statusElement.textContent = statusText;
+        }
+        
+        // Get speed limit for a location
+        function getSpeedLimit(device) {
+            const lat = device.latitude;
+            const lng = device.longitude;
+            
+            // Show loading state
+            document.getElementById('speedCircle').textContent = '...';
+            document.getElementById('speedRoad').textContent = 'Loading...';
+            document.getElementById('speedComparison').textContent = '';
+            document.getElementById('speedComparison').className = 'speed-comparison';
+            
+            logDebug(`Requesting speed limit for: ${lat}, ${lng}`);
+            
+            // Make API request to get speed limit
+            fetch(`/speed-limit/api/data?lat=${lat}&lng=${lng}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Server error: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    logDebug('Speed limit data received:', data);
+                    updateSpeedLimitDisplay(data, device);
+                })
+                .catch(error => {
+                    logError('Error fetching speed limit:', error);
+                    
+                    // Show error state
+                    document.getElementById('speedCircle').textContent = '--';
+                    document.getElementById('speedRoad').textContent = 'Error';
+                    document.getElementById('speedComparison').textContent = 'Could not get speed limit data';
+                });
+        }
+        
+        // Update speed limit display
+        function updateSpeedLimitDisplay(data, device) {
+            if (data.speedLimit) {
+                // Update circle with speed limit
+                document.getElementById('speedCircle').textContent = data.speedLimit;
+                
+                // Update road info
+                if (data.road) {
+                    document.getElementById('speedRoad').textContent = data.road;
+                } else {
+                    document.getElementById('speedRoad').textContent = 'Speed Limit';
+                }
+                
+                // Compare with device speed
+                const deviceSpeed = parseFloat(device.speed) || 0;
+                const speedLimit = parseFloat(data.speedLimit) || 0;
+                const speedComparison = document.getElementById('speedComparison');
+                
+                if (deviceSpeed > speedLimit) {
+                    speedComparison.textContent = `Over speed limit by ${(deviceSpeed - speedLimit).toFixed(1)} km/h`;
+                    speedComparison.className = 'speed-comparison speed-over';
+                } else {
+                    speedComparison.textContent = `Under speed limit by ${(speedLimit - deviceSpeed).toFixed(1)} km/h`;
+                    speedComparison.className = 'speed-comparison speed-under';
+                }
+            } else {
+                // No speed limit data available
+                document.getElementById('speedCircle').textContent = '--';
+                document.getElementById('speedRoad').textContent = 'Unknown';
+                document.getElementById('speedComparison').textContent = 'Speed limit data not available';
+                document.getElementById('speedComparison').className = 'speed-comparison';
+            }
+        }
+        
+        // Logging functions
+        function logDebug(...args) {
+            console.log(...args);
+            if (debugEnabled) {
+                const panel = document.getElementById('debugPanel');
+                const message = args.map(arg => 
+                    typeof arg === 'object' ? JSON.stringify(arg) : arg
+                ).join(' ');
+                panel.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${message}</div>`;
+                panel.scrollTop = panel.scrollHeight;
+            }
+        }
+        
+        function logError(...args) {
+            console.error(...args);
+            if (debugEnabled) {
+                const panel = document.getElementById('debugPanel');
+                const message = args.map(arg => 
+                    typeof arg === 'object' ? JSON.stringify(arg) : arg
+                ).join(' ');
+                panel.innerHTML += `<div style="color: #ff6b6b">${new Date().toLocaleTimeString()}: ${message}</div>`;
+                panel.scrollTop = panel.scrollHeight;
+            }
+        }
+        
+        // Toggle debug panel
+        function toggleDebugPanel() {
+            debugEnabled = !debugEnabled;
+            const panel = document.getElementById('debugPanel');
+            panel.style.display = debugEnabled ? 'block' : 'none';
+            if (debugEnabled) {
+                panel.innerHTML = '<div>Debug panel enabled</div>';
+            }
+        }
+        
+     
+        // Initialize the map when page loads
+        window.onload = initMap;
+        
+  
+    </script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

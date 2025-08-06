@@ -1,0 +1,66 @@
+body {
+     background: linear-gradient(rgba(10,25,47,.95),rgba(15,32,65,.95)),
+                 url('/THINTURE_IMAGE/add_new.jpg') center/cover fixed;
+     color: #f0f0f0;
+     font-family: 'Segoe UI', sans-serif;
+     min-height: 100vh;
+   }
+   .card {
+     position: relative;
+     top: 130px;
+     margin: 3rem auto;
+     width: 80%;
+     background: rgba(15,32,65,.8);
+     border-radius: 16px;
+     padding: 20px;
+     box-shadow: 0 8px 20px rgba(0,0,0,.5);
+   }
+   .card h1 { color:#fff; font-weight:bold; }
+   label, .form-label { color:#fff; }
+   .filters { background: rgba(255,255,255,.05); padding:20px; border-radius:15px; margin-bottom:1.5rem; }
+   .filters .form-control,
+   .filters .form-select { border:none; border-radius:10px; width: 150px; padding: .5rem; }
+   .filters.row { align-items:flex-end; }
+   .filters .btn {
+	background: linear-gradient(
+				 																					 	     135deg,
+				 																					 	    
+				 																					 	     rgba(15, 32, 65, 0.8),
+				 																					 	     rgba(15, 32, 65, 0.8),
+				 																					 	     rgba(15, 32, 65, 0.8)
+				 																					 	 );
+     border-radius:10px; font-weight:bold;
+  color: white;
+     box-shadow: 0 4px 12px rgba(255,255,255,.4);
+     height:38px;
+   }
+  
+   .filters .gap-2 { gap:.5rem; }
+   .table-container { background:#fff; border-radius:10px; overflow-x:auto; }
+
+
+.table thead th {
+  background: rgba(15, 32, 65, 0.8);
+  color: #fff;
+  text-transform: uppercase;
+}
+
+  
+  
+   .table tbody td { color:#212529; 
+	text-align:center; }
+   #pagination button {
+     min-width:100px; font-weight:bold; border:none;
+  box-shadow: 0 4px 12px rgba(255,255,255,.4);
+  color: white;
+  background: linear-gradient(
+  			 																					 	     135deg,
+  			 																					 	    
+  			 																					 	     rgba(15, 32, 65, 0.8),
+  			 																					 	     rgba(15, 32, 65, 0.8),
+  			 																					 	     rgba(15, 32, 65, 0.8)
+  			 																					 	 );
+   margin:0 .25rem;
+   }
+   
+   #currentPage { color: #fff; font-weight:600; }

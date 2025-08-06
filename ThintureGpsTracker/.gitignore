@@ -1,0 +1,12 @@
+logs/
+target/
+bin/
+docker/
+.settings/
+.classpath
+.factorypath
+.project
+*.iml
+*.log
+*.tmp
+.DS_Store

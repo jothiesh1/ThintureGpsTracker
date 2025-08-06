@@ -1,0 +1,96 @@
+body {
+								    font-family: Arial, sans-serif;
+								    margin: 0;
+								    padding: 0;
+								    position: relative;
+								}
+
+								body::before {
+											    content: "";
+											    position: fixed;
+											    top: 0;
+											    left: 0;
+											    width: 100%;
+											    height: 100%;
+
+											    background: linear-gradient(
+											        rgba(10, 25, 47, 0.95),
+											        rgba(15, 32, 65, 0.95)
+											      ),
+											      url('/THINTURE_IMAGE/add_new.jpg') no-repeat center center/cover;
+
+											    filter: blur(2px);
+											    z-index: -1;
+											}
+											@media only screen and (max-width: 768px) {
+											    body {
+											        background-attachment: fixed;
+											        min-height: 100vh;
+											        font-size: 14px;
+											        background-color: #0a192f; /* fallback for small screens if image fails */
+											        background-size: cover;
+											        color: #f0f0f0;
+											    }
+											}
+											.card {
+											    background-color: rgba(0, 0, 0, 0.3);
+											    position: relative; /* changed from absolute */
+											    margin: 150px auto 30px auto; /* adds top margin & centers */
+											    width: 80%;
+											    height: 750px;
+											    padding: 20px;
+											    border-radius: 12px;
+											    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+											}
+
+
+    h2 {
+      margin-bottom: 20px;
+	  color: azure;
+	  text-align: center;
+    }
+
+	.table-wrapper {
+	    width: 100%;
+	    overflow-x: auto;
+	}
+
+	/* Only apply scroll on small screens */
+	@media (max-width: 768px) {
+	    .table-wrapper {
+	        display: block;
+	        max-width: 100%;
+	        overflow-x: auto;
+	        -webkit-overflow-scrolling: touch;
+	    }
+
+	    table {
+	        min-width: 600px; /* Ensures horizontal scroll if needed */
+	    }
+	}
+
+	/* On larger screens, prevent scrolling */
+	@media (min-width: 769px) {
+	    .table-wrapper {
+	        overflow-x: visible;
+	    }
+	}
+
+
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color:darkblue;
+	  color: azure;
+    }
+	#pagination button {
+	    min-width: 30px;
+	}
+#searchInput{
+	width: 240px;
+}
