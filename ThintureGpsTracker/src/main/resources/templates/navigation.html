@@ -60,7 +60,7 @@
 		                    <li class="nav-item dropdown">
 		                        <a class="nav-link dropdown-toggle" href="#" id="trackingDropdown" role="button"
 		                            data-bs-toggle="dropdown" aria-expanded="false">
-		                            <strong>TRIP MANAGEMENT</strong>
+		                            <strong>Tracking</strong>
 		                        </a>
 		                        <ul class="dropdown-menu">
 									<li><a class="dropdown-item" href="/superadmin/map4">Live Map</a></li>
@@ -92,25 +92,13 @@
 											                         </a>
 											                         <ul class="dropdown-menu">
 																		<!-- inside REPORT dropdown -->
-																		<li><a class="dropdown-item" href="/superadmin/event">All Reports</a></li>
+																		<li><a class="dropdown-item" href="/superadmin/event">Reports</a></li>
+																		
 																		
 
 											                         </ul>
 											                     </li>
-																 <li class="nav-item dropdown">
-																  <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" data-bs-toggle="dropdown">
-																 	<strong>Users Management</strong>
-																  </a>
-																 <ul class="dropdown-menu">
-																	<li><a class="dropdown-item" href="/superadmin/admin_view">Admin</a></li>
-																	<li><a class="dropdown-item" href="/superadmin/dealer_view">Dealer</a></li>
-																	<li><a class="dropdown-item" href="/superadmin/client_view">Client</a></li>
-																	<li><a class="dropdown-item" href="/superadmin/users_view">User</a></li>
-																	<li><a class="dropdown-item" href="/superadmin/driver_view">Driver</a></li>
-
-																  
-																 </ul>
-																 </li>
+																
 																 <li class="nav-item dropdown">
 																 <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" data-bs-toggle="dropdown">
 																 <strong>NOTIFICATIONS</strong>
@@ -132,11 +120,7 @@
 																		  </a>
 											                         </ul>
 											                     </li>
-																 <li class="nav-item">
-																     <a class="nav-link" href="#" id="refreshPage">
-																           <strong><i class="fas fa-redo" id="refreshIcon"></i> REFRESH</strong>
-																     </a>
-																 </li>
+																 
 
 		                </ul>
 		            </div>
@@ -262,24 +246,7 @@
     });
 </script>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const refreshBtn = document.getElementById("refreshPage");
-    const refreshIcon = document.getElementById("refreshIcon");
 
-    refreshBtn.addEventListener("click", function (e) {
-        e.preventDefault();
-
-        // Add spin class
-        refreshIcon.classList.add("fa-spin");
-
-        // Simulate delay or refresh
-        setTimeout(() => {
-            location.reload(); // Refresh the page
-        }, 500); // delay for animation effect (optional)
-    });
-});
-</script>
 
 <script>
 		    document.getElementById('backward-button').addEventListener('click', () => {

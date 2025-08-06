@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Thinture GPS – Event Report</title>
-  <link rel="icon" href="THINTURE_IMAGE/favicon.jpg">
+  <title>Thinture GPS </title>
+  <link rel="icon" href="/THINTURE_IMAGE/favicon.jpg">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -76,6 +76,7 @@
             <th>Speed</th>
             <th>Ignition</th>
             <th>Status</th>
+			<th>L/H</th>
 			<th>Address</th>
 
           </tr>
@@ -87,11 +88,18 @@
     </div>
 
     <!-- Pagination -->
-    <div id="pagination" class="d-flex justify-content-center mt-3">
-      <button onclick="changePage(-1)">⬅️ Prev</button>
-      <span id="currentPage">Page 0 of 0</span>
-      <button onclick="changePage(1)">Next ➡️</button>
-    </div>
+	<div id="pagination-controls" class="d-flex justify-content-center align-items-center mt-4 gap-3">
+	  <button id="prevBtn" class="pagination-style">
+	    <i class="fas fa-arrow-left text-info me-1"></i> <strong>Prev</strong>
+	  </button>
+	  
+	  <span class="page-info text-white fw-semibold" id="page-info">Page 1 of 1</span>
+	  
+	  <button id="nextBtn" class="pagination-style">
+	    <strong>Next</strong> <i class="fas fa-arrow-right text-info ms-1"></i>
+	  </button>
+	</div>
+
   </div>
 
 
@@ -209,8 +217,8 @@
 
 	function renderPage() {
 	  const totalPages = Math.ceil(reportDataGlobal.length / rowsPerPage) || 1;
-	  const start      = (currentPage - 1) * rowsPerPage;
-	  const pageData   = reportDataGlobal.slice(start, start + rowsPerPage);
+	  const start = (currentPage - 1) * rowsPerPage;
+	  const pageData = reportDataGlobal.slice(start, start + rowsPerPage);
 
 	  const tbl = document.getElementById('reportTable');
 	  tbl.innerHTML = '';
@@ -224,13 +232,14 @@
 	      tr.innerHTML = `
 	        <td>${r.deviceID || '–'}</td>
 	        <td>${formatDateTimeRaw(r.timestamp)}</td>
-	        <td>${(+r.latitude  || 0).toFixed(5)}</td>
+	        <td>${(+r.latitude || 0).toFixed(5)}</td>
 	        <td>${(+r.longitude || 0).toFixed(5)}</td>
 	        <td>${r.vehicleSpeed || 0} km/h</td>
-	        <td style="color:${r.ignition==='IGon' ? 'lime' : 'red'}">
+	        <td style="color:${r.ignition === 'IGon' ? 'lime' : 'red'}">
 	          ${r.ignition === 'IGon' ? 'ON' : r.ignition === 'IGoff' ? 'OFF' : '–'}
 	        </td>
-	        <td>${r.vehicleStatus || '–'}</td>
+			<td>${r.vehicleStatus || '–'}</td>
+			<td>${r.status || '–'}</td>
 	        <td>
 	          <button class="btn btn-sm btn-primary"
 	                  onclick="viewAddress(${r.latitude}, ${r.longitude})">
@@ -241,9 +250,16 @@
 	    });
 	  }
 
-	  document.getElementById('currentPage')
-	          .textContent = `Page ${currentPage} of ${totalPages}`;
+	  // ✅ Update this to match new pagination layout
+	
+	  document.getElementById('page-info').textContent = `Page ${currentPage} of ${totalPages}`;
+
+	  // Disable buttons at edges
+	  document.getElementById("nextBtn").disabled = currentPage >= totalPages;
+	  document.getElementById("prevBtn").disabled = currentPage <= 1;
+
 	}
+
 
     function changePage(direction){
       const total = Math.ceil(reportDataGlobal.length / rowsPerPage) || 1;
@@ -304,107 +320,109 @@
 
     // stubs for PDF/Excel
 	async function downloadPDF() {
-	     // — grab your filters
-	     const fromInput   = document.getElementById('fromDate');
-	     const toInput     = document.getElementById('toDate');
-	     const devSelect   = document.getElementById('deviceID');
-	     const statSelect  = document.getElementById('vehicleStatus');
+		  const fromDate = document.getElementById('fromDateTime').value;
+		  const toDate = document.getElementById('toDateTime').value;
+		  const deviceID = document.getElementById('deviceID').value.trim();
+		  const vehicleStatus = document.getElementById('vehicleStatus').value;
 
-	     // — sanity check
-	     if (!fromInput || !toInput || !devSelect || !statSelect) {
-	       console.error('❌ One of the filter elements is missing:', {
-	         fromDate: fromInput, toDate: toInput,
-	         deviceID: devSelect, vehicleStatus: statSelect
-	       });
-	       Swal.fire('Error','Filter inputs not found in DOM','error');
-	       return;
-	     }
+		  if (!fromDate || !toDate) {
+		    Swal.fire({
+		      icon: "warning",
+		      title: "Missing Dates",
+		      text: "Please select both From and To dates."
+		    });
+		    return;
+		  }
 
-	     const fromDate      = fromInput.value;
-	     const toDate        = toInput.value;
-	     const deviceID      = devSelect.value.trim();
-	     const vehicleStatus = statSelect.value;
+		  const startDate = fromDate + ":00"; // ✅ Fixes timestamp
+		  const endDate = toDate + ":59";     // ✅ Ensures valid end time
 
-	     if (!fromDate || !toDate) {
-	       Swal.fire({
-	         icon: "warning",
-	         title: "Missing Dates",
-	         text: "Please select both From and To dates.",
-	         confirmButtonColor: "#3085d6"
-	       });
-	       return;
-	     }
+		  const url = `/api/vehicle/report/export/pdf?startDate=${startDate}&endDate=${endDate}` +
+		    (deviceID ? `&deviceId=${deviceID}` : '') +
+		    (vehicleStatus ? `&vehicleStatus=${vehicleStatus}` : '');
 
-	     const startDate = `${fromDate}T00:00:00`;
-	     const endDate   = `${toDate}T23:59:59`;
+		  console.log("PDF download URL:", url); // ✅ Inspect if needed
 
-	     const url =
-	       `/api/vehicle/report/export/pdf?startDate=${encodeURIComponent(startDate)}`
-	       + `&endDate=${encodeURIComponent(endDate)}`
-	       + (deviceID      ? `&deviceId=${encodeURIComponent(deviceID)}`         : '')
-	       + (vehicleStatus ? `&vehicleStatus=${encodeURIComponent(vehicleStatus)}` : '');
+		  try {
+		    const response = await fetch(url, { method: 'GET', headers: { 'Accept': 'application/pdf' } });
 
-	     try {
-	       const res = await fetch(url, {
-	         method: 'GET',
-	         headers: { 'Accept': 'application/pdf' }
-	       });
-	       if (!res.ok) throw new Error(`Status ${res.status}`);
-	       const blob = await res.blob();
-	       const link = document.createElement('a');
-	       const stamp = new Date().toISOString().slice(0,19).replace(/:/g,'-');
-	       link.href = URL.createObjectURL(blob);
-	       link.download = `Vehicle_Report_${stamp}_UTC.pdf`;
-	       document.body.appendChild(link);
-	       link.click();
-	       link.remove();
-	     } catch (err) {
-	       console.error("Download error:", err);
-	       Swal.fire("Download Error", err.message, "error");
-	     }
-	   }
+		    if (!response.ok) {
+		      const errText = await response.text(); // See backend error
+		      console.error("Backend error:", errText);
+		      throw new Error("Failed to download PDF file.");
+		    }
 
-	async function downloadExcel() {
-	  const fromDate = document.getElementById('fromDate').value;
-	  const toDate = document.getElementById('toDate').value;
-	  const deviceID = document.getElementById('deviceID').value.trim();
-	  const vehicleStatus = document.getElementById('vehicleStatus').value;
+		    const blob = await response.blob();
+		    const link = document.createElement('a');
+		    link.href = window.URL.createObjectURL(blob);
+		    link.download = 'Vehicle_Report.pdf';
+		    document.body.appendChild(link);
+		    link.click();
+		    document.body.removeChild(link);
+		  } catch (error) {
+		    console.error("Error in downloadPDF:", error);
+		    Swal.fire({
+		      icon: "error",
+		      title: "PDF Download Failed",
+		      text: error.message
+		    });
+		  }
+		}
 
-	  if (!fromDate || !toDate) {
-		Swal.fire({
-		  icon: "warning",
-		  title: "Missing Date Range",
-		  text: "Please select both From and To dates."
-		});
 
-	    return;
-	  }
+		async function downloadExcel() {
+		  const fromDate = document.getElementById('fromDateTime').value;
+		  const toDate = document.getElementById('toDateTime').value;
+		  const deviceID = document.getElementById('deviceID').value.trim();
+		  const vehicleStatus = document.getElementById('vehicleStatus').value;
 
-	  const startDate = `${fromDate}T00:00:00`;
-	  const endDate = `${toDate}T23:59:59`;
+		  if (!fromDate || !toDate) {
+		    Swal.fire({
+		      icon: "warning",
+		      title: "Missing Date Range",
+		      text: "Please select both From and To dates."
+		    });
+		    return;
+		  }
 
-	  const url = `/api/vehicle/report/export/excel?startDate=${startDate}&endDate=${endDate}` +
-	    (deviceID ? `&deviceId=${deviceID}` : '') +
-	    (vehicleStatus ? `&vehicleStatus=${vehicleStatus}` : '');
+		  // ✅ Fix: append seconds correctly
+		  const startDate = fromDate + ":00";
+		  const endDate = toDate + ":59";
 
-	  try {
-	    const response = await fetch(url, { method: 'GET', headers: { 'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' } });
+		  const url = `/api/vehicle/report/export/excel?startDate=${startDate}&endDate=${endDate}` +
+		    (deviceID ? `&deviceId=${deviceID}` : '') +
+		    (vehicleStatus ? `&vehicleStatus=${vehicleStatus}` : '');
 
-	    if (!response.ok) throw new Error("Failed to download Excel file.");
+		  try {
+		    const response = await fetch(url, {
+		      method: 'GET',
+		      headers: {
+		        'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+		      }
+		    });
 
-	    const blob = await response.blob();
-	    const link = document.createElement('a');
-	    link.href = window.URL.createObjectURL(blob);
-	    link.download = 'Vehicle_Report.xlsx';
-	    document.body.appendChild(link);
-	    link.click();
-	    document.body.removeChild(link);
-	  } catch (error) {
-	    console.error("Error in downloadExcel:", error);
-	    alert("Failed to download Excel file.");
-	  }
-	}
+		    if (!response.ok) {
+		      const errText = await response.text();
+		      console.error("Excel Backend error:", errText);
+		      throw new Error("Failed to download Excel file.");
+		    }
 
+		    const blob = await response.blob();
+		    const link = document.createElement('a');
+		    link.href = window.URL.createObjectURL(blob);
+		    link.download = 'Vehicle_Report.xlsx';
+		    document.body.appendChild(link);
+		    link.click();
+		    document.body.removeChild(link);
+		  } catch (error) {
+		    console.error("Error in downloadExcel:", error);
+		    Swal.fire({
+		      icon: "error",
+		      title: "Excel Download Failed",
+		      text: error.message
+		    });
+		  }
+		}
 	
 	
 	
@@ -481,6 +499,16 @@
 	  }
 	}
 
+	// Attach event listeners after DOM is fully loaded
+	document.addEventListener("DOMContentLoaded", () => {
+	  document.getElementById("nextBtn").addEventListener("click", () => {
+	    changePage(1);
+	  });
+
+	  document.getElementById("prevBtn").addEventListener("click", () => {
+	    changePage(-1);
+	  });
+	});
 
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

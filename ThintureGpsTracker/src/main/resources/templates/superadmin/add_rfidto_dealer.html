@@ -150,6 +150,8 @@
 	    }
 
 	    // Final form submission logic
+		// Replace your validateForm() function with this:
+
 		function validateForm() {
 		  const dealerId = document.getElementById('dealerDropdown').value;
 		  const fileInput = document.getElementById('rfidUpload');
@@ -196,22 +198,54 @@
 		    },
 		    body: JSON.stringify(rfidArray)
 		  })
-		    .then(response => response.text())
-		    .then(message => {
-		      Swal.fire("Success", message, "success");
-		      document.getElementById("driver-form").reset();
-		      rfidSet.clear();
-		      displayRFIDs();
-		      document.getElementById("selectedDealerId").innerText = '';
+		    .then(response => response.json()) // Changed from .text() to .json()
+		    .then(data => {
+		      if (data.success) {
+		        let message = data.message;
+		        
+		        // Show details if there were duplicates
+		        if (data.duplicateCount > 0) {
+		          message += "\n\nDuplicates: " + data.duplicateRFIDs.join(", ");
+		          Swal.fire({
+		            icon: "warning",
+		            title: "Partial Success",
+		            text: message,
+		            confirmButtonColor: "#3085d6"
+		          });
+		        } else {
+		          Swal.fire({
+		            icon: "success",
+		            title: "Success",
+		            text: message,
+		            confirmButtonColor: "#3085d6"
+		          });
+		        }
+		        
+		        document.getElementById("driver-form").reset();
+		        rfidSet.clear();
+		        displayRFIDs();
+		        document.getElementById("selectedDealerId").innerText = '';
+		      } else {
+		        Swal.fire({
+		          icon: "error",
+		          title: "Error",
+		          text: data.message || "Failed to submit RFIDs",
+		          confirmButtonColor: "#d33"
+		        });
+		      }
 		    })
 		    .catch(error => {
 		      console.error("Error:", error);
-		      Swal.fire("Error", "Failed to submit RFIDs", "error");
+		      Swal.fire({
+		        icon: "error",
+		        title: "Network Error",
+		        text: "Failed to submit RFIDs. Please check your connection and try again.",
+		        confirmButtonColor: "#d33"
+		      });
 		    });
 
 		  return false;
 		}
-
 		
 		document.getElementById('rfidUpload').addEventListener('change', function () {
 		  if (this.files.length > 0) {

@@ -16,13 +16,11 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
-
 @Entity
 @Table(
     name = "client",
     uniqueConstraints = {
         @UniqueConstraint(columnNames = "email") // ✅ Enforce unique email
-        // Add more if needed: phone, companyName
     }
 )
 public class Client extends BaseEntity {
@@ -40,14 +38,13 @@ public class Client extends BaseEntity {
     private String country;
     private String password;
     private boolean status = true;
-
-    
-    
     private String resetToken;
-    // Hybrid ID Fields
-    @Column(name = "admin_id")
-    private Long admin_id;
 
+    // ✅ REMOVE the separate admin_id column - JPA will handle it automatically
+    // @Column(name = "admin_id")  // ← DELETE THIS LINE
+    // private Long admin_id;      // ← DELETE THIS LINE
+
+    // Keep other hybrid ID fields
     @Column(name = "dealer_id")
     private Long dealer_id;
 
@@ -63,9 +60,9 @@ public class Client extends BaseEntity {
     @Column(name = "client_id")
     private Long client_id;
 
-    // Entity References (LAZY)
+    // ✅ Entity References - admin will automatically manage admin_id column
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "admin_id", referencedColumnName = "id")
     private Admin admin;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -89,12 +86,17 @@ public class Client extends BaseEntity {
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VehicleLastLocation> vehicleLastLocations = new ArrayList<>();
 
-    // Login Fields
-
-
-    // === Hybrid Mapping Accessors (from BaseEntity) ===
-    @Override public Long getAdmin_id() { return admin_id; }
-    @Override public void setAdmin_id(Long admin_id) { this.admin_id = admin_id; }
+    // === BaseEntity Implementation ===
+    @Override 
+    public Long getAdmin_id() { 
+        return admin != null ? admin.getId() : null; 
+    }
+    
+    @Override 
+    public void setAdmin_id(Long admin_id) { 
+        // This is handled automatically by JPA when you set the admin entity
+        // If you need to set by ID, you'd need to fetch the Admin entity first
+    }
 
     @Override public Long getDealer_id() { return dealer_id; }
     @Override public void setDealer_id(Long dealer_id) { this.dealer_id = dealer_id; }
@@ -116,7 +118,10 @@ public class Client extends BaseEntity {
     public void setId(Long id) { this.id = id; }
 
     public Admin getAdmin() { return admin; }
-    public void setAdmin(Admin admin) { this.admin = admin; }
+    public void setAdmin(Admin admin) { 
+        this.admin = admin; 
+        // JPA will automatically update the admin_id column in database
+    }
 
     public Dealer getDealer() { return dealer; }
     public void setDealer(Dealer dealer) { this.dealer = dealer; }
@@ -162,7 +167,6 @@ public class Client extends BaseEntity {
     public boolean isStatus() { return status; }
     public void setStatus(boolean status) { this.status = status; }
 
-    // === toString ===
     @Override
     public String toString() {
         return "Client{" +
@@ -170,7 +174,7 @@ public class Client extends BaseEntity {
                 ", companyName='" + companyName + '\'' +
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
-                ", admin_id=" + admin_id +
+                ", admin_id=" + getAdmin_id() +  // ✅ Use the method instead of field
                 ", dealer_id=" + dealer_id +
                 ", superadmin_id=" + superadmin_id +
                 ", client_id=" + client_id +

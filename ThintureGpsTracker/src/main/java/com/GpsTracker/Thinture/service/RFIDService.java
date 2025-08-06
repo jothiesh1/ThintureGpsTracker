@@ -3,24 +3,19 @@ package com.GpsTracker.Thinture.service;
 import com.GpsTracker.Thinture.dto.RFIDDetailsDTO;
 import com.GpsTracker.Thinture.model.Client;
 import com.GpsTracker.Thinture.model.Dealer;
-
 import com.GpsTracker.Thinture.model.RFID;
 import com.GpsTracker.Thinture.repository.ClientRepository;
 import com.GpsTracker.Thinture.repository.DealerRepository;
 import com.GpsTracker.Thinture.repository.RFIDRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.stereotype.Service;
 
-
 import java.util.*;
-
-
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 @Service
 public class RFIDService {
@@ -33,11 +28,11 @@ public class RFIDService {
     @Autowired
     private DealerRepository dealerRepository;
 
-     @Autowired
-     private ClientRepository clientRepository;
+    @Autowired
+    private ClientRepository clientRepository;
     
-    //dealer
-    public void saveRFIDs(List<String> rfidCodes, Long dealerId) {
+    // ✅ Enhanced dealer method with duplicate details
+    public Map<String, Object> saveRFIDs(List<String> rfidCodes, Long dealerId) {
         logger.info("[RFID API] Saving {} RFIDs for dealerId={}", rfidCodes.size(), dealerId);
 
         Dealer dealer = dealerRepository.findById(dealerId)
@@ -48,6 +43,8 @@ public class RFIDService {
 
         int savedCount = 0;
         int skippedCount = 0;
+        List<String> savedRFIDs = new ArrayList<>();
+        List<String> duplicateRFIDs = new ArrayList<>();
 
         for (String code : rfidCodes) {
             if (!rfidRepository.existsByRfidCode(code)) {
@@ -56,17 +53,30 @@ public class RFIDService {
                 rfid.setDealer(dealer);
                 rfidRepository.save(rfid);
                 logger.debug("[RFID API] Saved RFID: {}", code);
+                savedRFIDs.add(code);
                 savedCount++;
             } else {
                 logger.warn("[RFID API] Duplicate RFID skipped: {}", code);
+                duplicateRFIDs.add(code);
                 skippedCount++;
             }
         }
 
         logger.info("[RFID API] Completed saving. Total saved: {}, Skipped: {}", savedCount, skippedCount);
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("savedCount", savedCount);
+        result.put("duplicateCount", skippedCount);
+        result.put("savedRFIDs", savedRFIDs);
+        result.put("duplicateRFIDs", duplicateRFIDs);
+        result.put("success", true);
+        result.put("message", savedCount + " RFIDs registered successfully, " + skippedCount + " duplicates skipped.");
+        
+        return result;
     }
- // Client method (new)
-    public void saveRFIDsForClient(List<String> rfidCodes, Long clientId) {
+
+    // ✅ Enhanced client method with duplicate details
+    public Map<String, Object> saveRFIDsForClient(List<String> rfidCodes, Long clientId) {
         logger.info("[RFID API] Saving {} RFIDs for clientId={}", rfidCodes.size(), clientId);
 
         Client client = clientRepository.findById(clientId)
@@ -77,24 +87,37 @@ public class RFIDService {
 
         int savedCount = 0;
         int skippedCount = 0;
+        List<String> savedRFIDs = new ArrayList<>();
+        List<String> duplicateRFIDs = new ArrayList<>();
 
         for (String code : rfidCodes) {
             if (!rfidRepository.existsByRfidCode(code)) {
                 RFID rfid = new RFID();
                 rfid.setRfidCode(code);
-                rfid.setClient(client);  // Set the client here
+                rfid.setClient(client);
                 rfidRepository.save(rfid);
                 logger.debug("[RFID API] Saved RFID: {}", code);
+                savedRFIDs.add(code);
                 savedCount++;
             } else {
                 logger.warn("[RFID API] Duplicate RFID skipped: {}", code);
+                duplicateRFIDs.add(code);
                 skippedCount++;
             }
         }
 
         logger.info("[RFID API] Completed saving. Total saved: {}, Skipped: {}", savedCount, skippedCount);
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("savedCount", savedCount);
+        result.put("duplicateCount", skippedCount);
+        result.put("savedRFIDs", savedRFIDs);
+        result.put("duplicateRFIDs", duplicateRFIDs);
+        result.put("success", true);
+        result.put("message", savedCount + " RFIDs registered successfully, " + skippedCount + " duplicates skipped.");
+        
+        return result;
     }
-    
     
     public List<RFIDDetailsDTO> getAllRFIDDetails() {
         List<RFID> rfidList = rfidRepository.findAll();
@@ -105,19 +128,22 @@ public class RFIDService {
 
             if (rfid.getDealer() != null) {
                 dto.setDealerId(rfid.getDealer().getId());
-             //   dto.setDealerName(rfid.getDealer().getName()); // assumes Dealer has getName()
             }
 
             if (rfid.getClient() != null) {
                 dto.setClientId(rfid.getClient().getId());
-              //  dto.setClientName(rfid.getClient().getName()); // assumes Client has getName()
             }
 
             return dto;
         }).toList();
     }
     
+ // Add this method to your existing RFIDService class:
+
+    public List<String> getAllRFIDCodes() {
+        List<RFID> rfids = rfidRepository.findAll();
+        return rfids.stream()
+                    .map(RFID::getRfidCode)
+                    .collect(Collectors.toList());
+    }
 }
-
-
-

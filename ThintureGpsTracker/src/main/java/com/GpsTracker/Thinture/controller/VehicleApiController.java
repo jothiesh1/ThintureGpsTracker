@@ -124,16 +124,30 @@ public class VehicleApiController {
     
     @DeleteMapping("/delete/{deviceID}")
     public ResponseEntity<String> deleteVehicle(@PathVariable String deviceID) {
-        System.out.println("Attempting to delete deviceID: " + deviceID);
+        logger.info("🗑️ API request to delete Vehicle and LastLocation for deviceID={}", deviceID);
         try {
-            vehicleService.deleteVehicleByDeviceID(deviceID);
-            System.out.println("Deleted successfully: " + deviceID);
-            return ResponseEntity.ok("Vehicle deleted successfully.");
+            vehicleService.deleteVehicleAndLastLocation(deviceID);
+            logger.info("✅ Successfully deleted both records for deviceID={}", deviceID);
+            return ResponseEntity.ok("Vehicle and last-known location deleted successfully.");
         } catch (Exception e) {
-            System.out.println("Error deleting vehicle: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete vehicle.");
+            logger.error("❌ Error deleting records for deviceID={}: {}", deviceID, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("Failed to delete vehicle or last-known location.");
         }
     }
+
+    
+    @GetMapping("/vehicle/type")
+    public ResponseEntity<String> getVehicleTypeByDeviceId(@RequestParam String deviceId) {
+        logger.info("Fetching vehicle type for device ID: {}", deviceId);
+        Optional<Vehicle> optionalVehicle = vehicleService.getVehicleByDeviceID(deviceId);
+        if (optionalVehicle.isPresent()) {
+            return ResponseEntity.ok(optionalVehicle.get().getVehicleType());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("UNKNOWN");
+        }
+    }
+
 
     @PutMapping("/update/{deviceID}")
     public ResponseEntity<?> updateVehicle(@PathVariable String deviceID, @RequestBody VehicleDTO dto) {

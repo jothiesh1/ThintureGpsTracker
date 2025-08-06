@@ -5,9 +5,11 @@ package com.GpsTracker.Thinture.service;
 	import org.springframework.stereotype.Service;
 
 import com.GpsTracker.Thinture.dto.VehicleViolationReportDTO;
+import com.GpsTracker.Thinture.dto.ViolationSummaryDTO;
 import com.GpsTracker.Thinture.repository.VehicleViolationReportRepository;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,4 +44,45 @@ public class VehicleViolationReportService {
         dto.setStatus((String) data[10]);
         return dto;
     }
+    
+    
+    
+    public List<ViolationSummaryDTO> getViolationSummary() {
+        List<ViolationSummaryDTO> summaryList = new ArrayList<>();
+        
+        try {
+            List<Object[]> results = violationReportRepository.getViolationSummaryLast30Days();
+            
+            if (!results.isEmpty() && results.get(0) != null) {
+                Object[] row = results.get(0);
+                
+                summaryList.add(new ViolationSummaryDTO("Overspeed", 
+                    row[0] != null ? ((Number) row[0]).longValue() : 0L));
+                summaryList.add(new ViolationSummaryDTO("Sharp Turning", 
+                    row[1] != null ? ((Number) row[1]).longValue() : 0L));
+                summaryList.add(new ViolationSummaryDTO("Harsh Acceleration", 
+                    row[2] != null ? ((Number) row[2]).longValue() : 0L));
+                summaryList.add(new ViolationSummaryDTO("Harsh Breaking", 
+                    row[3] != null ? ((Number) row[3]).longValue() : 0L));
+            }
+        } catch (Exception e) {
+            // If there's an error, return default values
+            summaryList.add(new ViolationSummaryDTO("Overspeed", 0L));
+            summaryList.add(new ViolationSummaryDTO("Sharp Turning", 0L));
+            summaryList.add(new ViolationSummaryDTO("Harsh Acceleration", 0L));
+            summaryList.add(new ViolationSummaryDTO("Harsh Breaking", 0L));
+        }
+        
+        return summaryList;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }

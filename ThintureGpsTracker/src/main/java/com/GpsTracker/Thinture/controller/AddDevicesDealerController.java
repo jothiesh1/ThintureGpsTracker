@@ -1,6 +1,7 @@
 package com.GpsTracker.Thinture.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -38,10 +39,10 @@ public class AddDevicesDealerController {
     
     @Autowired private VehicleLastLocationRepository lastKnownRepository;
 
-    // ✅ Add single device using session-based role
+    // ✅ Add single device with duplicate checking
     @PostMapping("/add-single")
-    public ResponseEntity<Map<String, String>> addSingleVehicle(@RequestBody Map<String, Object> payload) {
-        Map<String, String> response = new HashMap<>();
+    public ResponseEntity<Map<String, Object>> addSingleVehicle(@RequestBody Map<String, Object> payload) {
+        Map<String, Object> response = new HashMap<>();
         try {
             logger.info("📌 Received request to add single vehicle: {}", payload);
 
@@ -53,6 +54,21 @@ public class AddDevicesDealerController {
 
             if (serialNo == null || imei == null || selectedDealerId == null) {
                 throw new IllegalArgumentException("serialNo, imei, and dealerId are required.");
+            }
+
+            // ✅ Check for duplicates before inserting
+            boolean serialExists = vehicleRepository.existsBySerialNo(serialNo.trim());
+            boolean imeiExists = vehicleRepository.existsByImei(imei.trim());
+
+            if (serialExists || imeiExists) {
+                List<String> duplicates = new ArrayList<>();
+                if (serialExists) duplicates.add("Serial Number: " + serialNo);
+                if (imeiExists) duplicates.add("IMEI: " + imei);
+                
+                response.put("success", false);
+                response.put("message", "Duplicate entries found: " + String.join(", ", duplicates));
+                response.put("duplicates", duplicates);
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
             }
 
             // Get logged-in user role and ID
@@ -75,16 +91,16 @@ public class AddDevicesDealerController {
             lastKnown.setImei(imei.trim());
             lastKnown.setDealer_id(selectedDealerId);
 
-            // Optionally set default values (lat/lng = 0, status = 'N1', etc.)
+            // Set default values
             lastKnown.setLatitude(0.0);
             lastKnown.setLongitude(0.0);
-            lastKnown.setStatus("N1");  // default
+            lastKnown.setStatus("N1");
             lastKnown.setTimestamp(new Timestamp(System.currentTimeMillis()));
             lastKnown.setVehicleStatus("INACTIVE");
             lastKnown.setIgnition("OFF");
             lastKnown.setSpeed("0");
 
-            // ✅ Set role IDs same as Vehicle
+            // Set role IDs same as Vehicle
             lastKnown.setSuperadmin_id(vehicle.getSuperadmin_id());
             lastKnown.setAdmin_id(vehicle.getAdmin_id());
             lastKnown.setDealer_id(vehicle.getDealer_id());
@@ -94,21 +110,25 @@ public class AddDevicesDealerController {
             lastKnownRepository.save(lastKnown);
             logger.info("✅ LastKnown initialized: SerialNo={}, IMEI={}, DealerId={}", serialNo, imei, selectedDealerId);
 
-            response.put("success", "true");
+            response.put("success", true);
             response.put("message", "Vehicle and LastKnown record saved successfully.");
             return ResponseEntity.ok(response);
 
+        } catch (DataIntegrityViolationException e) {
+            logger.error("❌ Duplicate entry detected", e);
+            response.put("success", false);
+            response.put("message", "Duplicate entry detected. This Serial Number or IMEI already exists.");
+            response.put("error_type", "DUPLICATE_ENTRY");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         } catch (Exception e) {
             logger.error("❌ Error saving vehicle/lastKnown", e);
-            response.put("success", "false");
+            response.put("success", false);
             response.put("message", "Failed to save: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 
-
-    // ✅ Add multiple devices using session-based role
- // ✅ Add multiple devices using session-based role
+    // ✅ Add multiple devices with detailed duplicate reporting
     @PostMapping("/add-multiple")
     public ResponseEntity<Map<String, Object>> addMultipleDevices(@RequestBody Map<String, Object> payload) {
         Map<String, Object> response = new HashMap<>();
@@ -128,6 +148,10 @@ public class AddDevicesDealerController {
             if (userInfo == null) throw new RuntimeException("Logged-in user not recognized.");
 
             int savedCount = 0;
+            int duplicateCount = 0;
+            List<Map<String, String>> duplicateDevices = new ArrayList<>();
+            List<Map<String, String>> savedDevices = new ArrayList<>();
+
             for (Map<String, Object> deviceMap : devices) {
                 String serialNo = (String) deviceMap.get("serialNo");
                 String imei = (String) deviceMap.get("imei");
@@ -137,56 +161,106 @@ public class AddDevicesDealerController {
                     continue;
                 }
 
-                // ✅ Save to Vehicle
-                Vehicle vehicle = new Vehicle();
-                vehicle.setSerialNo(serialNo.trim());
-                vehicle.setImei(imei.trim());
-                vehicle.setDealer_id(dealerId);
-                assignRoleIds(vehicle, userInfo);
-                vehicleRepository.save(vehicle);
+                // ✅ Check for duplicates
+                boolean serialExists = vehicleRepository.existsBySerialNo(serialNo.trim());
+                boolean imeiExists = vehicleRepository.existsByImei(imei.trim());
 
-                // ✅ Save to VehicleLastLocation
-                VehicleLastLocation lastKnown = new VehicleLastLocation();
-                lastKnown.setSerialNo(serialNo.trim());
-                lastKnown.setImei(imei.trim());
-                lastKnown.setDealer_id(dealerId);
+                if (serialExists || imeiExists) {
+                    Map<String, String> duplicateInfo = new HashMap<>();
+                    duplicateInfo.put("serialNo", serialNo);
+                    duplicateInfo.put("imei", imei);
+                    
+                    List<String> duplicateReasons = new ArrayList<>();
+                    if (serialExists) duplicateReasons.add("Serial Number exists");
+                    if (imeiExists) duplicateReasons.add("IMEI exists");
+                    
+                    duplicateInfo.put("reason", String.join(", ", duplicateReasons));
+                    duplicateDevices.add(duplicateInfo);
+                    duplicateCount++;
+                    
+                    logger.warn("⚠️ Skipping duplicate device: SerialNo={}, IMEI={}, Reason={}", 
+                               serialNo, imei, String.join(", ", duplicateReasons));
+                    continue;
+                }
 
-                lastKnown.setLatitude(0.0);
-                lastKnown.setLongitude(0.0);
-                lastKnown.setStatus("N1");
-                lastKnown.setTimestamp(new Timestamp(System.currentTimeMillis()));
-                lastKnown.setVehicleStatus("INACTIVE");
-                lastKnown.setIgnition("OFF");
-                lastKnown.setSpeed("0");
+                try {
+                    // ✅ Save to Vehicle
+                    Vehicle vehicle = new Vehicle();
+                    vehicle.setSerialNo(serialNo.trim());
+                    vehicle.setImei(imei.trim());
+                    vehicle.setDealer_id(dealerId);
+                    assignRoleIds(vehicle, userInfo);
+                    vehicleRepository.save(vehicle);
 
-                lastKnown.setSuperadmin_id(vehicle.getSuperadmin_id());
-                lastKnown.setAdmin_id(vehicle.getAdmin_id());
-                lastKnown.setDealer_id(vehicle.getDealer_id());
-                lastKnown.setClient_id(vehicle.getClient_id());
-                lastKnown.setUser_id(vehicle.getUser_id());
+                    // ✅ Save to VehicleLastLocation
+                    VehicleLastLocation lastKnown = new VehicleLastLocation();
+                    lastKnown.setSerialNo(serialNo.trim());
+                    lastKnown.setImei(imei.trim());
+                    lastKnown.setDealer_id(dealerId);
 
-                lastKnownRepository.save(lastKnown);
+                    lastKnown.setLatitude(0.0);
+                    lastKnown.setLongitude(0.0);
+                    lastKnown.setStatus("N1");
+                    lastKnown.setTimestamp(new Timestamp(System.currentTimeMillis()));
+                    lastKnown.setVehicleStatus("INACTIVE");
+                    lastKnown.setIgnition("OFF");
+                    lastKnown.setSpeed("0");
 
-                logger.info("✅ Saved device + last known: SerialNo={}, IMEI={}, DealerId={}", serialNo, imei, dealerId);
-                savedCount++;
+                    lastKnown.setSuperadmin_id(vehicle.getSuperadmin_id());
+                    lastKnown.setAdmin_id(vehicle.getAdmin_id());
+                    lastKnown.setDealer_id(vehicle.getDealer_id());
+                    lastKnown.setClient_id(vehicle.getClient_id());
+                    lastKnown.setUser_id(vehicle.getUser_id());
+
+                    lastKnownRepository.save(lastKnown);
+
+                    Map<String, String> savedInfo = new HashMap<>();
+                    savedInfo.put("serialNo", serialNo);
+                    savedInfo.put("imei", imei);
+                    savedDevices.add(savedInfo);
+
+                    logger.info("✅ Saved device + last known: SerialNo={}, IMEI={}, DealerId={}", serialNo, imei, dealerId);
+                    savedCount++;
+                    
+                } catch (DataIntegrityViolationException e) {
+                    // Handle race condition where duplicate might be inserted between check and save
+                    Map<String, String> duplicateInfo = new HashMap<>();
+                    duplicateInfo.put("serialNo", serialNo);
+                    duplicateInfo.put("imei", imei);
+                    duplicateInfo.put("reason", "Duplicate detected during save (race condition)");
+                    duplicateDevices.add(duplicateInfo);
+                    duplicateCount++;
+                    logger.warn("⚠️ Race condition duplicate: SerialNo={}, IMEI={}", serialNo, imei);
+                }
             }
 
-            response.put("success", "true");
-            response.put("message", savedCount + " devices added successfully .");
+            // ✅ Build comprehensive response
+            response.put("success", true);
+            response.put("savedCount", savedCount);
+            response.put("duplicateCount", duplicateCount);
+            response.put("totalProcessed", savedCount + duplicateCount);
+            
+            if (savedCount > 0) {
+                response.put("savedDevices", savedDevices);
+            }
+            
+            if (duplicateCount > 0) {
+                response.put("duplicateDevices", duplicateDevices);
+                response.put("message", String.format("Processing completed: %d devices saved, %d duplicates skipped.", 
+                                                    savedCount, duplicateCount));
+            } else {
+                response.put("message", String.format("All %d devices added successfully.", savedCount));
+            }
+
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
             logger.error("❌ Error adding devices", e);
-            response.put("success", "false");
+            response.put("success", false);
             response.put("message", "Failed to add devices: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
-
-
-    
-    
-    
 
     // ✅ Helper: Assign role-based creator ID to vehicle
     private void assignRoleIds(Vehicle vehicle, UserTypeFilterService.UserTypeResult userInfo) {

@@ -49,18 +49,27 @@ body {
   
    .table tbody td { color:#212529; 
 	text-align:center; }
-   #pagination button {
-     min-width:100px; font-weight:bold; border:none;
-  box-shadow: 0 4px 12px rgba(255,255,255,.4);
-  color: white;
-  background: linear-gradient(
-  			 																					 	     135deg,
-  			 																					 	    
-  			 																					 	     rgba(15, 32, 65, 0.8),
-  			 																					 	     rgba(15, 32, 65, 0.8),
-  			 																					 	     rgba(15, 32, 65, 0.8)
-  			 																					 	 );
-   margin:0 .25rem;
-   }
-   
-   #currentPage { color: #fff; font-weight:600; }
+  
+	#pagination-controls {
+	     background: transparent;
+	   }
+
+	   .pagination-style {
+	     background-color: #0d1b3d;
+	     color: white;
+	     border: none;
+	     padding: 8px 20px;
+	     border-radius: 10px;
+	     font-weight: 600;
+	     box-shadow: 0 0 10px rgba(173, 216, 230, 0.3); /* light blue glow */
+	     transition: 0.3s ease;
+	   }
+
+	   .pagination-style:hover {
+	     background-color: #122855;
+	     transform: scale(1.03);
+	   }
+
+	   .page-info {
+	     font-size: 1rem;
+	   }

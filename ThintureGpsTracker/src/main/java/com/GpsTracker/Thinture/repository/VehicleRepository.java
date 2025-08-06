@@ -130,6 +130,81 @@ public interface VehicleRepository extends BaseRestrictedRepository<Vehicle, Lon
      List<Vehicle> findByDriverId(Long driverId);
 
      
-}
+     
+     //----------------------------
+     // LIVE WEBSOCKET FILTER
+     // ---------------------------
+     
+     
+     
+     
+     
+     
+     // ✅ New queries for RBAC WebSocket filtering
+     @Query("SELECT v.deviceID FROM Vehicle v WHERE v.dealer_id = :id AND v.deviceID IS NOT NULL")
+     List<String> findDeviceIDsByDealerId(@Param("id") Long id);
+
+     @Query("SELECT v.deviceID FROM Vehicle v WHERE v.admin_id = :id AND v.deviceID IS NOT NULL")
+     List<String> findDeviceIDsByAdminId(@Param("id") Long id);
+
+     @Query("SELECT v.deviceID FROM Vehicle v WHERE v.client_id = :id AND v.deviceID IS NOT NULL")
+     List<String> findDeviceIDsByClientId(@Param("id") Long id);
+
+     @Query("SELECT v.deviceID FROM Vehicle v WHERE v.user_id = :id AND v.deviceID IS NOT NULL")
+     List<String> findDeviceIDsByUserId(@Param("id") Long id);
+
+     
+     
+     
+  // In VehicleRepository.java - Add these queries for device expiry reporting
+     @Query("SELECT v.renewalDate, COUNT(v) FROM Vehicle v " +
+            "WHERE v.renewalDate IS NOT NULL " +
+            "AND (v.renewed = false OR v.renewed IS NULL) " +
+            "GROUP BY v.renewalDate " +
+            "ORDER BY v.renewalDate")
+     List<Object[]> findDeviceExpiryCountsByDate();
+
+     @Query("SELECT v.renewalDate, v.deviceID, v.vehicleNumber, v.vehicleType " +
+            "FROM Vehicle v " +
+            "WHERE v.renewalDate IS NOT NULL " +
+            "AND (v.renewed = false OR v.renewed IS NULL) " +
+            "AND v.renewalDate BETWEEN :startDate AND :endDate " +
+            "ORDER BY v.renewalDate")
+     List<Object[]> findExpiringDevicesInDateRange(@Param("startDate") Date startDate, 
+                                                   @Param("endDate") Date endDate);
+
+     @Query("SELECT COUNT(v) FROM Vehicle v " +
+            "WHERE v.renewalDate IS NOT NULL " +
+            "AND (v.renewed = false OR v.renewed IS NULL) " +
+            "AND v.renewalDate < :currentDate")
+     Long countExpiredDevices(@Param("currentDate") Date currentDate);
+     
+     
+  // 1. Add this new method to your VehicleRepository interface:
+
+     @Query("SELECT v.renewalDate, COUNT(v) FROM Vehicle v " +
+            "WHERE v.renewalDate IS NOT NULL " +
+            "AND (v.renewed = false OR v.renewed IS NULL) " +
+            "AND v.renewalDate BETWEEN :startDate AND :endDate " +
+            "GROUP BY v.renewalDate " +
+            "ORDER BY v.renewalDate")
+     List<Object[]> findDeviceExpiryCountsNext30Days(@Param("startDate") Date startDate, 
+                                                    @Param("endDate") Date endDate);
+     
+     
+  // ✅ Check if Serial Number already exists
+     boolean existsBySerialNo(String serialNo);
+     
+     // ✅ Check if IMEI already exists  
+     boolean existsByImei(String imei);
+    
+     /**
+      * Count total expired devices
+      */
+     @Query("SELECT COUNT(v) FROM Vehicle v WHERE v.renewalDate < :currentDate AND (v.renewed = false OR v.renewed IS NULL)")
+     Long countTotalExpiredDevices(@Param("currentDate") Date currentDate);
+
+ }
+
   
 

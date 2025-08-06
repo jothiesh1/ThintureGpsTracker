@@ -19,9 +19,7 @@
 </head>
 <body>
 	<header th:replace="~{navigation_client :: navbar_client}"></header>
-	<button class="button" id="back-button">
-	       <i class="fas fa-arrow-left"></i> Back
-	   </button>
+	
 	<div class="card">
 	    <h2>ADD USER</h2>
 	   
@@ -154,7 +152,7 @@
 	                        timer: 2000,
 	                        showConfirmButton: false
 	                    });
-	                    window.location.href = "/adduser_client";
+	                  
 	                } else {
 	                    const errorText = await response.text();
 	                    Swal.fire({

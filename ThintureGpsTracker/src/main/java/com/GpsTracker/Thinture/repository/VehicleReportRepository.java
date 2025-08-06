@@ -33,13 +33,14 @@ public interface VehicleReportRepository extends JpaRepository<Vehicle, Long> {
 	 * @param vehicleStatus 
      * @return List of Object arrays containing report data.
      */
-	@Query(value = "SELECT device_id, latitude, longitude, speed, timestamp, ignition, vehicleStatus " +
-            "FROM vehicle_history " +
-            "WHERE (:start IS NULL OR timestamp >= :start) " +
-            "AND (:end IS NULL OR timestamp <= :end) " +
-            "AND (:deviceId IS NULL OR device_id = :deviceId) " +
-            "AND (:vehicleStatus IS NULL OR vehicleStatus = :vehicleStatus) " +
-            "ORDER BY timestamp DESC",
+	@Query(value = "SELECT device_id, latitude, longitude, speed, timestamp, ignition, vehicleStatus, status " +
+	        "FROM vehicle_history " +
+	        "WHERE (:start IS NULL OR timestamp >= :start) " +
+	        "AND (:end IS NULL OR timestamp <= :end) " +
+	        "AND (:deviceId IS NULL OR device_id = :deviceId) " +
+	        "AND (:vehicleStatus IS NULL OR vehicleStatus = :vehicleStatus) " +
+	        "ORDER BY timestamp DESC",
+
     nativeQuery = true)
 List<Object[]> findReports(@Param("start") Timestamp startDate,
                          @Param("end") Timestamp endDate,

@@ -77,6 +77,7 @@ public class VehicleReportService {
         dto.setTimestamp(row[4] != null ? (Timestamp) row[4] : null);
         dto.setIgnition(row[5] != null ? row[5].toString() : null);
         dto.setVehicleStatus(row[6] != null ? row[6].toString() : null);
+        dto.setStatus(row[7] != null ? row[7].toString() : null);
         return dto;
     }
 
@@ -103,13 +104,13 @@ public class VehicleReportService {
             document.add(title);
             document.add(new Paragraph(" ")); // Blank line for spacing
 
-            // Create table
-            PdfPTable table = new PdfPTable(7);
+            // Create table with 8 columns now (added L/H column)
+            PdfPTable table = new PdfPTable(8);
             table.setWidthPercentage(100);
             table.setSpacingBefore(10f);
             table.setSpacingAfter(10f);
 
-            Stream.of("Device ID", "Timestamp", "Latitude", "Longitude", "Speed", "Ignition", "Vehicle Status")
+            Stream.of("Device ID", "Timestamp", "Latitude", "Longitude", "Speed", "Ignition", "Status", "L/H")
                     .forEach(column -> {
                         PdfPCell header = new PdfPCell(new Phrase(column));
                         header.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -126,6 +127,7 @@ public class VehicleReportService {
                 table.addCell(report.getVehicleSpeed() != null ? report.getVehicleSpeed().toString() + " km/h" : "0 km/h");
                 table.addCell(report.getIgnition() != null ? report.getIgnition() : "N/A");
                 table.addCell(report.getVehicleStatus() != null ? report.getVehicleStatus() : "N/A");
+                table.addCell(report.getStatus() != null ? report.getStatus() : "N/A"); // Added L/H column
             }
 
             document.add(table);
@@ -156,9 +158,9 @@ public class VehicleReportService {
 
             Sheet sheet = workbook.createSheet("Vehicle Reports");
 
-            // Header
+            // Header - Added L/H column
             Row header = sheet.createRow(0);
-            String[] columns = {"Device ID", "Timestamp", "Latitude", "Longitude", "Speed", "Ignition", "Vehicle Status"};
+            String[] columns = {"Device ID", "Timestamp", "Latitude", "Longitude", "Speed", "Ignition", "Status", "L/H"};
 
             for (int i = 0; i < columns.length; i++) {
                 Cell cell = header.createCell(i);
@@ -181,6 +183,7 @@ public class VehicleReportService {
                 row.createCell(4).setCellValue(report.getVehicleSpeed() != null ? report.getVehicleSpeed().toString() : "N/A");
                 row.createCell(5).setCellValue(report.getIgnition() != null ? report.getIgnition() : "N/A");
                 row.createCell(6).setCellValue(report.getVehicleStatus() != null ? report.getVehicleStatus() : "N/A");
+                row.createCell(7).setCellValue(report.getStatus() != null ? report.getStatus() : "N/A"); // Added L/H column
             }
 
             for (int i = 0; i < columns.length; i++) {
@@ -196,58 +199,4 @@ public class VehicleReportService {
             throw new RuntimeException("Error generating Excel report: " + e.getMessage(), e);
         }
     }
-    
-    
-    
-    
-    
-    
-    
 }
-
-
-
-/*
-        List<VehicleReportDTO> reportList = new ArrayList<>();
-        
-        for (Object[] row : result) {
-            VehicleReportDTO report = new VehicleReportDTO();
-            logger.debug("Mapping result row: {}", Arrays.toString(row));
-
-            report.setDeviceID((String) row[0]);
-            report.setVehicleNumber((String) row[1]);
-            report.setVehicleType((String) row[2]);
-            report.setOwnerName((String) row[3]);
-            report.setEngineNumber((String) row[4]);
-            report.setManufacturer((String) row[5]);
-            report.setModel((String) row[6]);
-            report.setInstallationDate((Date) row[7]);
-            report.setSerialNo((String) row[8]);
-            report.setTechnicianName((String) row[9]);
-            report.setImei((String) row[10]);
-            report.setSimNumber((String) row[11]);
-            report.setDealerName((String) row[12]);
-            report.setAddressPhone((String) row[13]);
-            report.setCountry((String) row[14]);
-            report.setLatitude((Double) row[15]);
-            report.setLongitude((Double) row[16]);
-            report.setTimestamp((Timestamp) row[17]);
-            report.setVehicleSpeed((Double) row[18]);
-            report.setCourse((String) row[19]);
-            report.setAdditionalData((String) row[20]);
-            report.setSequenceNumber((Integer) row[21]);
-            report.setViolationDate((Date) row[22]);
-            report.setViolationType((String) row[23]);
-            report.setViolationSpeed((String) row[24]);
-            report.setLocation((String) row[25]);
-            report.setStatus((String) row[26]);
-
-            reportList.add(report);
-        }
-
-        logger.info("Returning {} records for DeviceID: {}", reportList.size(), deviceID);
-        return reportList;
-    }
-    
-    */
-

@@ -1,336 +1,459 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Thinture GPS</title>
-  <link rel="icon" type="image/x-icon" href="/THINTURE_IMAGE/favicon.jpg" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+			<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+		<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <title>Enhanced Serial and IMEI Management</title>
+    <style>
+		body::before {
+				    content: "";
+				    position: fixed;
+				    top: 0;
+				    left: 0;
+				    width: 100%;
+				    height: 100%;
 
-  <!-- Bootstrap & SweetAlert -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+				    background: linear-gradient(
+				        rgba(10, 25, 47, 0.95),
+				        rgba(15, 32, 65, 0.95)
+				      ),
+				      url('/THINTURE_IMAGE/add_new.jpg') no-repeat center center/cover;
 
-  <!-- PDF Libraries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+				    filter: blur(2px);
+				    z-index: -1;
+				}
+				@media only screen and (max-width: 768px) {
+				    body {
+				        background-attachment: fixed;
+				        min-height: 100vh;
+				        font-size: 14px;
+				        background-color: #0a192f; /* fallback for small screens if image fails */
+				        background-size: cover;
+				        color: #f0f0f0;
+				    }
+				}
 
-  <!-- Custom CSS -->
-  <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
-  <link rel="stylesheet" type="text/css" th:href="@{/css/adddevicesstyle.css}">
+        .card {
+			position: absolute;
+			top:150px;
+			left:30%;
+			background-color :rgba(0, 0, 0, 0.3);
+			          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+			          border-radius: 10px;
+			          width: 50%;
+			          padding: 20px 30px;
+			      }
+
+			      h2 {
+			          text-align: center;
+			          font-size: 24px;
+			          margin-bottom: 20px;
+			          color: white;
+			      }
+
+			      label,h3 {
+			          font-weight: bold;
+			          display: block;
+			          margin-bottom: 5px;
+					  color:white;
+			      }
+
+			      select, input[type="text"] {
+			          width: calc(100% - 22px);
+			          padding: 10px;
+			          margin: 10px 0;
+			          border: 1px solid #ddd;
+			          border-radius: 4px;
+			          font-size: 14px;
+			          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+			      }
+
+			      button {
+			          padding: 10px 20px;
+			          font-size: 14px;
+			          color: white;
+			          background: linear-gradient(to right, #00c6ff, #0072ff);
+			          border: none;
+			          border-radius: 4px;
+			          cursor: pointer;
+			          transition: background 0.3s;
+			          display: inline-block;
+			          margin-top: 10px;
+			      }
+
+			      button:hover {
+			          background: linear-gradient(to right, #0072ff, #00c6ff);
+			      }
+
+			      .tab-container {
+			          display: flex;
+			          justify-content: center;
+			          margin-bottom: 20px;
+					  color: white;
+			      }
+
+			      .tab-link {
+			          padding: 10px 20px;
+			          cursor: pointer;
+			          background: #f1f1f1;
+			          border: none;
+			          border-radius: 4px;
+			          margin: 0 5px;
+			          transition: background 0.3s;
+			      }
+
+			      .tab-link.active {
+			          background: #0072ff;
+			          color: white;
+			      }
+
+			      .tab-content {
+			          display: none;
+			          margin-top: 20px;
+			      }
+
+			      .tab-content.active {
+			          display: block;
+			      }
+
+			      table {
+			          width: 100%;
+			          border-collapse: collapse;
+			          margin-top: 20px;
+					  color: white;
+			      }
+
+			      th, td {
+			          border: 1px solid #ddd;
+			          padding: 10px;
+			          text-align: left;
+			      }
+
+			      th {
+			          background: #0072ff;
+			          color: white;
+			      }
+
+			      td input {
+			          width: 50%;
+			          padding: 5px;
+			          font-size: 14px;
+			      }
+    </style>
 </head>
 
+
 <body>
-  <header th:replace="navigation_admin :: navbar_admin"></header>
-  <div class="card p-4 m-3">
-    <h2>DEVICE TO DEALER</h2>
+	<header th:replace="navigation_admin :: navbar_admin"></header>
+	<div class="card">
+	    <h2>DEVICE TO DEALER</h2>
 
-    <label for="dealerName">Select Dealer:</label>
-    <select id="dealerDropdown" class="form-select w-auto" onchange="fetchSelectedDealerId()">
-      <option value="" disabled selected>Select Dealer</option>
-    </select>
-    <p id="selectedDealerId" class="mt-2"></p>
+	    <label for="dealerName">Select Dealer:</label>
+	    <select id="dealerDropdown" onchange="fetchSelectedDealerId()">
+	        <option value="" disabled selected>Select Dealer</option>
+	    </select>
 
-    <div class="tab-container mt-3">
-      <button class="btn  tab-link active" onclick="openTab('single')">Single</button>
-      <button class="btn  tab-link" onclick="openTab('dual')">Dual</button>
-    </div>
+	    <p id="selectedDealerId"></p>
+	
 
-    <div id="single" class="tab-content active mt-3">
-      <h4>Single Serial Number</h4>
-      <input type="text" id="singleSerial" placeholder="Enter Serial Number" class="form-control mb-2 w-50">
-      <input type="text" id="singleImei" placeholder="Enter IMEI Number" class="form-control mb-2 w-50">
-      <button  onclick="addSingleSerial()">Add Serial</button>
-    </div>
-
-    <div id="dual" class="tab-content mt-3">
-      <h4>Dual Serial Number Range</h4>
-      <input type="text" id="startSerial" placeholder="Start Serial Number" class="form-control mb-2 w-50">
-      <input type="text" id="endSerial" placeholder="End Serial Number" class="form-control mb-2 w-50">
-      <input type="text" id="removedSerial" placeholder="Remove Serial Number (Optional)" class="form-control mb-2 w-50">
-      <button  onclick="addDualSerial()">Add Range</button>
-    </div>
-
-	<div id="serialTableContainer" class="mt-4"></div>
-	<button id="addPreviewButton" class="btn btn-success mt-2" style="display: none;" onclick="handleAddDevices()">Add Devices</button>
-
-
-  <!-- Modal: Serial + IMEI Preview Before PDF -->
-  <div class="modal fade" id="pdfPreviewModal" tabindex="-1" aria-labelledby="pdfPreviewModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Verify Serial and IMEI Entries</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="tab-container">
+            <button class="tab-link active" onclick="openTab('single')">Single</button>
+            <button class="tab-link" onclick="openTab('dual')">Dual</button>
         </div>
-        <div class="modal-body" id="pdfPreviewTableBody">
-          <!-- Table will be injected here -->
+
+        <div id="single" class="tab-content active">
+            <h3>Single Serial Number</h3>
+            <input type="text" id="singleSerial" placeholder="Enter Serial Number">
+            <input type="text" id="singleImei" placeholder="Enter IMEI Number">
+            <button onclick="addSingleSerial()">Add Serial</button>
         </div>
-        
-      </div>
+
+        <div id="dual" class="tab-content">
+            <h3>Dual Serial Number Range</h3>
+            <input type="text" id="startSerial" placeholder="Start Serial Number">
+            <input type="text" id="endSerial" placeholder="End Serial Number">
+            <input type="text" id="removedSerial" placeholder="Remove Serial Number (Optional)">
+            <button onclick="addDualSerial()">Add Range</button>
+        </div>
+
+        <div id="serialTableContainer"></div>
+
+        <button id="addDevicesButton" style="display: none;" onclick="addDevices()">Add Devices</button>
     </div>
-  </div>
+	</div>
+	<!-- Include SweetAlert2 Library -->
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <script>
-    const serialNumbers = {};
-    const PREFIX = "TH/M4G/";
+	<script>
+		const serialNumbers = {};
+		const PREFIX = "TH/H4G/";
 
-    function openTab(tabName) {
-      document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
-      document.querySelectorAll(".tab-link").forEach(tab => tab.classList.remove("active"));
-      document.getElementById(tabName).classList.add("active");
-      document.querySelector(`[onclick="openTab('${tabName}')"]`).classList.add("active");
-    }
+		function openTab(tabName) {
+		    document.querySelectorAll(".tab-content").forEach(tab => {
+		        tab.classList.remove("active");
+		    });
+		    document.querySelectorAll(".tab-link").forEach(tab => {
+		        tab.classList.remove("active");
+		    });
+		    document.getElementById(tabName).classList.add("active");
+		    document.querySelector(`[onclick="openTab('${tabName}')"]`).classList.add("active");
+		}
 
-    function addSingleSerial() {
-      const serial = document.getElementById("singleSerial").value.trim();
-      const imei = document.getElementById("singleImei").value.trim();
-      const dealerId = document.getElementById("dealerDropdown").value;
-      const dealerName = document.getElementById("dealerDropdown").selectedOptions[0]?.text;
+		// Updated JavaScript functions with better duplicate handling
 
-      if (!serial || !imei || !dealerId) {
-        Swal.fire({ icon: 'error', title: 'Missing Input', text: 'Please enter Serial, IMEI, and select a Dealer.' });
-        return;
-      }
+		function addSingleSerial() {
+		    const serial = document.getElementById("singleSerial").value.trim();
+		    const imei = document.getElementById("singleImei").value.trim();
+		    const dealerDropdown = document.getElementById("dealerDropdown");
+		    const dealerId = dealerDropdown.value;
+		    const dealerName = dealerDropdown.options[dealerDropdown.selectedIndex]?.text;
 
-      const payload = {
-        serialNo: PREFIX + serial,
-        imei: imei,
-        dealerId: dealerId,
-        dealerName: dealerName,
-      };
+		    if (!serial || !imei || !dealerId) {
+		        Swal.fire({
+		            icon: 'error',
+		            title: 'Missing Input',
+		            text: 'Please enter Serial, IMEI, and select a Dealer.',
+		        });
+		        return;
+		    }
 
-      fetch('/dealer/add-single', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success === "true") {
-          Swal.fire({ icon: 'success', title: 'Success', text: data.message || 'Serial added successfully.' });
-          document.getElementById("singleSerial").value = "";
-          document.getElementById("singleImei").value = "";
-        } else {
-          Swal.fire({ icon: 'error', title: 'Error', text: data.message || 'Failed to add serial.' });
-        }
-      })
-      .catch(error => {
-        console.error('API Error:', error);
-        Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to add serial. Please try again.' });
-      });
-    }
+		    const payload = {
+		        serialNo: PREFIX + serial,
+		        imei: imei,
+		        dealerId: dealerId,
+		        dealerName: dealerName,
+		    };
 
-    function addDualSerial() {
-      const start = parseInt(document.getElementById("startSerial").value.trim());
-      const end = parseInt(document.getElementById("endSerial").value.trim());
-      const removed = document.getElementById("removedSerial").value.trim();
-      const dealerId = document.getElementById("dealerDropdown").value;
+		    console.log("📌 Single Serial Payload:", payload);
 
-      if (isNaN(start) || isNaN(end) || start > end || !dealerId) {
-        Swal.fire({ icon: 'error', title: 'Invalid Input', text: 'Please enter valid Start/End Serial and select a Dealer.' });
-        return;
-      }
+		    fetch('/dealer/add-single', {
+		        method: 'POST',
+		        headers: { 'Content-Type': 'application/json' },
+		        body: JSON.stringify(payload),
+		    })
+		    .then(response => response.json())
+		    .then(data => {
+		        console.log("✅ API Response:", data);
 
-      const removedSet = new Set();
-      if (removed) {
-        removed.split(',').forEach(num => {
-          const n = parseInt(num.trim());
-          if (!isNaN(n)) removedSet.add(n);
-        });
-      }
+		        if (data.success === true || data.success === "true") {
+		            Swal.fire({
+		                icon: 'success',
+		                title: 'Success',
+		                text: data.message || 'Single Serial added successfully.',
+		            });
+		            document.getElementById("singleSerial").value = "";
+		            document.getElementById("singleImei").value = "";
+		        } else if (data.duplicates) {
+		            // ✅ Handle duplicate entries specifically
+		            Swal.fire({
+		                icon: 'warning',
+		                title: 'Duplicate Entry Detected',
+		                html: `
+		                    <p>${data.message}</p>
+		                    <div style="text-align: left; margin-top: 10px;">
+		                        <strong>Duplicate entries:</strong><br>
+		                        ${data.duplicates.map(dup => `• ${dup}`).join('<br>')}
+		                    </div>
+		                `,
+		                confirmButtonText: 'OK'
+		            });
+		        } else {
+		            Swal.fire({
+		                icon: 'error',
+		                title: 'Error',
+		                text: data.message || 'Failed to add Single Serial.',
+		            });
+		        }
+		    })
+		    .catch(error => {
+		        console.error('❌ API Error:', error);
+		        Swal.fire({
+		            icon: 'error',
+		            title: 'Error',
+		            text: 'Failed to add Single Serial. Please try again later.',
+		        });
+		    });
+		}
 
-      resetSerials();
-      for (let i = start; i <= end; i++) {
-        if (!removedSet.has(i)) {
-          const serial = PREFIX + i;
-          serialNumbers[serial] = "";
-        }
-      }
+		function addDevices() {
+		    const dealerId = document.getElementById("dealerDropdown").value;
 
-      updateSerialTable();
-    }
+		    if (!dealerId) {
+		        Swal.fire({
+		            icon: 'error',
+		            title: 'Dealer Not Selected',
+		            text: 'Please select a dealer before submitting.',
+		        });
+		        return;
+		    }
 
-    function addDevices() {
-      const dealerId = document.getElementById("dealerDropdown").value;
-      if (!dealerId) {
-        Swal.fire({ icon: 'error', title: 'Dealer Not Selected', text: 'Please select a dealer.' });
-        return;
-      }
+		    const deviceList = Object.entries(serialNumbers).map(([serialNo, imei]) => ({
+		        serialNo,
+		        imei
+		    }));
 
-      const devices = Object.entries(serialNumbers).map(([serialNo, imei]) => ({ serialNo, imei }));
-      const payload = { dealerId: Number(dealerId), devices };
+		    const payload = {
+		        dealerId: Number(dealerId),
+		        devices: deviceList
+		    };
 
-      fetch('/dealer/add-multiple', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success === "true" || data.success === true) {
-          Swal.fire({ icon: 'success', title: 'Success', text: data.message || 'Devices added successfully.' });
-          resetSerials();
-          document.getElementById("startSerial").value = "";
-          document.getElementById("endSerial").value = "";
-        } else {
-          Swal.fire({ icon: 'error', title: 'Error', text: data.message || 'Failed to add devices.' });
-        }
-      })
-      .catch(error => {
-        console.error('API Error:', error);
-        Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to submit devices.' });
-      });
-    }
+		    console.log("📤 Submitting devices:", payload);
 
-    function updateSerialTable() {
-      const container = document.getElementById("serialTableContainer");
-      container.innerHTML = "";
+		    fetch('/dealer/add-multiple', {
+		        method: 'POST',
+		        headers: { 'Content-Type': 'application/json' },
+		        body: JSON.stringify(payload),
+		    })
+		    .then(response => response.json())
+		    .then(data => {
+		        console.log("✅ FULL API Response:", data);
+		        
+		        if (data.success === true || data.success === "true") {
+		            // ✅ Handle detailed response with duplicates
+		            let resultHtml = `<p><strong>${data.message}</strong></p>`;
+		            
+		            if (data.savedCount > 0) {
+		                resultHtml += `
+		                    <div style="margin-top: 15px; text-align: left;">
+		                        <h4 style="color: green; margin-bottom: 10px;">✅ Successfully Added (${data.savedCount}):</h4>
+		                        <ul style="max-height: 150px; overflow-y: auto;">
+		                            ${data.savedDevices.map(device => 
+		                                `<li><strong>Serial:</strong> ${device.serialNo}<br><strong>IMEI:</strong> ${device.imei}</li>`
+		                            ).join('')}
+		                        </ul>
+		                    </div>
+		                `;
+		            }
+		            
+		            if (data.duplicateCount > 0) {
+		                resultHtml += `
+		                    <div style="margin-top: 15px; text-align: left;">
+		                        <h4 style="color: orange; margin-bottom: 10px;">⚠️ Duplicates Skipped (${data.duplicateCount}):</h4>
+		                        <ul style="max-height: 150px; overflow-y: auto;">
+		                            ${data.duplicateDevices.map(device => 
+		                                `<li><strong>Serial:</strong> ${device.serialNo}<br><strong>IMEI:</strong> ${device.imei}<br><em>Reason: ${device.reason}</em></li>`
+		                            ).join('')}
+		                        </ul>
+		                    </div>
+		                `;
+		            }
 
-      if (Object.keys(serialNumbers).length === 0) {
-		document.getElementById("addPreviewButton").style.display = "block";
+		            Swal.fire({
+		                icon: data.duplicateCount > 0 ? 'warning' : 'success',
+		                title: data.duplicateCount > 0 ? 'Partial Success' : 'Success',
+		                html: resultHtml,
+		                width: '600px',
+		                confirmButtonText: 'OK'
+		            });
 
-        return;
-      }
+		            // Clear form if any devices were saved
+		            if (data.savedCount > 0) {
+		                resetSerials();
+		                document.getElementById("startSerial").value = "";
+		                document.getElementById("endSerial").value = "";
+		            }
+		        } else {
+		            Swal.fire({
+		                icon: 'error',
+		                title: 'Error',
+		                text: data.message || 'Failed to add devices.',
+		            });
+		        }
+		    })
+		    .catch(error => {
+		        console.error('❌ API Error:', error);
+		        Swal.fire({
+		            icon: 'error',
+		            title: 'Error',
+		            text: 'Failed to submit devices. Please try again.',
+		        });
+		    });
+		}
 
-      const table = document.createElement("table");
-      table.className = "table table-bordered";
-      table.innerHTML = `
-        <thead><tr><th>Serial Number</th><th>IMEI Number</th></tr></thead>
-        <tbody></tbody>
-      `;
+		// Rest of your existing JavaScript functions remain the same...
 
-      Object.entries(serialNumbers).forEach(([serial, imei]) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${serial}</td>
-          <td><input type="text" value="${imei}" placeholder="Enter IMEI" class="form-control" oninput="updateImei('${serial}', this.value)" /></td>
-        `;
-        table.querySelector("tbody").appendChild(row);
-      });
 
-      container.appendChild(table);
-      document.getElementById("addDevicesButton").style.display = "block";
-    }
+		function updateSerialTable() {
+		    const tableContainer = document.getElementById("serialTableContainer");
+		    tableContainer.innerHTML = "";
 
-    function updateImei(serial, imei) {
-      serialNumbers[serial] = imei;
-    }
+		    if (Object.keys(serialNumbers).length === 0) {
+		        document.getElementById("addDevicesButton").style.display = "none";
+		        return;
+		    }
 
-    function resetSerials() {
-      Object.keys(serialNumbers).forEach(key => delete serialNumbers[key]);
-      updateSerialTable();
-    }
+		    const table = document.createElement("table");
+		    table.innerHTML = `
+		        <tr>
+		            <th>Serial Number</th>
+		            <th>IMEI Number</th>
+		        </tr>
+		    `;
 
-    function populateDealerDropdown() {
-      fetch("/dealer/all")
-        .then(res => res.json())
-        .then(data => {
-          const dropdown = document.getElementById("dealerDropdown");
-          data.forEach(dealer => {
-            const option = document.createElement("option");
-            option.value = dealer.id;
-            option.textContent = dealer.name;
-            dropdown.appendChild(option);
-          });
-        });
-    }
+		    for (const [serial, imei] of Object.entries(serialNumbers)) {
+		        const row = document.createElement("tr");
+		        row.innerHTML = `
+		            <td>${serial}</td>
+		            <td>
+		                <input type="text" value="${imei}" placeholder="Enter IMEI" oninput="updateImei('${serial}', this.value)">
+		            </td>
+		        `;
+		        table.appendChild(row);
+		    }
 
-    function fetchSelectedDealerId() {
-      const dropdown = document.getElementById("dealerDropdown");
-      const id = dropdown.value;
-      const name = dropdown.options[dropdown.selectedIndex]?.text;
-      document.getElementById("selectedDealerId").innerText = `Selected Dealer: ${name} (ID: ${id})`;
-    }
+		    tableContainer.appendChild(table);
+		    document.getElementById("addDevicesButton").style.display = "block";
+		}
 
-	let previewShown = false;
 
-	function handleAddDevices() {
-	  if (!previewShown) {
-	    const missing = Object.entries(serialNumbers).filter(([_, imei]) => !imei.trim());
-	    if (missing.length > 0) {
-	      Swal.fire({ icon: 'warning', title: 'Incomplete IMEI', text: 'Please fill all IMEI numbers before proceeding.' });
-	      return;
+	    function updateImei(serial, imei) {
+	        serialNumbers[serial] = imei;
 	    }
 
-	    // Build preview modal
-	    const container = document.getElementById("pdfPreviewTableBody");
-	    container.innerHTML = `
-	      <table class="table table-striped">
-	        <thead><tr><th>Select</th><th>Serial Number</th><th>IMEI Number</th></tr></thead>
-	        <tbody>
-	          ${Object.entries(serialNumbers).map(([serial, imei], index) => `
-	            <tr>
-	              <td><input type="checkbox" class="form-check-input confirm-checkbox" id="chk${index}"></td>
-	              <td>${serial}</td>
-	              <td>${imei}</td>
-	            </tr>
-	          `).join('')}
-	        </tbody>
-	      </table>
-	      <button class="btn btn-primary mt-2" onclick="confirmAndCloseModal()">Confirm</button>
-	    `;
+	    function resetSerials() {
+	        Object.keys(serialNumbers).forEach(key => delete serialNumbers[key]);
+	        updateSerialTable();
+	    }
 
-	    // Show modal
-	    const modal = new bootstrap.Modal(document.getElementById('pdfPreviewModal'));
-	    modal.show();
-
-	    // Attach row highlight listener
-	    setTimeout(() => {
-	      document.querySelectorAll('.confirm-checkbox').forEach(checkbox => {
-	        checkbox.addEventListener('change', function () {
-	          const row = this.closest('tr');
-	          if (this.checked) {
-	            row.classList.add('selected');
-	          } else {
-	            row.classList.remove('selected');
-	          }
-	        });
-	      });
-	    }, 100);
-	  } else {
-	    addDevices(); // Final action
-	    previewShown = false;
-	    document.getElementById("addPreviewButton").textContent = "Add Devices";
-	  }
-	}
-
-
-
-	function confirmAndCloseModal() {
-	  const checkboxes = document.querySelectorAll(".confirm-checkbox");
-	  const allChecked = Array.from(checkboxes).every(c => c.checked);
-
-	  if (!allChecked) {
-	    Swal.fire({
-	      icon: 'warning',
-	      title: 'Confirmation Required',
-	      text: 'Please check all Serial Numbers and IMEI Numbers.'
+	    document.addEventListener("DOMContentLoaded", () => {
+	        populateDealerDropdown();
 	    });
-	    return;
-	  }
 
-	  // Close modal and enable final submission
-	  const modal = bootstrap.Modal.getInstance(document.getElementById('pdfPreviewModal'));
-	  modal.hide();
+	    function populateDealerDropdown() {
+	        fetch("/dealer/all")
+	            .then(response => response.json())
+	            .then(dealers => {
+	                const dropdown = document.getElementById("dealerDropdown");
+	                dealers.forEach(dealer => {
+	                    const option = document.createElement("option");
+	                    option.value = dealer.id;
+	                    option.textContent = dealer.name;
+	                    dropdown.appendChild(option);
+	                });
+	            })
+	            .catch(error => console.error("Error fetching dealers:", error));
+	    }
 
-	  Swal.fire({
-	    icon: 'success',
-	    title: 'Verified',
-	    text: 'Now click again to submit all devices.'
-	  });
+	    function fetchSelectedDealerId() {
+	        const dropdown = document.getElementById("dealerDropdown");
+	        const selectedDealerId = dropdown.value;
+	        const selectedDealerName = dropdown.options[dropdown.selectedIndex]?.text;
 
-	  previewShown = true;
-	  document.getElementById("addPreviewButton").textContent = "Submit Devices";
-	}
+	        document.getElementById("selectedDealerId").innerText =
+	            `Selected Dealer: ${selectedDealerName} (ID: ${selectedDealerId})`;
+	    }
 
-     
+	    openTab("single");
+		
+		
+		
+		
+	</script>
 
-    document.addEventListener("DOMContentLoaded", () => {
-      populateDealerDropdown();
-      openTab("single");
-    });
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
+
 </html>

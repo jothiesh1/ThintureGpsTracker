@@ -5,10 +5,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.GpsTracker.Thinture.dto.LocationUpdate;
+import com.GpsTracker.Thinture.model.CoordinatesCache;
 import com.GpsTracker.Thinture.model.GpsData;
 import com.GpsTracker.Thinture.model.Vehicle;
 import com.GpsTracker.Thinture.model.VehicleHistory;
 import com.GpsTracker.Thinture.model.VehicleLastLocation;
+import com.GpsTracker.Thinture.repository.CoordinatesCacheRepository;
 import com.GpsTracker.Thinture.repository.VehicleLastLocationRepository;
 import com.GpsTracker.Thinture.service.VehicleHistoryService;
 import com.GpsTracker.Thinture.service.VehicleService;
@@ -20,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -65,10 +68,17 @@ public class MqttService implements MqttCallbackExtended {
 
     @Autowired
     private VehicleHistoryService vehicleHistoryService;
-
+    // Add this autowired service to your existing MqttService
+    @Autowired
+    private GeocodingService geocodingService;
     @Autowired
     private VehicleLastLocationRepository vehicleLastLocationRepository;
-
+  
+    
+    
+    @Autowired
+    private CoordinatesCacheRepository coordinatesCacheRepository;
+    
     private MqttClient mqttClient;
     private final AtomicBoolean connectedToBroker = new AtomicBoolean(false);
     private final AtomicBoolean reconnecting = new AtomicBoolean(false);
@@ -448,9 +458,14 @@ public class MqttService implements MqttCallbackExtended {
         return jsonObjects;
     }
 
-
+    
+    /**
+     * UPDATED processGpsData - Auto-save unique coordinates to CoordinatesCache
+     * (WITHOUT calling address API - just store lat/lng pairs)
+     */
     private void processGpsData(GpsData gpsData) {
         try {
+            // ✅ Validate GPS data (same as before)
             if (gpsData == null ||
                 gpsData.getDeviceID() == null ||
                 gpsData.getLatitude() == null ||
@@ -463,9 +478,11 @@ public class MqttService implements MqttCallbackExtended {
 
             String deviceID = gpsData.getDeviceID().trim();
             String imei = gpsData.getImei() != null ? gpsData.getImei().trim() : "";
+            String status = gpsData.getStatus().trim();
 
-            logger.info("[INFO] Processing GPS Data: deviceID={}, IMEI={}", deviceID, imei);
+            logger.info("[INFO] Processing GPS Data: deviceID={}, IMEI={}, STATUS={}", deviceID, imei, status);
 
+            // ✅ Find vehicle by IMEI (same as before)
             Optional<Vehicle> vehicleOpt = vehicleService.getVehicleByImei(imei);
             if (vehicleOpt.isEmpty()) {
                 logger.error("[ERROR] No vehicle found with IMEI={} (cannot save GPS data)", imei);
@@ -475,23 +492,26 @@ public class MqttService implements MqttCallbackExtended {
             Vehicle vehicle = vehicleOpt.get();
             String dbDeviceID = vehicle.getDeviceID() != null ? vehicle.getDeviceID().trim() : "";
 
+            // ✅ Device ID validation (same as before)
             if (dbDeviceID.isEmpty()) {
-                // ✅ First time: Save device ID into DB
                 vehicle.setDeviceID(deviceID);
                 vehicleService.save(vehicle);
                 logger.info("🆕 First-time deviceID registered: {} for IMEI={}", deviceID, imei);
             } else {
-                // ✅ Enforce strict match after first time
                 if (!deviceID.equalsIgnoreCase(dbDeviceID)) {
                     logger.warn("❌ DeviceID mismatch. Incoming={}, DB={}. Skipping save.", deviceID, dbDeviceID);
                     return;
                 }
             }
 
-            // ✅ Save history (same logic as before)
+            // ✅ Parse coordinates
             double latitude = Double.parseDouble(gpsData.getLatitude());
             double longitude = Double.parseDouble(gpsData.getLongitude());
 
+            // 🆕 NEW: Auto-save unique coordinates to CoordinatesCache (NO API call yet)
+            saveUniqueCoordinatesToCache(latitude, longitude, deviceID);
+
+            // ✅ Create VehicleHistory record (same as before)
             VehicleHistory history = new VehicleHistory();
             history.setVehicle(vehicle);
             history.setTimestamp(Timestamp.valueOf(gpsData.getTimestamp()));
@@ -508,34 +528,56 @@ public class MqttService implements MqttCallbackExtended {
             history.setGsmStrength(gpsData.getGsmStrength());
             history.setImei(imei);
 
+            // ✅ Process additional data (same as before)
             if (gpsData.getAdditionalData() != null && !gpsData.getAdditionalData().isEmpty()) {
                 try {
                     int additionalDataValue = Integer.parseInt(gpsData.getAdditionalData(), 2);
+                    
+                    if (additionalDataValue > 1023) {
+                        logger.warn("{}[WARN] Additional data value {} exceeds 10-bit range (max 1023) for device {}{}",
+                                ANSI_YELLOW, additionalDataValue, deviceID, ANSI_RESET);
+                    }
+                    
                     Map<String, Boolean> flags = decodeAdditionalData(additionalDataValue);
                     String decoded = flags.entrySet().stream()
                             .filter(Map.Entry::getValue)
                             .map(Map.Entry::getKey)
                             .collect(Collectors.joining(", "));
-                    logger.info("[INFO] Decoded Additional Data for {}: {}", deviceID, flags);
-                    history.setAdditionalData(decoded);
+                    
+                    history.setAdditionalData(decoded.isEmpty() ? "No Active Alerts" : decoded);
+                    
+                    logger.info("{}[INFO] Decoded Additional Data for {}: {}{}", 
+                            ANSI_GREEN, deviceID, decoded.isEmpty() ? "No Active Alerts" : decoded, ANSI_RESET);
+                    
                 } catch (NumberFormatException e) {
-                    logger.warn("[WARN] Could not parse additional data: {}", gpsData.getAdditionalData());
+                    logger.error("{}[ERROR] Could not parse additional data as binary: {} for device {}{}",
+                            ANSI_RED, gpsData.getAdditionalData(), deviceID, ANSI_RESET, e);
+                    history.setAdditionalData("Parse Error: " + gpsData.getAdditionalData());
                 }
+            } else {
+                history.setAdditionalData("No Additional Data");
             }
 
+            // ✅ Save vehicle history (same as before)
             synchronized (historyBatch) {
                 if (historyBatch.isEmpty()) {
-                    logger.info("[SAVE] Saving single GPS record immediately for {}", deviceID);
+                    logger.info("{}[SAVE] 💾 Saving GPS record for {} | Lat: {}, Lng: {}{}",
+                            ANSI_GREEN, deviceID, latitude, longitude, ANSI_RESET);
                     vehicleHistoryService.save(history);
                 } else {
                     historyBatch.add(history);
+                    logger.info("{}[BATCH] 📦 Added to batch ({}/{}) for {} | Lat: {}, Lng: {}{}",
+                            ANSI_BLUE, historyBatch.size(), BATCH_SIZE, deviceID, latitude, longitude, ANSI_RESET);
+                    
                     if (historyBatch.size() >= BATCH_SIZE) {
+                        logger.info("{}[BATCH] 💾 Saving batch of {} GPS records{}",
+                                ANSI_GREEN, historyBatch.size(), ANSI_RESET);
                         saveBatches();
                     }
                 }
             }
 
-            // ✅ Save/update last location
+            // ✅ Save/update last location (same as before)
             VehicleLastLocation lastLocation = vehicleLastLocationRepository
                     .findByImei(imei).orElse(vehicleLastLocationRepository.findByDeviceId(deviceID).orElse(new VehicleLastLocation()));
 
@@ -553,35 +595,172 @@ public class MqttService implements MqttCallbackExtended {
             lastLocation.setGsmStrength(gpsData.getGsmStrength());
 
             vehicleLastLocationRepository.save(lastLocation);
-            logger.info("[GPS] Updated last known location for {}", deviceID);
+            logger.info("{}[GPS] 📍 Updated last location for {} | Lat: {}, Lng: {}{}",
+                    ANSI_CYAN, deviceID, latitude, longitude, ANSI_RESET);
 
-            messagingTemplate.convertAndSend("/topic/location-updates",
-                    new LocationUpdate(latitude, longitude, deviceID, gpsData.getTimestamp(),
-                            gpsData.getSpeed(), gpsData.getIgnition(),
-                            gpsData.getCourse(), gpsData.getVehicleStatus(),
-                            gpsData.getAdditionalData(),gpsData.getGsmStrength(), gpsData.getTimeIntervals()));
+            // ✅ WebSocket logic (same as before)
+            if (!"N1".equalsIgnoreCase(status)) {
+                logger.info("{}🚫 [WebSocket] Blocking WebSocket update for device {} with status {} (Only N1 allowed){}",
+                        ANSI_YELLOW, deviceID, status, ANSI_RESET);
+                return;
+            }
+
+            logger.info("{}✅ [WebSocket] Sending location update for device {} with status {}{}",
+                    ANSI_GREEN, deviceID, status, ANSI_RESET);
+
+            LocationUpdate update = new LocationUpdate(
+                    latitude,
+                    longitude,
+                    deviceID,
+                    gpsData.getTimestamp(),
+                    gpsData.getSpeed(),
+                    gpsData.getIgnition(),
+                    gpsData.getCourse(),
+                    gpsData.getVehicleStatus(),
+                    gpsData.getAdditionalData(),
+                    gpsData.getGsmStrength(),
+                    gpsData.getTimeIntervals()
+            );
+
+            // ✅ Send WebSocket updates (same as before)
+            if (vehicle.getDealer_id() != null) {
+                String topic = "/topic/location-updates/dealer/" + vehicle.getDealer_id();
+                messagingTemplate.convertAndSend(topic, update);
+                logger.info("{}📡 [WS] Sent to => DEALER (ID={}) | deviceID={} | Lat: {}, Lng: {}{}",
+                        ANSI_CYAN, vehicle.getDealer_id(), deviceID, latitude, longitude, ANSI_RESET);
+            }
+
+            if (vehicle.getAdmin_id() != null) {
+                String topic = "/topic/location-updates/admin/" + vehicle.getAdmin_id();
+                messagingTemplate.convertAndSend(topic, update);
+                logger.info("{}📡 [WS] Sent to => ADMIN (ID={}) | deviceID={} | Lat: {}, Lng: {}{}",
+                        ANSI_CYAN, vehicle.getAdmin_id(), deviceID, latitude, longitude, ANSI_RESET);
+            }
+
+            if (vehicle.getClient_id() != null) {
+                String topic = "/topic/location-updates/client/" + vehicle.getClient_id();
+                messagingTemplate.convertAndSend(topic, update);
+                logger.info("{}📡 [WS] Sent to => CLIENT (ID={}) | deviceID={} | Lat: {}, Lng: {}{}",
+                        ANSI_CYAN, vehicle.getClient_id(), deviceID, latitude, longitude, ANSI_RESET);
+            }
+
+            if (vehicle.getUser_id() != null) {
+                String topic = "/topic/location-updates/user/" + vehicle.getUser_id();
+                messagingTemplate.convertAndSend(topic, update);
+                logger.info("{}📡 [WS] Sent to => USER (ID={}) | deviceID={} | Lat: {}, Lng: {}{}",
+                        ANSI_CYAN, vehicle.getUser_id(), deviceID, latitude, longitude, ANSI_RESET);
+            }
+            
+            if (vehicle.getSuperadmin_id() != null) {
+                String topic = "/topic/location-updates/superadmin/" + vehicle.getSuperadmin_id();
+                messagingTemplate.convertAndSend(topic, update);
+                logger.info("{}📡 [WS] Sent to => SUPERADMIN (ID={}) | deviceID={} | Lat: {}, Lng: {}{}",
+                        ANSI_CYAN, vehicle.getSuperadmin_id(), deviceID, latitude, longitude, ANSI_RESET);
+            }
+
         } catch (Exception e) {
-            logger.error("[ERROR] Exception while processing GPS Data: {}", gpsData, e);
+            logger.error("{}[ERROR] Exception while processing GPS Data: {}{}",
+                    ANSI_RED, gpsData, ANSI_RESET, e);
         }
     }
 
-    
-    
-
     /**
-     * Decodes Additional Data flags using bitwise operations.
+     * 🆕 NEW METHOD: Save unique coordinates to CoordinatesCache (without address)
+     * This prevents duplicate lat/lng pairs from being saved
+     */
+    private void saveUniqueCoordinatesToCache(double latitude, double longitude, String deviceID) {
+        try {
+            // Check if this coordinate pair already exists
+            boolean exists = coordinatesCacheRepository.existsByLatitudeAndLongitude(latitude, longitude);
+            
+            if (exists) {
+                logger.debug("{}📍 [COORD CACHE] Coordinates {},{} already exist for device {}{}",
+                        ANSI_GREEN, latitude, longitude, deviceID, ANSI_RESET);
+                return; // Skip saving duplicate coordinates
+            }
+            
+            // Save new coordinate pair (without address - address will be null/empty)
+            CoordinatesCache coordinateEntry = new CoordinatesCache();
+            coordinateEntry.setLatitude(latitude);
+            coordinateEntry.setLongitude(longitude);
+            coordinateEntry.setAddress(""); // Empty address - will be filled when requested
+            
+            coordinatesCacheRepository.save(coordinateEntry);
+            
+            logger.info("{}🆕 [COORD CACHE] Saved new coordinates: {},{} from device {}{}",
+                    ANSI_BLUE, latitude, longitude, deviceID, ANSI_RESET);
+            
+        } catch (DataIntegrityViolationException e) {
+            // Handle duplicate key constraint gracefully (race condition)
+            logger.debug("{}📍 [COORD CACHE] Duplicate coordinates {},{} detected (race condition) - device: {}{}",
+                    ANSI_GREEN, latitude, longitude, deviceID, ANSI_RESET);
+            
+        } catch (Exception e) {
+            logger.error("{}[COORD CACHE ERROR] Failed to save coordinates {},{} for device {}: {}{}",
+                    ANSI_RED, latitude, longitude, deviceID, e.getMessage(), ANSI_RESET);
+        }
+    }
+    
+    
+    
+    
+    
+    /**
+     * Decodes Additional Data flags using bitwise operations for 10-bit format.
+     * 
+     * BIT POSITIONS:
+     * 0 - Over Speed
+     * 1 - Angle Change > 30°
+     * 2 - Theft/Towing
+     * 3 - Sharp Turning
+     * 4 - Distance Change
+     * 5 - Roaming
+     * 6 - Harsh Acceleration
+     * 7 - Harsh Breaking
+     * 8 - Box Open
+     * 9 - Power Cut
      */
     private Map<String, Boolean> decodeAdditionalData(int additionalData) {
-        Map<String, Boolean> flags = new HashMap<>();
-        flags.put("Speed Crossed", (additionalData & 0b00000001) != 0);
-        flags.put("Angle Change > 30°", (additionalData & 0b00000010) != 0);
-        flags.put("Theft/Towing", (additionalData & 0b00000100) != 0);
-        flags.put("Sharp Turning", (additionalData & 0b00001000) != 0);
-        flags.put("Distance Change", (additionalData & 0b00010000) != 0);
-        flags.put("Roaming", (additionalData & 0b00100000) != 0);
-        flags.put("Harsh Acceleration", (additionalData & 0b01000000) != 0);
-        flags.put("Harsh Breaking", (additionalData & 0b10000000) != 0);
+        Map<String, Boolean> flags = new LinkedHashMap<>(); // Using LinkedHashMap to maintain order
+        
+        // Original 8 bits (0-7)
+        flags.put("Over Speed", (additionalData & 0b0000000001) != 0);           // Bit 0
+        flags.put("Angle Change > 30°", (additionalData & 0b0000000010) != 0);   // Bit 1
+        flags.put("Theft/Towing", (additionalData & 0b0000000100) != 0);         // Bit 2
+        flags.put("Sharp Turning", (additionalData & 0b0000001000) != 0);        // Bit 3
+        flags.put("Distance Change", (additionalData & 0b0000010000) != 0);      // Bit 4
+        flags.put("Roaming", (additionalData & 0b0000100000) != 0);              // Bit 5
+        flags.put("Harsh Acceleration", (additionalData & 0b0001000000) != 0);   // Bit 6
+        flags.put("Harsh Breaking", (additionalData & 0b0010000000) != 0);       // Bit 7
+        
+        // New 2 bits (8-9)
+        flags.put("Box Open", (additionalData & 0b0100000000) != 0);             // Bit 8
+        flags.put("Power Cut", (additionalData & 0b1000000000) != 0);            // Bit 9
+        
         return flags;
+    }
+
+    /**
+     * Helper method to log detailed bit analysis for debugging
+     */
+    private void logBitAnalysis(String deviceID, String additionalDataString, int additionalDataValue, Map<String, Boolean> flags) {
+        logger.info("{}[BIT ANALYSIS] Device: {} | Raw: {} | Decimal: {} | Binary: {}{}",
+                ANSI_CYAN, deviceID, additionalDataString, additionalDataValue, 
+                String.format("%10s", Integer.toBinaryString(additionalDataValue)).replace(' ', '0'), ANSI_RESET);
+        
+        // Log active flags only
+        String activeFlags = flags.entrySet().stream()
+                .filter(Map.Entry::getValue)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.joining(", "));
+        
+        if (!activeFlags.isEmpty()) {
+            logger.info("{}[ACTIVE ALERTS] Device: {} | Flags: {}{}",
+                    ANSI_YELLOW, deviceID, activeFlags, ANSI_RESET);
+        } else {
+            logger.info("{}[NO ALERTS] Device: {} | All flags are inactive{}",
+                    ANSI_GREEN, deviceID, ANSI_RESET);
+        }
     }
 
     @Scheduled(fixedRate = 2000)

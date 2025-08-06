@@ -78,6 +78,10 @@
 
 <script>
   let fullData = [];
+  function getUrlParam(name) {
+    const url = new URL(window.location.href);
+    return url.searchParams.get(name);
+  }
 
   document.addEventListener("DOMContentLoaded", () => loadRenewals(0));
 
@@ -89,13 +93,25 @@
       .then(res => res.json())
       .then(data => {
         fullData = data;
-        renderRenewals(data);
+
+        // ✅ Check for `date` from URL
+        const urlDate = getUrlParam("date");
+        if (urlDate) {
+          const filtered = data.filter(v => {
+            const rDate = v.renewalDate?.split("T")[0];
+            return rDate === urlDate;
+          });
+          renderRenewals(filtered);
+        } else {
+          renderRenewals(data);
+        }
       })
       .catch(err => {
         console.error("Error loading renewals", err);
         Swal.fire("Error", "Failed to load data", "error");
       });
   }
+
 
   function renderRenewals(data) {
     const tbody = document.querySelector("#renewalTable tbody");

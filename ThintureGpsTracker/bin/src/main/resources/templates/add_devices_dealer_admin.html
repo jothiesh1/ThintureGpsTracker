@@ -202,6 +202,8 @@
 		    document.querySelector(`[onclick="openTab('${tabName}')"]`).classList.add("active");
 		}
 
+		// Updated JavaScript functions with better duplicate handling
+
 		function addSingleSerial() {
 		    const serial = document.getElementById("singleSerial").value.trim();
 		    const imei = document.getElementById("singleImei").value.trim();
@@ -219,9 +221,9 @@
 		    }
 
 		    const payload = {
-		        serialNo: PREFIX + serial,  // ✅ Corrected Prefix Usage
+		        serialNo: PREFIX + serial,
 		        imei: imei,
-		        dealerId: dealerId,  // ✅ Ensure correct key name
+		        dealerId: dealerId,
 		        dealerName: dealerName,
 		    };
 
@@ -236,7 +238,7 @@
 		    .then(data => {
 		        console.log("✅ API Response:", data);
 
-		        if (data.success === "true") {
+		        if (data.success === true || data.success === "true") {
 		            Swal.fire({
 		                icon: 'success',
 		                title: 'Success',
@@ -244,6 +246,20 @@
 		            });
 		            document.getElementById("singleSerial").value = "";
 		            document.getElementById("singleImei").value = "";
+		        } else if (data.duplicates) {
+		            // ✅ Handle duplicate entries specifically
+		            Swal.fire({
+		                icon: 'warning',
+		                title: 'Duplicate Entry Detected',
+		                html: `
+		                    <p>${data.message}</p>
+		                    <div style="text-align: left; margin-top: 10px;">
+		                        <strong>Duplicate entries:</strong><br>
+		                        ${data.duplicates.map(dup => `• ${dup}`).join('<br>')}
+		                    </div>
+		                `,
+		                confirmButtonText: 'OK'
+		            });
 		        } else {
 		            Swal.fire({
 		                icon: 'error',
@@ -262,35 +278,6 @@
 		    });
 		}
 
-
-		function addDualSerial() {
-		    const startSerial = parseInt(document.getElementById("startSerial").value.trim());
-		    const endSerial = parseInt(document.getElementById("endSerial").value.trim());
-		    const dealerDropdown = document.getElementById("dealerDropdown");
-		    const dealerId = dealerDropdown.value;
-
-		    if (isNaN(startSerial) || isNaN(endSerial) || startSerial > endSerial || !dealerId) {
-		        Swal.fire({
-		            icon: 'error',
-		            title: 'Invalid Input',
-		            text: 'Ensure valid Start/End Serial and select a Dealer.',
-		        });
-		        return;
-		    }
-
-		    const PREFIX = "TH/M4G/";
-
-		    // Reset the global object
-		    resetSerials();
-
-		    // Store serials with empty IMEI for manual input
-		    for (let i = startSerial; i <= endSerial; i++) {
-		        const serial = PREFIX + i;
-		        serialNumbers[serial] = ""; // IMEI will be filled later
-		    }
-
-		    updateSerialTable(); // Show the table with input fields
-		}
 		function addDevices() {
 		    const dealerId = document.getElementById("dealerDropdown").value;
 
@@ -320,27 +307,62 @@
 		        headers: { 'Content-Type': 'application/json' },
 		        body: JSON.stringify(payload),
 		    })
-			.then(response => response.json())
-			.then(data => {
-			    console.log("✅ FULL API Response:", data); // 🔍 Add this line to inspect actual response
-			    if (data.success === "true" || data.success === true) {
-			        Swal.fire({
-			            icon: 'success',
-			            title: 'Success',
-			            text: data.message || 'Devices added successfully.',
-			        });
-			        resetSerials();
-			        document.getElementById("startSerial").value = "";
-			        document.getElementById("endSerial").value = "";
-			    } else {
-			        Swal.fire({
-			            icon: 'error',
-			            title: 'Error',
-			            text: data.message || 'Failed to add devices.',
-			        });
-			    }
-			})
+		    .then(response => response.json())
+		    .then(data => {
+		        console.log("✅ FULL API Response:", data);
+		        
+		        if (data.success === true || data.success === "true") {
+		            // ✅ Handle detailed response with duplicates
+		            let resultHtml = `<p><strong>${data.message}</strong></p>`;
+		            
+		            if (data.savedCount > 0) {
+		                resultHtml += `
+		                    <div style="margin-top: 15px; text-align: left;">
+		                        <h4 style="color: green; margin-bottom: 10px;">✅ Successfully Added (${data.savedCount}):</h4>
+		                        <ul style="max-height: 150px; overflow-y: auto;">
+		                            ${data.savedDevices.map(device => 
+		                                `<li><strong>Serial:</strong> ${device.serialNo}<br><strong>IMEI:</strong> ${device.imei}</li>`
+		                            ).join('')}
+		                        </ul>
+		                    </div>
+		                `;
+		            }
+		            
+		            if (data.duplicateCount > 0) {
+		                resultHtml += `
+		                    <div style="margin-top: 15px; text-align: left;">
+		                        <h4 style="color: orange; margin-bottom: 10px;">⚠️ Duplicates Skipped (${data.duplicateCount}):</h4>
+		                        <ul style="max-height: 150px; overflow-y: auto;">
+		                            ${data.duplicateDevices.map(device => 
+		                                `<li><strong>Serial:</strong> ${device.serialNo}<br><strong>IMEI:</strong> ${device.imei}<br><em>Reason: ${device.reason}</em></li>`
+		                            ).join('')}
+		                        </ul>
+		                    </div>
+		                `;
+		            }
 
+		            Swal.fire({
+		                icon: data.duplicateCount > 0 ? 'warning' : 'success',
+		                title: data.duplicateCount > 0 ? 'Partial Success' : 'Success',
+		                html: resultHtml,
+		                width: '600px',
+		                confirmButtonText: 'OK'
+		            });
+
+		            // Clear form if any devices were saved
+		            if (data.savedCount > 0) {
+		                resetSerials();
+		                document.getElementById("startSerial").value = "";
+		                document.getElementById("endSerial").value = "";
+		            }
+		        } else {
+		            Swal.fire({
+		                icon: 'error',
+		                title: 'Error',
+		                text: data.message || 'Failed to add devices.',
+		            });
+		        }
+		    })
 		    .catch(error => {
 		        console.error('❌ API Error:', error);
 		        Swal.fire({
@@ -351,7 +373,7 @@
 		    });
 		}
 
-
+		// Rest of your existing JavaScript functions remain the same...
 
 
 		function updateSerialTable() {

@@ -27,36 +27,71 @@
 	<!-- Insert the navigation fragment -->
 		<header th:insert="~{navigation :: navbar}"></header>
 <div class="card">
-	<div class="main-heading">Analytics Monitoring</div>
+	<div class="main-heading">Vehicle & Driver Monitoring</div>
 
     <div id="use-normal" class="report-grid">
         <div class="report-card" id="event">
-            <img src="/THINTURE_IMAGE/events1.jpg" alt="Event Report">
+            <img src="/THINTURE_IMAGE/eventsr.png" alt="Event Report">
             <span>Event status Report</span>
         </div>
 		<div class="report-card" id="trip">
-		           <img src="/THINTURE_IMAGE/trip.jpg" class="install" alt="Historical Data">
+		           <img src="/THINTURE_IMAGE/tripr.png" class="install" alt="Historical Data">
 		           <span>Trip management Report</span>
 		       </div>
 		
-        <div class="report-card" id="install">
-            <img src="/THINTURE_IMAGE/installation.jpg" class="install" alt="Historical Data">
-            <span>Installation Report</span>
-        </div>
+       
 		
         <div class="report-card" id="complaint">
-            <img src="/THINTURE_IMAGE/complaints.jpg" alt="Parking Report">
+            <img src="/THINTURE_IMAGE/complaintsr.png" alt="Parking Report">
             <span>Complaints Report</span>
         </div>
 		
         <div class="report-card" id="vehicleReport">
-            <img src="/THINTURE_IMAGE/vehile4.jpg" alt="Vehicle Report">
+            <img src="/THINTURE_IMAGE/vviolationr.png" alt="Vehicle Report">
             <span>Vehicle Violation Report</span>
         </div>
         <div class="report-card" id="driver">
-            <img src="/THINTURE_IMAGE/driver3.jpg" alt="Driver Report">
+            <img src="/THINTURE_IMAGE/ragrr.png" alt="Driver Report">
             <span>Driver RAG Report</span>
         </div>
+		<div class="report-card" id="install">
+		           <img src="/THINTURE_IMAGE/installr.png" class="install" alt="Historical Data">
+		           <span>Install Report </span>
+		       </div>
+    </div>
+
+    
+</div>
+<br>
+<br>
+<div class="card">
+	<div class="main-heading">Users Management</div>
+
+    <div id="use-normal" class="report-grid">
+        <div class="report-card" id="admin">
+            <img src="/THINTURE_IMAGE/adminr.png" alt="Event Report">
+            <span>Admin</span>
+        </div>
+		<div class="report-card" id="dealer">
+		           <img src="/THINTURE_IMAGE/dealerr.png" class="install" alt="Historical Data">
+		           <span>Dealer</span>
+		       </div>
+		
+        <div class="report-card" id="client">
+            <img src="/THINTURE_IMAGE/clientr.png" class="install" alt="Historical Data">
+            <span>Client</span>
+        </div>
+		
+        <div class="report-card" id="user">
+            <img src="/THINTURE_IMAGE/usersr.png" alt="Parking Report">
+            <span>Users</span>
+        </div>
+		
+        <div class="report-card" id="driverl">
+            <img src="/THINTURE_IMAGE/driverr.png" alt="Vehicle Report">
+            <span>Driver</span>
+        </div>
+       
         
     </div>
 
@@ -103,6 +138,38 @@
 		           window.location.href = '/superadmin/tripmanagement';
 		       });
 		
+			   document.getElementById('admin').addEventListener('click', function() {
+			               window.location.href = '/superadmin/admin_view';
+			           });   
+			   
+			   
+					   document.getElementById('dealer').addEventListener('click', function() {
+					               window.location.href = '/superadmin/dealer_view';
+					           });
+			   
+			   
+			   
+							   document.getElementById('client').addEventListener('click', function() {
+							               window.location.href = '/superadmin/client_view';
+							           });
+			   
+									   document.getElementById('user').addEventListener('click', function() {
+									               window.location.href = '/superadmin/users_view';
+									           });
+			   
+											   document.getElementById('driverl').addEventListener('click', function() {
+											               window.location.href = '/superadmin/driver_view';
+											           });
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
+			   
         // Only attach if the element exists (your video is commented out in HTML)
         const videoCard = document.getElementById('video');
         if (videoCard) {

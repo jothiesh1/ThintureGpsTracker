@@ -99,17 +99,7 @@
 						           
 						        </ul>
 						    </li>
-						    <li class="nav-item dropdown" id="menu-users">
-						        <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" data-bs-toggle="dropdown">
-						            <strong>Users Management</strong>
-						        </a>
-						        <ul class="dropdown-menu" id="menu-users">
-						            <li><a class="dropdown-item" href="/admin/dealer_view">Dealer</a></li>
-						            <li><a class="dropdown-item" href="/admin/client_view">Client</a></li>
-						            <li><a class="dropdown-item" href="/admin/user_view">User</a></li>
-						            <li><a class="dropdown-item" href="/admin/driver_view">Driver</a></li>
-						        </ul>
-						    </li>
+						   
 						    <li class="nav-item dropdown" id="menu-notifications">
 						        <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" data-bs-toggle="dropdown">
 						            <strong>NOTIFICATIONS</strong>
@@ -265,55 +255,6 @@
 		        window.history.forward();
 		    });
 		</script>
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const adminEmail = localStorage.getItem("username"); // ← already saved on login
-    if (!adminEmail) {
-      console.warn("⚠️ No email found in localStorage under 'username'");
-      return;
-    }
-
-    const normalizedEmail = adminEmail.trim().toLowerCase();
-    const allowedEmails = ["info1@thinture.com", "info2@thinture.com"];
-    const showAllNavItems = allowedEmails.includes(normalizedEmail);
-
-    // List of top-level nav-item <li> IDs
-    const allNavItemIds = [
-      "menu-home",
-      "menu-admin",
-      "menu-assign-device",
-      "menu-tracking",
-      "menu-configuration",
-      "menu-report",
-      "menu-users",
-      "menu-notifications",
-      "menu-profile"
-    ];
-
-    const allowedNavItemIds = [
-      "menu-home",
-      "menu-admin",
-      "menu-assign-device",
-	  "menu-tracking",
-      "menu-profile"
-    ];
-
-    // Hide all first
-    allNavItemIds.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.style.display = "none";
-    });
-
-    // Show allowed ones
-    const visibleIds = showAllNavItems ? allNavItemIds : allowedNavItemIds;
-    visibleIds.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.style.display = "block";
-    });
-
-    console.log("✅ Menu adjusted for:", normalizedEmail);
-  });
-</script>
 
 
 

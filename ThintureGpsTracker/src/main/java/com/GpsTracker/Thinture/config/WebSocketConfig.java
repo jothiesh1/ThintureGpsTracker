@@ -1,24 +1,8 @@
+// ===== 1. Enhanced WebSocket Config =====
 package com.GpsTracker.Thinture.config;
 
-import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-
-
-/*
-**********************************Developer Jothiesh **********************
-*                                                                         /
-*                                 ********************                                                                  /
-***************************************************************************
-*                                                                         /
-*
-*                                                                         /
-*
-***************************************************************************
-*
-*/
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -30,26 +14,35 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketConfig.class);
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // Configure the message broker with a thread pool scheduler
-        ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
-        taskScheduler.setPoolSize(20); // Increase thread pool size
-        taskScheduler.setThreadNamePrefix("WebSocketBrokerTask-");
-        taskScheduler.initialize();
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(1);
+        scheduler.setThreadNamePrefix("ws-heartbeat-");
+        scheduler.initialize();
 
-        // Configure the simple broker
-        config.enableSimpleBroker("/topic")
-              .setTaskScheduler(taskScheduler); // Set scheduler for message broker
+        config.enableSimpleBroker("/topic", "/queue")
+            .setHeartbeatValue(new long[]{10000, 10000})
+            .setTaskScheduler(scheduler);
 
-        config.setApplicationDestinationPrefixes("/app"); // Prefix for messages bound for @MessageMapping
+        config.setApplicationDestinationPrefixes("/app");
+        config.setUserDestinationPrefix("/user");
+        
+        logger.info("✅ WebSocket broker configured with prefixes: /topic, /queue, /app, /user");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // Register the WebSocket endpoint and enable SockJS as a fallback
-        registry.addEndpoint("/gs-guide-websocket")
-                .setAllowedOriginPatterns("*") // Allow all origins (CORS)
-                .withSockJS();
+        registry.addEndpoint("/ws")
+            .setAllowedOriginPatterns("*")
+            .withSockJS();
+        
+        // Also add without SockJS for native WebSocket clients
+        registry.addEndpoint("/ws-native")
+            .setAllowedOriginPatterns("*");
+        
+        logger.info("🔌 WebSocket endpoints registered: /ws (SockJS), /ws-native (native)");
     }
 }

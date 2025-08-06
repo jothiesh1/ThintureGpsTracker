@@ -33,7 +33,7 @@ public class VehicleReportDTO {
     private Double vehicleSpeed;
     private String ignition;
     private String vehicleStatus;
-
+    private String status;
 	public String getIgnition() {
 		return ignition;
 	}
@@ -53,7 +53,7 @@ public class VehicleReportDTO {
     private String violationType;
     private String violationSpeed;
     private String location;
-    private String status;
+   
 
     public String getDeviceID() {
 		return deviceID;

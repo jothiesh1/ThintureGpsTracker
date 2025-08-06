@@ -29,6 +29,25 @@ import com.GpsTracker.Thinture.model.VehicleHistory;
 	                                              @Param("startDate") Timestamp startDate,
 	                                              @Param("endDate") Timestamp endDate,
 	                                              @Param("additionalData") String additionalData);
+	    
+	    
+	    
+	    
+	    
+	    
+	    //DAHSHBOARD CODE CHART
+	    
+	    
+	    @Query(value = "SELECT " +
+	            "SUM(CASE WHEN additionalData LIKE '%Over speed%' THEN 1 ELSE 0 END) as overspeed, " +
+	            "SUM(CASE WHEN additionalData LIKE '%Sharp Turning%' THEN 1 ELSE 0 END) as sharpTurning, " +
+	            "SUM(CASE WHEN additionalData LIKE '%Harsh Acceleration%' THEN 1 ELSE 0 END) as harshAcceleration, " +
+	            "SUM(CASE WHEN additionalData LIKE '%Harsh Breaking%' THEN 1 ELSE 0 END) as harshBreaking " +
+	            "FROM vehicle_history " +
+	            "WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 30 DAY)",
+	            nativeQuery = true)
+	    List<Object[]> getViolationSummaryLast30Days();
+	
 	}
 
 

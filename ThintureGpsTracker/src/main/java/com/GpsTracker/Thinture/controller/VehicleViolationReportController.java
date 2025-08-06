@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.GpsTracker.Thinture.dto.VehicleViolationReportDTO;
+import com.GpsTracker.Thinture.dto.ViolationSummaryDTO;
 import com.GpsTracker.Thinture.service.VehicleHistoryService;
 import com.GpsTracker.Thinture.service.VehicleService;
 import com.GpsTracker.Thinture.service.VehicleViolationReportService;
@@ -97,14 +98,12 @@ public class VehicleViolationReportController {
     }
 
 
-   
-
-
+  
 
     @GetMapping("/additional-data")
     public List<String> getAdditionalDataTypes() {
         return Arrays.asList(
-            "Speed Crossed",
+            "Over speed ",
             "Sharp Turning",
             "Harsh Acceleration",
             "Harsh Breaking",

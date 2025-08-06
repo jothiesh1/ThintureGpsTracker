@@ -149,9 +149,9 @@ public class AdminController {
             adminRepository.deleteById(id);
             return ResponseEntity.ok("Admin deleted successfully");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting admin");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error deleting admin: " + e.getMessage());
         }
-
     }
     }
 //    @PostMapping("/addAdmin")

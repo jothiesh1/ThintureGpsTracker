@@ -27,6 +27,7 @@ import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -447,6 +448,16 @@ public class VehicleHistoryService {
 	    vehicleHistoryRepository.save(history);
 
 	    logger.info(ANSI_GREEN + "[SAVE] New vehicle history record saved for Device ID: {} at Timestamp: {}" + ANSI_RESET);
+	}
+
+	public List<VehicleHistory> findRecordsWithoutAddresses() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Optional<VehicleHistory> findById(Long vehicleHistoryId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

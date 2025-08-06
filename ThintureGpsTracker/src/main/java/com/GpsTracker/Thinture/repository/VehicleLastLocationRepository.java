@@ -56,5 +56,6 @@ public interface VehicleLastLocationRepository extends BaseRestrictedRepository<
     VehicleLastLocation findTopByDeviceIDOrderByTimestampDesc(@Param("deviceId") String deviceId);
 
     
-   
+    // ✅ NEW method for deleting by deviceId
+    void deleteByDeviceId(String deviceId);
 }

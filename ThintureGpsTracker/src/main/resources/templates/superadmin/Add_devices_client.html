@@ -76,6 +76,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     const PREFIX = "TH/M4G/";
     const serialNumbers = {};
@@ -108,8 +109,16 @@
             option.textContent = client.name;
             dropdown.appendChild(option);
           });
+          console.log(`✅ Loaded ${clients.length} clients`);
         })
-        .catch(error => console.error("Error fetching clients:", error));
+        .catch(error => {
+          console.error("❌ Error fetching clients:", error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to load clients. Please refresh the page.'
+          });
+        });
     }
 
     function fetchSelectedClientId() {
@@ -119,17 +128,30 @@
       document.getElementById("selectedClientId").innerText = `Selected Client: ${clientName} (ID: ${clientId})`;
     }
 
+    // ✅ Enhanced Single Serial Addition with Duplicate Handling
     function addSingleSerial() {
       const serial = document.getElementById("singleSerial").value.trim();
       const imei = document.getElementById("singleImei").value.trim();
       const clientId = document.getElementById("ClientDropdown").value;
+      const clientName = document.getElementById("ClientDropdown").options[document.getElementById("ClientDropdown").selectedIndex]?.text;
 
       if (!serial || !imei || !clientId) {
-        Swal.fire({ icon: 'error', title: 'Missing Input', text: 'Fill all fields and select client.' });
+        Swal.fire({ 
+          icon: 'error', 
+          title: 'Missing Input', 
+          text: 'Please enter Serial, IMEI, and select a Client.' 
+        });
         return;
       }
 
-      const payload = { serialNo: `${PREFIX}${serial}`, imei, clientId };
+      const payload = { 
+        serialNo: `${PREFIX}${serial}`, 
+        imei, 
+        clientId,
+        clientName 
+      };
+
+      console.log("📌 Single Serial Payload for Client:", payload);
 
       fetch('/client/add-single', {
         method: 'POST',
@@ -138,17 +160,48 @@
       })
         .then(response => response.json())
         .then(data => {
-          if (data.success === "true") {
-            Swal.fire({ icon: 'success', title: 'Success', text: 'Single Serial added!' });
+          console.log("✅ API Response:", data);
+
+          if (data.success === true || data.success === "true") {
+            Swal.fire({ 
+              icon: 'success', 
+              title: 'Success', 
+              text: data.message || 'Single Serial added successfully to client!'
+            });
             document.getElementById("singleSerial").value = "";
             document.getElementById("singleImei").value = "";
+          } else if (data.duplicates) {
+            // ✅ Handle duplicate entries specifically
+            Swal.fire({
+              icon: 'warning',
+              title: 'Duplicate Entry Detected',
+              html: `
+                <p><strong>${data.message}</strong></p>
+                <div style="text-align: left; margin-top: 15px;">
+                  <h5 style="color: #fd7e14;">Duplicate entries found:</h5>
+                  <ul style="list-style-type: none; padding-left: 0;">
+                    ${data.duplicates.map(dup => `<li style="padding: 5px 0; border-bottom: 1px solid #eee;"><i class="fas fa-exclamation-triangle" style="color: orange;"></i> ${dup}</li>`).join('')}
+                  </ul>
+                </div>
+              `,
+              confirmButtonText: 'Understood',
+              width: '500px'
+            });
           } else {
-            Swal.fire({ icon: 'error', title: 'Failed', text: 'Could not add serial.' });
+            Swal.fire({ 
+              icon: 'error', 
+              title: 'Failed', 
+              text: data.message || 'Could not add serial to client.' 
+            });
           }
         })
         .catch(err => {
-          console.error("Error:", err);
-          Swal.fire({ icon: 'error', title: 'Network Error', text: 'Please check your connection.' });
+          console.error("❌ Error:", err);
+          Swal.fire({ 
+            icon: 'error', 
+            title: 'Network Error', 
+            text: 'Please check your connection and try again.' 
+          });
         });
     }
 
@@ -169,7 +222,11 @@
       const clientId = document.getElementById("ClientDropdown").value;
 
       if (isNaN(startSerial) || isNaN(endSerial) || startSerial > endSerial || !clientId) {
-        Swal.fire({ icon: 'error', title: 'Invalid Input', text: 'Check Serial Range and Client.' });
+        Swal.fire({ 
+          icon: 'error', 
+          title: 'Invalid Input', 
+          text: 'Please check Serial Range and ensure Client is selected.' 
+        });
         return;
       }
 
@@ -210,18 +267,26 @@
       tableContainer.appendChild(table);
       document.getElementById("addDevicesButton").style.display = "block";
     }
+
+	// ✅ Enhanced Submit Devices with Detailed Duplicate Handling
 	function submitDevices() {
 	  const clientId = document.getElementById("ClientDropdown").value;
 
 	  if (!clientId || Object.keys(serialNumbers).length === 0) {
-	    Swal.fire({ icon: 'error', title: 'Missing Data', text: 'No serials or client selected.' });
+	    Swal.fire({ 
+	      icon: 'error', 
+	      title: 'Missing Data', 
+	      text: 'No serials to submit or client not selected.' 
+	    });
 	    return;
 	  }
 
 	  const payload = {
 	    serialNumbers: Object.entries(serialNumbers).map(([serialNo, imei]) => ({ serialNo, imei })),
-	    clientId
+	    clientId: Number(clientId)
 	  };
+
+	  console.log("📤 Submitting devices to client:", payload);
 
 	  fetch('/client/add-dual', {
 	    method: 'POST',
@@ -230,54 +295,135 @@
 	  })
 	    .then(res => res.json())
 	    .then(data => {
-	      if (data.success === "true" || data.success === true) {
-	        Swal.fire({ icon: 'success', title: 'Success', text: 'Devices added successfully!' });
-	        resetSerials();
-	        document.getElementById("serialTableContainer").innerHTML = "";
-	        document.getElementById("addDevicesButton").style.display = "none";
+	      console.log("✅ FULL API Response:", data);
+	      
+	      if (data.success === true || data.success === "true") {
+	        // ✅ Handle detailed response with duplicates
+	        let resultHtml = `<p><strong>${data.message}</strong></p>`;
+	        
+	        if (data.savedCount > 0) {
+	          resultHtml += `
+	            <div style="margin-top: 20px; text-align: left;">
+	              <h5 style="color: #28a745; margin-bottom: 15px;">
+	                <i class="fas fa-check-circle"></i> Successfully Added to Client (${data.savedCount}):
+	              </h5>
+	              <div style="max-height: 200px; overflow-y: auto; border: 1px solid #28a745; border-radius: 5px; padding: 10px;">
+	                ${data.savedDevices.map(device => 
+	                  `<div style="margin-bottom: 10px; padding: 8px; background-color: #d4edda; border-radius: 3px;">
+	                    <strong>Serial:</strong> ${device.serialNo}<br>
+	                    <strong>IMEI:</strong> ${device.imei}
+	                  </div>`
+	                ).join('')}
+	              </div>
+	            </div>
+	          `;
+	        }
+	        
+	        if (data.duplicateCount > 0) {
+	          resultHtml += `
+	            <div style="margin-top: 20px; text-align: left;">
+	              <h5 style="color: #fd7e14; margin-bottom: 15px;">
+	                <i class="fas fa-exclamation-triangle"></i> Duplicates Skipped (${data.duplicateCount}):
+	              </h5>
+	              <div style="max-height: 200px; overflow-y: auto; border: 1px solid #fd7e14; border-radius: 5px; padding: 10px;">
+	                ${data.duplicateDevices.map(device => 
+	                  `<div style="margin-bottom: 10px; padding: 8px; background-color: #fff3cd; border-radius: 3px;">
+	                    <strong>Serial:</strong> ${device.serialNo}<br>
+	                    <strong>IMEI:</strong> ${device.imei}<br>
+	                    <em style="color: #856404;">Reason: ${device.reason}</em>
+	                  </div>`
+	                ).join('')}
+	              </div>
+	            </div>
+	          `;
+	        }
+
+	        Swal.fire({
+	          icon: data.duplicateCount > 0 ? 'warning' : 'success',
+	          title: data.duplicateCount > 0 ? 'Partial Success' : 'Complete Success',
+	          html: resultHtml,
+	          width: '700px',
+	          confirmButtonText: 'OK'
+	        });
+
+	        // Clear form if any devices were saved
+	        if (data.savedCount > 0) {
+	          resetSerials();
+	          document.getElementById("serialTableContainer").innerHTML = "";
+	          document.getElementById("addDevicesButton").style.display = "none";
+	          document.getElementById("startSerial").value = "";
+	          document.getElementById("endSerial").value = "";
+	          document.getElementById("removedSerial").value = "";
+	          previewShown = false;
+	          document.getElementById("addDevicesButton").textContent = "Add Devices";
+	        }
 	      } else {
-	        Swal.fire({ icon: 'error', title: 'Failed', text: data.message || 'Error adding devices.' });
+	        Swal.fire({ 
+	          icon: 'error', 
+	          title: 'Failed', 
+	          text: data.message || 'Error adding devices to client.' 
+	        });
 	      }
 	    })
 	    .catch(err => {
-	      console.error(err);
-	      Swal.fire({ icon: 'error', title: 'Network Error', text: 'Try again later.' });
+	      console.error("❌ Error:", err);
+	      Swal.fire({ 
+	        icon: 'error', 
+	        title: 'Network Error', 
+	        text: 'Failed to submit devices. Try again later.' 
+	      });
 	    });
 	}
-
-	
-	
 	
 	function handleAddDevices() {
 	  const clientId = document.getElementById("ClientDropdown").value;
 
 	  if (!clientId || Object.keys(serialNumbers).length === 0) {
-	    Swal.fire({ icon: 'error', title: 'Missing Data', text: 'Please add serials and select client.' });
+	    Swal.fire({ 
+	      icon: 'error', 
+	      title: 'Missing Data', 
+	      text: 'Please add serials and select client.' 
+	    });
 	    return;
 	  }
 
 	  if (!previewShown) {
 	    const missing = Object.entries(serialNumbers).filter(([_, imei]) => !imei.trim());
 	    if (missing.length > 0) {
-	      Swal.fire({ icon: 'warning', title: 'Incomplete IMEI', text: 'Please fill all IMEI numbers.' });
+	      Swal.fire({ 
+	        icon: 'warning', 
+	        title: 'Incomplete IMEI', 
+	        text: `Please fill IMEI numbers for ${missing.length} devices.`,
+	        html: `
+	          <p><strong>Missing IMEI for:</strong></p>
+	          <ul style="text-align: left; max-height: 150px; overflow-y: auto;">
+	            ${missing.map(([serial, _]) => `<li>${serial}</li>`).join('')}
+	          </ul>
+	        `
+	      });
 	      return;
 	    }
 
 	    const modalBody = document.getElementById("confirmationModalBody");
 	    modalBody.innerHTML = `
+	      <div class="alert alert-info">
+	        <i class="fas fa-info-circle"></i> Please verify all Serial Numbers and IMEI Numbers before submitting.
+	      </div>
 	      <table class="table table-striped">
 			<thead><tr><th>Select</th><th>Serial Number</th><th>IMEI Number</th></tr></thead>
-
 	        <tbody>
 	          ${Object.entries(serialNumbers).map(([serial, imei], i) => `
 	            <tr>
 	              <td><input type="checkbox" class="form-check-input confirm-checkbox" id="chk${i}"></td>
-	              <td>${serial}</td>
-	              <td>${imei}</td>
+	              <td><code>${serial}</code></td>
+	              <td><code>${imei}</code></td>
 	            </tr>`).join('')}
 	        </tbody>
 	      </table>
-	      <button class="btn btn-primary mt-2" onclick="confirmAndCloseModal()">Confirm</button>
+	      <div class="d-flex justify-content-between">
+	        <button class="btn btn-secondary" onclick="selectAllCheckboxes()">Select All</button>
+	        <button class="btn btn-primary" onclick="confirmAndCloseModal()">Confirm Selection</button>
+	      </div>
 	    `;
 
 	    const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
@@ -286,10 +432,9 @@
 			document.querySelectorAll('.confirm-checkbox').forEach(checkbox => {
 			  checkbox.addEventListener('change', function () {
 			    const row = this.closest('tr');
-			    row.classList.toggle('selected', this.checked);
+			    row.classList.toggle('table-success', this.checked);
 			  });
 			});
-
 		    }, 100);
 		  } else {
 	    submitDevices();
@@ -297,30 +442,63 @@
 	    document.getElementById("addDevicesButton").textContent = "Add Devices";
 	  }
 	}
+
+	function selectAllCheckboxes() {
+	  const checkboxes = document.querySelectorAll(".confirm-checkbox");
+	  checkboxes.forEach(checkbox => {
+	    checkbox.checked = true;
+	    checkbox.closest('tr').classList.add('table-success');
+	  });
+	}
+
 	function confirmAndCloseModal() {
 	  const checkboxes = document.querySelectorAll(".confirm-checkbox");
-	  const allChecked = Array.from(checkboxes).every(c => c.checked);
+	  const checkedCount = Array.from(checkboxes).filter(c => c.checked).length;
+	  const totalCount = checkboxes.length;
 
-	  if (!allChecked) {
+	  if (checkedCount === 0) {
 	    Swal.fire({
 	      icon: 'warning',
-	      title: 'Confirmation Required',
-	      text: 'Please check all Serial Numbers and IMEI Numbers.'
+	      title: 'No Selection',
+	      text: 'Please select at least one device to proceed.'
 	    });
 	    return;
 	  }
 
+	  if (checkedCount < totalCount) {
+	    Swal.fire({
+	      icon: 'question',
+	      title: 'Partial Selection',
+	      text: `You've selected ${checkedCount} out of ${totalCount} devices. Continue?`,
+	      showCancelButton: true,
+	      confirmButtonText: 'Yes, Continue',
+	      cancelButtonText: 'No, Select More'
+	    }).then((result) => {
+	      if (result.isConfirmed) {
+	        proceedWithConfirmation();
+	      }
+	    });
+	  } else {
+	    proceedWithConfirmation();
+	  }
+	}
+
+	function proceedWithConfirmation() {
 	  const modal = bootstrap.Modal.getInstance(document.getElementById('confirmationModal'));
 	  modal.hide();
 
 	  Swal.fire({
 	    icon: 'success',
-	    title: 'Verified',
-	    text: 'Now click again to submit all devices.'
+	    title: 'Verification Complete',
+	    text: 'Click the button again to submit all devices to the client.',
+	    timer: 2000,
+	    showConfirmButton: false
 	  });
 
 	  previewShown = true;
 	  document.getElementById("addDevicesButton").textContent = "Submit Devices";
+	  document.getElementById("addDevicesButton").classList.remove('btn-success');
+	  document.getElementById("addDevicesButton").classList.add('btn-primary');
 	}
 
   </script>

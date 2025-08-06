@@ -26,6 +26,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -778,17 +779,38 @@ return saved;
 
 
 
+    @Transactional
     public void deleteVehicleByDeviceID(String deviceID) {
-        Optional<Vehicle> vehicle = vehicleRepository.findByDeviceID(deviceID);
-        if (vehicle.isPresent()) {
-            vehicleRepository.deleteByDeviceID(deviceID);
-            System.out.println("Vehicle deleted: " + deviceID);
-        } else {
-            throw new RuntimeException("Vehicle with ID " + deviceID + " not found.");
-        }
+        logger.info("🗑️ Attempting to delete Vehicle with deviceID={}", deviceID);
+
+        Vehicle vehicle = vehicleRepository.findByDeviceID(deviceID)
+            .orElseThrow(() -> new RuntimeException("❌ Vehicle with ID " + deviceID + " not found."));
+
+        vehicleRepository.delete(vehicle);
+        logger.info("✅ Vehicle deleted: {}", deviceID);
     }
 
+    @Transactional
+    public void deleteLastLocationByDeviceID(String deviceID) {
+        logger.info("🗑️ Attempting to delete VehicleLastLocation with deviceID={}", deviceID);
 
+        vehicleLastLocationRepository.findByDeviceId(deviceID)
+            .ifPresentOrElse(
+                location -> {
+                    vehicleLastLocationRepository.delete(location);
+                    logger.info("✅ Deleted VehicleLastLocation with deviceID={}", deviceID);
+                },
+                () -> logger.warn("⚠️ No VehicleLastLocation found for deviceID={}", deviceID)
+            );
+    }
+
+    @Transactional
+    public void deleteVehicleAndLastLocation(String deviceID) {
+        logger.info("🗑️ DELETE request for both Vehicle AND LastLocation with deviceID={}", deviceID);
+        deleteVehicleByDeviceID(deviceID);
+        deleteLastLocationByDeviceID(deviceID);
+        logger.info("✅ Finished deleting Vehicle and VehicleLastLocation with deviceID={}", deviceID);
+    }
 
     
     
@@ -1001,9 +1023,98 @@ return saved;
             throw new RuntimeException("Delete failed", e);
         }
     }
-
-
+    /**
+     * Get comprehensive device expiry analytics
+     */
+    public Map<String, Object> getDeviceExpiryAnalytics() {
+        Map<String, Object> analytics = new HashMap<>();
+        
+        try {
+            // Get all expiry data
+            List<Object[]> expiryData = vehicleRepository.findDeviceExpiryCountsByDate();
+            
+            // Calculate analytics
+            Date currentDate = new Date(0, 0, 0);
+            Long totalExpired = vehicleRepository.countExpiredDevices(currentDate);
+            
+            // Group by time periods
+            Map<String, Long> monthlyExpiries = groupExpiryByMonth(expiryData);
+            Map<String, Long> weeklyExpiries = groupExpiryByWeek(expiryData, currentDate);
+            
+            analytics.put("totalExpired", totalExpired);
+            analytics.put("monthlyExpiries", monthlyExpiries);
+            analytics.put("weeklyExpiries", weeklyExpiries);
+            analytics.put("expiryTrend", calculateExpiryTrend(expiryData));
+            
+        } catch (Exception e) {
+            logger.error("Error calculating device expiry analytics", e);
+            analytics.put("error", "Failed to calculate analytics");
+        }
+        
+        return analytics;
+    }
+    
+    private Map<String, Long> groupExpiryByMonth(List<Object[]> expiryData) {
+        Map<String, Long> monthlyData = new LinkedHashMap<>();
+        java.text.SimpleDateFormat monthFormat = new java.text.SimpleDateFormat("MMM-yyyy");
+        
+        for (Object[] row : expiryData) {
+            Date expiryDate = (Date) row[0];
+            Long count = (Long) row[1];
+            String monthKey = monthFormat.format(expiryDate);
+            monthlyData.merge(monthKey, count, Long::sum);
+        }
+        
+        return monthlyData;
+    }
+    
+    private Map<String, Long> groupExpiryByWeek(List<Object[]> expiryData, Date currentDate) {
+        Map<String, Long> weeklyData = new LinkedHashMap<>();
+        
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(currentDate);
+        
+        for (int i = 0; i < 8; i++) { // Next 8 weeks
+            Date weekStart = (Date) cal.getTime();
+            cal.add(Calendar.DAY_OF_WEEK, 7);
+            Date weekEnd = (Date) cal.getTime();
+            
+            long weekCount = expiryData.stream()
+                .filter(row -> {
+                    Date expiryDate = (Date) row[0];
+                    return expiryDate.after(weekStart) && expiryDate.before(weekEnd);
+                })
+                .mapToLong(row -> (Long) row[1])
+                .sum();
+            
+            String weekKey = "Week " + (i + 1);
+            weeklyData.put(weekKey, weekCount);
+        }
+        
+        return weeklyData;
+    }
+    
+    private String calculateExpiryTrend(List<Object[]> expiryData) {
+        if (expiryData.size() < 2) return "STABLE";
+        
+        // Simple trend calculation based on recent vs older data
+        long recentCount = expiryData.stream()
+            .skip(Math.max(0, expiryData.size() - 7)) // Last 7 entries
+            .mapToLong(row -> (Long) row[1])
+            .sum();
+            
+        long olderCount = expiryData.stream()
+            .limit(Math.min(7, expiryData.size()))
+            .mapToLong(row -> (Long) row[1])
+            .sum();
+        
+        if (recentCount > olderCount * 1.2) return "INCREASING";
+        if (recentCount < olderCount * 0.8) return "DECREASING";
+        return "STABLE";
+    }
 }
+
+
     
 
 

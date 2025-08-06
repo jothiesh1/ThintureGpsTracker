@@ -140,5 +140,8 @@ public class dealerPageController {
     public String loadDealerProfilePage() {
         return "dealer/profile_dealer"; // Should match the name of the HTML file in the templates folder (map2.html)
     }
-
+    @GetMapping("/dealer/reports_dealer")
+    public String loadDealerReportPage() {
+        return "dealer/reports_dealer"; // Should match the name of the HTML file in the templates folder (map2.html)
+    }
 }

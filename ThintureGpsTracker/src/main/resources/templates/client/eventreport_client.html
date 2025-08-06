@@ -228,87 +228,109 @@
 
     // stubs for PDF/Excel
 	async function downloadPDF() {
-	  const fromDate = document.getElementById('fromDate').value;
-	  const toDate = document.getElementById('toDate').value;
-	  const deviceID = document.getElementById('deviceID').value.trim();
-	  const vehicleStatus = document.getElementById('vehicleStatus').value;
+		  const fromDate = document.getElementById('fromDateTime').value;
+		  const toDate = document.getElementById('toDateTime').value;
+		  const deviceID = document.getElementById('deviceID').value.trim();
+		  const vehicleStatus = document.getElementById('vehicleStatus').value;
 
-	  if (!fromDate || !toDate) {
-	    Swal.fire({
-	      icon: "warning",
-	      title: "Missing Dates",
-	      text: "Please select both From and To dates.",
-	      confirmButtonColor: "#3085d6"
-	    });
-	    return;
-	  }
+		  if (!fromDate || !toDate) {
+		    Swal.fire({
+		      icon: "warning",
+		      title: "Missing Dates",
+		      text: "Please select both From and To dates."
+		    });
+		    return;
+		  }
+
+		  const startDate = fromDate + ":00"; // ✅ Fixes timestamp
+		  const endDate = toDate + ":59";     // ✅ Ensures valid end time
+
+		  const url = `/api/vehicle/report/export/pdf?startDate=${startDate}&endDate=${endDate}` +
+		    (deviceID ? `&deviceId=${deviceID}` : '') +
+		    (vehicleStatus ? `&vehicleStatus=${vehicleStatus}` : '');
+
+		  console.log("PDF download URL:", url); // ✅ Inspect if needed
+
+		  try {
+		    const response = await fetch(url, { method: 'GET', headers: { 'Accept': 'application/pdf' } });
+
+		    if (!response.ok) {
+		      const errText = await response.text(); // See backend error
+		      console.error("Backend error:", errText);
+		      throw new Error("Failed to download PDF file.");
+		    }
+
+		    const blob = await response.blob();
+		    const link = document.createElement('a');
+		    link.href = window.URL.createObjectURL(blob);
+		    link.download = 'Vehicle_Report.pdf';
+		    document.body.appendChild(link);
+		    link.click();
+		    document.body.removeChild(link);
+		  } catch (error) {
+		    console.error("Error in downloadPDF:", error);
+		    Swal.fire({
+		      icon: "error",
+		      title: "PDF Download Failed",
+		      text: error.message
+		    });
+		  }
+		}
 
 
-	  const startDate = `${fromDate}T00:00:00`;
-	  const endDate = `${toDate}T23:59:59`;
+		async function downloadExcel() {
+		  const fromDate = document.getElementById('fromDateTime').value;
+		  const toDate = document.getElementById('toDateTime').value;
+		  const deviceID = document.getElementById('deviceID').value.trim();
+		  const vehicleStatus = document.getElementById('vehicleStatus').value;
 
-	  const url = `/api/vehicle/report/export/pdf?startDate=${startDate}&endDate=${endDate}` +
-	    (deviceID ? `&deviceId=${deviceID}` : '') +
-	    (vehicleStatus ? `&vehicleStatus=${vehicleStatus}` : '');
+		  if (!fromDate || !toDate) {
+		    Swal.fire({
+		      icon: "warning",
+		      title: "Missing Date Range",
+		      text: "Please select both From and To dates."
+		    });
+		    return;
+		  }
 
-	  try {
-	    const response = await fetch(url, { method: 'GET', headers: { 'Accept': 'application/pdf' } });
+		  // ✅ Fix: append seconds correctly
+		  const startDate = fromDate + ":00";
+		  const endDate = toDate + ":59";
 
-	    if (!response.ok) throw new Error("Failed to download PDF file.");
+		  const url = `/api/vehicle/report/export/excel?startDate=${startDate}&endDate=${endDate}` +
+		    (deviceID ? `&deviceId=${deviceID}` : '') +
+		    (vehicleStatus ? `&vehicleStatus=${vehicleStatus}` : '');
 
-	    const blob = await response.blob();
-	    const link = document.createElement('a');
-	    link.href = window.URL.createObjectURL(blob);
-	    link.download = 'Vehicle_Report.pdf';
-	    document.body.appendChild(link);
-	    link.click();
-	    document.body.removeChild(link);
-	  } catch (error) {
-	    console.error("Error in downloadPDF:", error);
-	    alert("Failed to download PDF file.");
-	  }
-	}
+		  try {
+		    const response = await fetch(url, {
+		      method: 'GET',
+		      headers: {
+		        'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+		      }
+		    });
 
-	async function downloadExcel() {
-	  const fromDate = document.getElementById('fromDate').value;
-	  const toDate = document.getElementById('toDate').value;
-	  const deviceID = document.getElementById('deviceID').value.trim();
-	  const vehicleStatus = document.getElementById('vehicleStatus').value;
+		    if (!response.ok) {
+		      const errText = await response.text();
+		      console.error("Excel Backend error:", errText);
+		      throw new Error("Failed to download Excel file.");
+		    }
 
-	  if (!fromDate || !toDate) {
-		Swal.fire({
-		  icon: "warning",
-		  title: "Missing Date Range",
-		  text: "Please select both From and To dates."
-		});
-
-	    return;
-	  }
-
-	  const startDate = `${fromDate}T00:00:00`;
-	  const endDate = `${toDate}T23:59:59`;
-
-	  const url = `/api/vehicle/report/export/excel?startDate=${startDate}&endDate=${endDate}` +
-	    (deviceID ? `&deviceId=${deviceID}` : '') +
-	    (vehicleStatus ? `&vehicleStatus=${vehicleStatus}` : '');
-
-	  try {
-	    const response = await fetch(url, { method: 'GET', headers: { 'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' } });
-
-	    if (!response.ok) throw new Error("Failed to download Excel file.");
-
-	    const blob = await response.blob();
-	    const link = document.createElement('a');
-	    link.href = window.URL.createObjectURL(blob);
-	    link.download = 'Vehicle_Report.xlsx';
-	    document.body.appendChild(link);
-	    link.click();
-	    document.body.removeChild(link);
-	  } catch (error) {
-	    console.error("Error in downloadExcel:", error);
-	    alert("Failed to download Excel file.");
-	  }
-	}
+		    const blob = await response.blob();
+		    const link = document.createElement('a');
+		    link.href = window.URL.createObjectURL(blob);
+		    link.download = 'Vehicle_Report.xlsx';
+		    document.body.appendChild(link);
+		    link.click();
+		    document.body.removeChild(link);
+		  } catch (error) {
+		    console.error("Error in downloadExcel:", error);
+		    Swal.fire({
+		      icon: "error",
+		      title: "Excel Download Failed",
+		      text: error.message
+		    });
+		  }
+		}
 
 	
 	

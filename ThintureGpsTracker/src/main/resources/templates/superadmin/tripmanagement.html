@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,14 +11,17 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <link rel="stylesheet" type="text/css" th:href="@{/css/styled.css}">
-  <link rel="stylesheet" type="text/css" th:href="@{/css/eventreportstyle.css}">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="/css/styled.css">
+  <link rel="stylesheet" type="text/css" href="/css/eventreportstyle.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
 </head>
 
 <body>
-  <header th:replace="~{navigation :: navbar}"></header>
-
+	<header th:replace="~{navigation :: navbar}"></header>
   <div class="card">
     <h1 class="text-center">Trip Management Report</h1>
 
@@ -84,6 +88,9 @@
 	    <div class="col  text-white p-2 rounded">Night Trips: <span id="nightTripCount">0</span></div> <!-- 🆕 -->
 	</div>
 
+	<div class="text-end my-2 pe-3">
+	  <strong>Total KM:</strong> <span id="totalKmValue">0.00</span> km
+	</div>
 
     <!-- Table -->
     <div class="table-container">
@@ -134,7 +141,7 @@
   </div>
 
   <script>
-  const rowsPerPage = 10;
+  const rowsPerPage = 20;
   let tripDataGlobal = [];
   let currentPage = 1;
 
@@ -250,11 +257,20 @@
       updateStatusSummary(data);
 
       // 2. Then calculate trip summary
-      if (data.length > 0) {
-		let trips = calculateTripsWithRest(data);
+	  if (data.length > 0) {
+	    let trips = calculateTripsWithRest(data);
 
-		// Sort trips so latest comes first
-		trips.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+	    // 🔒 Filter trips strictly within the selected UTC From-To range
+	    const fromUtc = new Date(document.getElementById('fromDate').value + 'Z');
+	    const toUtc = new Date(document.getElementById('toDate').value + 'Z');
+
+	    trips = trips.filter(t =>
+	      new Date(t.startTime) >= fromUtc &&
+	      new Date(t.endTime) <= toUtc
+	    );
+
+	    // Sort trips so latest comes first
+	    trips.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
 
 
 		if (tripMode === 'daily') {
@@ -297,61 +313,120 @@
   }
 
   // Trip and Rest Calculation
-  function calculateTripsWithRest(data) {
-    let trips = [];
-    let tripStart = null, lastRunning = null, currentRestStart = null;
-    let tripStartData = {};
-    let restTimes = [];
+  // -----------------------------------------------------------------------------
+  //  New rules: start-on-running(≥2s gap) • rest ≤120 s • end on rest >120 s
+  // -----------------------------------------------------------------------------
+  function calculateTripsWithRest(data, restThresholdSec = 120, startGapSec = 2) {
+     if (!Array.isArray(data) || !data.length) return [];
 
-    data.sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+     // 1. sort ascending
+     data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
-    data.forEach(entry => {
-      const status = entry.vehicleStatus?.toUpperCase() || "";
-      const timestamp = entry.timestamp;
-      if (!timestamp) return;
+     const trips = [];
 
-      if (status === 'RUNNING') {
-        if (!tripStart) {
-          tripStart = timestamp;
-          tripStartData = entry;
-        }
-        if (currentRestStart) {
-          const seconds = (new Date(timestamp) - new Date(currentRestStart))/1000;
-          if (seconds > 300) restTimes.push(seconds);
-          currentRestStart = null;
-        }
-        lastRunning = timestamp;
-      }
+     // working state
+     let trip = null;            // current trip object (null = no trip)
+     let lastPoint = null;       // previous processed point
+     let restStart = null;       // TS where the current IDLE/PARKED streak began
+     let restStartPt = null;     // full point object of that streak start
 
-      if (status === 'IDLE') {
-        if (lastRunning) currentRestStart = timestamp;
-      }
+     const pushTrip = (endPt) => {
+       if (!trip) return;
+       trips.push({
+         deviceID: trip.start.deviceID || "-",
+         driverName: trip.start.driverName || "-",
+         startTime: trip.start.timestamp,
+         endTime: endPt.timestamp,
+         startLat: trip.start.latitude,
+         startLon: trip.start.longitude,
+         endLat: endPt.latitude,
+         endLon: endPt.longitude,
+         totalRestSeconds: Math.min(trip.restSeconds,           // never > trip duration
+           (new Date(endPt.timestamp) - new Date(trip.start.timestamp)) / 1000)
+       });
+       // reset state
+       trip = null;
+       restStart = null;
+       restStartPt = null;
+     };
 
-      if (status === 'PARKED') {
-        if (tripStart) {
-          const tripEnd = timestamp;
-          trips.push({
-            deviceID: tripStartData.deviceID || '-',
-           
-            driverName: tripStartData.driverName || '-',
-            startTime: tripStart,
-            endTime: tripEnd,
-            startLat: tripStartData.latitude,      // 🆕 Start Latitude
-            startLon: tripStartData.longitude,     // 🆕 Start Longitude
-            endLat: entry.latitude,                // 🆕 End Latitude
-            endLon: entry.longitude,               // 🆕 End Longitude
-            totalRestSeconds: restTimes.reduce((a,b)=>a+b,0)
-          });
-          tripStart = null;
-          lastRunning = null;
-          currentRestStart = null;
-          restTimes = [];
-        }
-      }
-    });
+     // ---------------------------------------------------------------------------
+     for (const pt of data) {
+       // guard: skip bad rows
+       if (!pt || !pt.timestamp) continue;
 
-    return trips;
-  }
+       const ts        = new Date(pt.timestamp);
+       const status    = (pt.vehicleStatus || "").toUpperCase();
+
+       // ─────────────────────────────────────────────────────────────────────────
+       // 1) RUNNING
+       // ─────────────────────────────────────────────────────────────────────────
+       if (status === "RUNNING") {
+         // If we’re coming out of a rest streak, decide whether it broke the trip
+         if (restStart) {
+           const restDur = (ts - restStart) / 1000;
+           if (restDur > restThresholdSec) {
+             // Streak is longer than threshold ⇒ end previous trip
+             pushTrip(restStartPt);      // trip ends at first point of the long rest
+           } else if (trip) {
+             // otherwise add rest time to the open trip
+             trip.restSeconds += restDur;
+           }
+           // Either way, streak ends now
+           restStart = null;
+           restStartPt = null;
+         }
+
+         // Either we just started a new trip or we’re already in one
+         if (!trip) {
+           // Only open a trip if this RUNNING point is ≥ startGapSec after last msg
+           if (!lastPoint || (ts - new Date(lastPoint.timestamp)) / 1000 >= startGapSec) {
+             trip = { start: pt, restSeconds: 0 };
+           }
+         }
+       }
+
+       // ─────────────────────────────────────────────────────────────────────────
+       // 2) IDLE/PARKED
+       // ─────────────────────────────────────────────────────────────────────────
+       if (status === "IDLE" || status === "PARKED") {
+         // mark the beginning of a potential rest streak
+         if (!restStart) {
+           restStart   = ts;
+           restStartPt = pt;
+         }
+         // If we are NOT in a trip, we simply ignore long parked/idles (leading tail)
+         // If we ARE in a trip, we will know later (when we get RUNNING again) whether
+         // the streak stayed within restThreshold or actually broke the trip.
+       }
+
+       // keep the very last processed point
+       lastPoint = pt;
+     }
+
+     // ---------------------------------------------------------------------------
+     // Clean-up after loop: if a trip is still open we need to decide where it ends
+     // ---------------------------------------------------------------------------
+     if (trip) {
+       if (restStart && ((new Date(lastPoint.timestamp) - restStart) / 1000) > restThresholdSec) {
+         // final streak broke the trip
+         pushTrip(restStartPt);
+       } else {
+         // final streak (if any) was just a rest ≤120 s – include it
+         if (restStart) trip.restSeconds += (new Date(lastPoint.timestamp) - restStart) / 1000;
+         pushTrip(lastPoint);
+       }
+     }
+
+     return trips;
+   }
+
+
+
+
+
+
+
   function calculateDistance(lat1, lon1, lat2, lon2) {
             const R = 6371;
             const dLat = (lat2 - lat1) * (Math.PI / 180);
@@ -399,80 +474,118 @@
           startTime: t.startTime,
           endTime: t.endTime,
           totalRestSeconds: t.totalRestSeconds,
-          tripCount: 1
+          tripCount: 1,
+          totalKm: t.totalKm || 0    // 🆕 Add total KM here if you're already calculating
         };
       } else {
-        // Pick earliest startTime and latest endTime
         grouped[key].startTime = new Date(t.startTime) < new Date(grouped[key].startTime) ? t.startTime : grouped[key].startTime;
         grouped[key].endTime = new Date(t.endTime) > new Date(grouped[key].endTime) ? t.endTime : grouped[key].endTime;
         grouped[key].totalRestSeconds += t.totalRestSeconds;
         grouped[key].tripCount++;
+        grouped[key].totalKm += t.totalKm || 0;   // 🆕 Accumulate KM
       }
     });
 
     return Object.values(grouped);
   }
 
+  function formatLocalTime(timestamp) {
+    if (!timestamp) return '–';
+    const dateObj = new Date(timestamp);
+    return dateObj.toISOString().replace("T", " ").substring(0, 19);
+  }
 
 
   function renderPage() {
-    const start = (currentPage-1) * rowsPerPage;
+    const start = (currentPage - 1) * rowsPerPage;
     const pageData = tripDataGlobal.slice(start, start + rowsPerPage);
     const tbl = document.getElementById('tripTable');
     tbl.innerHTML = '';
+    document.getElementById('totalKmValue').innerText = 'Calculating...';
 
     if (!pageData.length) {
-      tbl.innerHTML = '<tr><td colspan="8" class="text-center">No records</td></tr>';
-    } else {
-      pageData.forEach(r => {
-        const isNight = isNightDrive(r.startTime, r.endTime);
-
-        // 🆕 Generate badge HTML
-		const nightBadge = isNight 
-		        ? '<span class="badge bg-dark"><i class="fas fa-moon"></i> Night Drive</span>'
-		        : '<span class="badge bg-warning text-dark"><i class="fas fa-sun"></i> Day Drive</span>';
-
-        const nightRowClass = isNight ? 'table-dark' : '';
-
-		tbl.innerHTML += `
-		  <tr class="${nightRowClass}" id="tripRow_${r.startTime.replaceAll(':', '_')}">
-		    <td>${r.deviceID}</td>
-		    <td>${r.driverName}</td>
-		    <td>${new Date(r.startTime).toLocaleString()}</td>
-		    <td>${new Date(r.endTime).toLocaleString()}</td>
-		    <td>${formatDuration(new Date(r.endTime) - new Date(r.startTime))}</td>
-		    <td>${formatDuration(r.totalRestSeconds * 1000)}</td>
-			<td id="tripKm_${r.startTime.replace(/[^a-zA-Z0-9]/g, '_')}">Calculating...</td>
-
-
-		    <td>${nightBadge}</td>
-		    <td><button class="btn btn-sm btn-outline-primary" onclick='viewTripPath(${JSON.stringify(r)})'><i class="fas fa-map-marker-alt"></i> View Trip</button></td>
-		    <td><button class="btn btn-sm btn-outline-success" onclick='showSpeedGraph(${JSON.stringify(r)})'><i class="fas fa-chart-line"></i> Speed Graph</button></td>
-		  </tr>`;
-
-		calculateAccurateTripKm(r); // Call async function to populate correct distance
-
-
-      });
+      tbl.innerHTML = '<tr><td colspan="10" class="text-center text-warning">No records</td></tr>';
+      document.getElementById('totalKmValue').innerText = '0.00';
+      return;
     }
-	function calculateTripKm(startLat, startLon, endLat, endLon) {
-	  if (startLat == null || startLon == null || endLat == null || endLon == null) return '-';
-	  const km = calculateDistance(startLat, startLon, endLat, endLon);
-	  return km.toFixed(2); // Rounded to 2 decimal places
-	}
-	// Haversine Formula
-	function calculateDistance(lat1, lon1, lat2, lon2) {
-	    const R = 6371;
-	    const dLat = (lat2 - lat1) * (Math.PI / 180);
-	    const dLon = (lon2 - lon1) * (Math.PI / 180);
 
-	    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-	              Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
-	              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const promises = [];
 
-	    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-	    return R * c;
-	}
+	pageData.forEach(r => {
+	  const driveType = isNightDrive(r.startTime, r.endTime); // Call only once
+	  let nightBadge = '';
+	  let nightRowClass = 'table-light';
+
+	  if (driveType === "Night") {
+	    nightBadge = '<span class="badge bg-dark"><i class="fas fa-moon"></i> Night Drive</span>';
+	  } else if (driveType === "Day") {
+	    nightBadge = '<span class="badge bg-warning text-dark"><i class="fas fa-sun"></i> Day Drive</span>';
+	  } else if (driveType === "Both") {
+	    nightBadge = '<span class="badge bg-info text-white"><i class="fas fa-adjust"></i> Day & Night</span>';
+	  }
+
+	  const rowId = `${r.startTime}_${r.endTime}`.replace(/[^a-zA-Z0-9]/g, '_');
+
+	  tbl.innerHTML += `
+	    <tr class="${nightRowClass}" id="tripRow_${rowId}">
+	      <td>${r.deviceID}</td>
+	      <td>${r.driverName}</td>
+		  <td>${formatLocalTime(r.startTime)}</td>
+		      <td>${formatLocalTime(r.endTime)}</td>
+	      <td>${formatDuration(new Date(r.endTime) - new Date(r.startTime))}</td>
+	      <td>${formatDuration(r.totalRestSeconds * 1000)}</td>
+	      <td id="tripKm_${rowId}">Calculating...</td>
+	      <td>${nightBadge}</td>
+		  
+	      <td><button class="btn btn-sm btn-outline-primary" onclick='viewTripPath(${JSON.stringify(r)})'><i class="fas fa-map-marker-alt"></i> View Trip</button></td>
+	      <td><button class="btn btn-sm btn-outline-success" onclick='showSpeedGraph(${JSON.stringify(r)})'><i class="fas fa-chart-line"></i> Speed Graph</button></td>
+	    </tr>`;
+
+
+      // Push distance calculation promises
+      promises.push(
+        calculateAccurateTripKm(r, rowId).then(distance => ({ rowId, distance }))
+      );
+    });
+
+    // Wait for all KM values to finish before calculating total
+    Promise.all(promises).then(results => {
+      let total = 0;
+      results.forEach(({ rowId, distance }) => {
+        total += distance;
+        const cell = document.getElementById(`tripKm_${rowId}`);
+        if (cell && !cell.textContent.includes('km')) {
+          cell.textContent = `${distance.toFixed(2)} km`;
+        }
+      });
+
+      document.getElementById('totalKmValue').innerText = total.toFixed(2);
+    });
+
+    // Pagination
+    const totalPages = Math.ceil(tripDataGlobal.length / rowsPerPage) || 1;
+    document.getElementById('currentPage').innerText = `Page ${currentPage} of ${totalPages}`;
+  }
+
+
+
+  function calculateTripKm(startLat, startLon, endLat, endLon) {
+    if (startLat == null || startLon == null || endLat == null || endLon == null) return 0;
+    return calculateDistance(startLat, startLon, endLat, endLon).toFixed(2);
+  }
+
+  function calculateTotalTripDistance(pathPoints) {
+    let totalKm = 0;
+    for (let i = 1; i < pathPoints.length; i++) {
+      const prev = pathPoints[i - 1];
+      const curr = pathPoints[i];
+      if (prev && curr && prev.latitude && prev.longitude && curr.latitude && curr.longitude) {
+        totalKm += calculateDistance(prev.latitude, prev.longitude, curr.latitude, curr.longitude);
+      }
+    }
+    return totalKm.toFixed(2);
+  }
+
 
 	// Total trip distance from replay points
 	function calculateTotalTripDistance(pathPoints) {
@@ -487,61 +600,87 @@
 	    return totalKm.toFixed(2);
 	}
 
+	async function calculateAccurateTripKm(trip, rowId) {
+	  const format = (d) => {
+	    const pad = n => n.toString().padStart(2, '0');
+	    const date = new Date(d);
+	    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+	  };
 
-	async function calculateAccurateTripKm(trip) {
-	    const format = (d) => {
-	        const pad = (n) => n.toString().padStart(2, '0');
-	        const date = new Date(d);
-	        return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
-	    };
+	  const from = encodeURIComponent(format(trip.startTime));
+	  const to = encodeURIComponent(format(trip.endTime));
+	  const url = `/api/vehicle/history/${trip.deviceID}?from=${from}&to=${to}`;
+	  const cell = document.getElementById(`tripKm_${rowId}`);
 
-	    const from = encodeURIComponent(format(trip.startTime));
-	    const to = encodeURIComponent(format(trip.endTime));
-	    const url = `/api/vehicle/history/${trip.deviceID}?from=${from}&to=${to}`;
+	  try {
+	    const res = await fetch(url);
+	    const replayData = await res.json();
 
-		const rowId = `tripKm_${trip.startTime.replace(/[^a-zA-Z0-9]/g, '_')}`;
-
-
-	    const cell = document.getElementById(rowId);
-	    if (!cell) {
-	        console.warn("⚠️ Could not find table cell for Trip KM with ID:", rowId);
-	        return;
+	    let distanceKm = 0;
+	    if (Array.isArray(replayData) && replayData.length >= 2) {
+	      distanceKm = calculateTotalTripDistance(replayData);
+	      if (cell) cell.textContent = `${distanceKm} km`;
+	    } else if (trip.startLat && trip.startLon && trip.endLat && trip.endLon) {
+	      distanceKm = calculateTripKm(trip.startLat, trip.startLon, trip.endLat, trip.endLon);
+	      if (cell) cell.innerHTML = `${distanceKm} km <small class="text-warning">(est)</small>`;
+	    } else {
+	      if (cell) cell.textContent = "0.00 km";
 	    }
 
-	    try {
-	        const res = await fetch(url);
-	        const replayData = await res.json();
-
-	        if (!Array.isArray(replayData) || replayData.length < 2) {
-	            console.warn("⚠️ Insufficient replay data for distance:", replayData);
-	            cell.textContent = "0.00 km";
-	            return;
-	        }
-
-	        const distanceKm = calculateTotalTripDistance(replayData);
-	        cell.textContent = `${distanceKm} km`;
-	    } catch (err) {
-	        console.error("🚨 Trip KM error for", trip.deviceID, err);
-	        cell.textContent = "Error";
-	    }
+	    return parseFloat(distanceKm);
+	  } catch (e) {
+	    console.error("⚠️ Error calculating trip KM:", e);
+	    if (cell) cell.textContent = "Error";
+	    return 0;
+	  }
 	}
 
 
-    const totalPages = Math.ceil(tripDataGlobal.length / rowsPerPage) || 1;
-    document.getElementById('currentPage').innerText = `Page ${currentPage} of ${totalPages}`;
-  }
+
+
+	function updateTotalKm() {
+	    let total = 0;
+	    const cells = document.querySelectorAll('[id^="tripKm_"]');
+	    cells.forEach(cell => {
+	        const text = cell.textContent || '';
+	        const match = text.match(/([\d.]+)\s*km/);
+	        if (match) {
+	            total += parseFloat(match[1]);
+	        }
+	    });
+	    document.getElementById('totalKmValue').innerText = total.toFixed(2);
+	}
+
+
+
+
 
   
-  function isNightDrive(startTime, endTime) {
-    const start = new Date(startTime);
-    const end = new Date(endTime);
+	function isNightDrive(startTime, endTime) {
+	  const start = new Date(startTime);
+	  const end = new Date(endTime);
+	  const totalMinutes = (end - start) / (1000 * 60);
+	  if (totalMinutes <= 0) return "Day";
 
-    const startHour = start.getHours();
-    const endHour = end.getHours();
+	  let nightMinutes = 0;
+	  let current = new Date(start);
 
-    // Night hours between 8 PM (20) to 5 AM (5)
-    return (startHour >= 20 || startHour < 5) || (endHour >= 20 || endHour < 5);
-  }
+	  while (current < end) {
+	    const hour = current.getHours();
+	    const isNight = (hour < 6 || hour >= 20); // 8 PM - 6 AM is night
+	    if (isNight) nightMinutes++;
+	    current.setMinutes(current.getMinutes() + 1);
+	  }
+
+	  const nightPercentage = (nightMinutes / totalMinutes) * 100;
+
+	  if (nightPercentage >= 70) return "Night";
+	  else if (nightPercentage <= 30) return "Day";
+	  else return "Both";
+	}
+
+
+
 
   function changePage(dir) {
     const total = Math.ceil(tripDataGlobal.length/rowsPerPage)||1;
@@ -571,16 +710,17 @@
 
   async function showSpeedGraph(trip) {
       try {
-          // Format ISO string to "yyyy-MM-dd HH:mm:ss"
-          const formatTime = (iso) => {
+          // Format ISO string to "yyyy-MM-dd HH:mm:ss" in UTC
+          const formatUtcTime = (iso) => {
               const d = new Date(iso);
               const pad = n => n.toString().padStart(2, '0');
-              return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+              return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ` +
+                     `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
           };
 
           const deviceID = encodeURIComponent(trip.deviceID);
-          const from = encodeURIComponent(formatTime(trip.startTime));
-          const to = encodeURIComponent(formatTime(trip.endTime));
+          const from = encodeURIComponent(formatUtcTime(trip.startTime));
+          const to = encodeURIComponent(formatUtcTime(trip.endTime));
 
           const url = `/api/vehicle/history/${deviceID}?from=${from}&to=${to}`;
           const res = await fetch(url);
@@ -591,14 +731,19 @@
               return;
           }
 
-          const labels = replayData.map(p => new Date(p.timestamp).toLocaleTimeString());
+          // 🕒 Use UTC time for chart labels
+          const labels = replayData.map(p => {
+              const d = new Date(p.timestamp);
+              const pad = n => n.toString().padStart(2, '0');
+              return `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
+          });
+
           const speeds = replayData.map(p => parseFloat(p.speed) || 0);
 
           if (speedChart) speedChart.destroy();
 
           const ctx = document.getElementById("speedChartCanvas").getContext("2d");
 
-          // 🎨 Create gradient fill
           const gradient = ctx.createLinearGradient(0, 0, 0, 300);
           gradient.addColorStop(0, 'rgba(0, 153, 255, 0.5)');
           gradient.addColorStop(1, 'rgba(0, 153, 255, 0.05)');
@@ -624,38 +769,27 @@
                   maintainAspectRatio: false,
                   layout: { padding: 10 },
                   scales: {
-					y: {
-					  min: 0,
-					  max: 200,
-					  ticks: {
-					    stepSize: 5, // Allows finer evaluation
-					    autoSkip: false, // Prevent Chart.js from hiding ticks
-					    callback: function (value) {
-					      const allowedTicks = [0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200];
-					      return allowedTicks.includes(value) ? value + ' km/h' : '';
-					    },
-					    color: '#333',
-					    font: {
-					      size: 13,
-					      weight: 'bold'
-					    }
-					  },
-					  grid: {
-					    color: 'rgba(0, 0, 0, 0.08)',
-					    drawTicks: true
-					  }
-					
-
-					
-
-                      },
-                      x: {
+                      y: {
+                          min: 0,
+                          max: 200,
                           ticks: {
-                              display: false
+                              stepSize: 5,
+                              autoSkip: false,
+                              callback: value => {
+                                  const allowed = [0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200];
+                                  return allowed.includes(value) ? value + ' km/h' : '';
+                              },
+                              color: '#333',
+                              font: { size: 13, weight: 'bold' }
                           },
                           grid: {
-                              display: false
+                              color: 'rgba(0, 0, 0, 0.08)',
+                              drawTicks: true
                           }
+                      },
+                      x: {
+                          ticks: { display: false },
+                          grid: { display: false }
                       }
                   },
                   plugins: {
@@ -686,26 +820,59 @@
   }
 
 
-
   let tripMap, tripLayer;
 
   function viewTripPath(trip) {
-      const formatToYMDHMS = (iso) => {
+      // Format UTC date string: "YYYY-MM-DD HH:mm:ss"
+      const formatUtcTime = (iso) => {
           const d = new Date(iso);
           const pad = n => n.toString().padStart(2, '0');
-          return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+          return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ` +
+                 `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
       };
 
       const deviceID = encodeURIComponent(trip.deviceID);
-      const startTime = encodeURIComponent(formatToYMDHMS(trip.startTime));
-      const endTime = encodeURIComponent(formatToYMDHMS(trip.endTime));
+      const startTime = encodeURIComponent(formatUtcTime(trip.startTime));
+      const endTime = encodeURIComponent(formatUtcTime(trip.endTime));
 
       const url = `/superadmin/replay?deviceId=${deviceID}&from=${startTime}&to=${endTime}`;
       window.location.href = url;
   }
 
 
+
   </script>
+  <script>
+  function downloadExcel() {
+      const wb = XLSX.utils.book_new();
+      const wsData = [
+          ["Vehicle Number", "Driver Name", "Trip Start", "Trip End", "Duration", "Rest Time", "Distance (KM)", "Day/Night"]
+      ];
+
+      tripDataGlobal.forEach(t => {
+          const duration = formatDuration(new Date(t.endTime) - new Date(t.startTime));
+          const restTime = formatDuration(t.totalRestSeconds * 1000);
+          const rowId = `${t.startTime}_${t.endTime}`.replace(/[^a-zA-Z0-9]/g, '_');
+          const distanceText = document.getElementById(`tripKm_${rowId}`)?.textContent || "0.00 km";
+          const driveType = isNightDrive(t.startTime, t.endTime);
+
+          wsData.push([
+              t.deviceID, t.driverName,
+              new Date(t.startTime).toLocaleString(),
+              new Date(t.endTime).toLocaleString(),
+              duration,
+              restTime,
+              distanceText,
+              driveType
+          ]);
+      });
+
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      XLSX.utils.book_append_sheet(wb, ws, "Trips");
+      XLSX.writeFile(wb, "Trip_Report.xlsx");
+  }
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   </body>
   </html>

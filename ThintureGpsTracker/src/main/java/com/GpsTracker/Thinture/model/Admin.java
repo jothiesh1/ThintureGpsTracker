@@ -63,9 +63,13 @@ public class Admin extends BaseEntity {
     @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Dealer> dealers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Client> clients = new ArrayList<>();
+    // @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, orphanRemoval = true)
+    // private List<Client> clients = new ArrayList<>();
 
+ // NEW (fixes the problem):
+    @OneToMany(mappedBy = "admin", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private List<Client> clients = new ArrayList<>();
+    
     @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Driver> drivers = new ArrayList<>();
     // === BaseEntity Implementation ===
